@@ -90,9 +90,9 @@ def gate_in_thread():
                 reset = False
                 while True:
                     push_button_or_card = s.recv(1024).decode("utf-8").rstrip()
-                    if 'W2' in push_button_or_card:
+                    if 'W2' in push_button_or_card or 'W1' in push_button_or_card:
                         print('card detected ' + push_button_or_card)
-                        data = {'is_member': True, 'card_id': push_button_or_card[3:-1]}
+                        data = {'is_member': True, 'card_number': push_button_or_card[3:-1]}
                         break
                     elif 'INP21' in push_button_or_card:
                         print('push button detected')
