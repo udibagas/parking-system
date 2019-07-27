@@ -118,6 +118,10 @@ def gate_in_thread():
                 if reset:
                     continue
 
+                data['barcode_number'] = generate_barcode_number()
+                print("Taking picture: " + data['barcode_number'])
+                take_picture(data['barcode_number'])
+
                 # kalau bukan member cetak struk
                 if not data['is_member']:
                     try:
@@ -129,16 +133,12 @@ def gate_in_thread():
 
                     response = r.json()
                     data['ticket_number'] = str(response['ticket_number'])
-                    data['barcode_number'] = generate_barcode_number()
                     print("Printing ticket: " + data['barcode_number'])
                     print_status = print_ticket(data['ticket_number'], data['barcode_number'])
 
                     if not print_status:
                         # TODO: notify to operator
                         pass
-
-                    print("Taking picture: " + data['barcode_number'])
-                    take_picture(data['barcode_number'])
 
                     # play "Silahkam ambil dan simpan struk anda" then clear buffer
                     print("silakan ambil tiket")

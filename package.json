@@ -20,10 +20,14 @@
         "resolve-url-loader": "^2.3.1",
         "sass": "^1.15.2",
         "sass-loader": "^7.1.0",
-        "vue": "^2.5.17"
+        "vue": "^2.5.17",
+        "vue-template-compiler": "^2.6.10"
     },
     "dependencies": {
         "element-ui": "^2.11.0",
+        "export-from-json": "^1.1.4",
+        "moment": "^2.24.0",
+        "vue-echarts": "^4.0.3",
         "vue-router": "^3.0.7",
         "vuex": "^3.1.1"
     }
