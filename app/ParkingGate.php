@@ -8,7 +8,7 @@ class ParkingGate extends Model
 {
     protected $fillable = [
         'name', 'type', 'vehicle_type',
-        'gate_ip_address', 'gate_port',
+        'controller_ip_address', 'controller_port',
         'printer_ip_address',
         'camera_ip_address', 'camera_username',
         'camera_password',

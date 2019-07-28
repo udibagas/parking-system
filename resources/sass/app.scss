@@ -1,8 +1,110 @@
-// Fonts
-@import url('https://fonts.googleapis.com/css?family=Nunito');
-
-// Variables
 @import 'variables';
+@import '~element-ui/lib/theme-chalk/index.css';
 
-// Bootstrap
-@import '~bootstrap/scss/bootstrap';
+@font-face {
+    font-family: "MyriadMM";
+    src: url("../assets/fonts/MyriadMM.ttf");
+}
+
+* {
+    font-family: "MyriadMM", sans-serif;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    font-family: "MyriadMM", sans-serif;
+    min-height: 100%;
+    color: #505050;
+    margin: 0;
+    padding: 0;
+}
+
+.el-icon-more {
+    transform: rotate(90deg);
+    -webkit-transform: rotate(90deg);
+    -moz-transform: rotate(90deg);
+    -ms-transform: rotate(90deg);
+    -o-transform: rotate(90deg);
+}
+
+.el-table {
+    width:100%;
+    border-top:1px solid #eee;
+}
+
+// .el-form-item__error {
+//     padding-top: 0;
+// }
+
+// .el-dialog__header {
+//     border-bottom: 1px solid #ddd;
+//     background-color: #006098 !important;
+// }
+
+// .el-dialog__title {
+//     color: #fff !important;
+// }
+
+// .el-dialog__footer {
+//     border-top: 1px solid #ddd;
+//     padding: 10px 20px;
+// }
+
+.no-padding-dialog > .el-dialog__body {
+    padding: 0px;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.text-right {
+    text-align: right;
+}
+
+.text-white, .text-white:hover, .text-white:active, .text-white:focus {
+    color: #fff !important;
+}
+
+.el-form-item__label {
+    font-weight: bold;
+}
+
+.bg-blue {
+    background-color: $blue;
+}
+.bg-indigo {
+    background-color: $indigo;
+}
+.bg-purple {
+    background-color: $purple;
+}
+.bg-pink {
+    background-color: $pink;
+}
+.bg-red {
+    background-color: $red;
+}
+.bg-orange {
+    background-color: $orange;
+}
+.bg-yellow {
+    background-color: $yellow;
+}
+.bg-green {
+    background-color: $green;
+}
+.bg-teal {
+    background-color: $teal;
+}
+.bg-cyan {
+    background-color: $cyan;
+}
+
+.el-table th {
+    background-color: #060446;
+    color: #fff;
+}

@@ -16,7 +16,9 @@ LOCATION = "PLAZA SEMARANG"
 GATE_OUT_HOST = '127.0.0.1'
 GATE_OUT_PORT = 4000
 
-def take_picture(output_file_name):
+API_URL = 'http://127.0.0.1:8000/api'
+
+def take_snapshot(output_file_name):
     try:
         r = requests.get('http://192.168.1.213/cgi-bin/snapshot.cgi', auth=HTTPDigestAuth('admin', 'admin123'), timeout=3)
     except Exception as e:
@@ -34,9 +36,9 @@ def take_picture(output_file_name):
         return False
 
 def generate_barcode_number():
-    return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
+    return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(10)])
 
-def print_ticket(ticket_number, barcode_number):
+def print_ticket(barcode_number):
     try:
         p = Network('192.168.1.20')
     except Exception as e:
@@ -51,10 +53,10 @@ def print_ticket(ticket_number, barcode_number):
         p.set(height=2, align='center')
         p.text(LOCATION + "\n\n")
         p.set(align='left')
-        p.text('Ticket No.'.ljust(10) + ' : ' + ticket_number + "\n")
+        p.text('Ticket No.'.ljust(10) + ' : ' + time.strftime('%Y%m%d%H%M%S') + "\n")
         p.text('Type'.ljust(10) + " : MOTOR\n")
         p.text('Date'.ljust(10) + ' : ' + time.strftime('%d %b %Y') + "\n")
-        p.text('Time'.ljust(10) + ' : ' + time.strftime('%H:%M:%S') + "\n\n")
+        p.text('Time'.ljust(10) + ' : ' + time.strftime('%T') + "\n\n")
         p.set(align='center')
         p.barcode('*' + barcode_number + '*', 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
         p.text("\n")
@@ -67,6 +69,27 @@ def print_ticket(ticket_number, barcode_number):
         return False
 
     return True
+
+def check_card(card_number):
+    data = { 'card_number': card_number }
+    try:
+        r = r.requests.get(API_URL + '/checkCard', data=data, timeout=3)
+    except Exception as e:
+        print("Failed to check card", str(e))
+        return False
+
+    print r.json()
+    return r.json()
+
+def save_data(data):
+    try:
+        r = r.requests.post(API_URL + '/parkingTransaction', data=data, timeout=3)
+    except Exception as e:
+        print("Failed save data", str(e))
+        return False
+
+    print r.json()
+    return r.json()
 
 def gate_in_thread():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -88,29 +111,42 @@ def gate_in_thread():
 
                 # detect push button or card
                 reset = False
+
                 while True:
                     push_button_or_card = s.recv(1024).decode("utf-8").rstrip()
                     if 'W2' in push_button_or_card or 'W1' in push_button_or_card:
                         print('card detected ' + push_button_or_card)
-                        data = {'is_member': True, 'card_number': push_button_or_card[3:-1]}
+                        card_number = push_button_or_card[3:-1]
+                        print("Checking card...")
+                        valid_card = check_card(card_number)
+
+                        if not valid_card:
+                            continue
+
+                        data = {'is_member': True, 'card_number': card_number}
                         break
+
                     elif 'INP21' in push_button_or_card:
                         print('push button detected')
                         data = {'is_member': False}
                         break
-                    elif 'INP31' in push_button_or_card:
+
+                    elif 'INP3' in push_button_or_card:
                         print('Reset proses')
                         reset = True
                         break
+
                     elif 'INP41' in push_button_or_card:
                         print('tombol bantuan')
                         reset = True
                         # TODO: notify to operator (detect OUT2 di controller gate out)
                         break
+
                     elif 'INP10' in push_button_or_card:
                         print('motor balik lagi')
                         reset = True
                         break
+
                     else:
                         print("No valid input detected")
                         time.sleep(0.5)
@@ -120,31 +156,26 @@ def gate_in_thread():
 
                 data['barcode_number'] = generate_barcode_number()
                 print("Taking picture: " + data['barcode_number'])
-                take_picture(data['barcode_number'])
+                data['snapshot_status'] = take_snapshot(data['barcode_number'])
 
                 # kalau bukan member cetak struk
                 if not data['is_member']:
-                    try:
-                        r = requests.get(API_URL + '/getLastTicketNumber', timeout=3)
-                    except Exception as e:
-                        print("Failed to get last ticket number from server " + str(e))
-                        # reset lagi ke awal
-                        continue
-
-                    response = r.json()
-                    data['ticket_number'] = str(response['ticket_number'])
                     print("Printing ticket: " + data['barcode_number'])
-                    print_status = print_ticket(data['ticket_number'], data['barcode_number'])
+                    data['print_status'] = print_ticket(data['barcode_number'])
 
-                    if not print_status:
+                    if not data['print_status']:
                         # TODO: notify to operator
-                        pass
+                        data['note'] = "Failed to print ticket"
 
                     # play "Silahkam ambil dan simpan struk anda" then clear buffer
                     print("silakan ambil tiket")
                     s.sendall(b':PLAYTRACK2;')
                     s.recv(1024).decode("utf-8").rstrip()
                     time.sleep(3)
+
+                if not save_data(data):
+                    # TODO: play audio or notify operator, meski kemungkinan sangat kecil
+                    pass
 
                 # play "Terimakasih" audio then clean buffer
                 print("Terimakasih")
@@ -164,10 +195,10 @@ def gate_in_thread():
                     print('Failed to open gate')
 
                 # detect loop 2 buat reset
-                while 'INP31' not in s.recv(1024).decode("utf-8").rstrip():
+                while 'INP3' not in s.recv(1024).decode("utf-8").rstrip():
                     time.sleep(.5)
 
-                print('Motor masuk')
+                print('Motor masuk. Selesai')
 
             except KeyboardInterrupt:
                 break
@@ -175,5 +206,5 @@ def gate_in_thread():
         sys.exit()
 
 gate_in_thread()
-# take_picture('aaa')
+# take_snapshot('aaa')
 # print_ticket('12345', 'ABC1234567890DEFG')

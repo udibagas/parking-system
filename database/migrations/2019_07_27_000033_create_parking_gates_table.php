@@ -18,8 +18,8 @@ class CreateParkingGatesTable extends Migration
             $table->string('name');
             $table->string('type', 2); // IN or OUT
             $table->string('vehicle_type'); // MOBIL or MOTOR
-            $table->string('gate_ip_address', 15);
-            $table->integer('gate_port');
+            $table->string('controller_ip_address', 15);
+            $table->integer('controller_port');
             $table->string('printer_ip_address', 15)->nullable();
             $table->string('camera_ip_address', 15);
             $table->string('camera_username');

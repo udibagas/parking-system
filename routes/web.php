@@ -10,7 +10,16 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+Route::post('login', 'AuthController@login');
 
-Route::get('/', function () {
-    return view('welcome');
+Route::group(['middleware' => 'auth.jwt'], function () {
+    Route::get('checkAuth', 'AppController@checkAuth');
+    Route::post('logout', 'AuthController@logout');
+    Route::resource('user', 'UserController')->except(['create', 'edit']);
+    Route::resource('parkingGate', 'ParkingGateController')->except(['create', 'edit']);
+    Route::resource('parkingMember', 'ParkingMemberController')->except(['create', 'edit']);
+    Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
+    Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
 });
+
+Route::get('/{any}', 'AppController@index')->where('any', '.*');
