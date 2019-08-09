@@ -16,3 +16,8 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::post('parkingTransaction', 'ParkingTransactionController@store');
+Route::get('locationIdentity/search', 'LocationIdentityController@search');
+Route::get('parkingGate/search', 'parkingGateController@search');
+Route::get('notification', 'NotificationController@store');

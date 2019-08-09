@@ -18,16 +18,46 @@
         height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="name" label="Name" sortable="custom"></el-table-column>
-            <el-table-column prop="type" label="Type" sortable="custom"></el-table-column>
-            <el-table-column prop="vehicle_type" label="Vehicle Type" sortable="custom"></el-table-column>
-            <el-table-column prop="controller_ip_address" label="Controller Address" sortable="custom">
+            <el-table-column type="expand">
+                <template slot-scope="scope">
+                    <table>
+                        <tbody>
+                            <tr><td class="td-label">Name</td><td class="td-value">{{scope.row.name}}</td></tr>
+                            <tr><td class="td-label">Type</td><td class="td-value">{{scope.row.type}}</td></tr>
+                            <tr><td class="td-label">Vehicle Type</td><td class="td-value">{{scope.row.vehicle_type}}</td></tr>
+                            <tr><td class="td-label">Controller IP Address</td><td class="td-value">{{scope.row.controller_ip_address}}</td></tr>
+                            <tr><td class="td-label">Controller Port</td><td class="td-value">{{scope.row.controller_port}}</td></tr>
+                            <tr><td class="td-label">Printer IP Address</td><td class="td-value">{{scope.row.printer_ip_address}}</td></tr>
+                            <tr><td class="td-label">Camera IP Address</td><td class="td-value">{{scope.row.camera_ip_address}}</td></tr>
+                            <tr><td class="td-label">Camera Username</td><td class="td-value">{{scope.row.camera_username}}</td></tr>
+                            <tr><td class="td-label">Camera Password</td><td class="td-value">{{scope.row.camera_password}}</td></tr>
+                            <tr><td class="td-label">Camera Image Snapshot URL</td><td class="td-value">{{scope.row.camera_image_snapshot_url}}</td></tr>
+                            <tr><td class="td-label">Camera Video Snapshot URL</td><td class="td-value">{{scope.row.camera_video_snapshot_url}}</td></tr>
+                            <tr><td class="td-label">Status</td><td class="td-value">{{scope.row.is_active ? 'Active' : 'Inactive'}}</td></tr>
+                        </tbody>
+                    </table>
+                </template>
+            </el-table-column>
+            <el-table-column prop="name" label="Name" sortable="custom" min-width="100px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="type" label="Type" sortable="custom" min-width="80px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="vehicle_type" label="Vehicle Type" sortable="custom" min-width="120px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="controller_ip_address" label="Controller Address" sortable="custom" min-width="160px" show-overflow-tooltip>
                 <template slot-scope="scope">
                     {{scope.row.controller_ip_address}}:{{scope.row.controller_port}}
                 </template>
             </el-table-column>
-            <el-table-column prop="printer_ip_address" label="Printer IP Address" sortable="custom"></el-table-column>
-            <el-table-column prop="camera_ip_address" label="Camera IP Address" sortable="custom"></el-table-column>
+            <el-table-column prop="printer_ip_address" label="Printer IP Address" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_ip_address" label="Camera IP Address" sortable="custom" min-width="160px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_username" label="Camera Username" sortable="custom" min-width="160px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_password" label="Camera Password" sortable="custom" min-width="160px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_image_snapshot_url" label="Camera Image Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_video_snapshot_url" label="Camera Video Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column>
+
+            <el-table-column fixed="right" prop="status" label="Status" sortable="custom" min-width="100px">
+                <template slot-scope="scope">
+                    <el-tag size="mini" :type="scope.row.active ? 'success' : 'info'">{{scope.row.active ? 'Active' : 'Inactive'}}</el-tag>
+                </template>
+            </el-table-column>
 
             <el-table-column fixed="right" width="40px">
                 <template slot-scope="scope">
@@ -55,7 +85,7 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT GATE' : 'ADD NEW GATE'" width="550px" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog top="40px" :visible.sync="showForm" :title="!!formModel.id ? 'EDIT GATE' : 'ADD NEW GATE'" width="550px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"
@@ -80,6 +110,17 @@
                         <el-option v-for="(t, i) in ['MOBIL', 'MOTOR', 'MOBIL/MOTOR']" :value="t" :label="t" :key="i"></el-option>
                     </el-select>
                     <div class="el-form-item__error" v-if="formErrors.vehicle_type">{{formErrors.vehicle_type[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Status" :class="formErrors.active ? 'is-error' : ''">
+                    <el-switch
+                    :active-value="1"
+                    :inactive-value="0"
+                    v-model="formModel.active"
+                    active-color="#13ce66">
+                    </el-switch>
+                    <el-tag :type="formModel.active ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.active ? 'Active' : 'Inactive'}}</el-tag>
+                    <div class="el-form-item__error" v-if="formErrors.active">{{formErrors.active[0]}}</div>
                 </el-form-item>
 
                 <el-form-item label="Controller Address" :class="formErrors.controller_ip_address ? 'is-error' : ''">
@@ -255,3 +296,17 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.td-label {
+    min-width: 150px;
+    font-weight: bold;
+    background-color: #ddd;
+    padding: 5px 10px;
+}
+
+.td-value {
+    background-color: #eee;
+    padding: 5px 10px;
+}
+</style>

@@ -35,6 +35,7 @@ class ParkingGateRequest extends FormRequest
             'camera_password' => 'required',
             // 'camera_image_snapshot_url' => 'required|url',
             // 'camera_video_snapshot_url' => 'required|url',
+            'active' => 'boolean'
         ];
     }
 }

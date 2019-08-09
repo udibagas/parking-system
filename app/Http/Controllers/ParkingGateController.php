@@ -43,9 +43,17 @@ class ParkingGateController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function search(Request $request)
     {
-        //
+        $gate = ParkingGate::where('type', $request->type)
+            ->where('active', 1)
+            ->get();
+
+        if (!$gate) {
+            return response(['message' => 'Not found'], 404);
+        }
+
+        return $gate;
     }
 
     /**

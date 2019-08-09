@@ -51,6 +51,20 @@ class ParkingMemberController extends Controller
         return $parkingMember;
     }
 
+    public function search(Request $request)
+    {
+        $member = ParkingMember::where('plate_number', $request->plate_number)
+            ->where('expiry_date', '>=', date('Y-m-d'))
+            ->where('is_active', 1)
+            ->first();
+
+        if (!$member) {
+            return response(['message' => 'No member found'], 404);
+        }
+
+        return $member;
+    }
+
     /**
      * Update the specified resource in storage.
      *

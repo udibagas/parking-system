@@ -13,8 +13,10 @@ import locale from 'element-ui/lib/locale/lang/en'
 import App from './App'
 import router from './router'
 import store from './store'
+import VueMask from 'v-mask'
 
 Vue.use(ElementUI, { locale });
+Vue.use(VueMask);
 
 Vue.filter('readableDateTime', function(v) {
     return v ? moment(v).format('DD-MMM-YYYY HH:mm') : ''

@@ -15,25 +15,37 @@
         height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="updated_at" label="Time" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="ticket_number" label="Ticket No." sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="vehicle_type" label="Type" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="gate_in" label="Gate In" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="gate_out" label="Gate Out" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="time_in" label="Time In" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="time_out" label="Time Out" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column label="Duration" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column label="Fare" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column label="Operator" sortable="custom" show-overflow-tooltip></el-table-column>
-            <el-table-column label="Member" sortable="custom" show-overflow-tooltip>
+            <el-table-column type="expand">
                 <template slot-scope="scope">
-                    <i class="el-icon-close" v-if="!scope.row.is_member"></i>
-                    <el-popover>
-                        Informasi member
-                        <i slot="reference" class="el-icon-check pointer"></i>
-                    </el-popover>
-
+                    <table>
+                        <tbody>
+                            <tr><td class="td-label">Name</td><td class="td-value">{{scope.row.name}}</td></tr>
+                            <tr><td class="td-label">Email</td><td class="td-value">{{scope.row.email}}</td></tr>
+                            <tr><td class="td-label">Phone</td><td class="td-value">{{scope.row.phone}}</td></tr>
+                            <tr><td class="td-label">Plate Number</td><td class="td-value">{{scope.row.plate_number}}</td></tr>
+                            <tr><td class="td-label">Card Number</td><td class="td-value">{{scope.row.card_number}}</td></tr>
+                            <tr><td class="td-label">Vehicle Type</td><td class="td-value">{{scope.row.vehicle_type}}</td></tr>
+                            <tr><td class="td-label">Expiry Date</td><td class="td-value">{{scope.row.expiry_date}}</td></tr>
+                            <tr><td class="td-label">Last Trx</td><td class="td-value">{{scope.row.last_transaction}}</td></tr>
+                            <tr><td class="td-label">Status</td><td class="td-value">{{scope.row.is_active ? 'Active' : 'Inactive'}}</td></tr>
+                        </tbody>
+                    </table>
+                </template>
+            </el-table-column>
+            <el-table-column prop="updated_at" label="Time" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="ticket_number" label="Ticket No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="vehicle_type" label="Type" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="gate_in" label="Gate In" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="gate_out" label="Gate Out" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="time_in" label="Time In" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="time_out" label="Time Out" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column label="Duration" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="fare" label="Fare" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="150px">
+                <template slot-scope="scope">
+                    {{scope.row.is_member ? 'Yes' : 'No'}}
                 </template>
             </el-table-column>
 
@@ -116,3 +128,17 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+.td-label {
+    min-width: 150px;
+    font-weight: bold;
+    background-color: #ddd;
+    padding: 5px 10px;
+}
+
+.td-value {
+    background-color: #eee;
+    padding: 5px 10px;
+}
+</style>

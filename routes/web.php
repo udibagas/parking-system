@@ -16,10 +16,17 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::get('checkAuth', 'AppController@checkAuth');
     Route::post('logout', 'AuthController@logout');
     Route::resource('user', 'UserController')->except(['create', 'edit']);
+    Route::resource('locationIdentity', 'LocationIdentityController')->except(['create', 'edit']);
     Route::resource('parkingGate', 'ParkingGateController')->except(['create', 'edit']);
+    Route::get('vehicleType/getList', 'VehicleTypeController@getList');
+    Route::resource('vehicleType', 'VehicleTypeController')->except(['create', 'edit']);
+    Route::get('parkingMember/search', 'ParkingMemberController@search');
     Route::resource('parkingMember', 'ParkingMemberController')->except(['create', 'edit']);
+    Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
+    Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
-    Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
+    Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
+    // Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
 });
 
 Route::get('/{any}', 'AppController@index')->where('any', '.*');

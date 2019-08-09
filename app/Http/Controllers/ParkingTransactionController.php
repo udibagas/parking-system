@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ParkingTransaction;
 use App\Http\Requests\ParkingTransactionRequest;
+use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+use Mike42\Escpos\Printer;
 
 class ParkingTransactionController extends Controller
 {
@@ -37,15 +40,42 @@ class ParkingTransactionController extends Controller
         return ParkingTransaction::create($request->all());
     }
 
+    public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
+    {
+        // $connector = new NetworkPrintConnector("10.x.x.x", 9100);
+        $connector = new FilePrintConnector("/dev/ttyS0");
+        $printer = new Printer($connector);
+
+        try {
+            if ($request->trx == 'IN') {
+                $printer->text("IN!\n");
+            }
+
+            if ($request->trx == 'OUT') {
+                $printer->text("OUT!\n");
+            }
+
+            $printer->cut();
+        } catch (\Exeption $e) {
+            // print failed
+        } finally {
+            $printer->close();
+        }
+    }
+
     /**
      * Display the specified resource.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show(ParkingTransactionRequest $request)
+    public function search(Request $request)
     {
-        if ($data = ParkingTransaction::where($request->all())->first()) {
+        $data = ParkingTransaction::where('barcode_number', $request->barcode_number)
+            ->where('time_out', null)
+            ->first();
+
+        if ($data) {
             return $data;
         }
 

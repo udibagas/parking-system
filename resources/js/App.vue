@@ -1,7 +1,7 @@
 <template>
     <el-container>
         <Login :visible.sync="!this.$store.state.is_logged_in" />
-        <Profile :show="showProfile" @close="showProfile = false" />
+        <Profile v-if="this.$store.state.is_logged_in" :show="showProfile" @close="showProfile = false" />
         <el-header>
             <el-row>
                 <el-col :span="12">
@@ -54,12 +54,14 @@ export default {
             return [
                 {label: 'Home', icon: 'el-icon-s-home', path: '/' },
                 {label: 'Transactions', icon: 'el-icon-document-copy', path: 'parking-transaction' },
-                {label: 'Member Renewal', icon: 'el-icon-refresh', path: 'member-renewal' },
+                // {label: 'Member Renewal', icon: 'el-icon-refresh', path: 'member-renewal' },
                 {label: 'Report', icon: 'el-icon-data-analysis', path: 'report' },
                 {label: 'Gates', icon: 'el-icon-minus', path: 'parking-gate' },
+                {label: 'Vehicle Type', icon: 'el-icon-truck', path: 'vehicle-type' },
+                {label: 'Location Identity', icon: 'el-icon-office-building', path: 'location-identity' },
                 {label: 'Members', icon: 'el-icon-bank-card', path: 'parking-member' },
                 {label: 'Users', icon: 'el-icon-user', path: 'user' },
-                {label: 'Log', icon: 'el-icon-bell', path: 'log' },
+                // {label: 'Log', icon: 'el-icon-bell', path: 'log' },
             ]
         }
     },
@@ -68,7 +70,8 @@ export default {
             collapse: true,
             appName: APP_NAME,
             showProfile: false,
-            loginForm: !this.$store.state.is_logged_in
+            loginForm: !this.$store.state.is_logged_in,
+            notif: false
         }
     },
     methods: {
@@ -90,6 +93,40 @@ export default {
                 this.showProfile = true
             }
         },
+        getNotification() {
+            let params = { read: 0, pageSize: 1 }
+            axios.get('/notification', { params: params }).then(r => {
+                if (r.data.data.length == 0) {
+                    return
+                }
+
+                // jika tidak ada notifikasi yg tampil
+                if (!this.notif)
+                {
+                    let n = r.data.data[0]
+                    this.notif = true
+                    this.$alert(n.message, 'Notifikasi', {
+                        type: 'warning',
+                        center: true,
+                        roundButton: true,
+                        confirmButtonText: 'SAYA TELAH MEMBACA NOTIFIKASI INI',
+                        confirmButtonClass: 'bg-red',
+                        beforeClose: (action, instance, done) => {
+                            this.notif = false
+                            done()
+                        }
+                    }).then(() => {
+                        this.notif = false
+                        axios.put('/notification/' + n.id, { read: 1 }).then(rr => {
+                            console.log(rr.data)
+                        }).catch(e => console.log(e))
+                    })
+                }
+            }).catch(e => console.log(e))
+        }
+    },
+    mounted() {
+        setInterval(this.getNotification, 3000)
     }
 }
 </script>
