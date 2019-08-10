@@ -37,6 +37,7 @@ class NotificationController extends Controller
 
         // notifikasi di gate yg belum terbaca
         $exists = Notification::where('parking_gate_id', $request->parking_gate_id)
+            ->where('message', $request->message)
             ->where('read', 0)
             ->first();
 
