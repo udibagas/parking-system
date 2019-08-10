@@ -30,7 +30,7 @@ def take_snapshot(output_file_name, gate):
         return False
 
 def generate_barcode_number():
-    return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(10)])
+    return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
 
 def print_ticket(trx_data, gate):
     try:
@@ -49,9 +49,9 @@ def print_ticket(trx_data, gate):
         p.set(align='left')
         p.text('Gate'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
         p.text('Date'.ljust(10) + ' : ' + trx_data['time_in'][:10] + "\n")
-        p.text('Time'.ljust(10) + ' : ' + trx_data['time_in'][10:] + "\n\n")
+        p.text('Time'.ljust(10) + ' : ' + trx_data['time_in'][11:] + "\n\n")
         p.set(align='center')
-        p.barcode('*' + trx_data['barcode_number'] + '*', 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
+        p.barcode(trx_data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
         p.text("\n")
         p.text("JANGAN MENINGGALKAN TICKET INI &\n")
         p.text("BARANG BERHARGA\n")
@@ -75,13 +75,14 @@ def check_card(card_number):
     return r.json()
 
 def save_data(data):
+    print(data)
     try:
-        r = r.requests.post(API_URL + '/parkingTransaction', data=data, timeout=3)
+        r = requests.post(API_URL + '/parkingTransaction', data=data, timeout=3)
     except Exception as e:
         print("Failed save data", str(e))
         return False
 
-    print(r.json())
+    print(r.status_code)
     return r.json()
 
 def gate_in_thread(gate):
@@ -97,7 +98,7 @@ def gate_in_thread(gate):
             try:
                 # motor lewat loop detector 1
                 print("Detecting vehicle...")
-                if 'IN1ON' in s.recv(32):
+                if b'IN1ON' in s.recv(32):
                     # Play "Selamat datang silahkan tekan tombol hijau" then clear buffer
                     print("ada motor. play selamat datang")
                     s.sendall(b'\xa6MT00001\xa9')
@@ -108,7 +109,7 @@ def gate_in_thread(gate):
 
                 while True:
                     push_button_or_card = s.recv(32)
-                    if 'W' in push_button_or_card:
+                    if b'W' in push_button_or_card:
                         print('card detected ' + push_button_or_card)
                         card_number = push_button_or_card[3:-1]
                         print("Checking card...")
@@ -117,22 +118,24 @@ def gate_in_thread(gate):
                         if not valid_card:
                             continue
 
-                        data = {'is_member': True, 'card_number': card_number}
+                        data = {'is_member': 1, 'card_number': card_number}
                         break
 
-                    elif 'IN2ON' in push_button_or_card:
+                    elif b'IN2ON' in push_button_or_card:
                         print('push button detected')
-                        data = {'is_member': False}
+                        data = {'is_member': 0}
                         break
 
-                    elif 'IN3' in push_button_or_card:
+                    elif b'IN3' in push_button_or_card:
                         print('Reset proses')
                         reset = True
                         break
 
-                    elif 'IN4' in push_button_or_card:
+                    elif b'IN4' in push_button_or_card:
                         print('tombol bantuan')
                         reset = True
+                        s.sendall(b'\xa6MT00005\xa9')
+                        s.recv(32)
                         notification = { 'message' : 'Pengunjung di ' + gate.name + ' membutuhkan bantuan Anda' }
 
                         try:
@@ -142,7 +145,7 @@ def gate_in_thread(gate):
 
                         break
 
-                    elif 'IN1OFF' in push_button_or_card:
+                    elif b'IN1OFF' in push_button_or_card:
                         print('motor balik lagi')
                         reset = True
                         break
@@ -151,14 +154,15 @@ def gate_in_thread(gate):
                     continue
 
                 data['barcode_number'] = generate_barcode_number()
-                print("Taking picture: " + data['barcode_number'])
-                data['snapshot_status'] = take_snapshot(data['barcode_number'], gate)
-
+                # print("Taking picture: " + data['barcode_number'])
+                # data['snapshot_status'] = take_snapshot(data['barcode_number'], gate)
+                data['gate_in_id'] = gate['id']
+                data['vehicle_type'] = gate['vehicle_type']
                 trx_data = save_data(data)
 
                 # kalau gagal simpan data ulangi dari awal
                 if trx_data == False:
-                    notification = { 'message' : 'Pengunjung di ' + gate.name + ' membutuhkan bantuan Anda (gagal menyimpan data)' }
+                    notification = { 'message' : 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda (gagal menyimpan data)' }
                     try:
                         r = requests.post(API_URL + '/notification', data=notification)
                     except Exception as e:
@@ -167,12 +171,12 @@ def gate_in_thread(gate):
                     continue
 
                 # kalau bukan member cetak struk
-                if not data['is_member']:
+                if data['is_member'] == 0:
                     print("Printing ticket: " + data['barcode_number'])
                     data['print_status'] = print_ticket(trx_data, gate)
 
                     if not data['print_status']:
-                        notification = { 'message' : 'Pengunjung di ' + gate.name + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'] }
+                        notification = { 'message' : 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'] }
                         try:
                             r = requests.post(API_URL + '/notification', data=notification)
                         except Exception as e:
@@ -188,7 +192,7 @@ def gate_in_thread(gate):
 
                 # play "Terimakasih" audio then clean buffer
                 print("Terimakasih")
-                s.sendall(b'\xa6MT00003\xa9')
+                s.sendall(b'\xa6MT00006\xa9')
                 s.recv(32)
                 # is it required?
                 # time.sleep(1)
@@ -196,7 +200,7 @@ def gate_in_thread(gate):
                 # open gate
                 print("Open gate")
                 s.sendall(b'\xa6OPEN1\xa9')
-                if 'OPEN1OK' in s.recv(32):
+                if b'OPEN1OK' in s.recv(32):
                     print('Gate opened')
                 # gagal buka gate
                 else:
@@ -204,7 +208,7 @@ def gate_in_thread(gate):
                     print('Failed to open gate')
 
                 # detect loop 2 buat reset
-                while 'IN3' not in s.recv(32):
+                while b'IN3' not in s.recv(32):
                     time.sleep(.5)
 
                 print('Motor masuk. Selesai')
@@ -237,4 +241,5 @@ if __name__ == "__main__":
     gate_in_thread(gates[0])
 
     # for g in gates:
-    #     _thread.start_new_thread(gate_in_thread, (g,))
+        # print(g)
+        # _thread.start_new_thread(gate_in_thread, (g,))

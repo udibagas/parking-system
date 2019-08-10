@@ -36,9 +36,11 @@ class ParkingTransactionController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(ParkingTransactionRequest $request)
+    public function store(Request $request)
     {
-        return ParkingTransaction::create($request->all());
+        $input = $request->all();
+        $input['time_in'] = date('Y-m-d H:i:s');
+        return ParkingTransaction::create($input);
     }
 
     public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
