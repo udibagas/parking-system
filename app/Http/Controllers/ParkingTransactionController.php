@@ -45,8 +45,8 @@ class ParkingTransactionController extends Controller
 
     public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
     {
-        // $connector = new NetworkPrintConnector("10.x.x.x", 9100);
-        $connector = new FilePrintConnector("/dev/ttyS0");
+        $connector = new NetworkPrintConnector("192.168.1.103", 9100);
+        // $connector = new FilePrintConnector("/dev/ttyS0");
         $printer = new Printer($connector);
 
         try {
@@ -55,7 +55,7 @@ class ParkingTransactionController extends Controller
             }
 
             if ($request->trx == 'OUT') {
-                $printer->text("OUT!\n");
+                $printer->text("TERIMAKASIH\n");
             }
 
             $printer->cut();
