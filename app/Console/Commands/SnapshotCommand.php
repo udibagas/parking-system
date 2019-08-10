@@ -3,6 +3,8 @@
 namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
+use App\ParkingGate;
+use GuzzleHttp\Client;
 
 class SnapshotCommand extends Command
 {
