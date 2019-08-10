@@ -42,15 +42,18 @@ class GateCommand extends Command
             $serial = new PhpSerial;
             $serial->deviceSet($this->argument('device'));
             $serial->confBaudRate(2400);
-            // $serial->confParity("none");
-            // $serial->confCharacterLength(8);
-            // $serial->confStopBits(1);
-            // $serial->confFlowControl("none");
+            $serial->confParity("none");
+            $serial->confCharacterLength(8);
+            $serial->confStopBits(1);
+            $serial->confFlowControl("none");
             $serial->deviceOpen();
             $serial->sendMessage("1");
+            $this->info($serial->readLine());
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             return;
+        } finally {
+            $serial->deviceClose();
         }
 
         $this->info('Gate berhasil dibuka');
