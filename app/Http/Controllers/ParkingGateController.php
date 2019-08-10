@@ -83,6 +83,6 @@ class ParkingGateController extends Controller
 
     public function getList()
     {
-        return ParkingGate::orderBy('name', 'asc')->get();
+        return ParkingGate::orderBy('name', 'asc')->where('active', 1)->get();
     }
 }
