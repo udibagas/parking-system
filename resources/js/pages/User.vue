@@ -65,7 +65,7 @@
                 style="margin-bottom:15px;">
             </el-alert>
 
-            <el-form label-width="170px">
+            <el-form label-width="180px">
                 <el-form-item label="Name" :class="formErrors.name ? 'is-error' : ''">
                     <el-input placeholder="Name" v-model="formModel.name"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>

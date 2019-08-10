@@ -32,8 +32,8 @@
                     </table>
                 </template>
             </el-table-column>
+            <el-table-column prop="id" label="ID" sortable="custom"></el-table-column>
             <el-table-column prop="updated_at" label="Time" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="ticket_number" label="Ticket No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="vehicle_type" label="Type" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="gate_in" label="Gate In" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
