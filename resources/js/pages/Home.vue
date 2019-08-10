@@ -212,7 +212,7 @@ export default {
             })
         },
         printTicket(id, trx) {
-            axios.post('/parkingTransaction/' + id, { trx: trx }).then(r => {
+            axios.post('/parkingTransaction/printTicket/' + id, { trx: trx }).then(r => {
                 console.log(r.data)
             }).catch(e => {
                 this.$message({

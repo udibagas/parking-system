@@ -70,7 +70,7 @@ class ParkingTransactionController extends Controller
     {
         try {
             $serial = new PhpSerial;
-            $serial->deviceSet("/dev/ttyS0");
+            $serial->deviceSet("/dev/ttyS1");
             $serial->confBaudRate(2400);
             $serial->confParity("none");
             $serial->confCharacterLength(8);
