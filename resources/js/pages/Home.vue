@@ -17,7 +17,7 @@
                             <div class="label-big">[+] NO. TIKET</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" type="text" maxlength="10" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="ticket-number" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -45,7 +45,7 @@
                     <el-row :gutter="15">
                         <el-col :span="8">
                             <div class="label">[/] IN</div>
-                            <input id="time-in" v-mask="'##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxxxxxxx'" type="text" placeholder="00:00:00" v-model="formModel.time_in" class="my-input text-center">
+                            <input id="time-in" v-mask="'##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" type="text" placeholder="00:00:00" v-model="formModel.time_in" class="my-input text-center">
                         </el-col>
                         <el-col :span="8">
                             <div class="label">OUT</div>
@@ -96,10 +96,10 @@ export default {
     },
     watch: {
         'formModel.barcode_number'(v, o) {
-            if (v.length == 10) {
+            if (v.length == 5) {
                 this.formModel.time_out = moment().format('HH:mm:ss');
 
-                if (this.formModel.barcode_number.toLowerCase() == 'xxxxxxxxxx') {
+                if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
                     // todo : ticket hilang
                 } else {
                     let params = { barcode_number: v }
@@ -129,12 +129,12 @@ export default {
                 if (!this.formModel.is_member)
                 {
                     this.formModel.fare = vehicle.tarif_flat
-                    if (this.formModel.barcode_number.toLowerCase() == 'xxxxxxxxxx') {
+                    if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
                         this.formModel.fare += vehicle.denda_tiket_hilang
                     }
                 }
 
-                if (this.formModel.barcode_number.toLowerCase() == 'xxxxxxxxxx') {
+                if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
                     document.getElementById('time-in').focus()
                 }
             }
@@ -167,7 +167,7 @@ export default {
             //     return
             // }
 
-            if (this.formModel.barcode_number.length !== 10) {
+            if (this.formModel.barcode_number.length !== 5) {
                 this.$message({
                     message: 'NOMOR TIKET INVALID!',
                     type: 'error',
