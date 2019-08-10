@@ -162,10 +162,11 @@ def gate_in_thread(gate):
                     continue
 
                 # lengkapi data kemudian simpan
+                data['gate_in_id'] = gate['id']
+                data['time_in'] = time.strftime('%Y-%m-%d %T')
+                data['vehicle_type'] = gate['vehicle_type']
                 data['barcode_number'] = generate_barcode_number()
                 data['snapshot_in'] = take_snapshot(gate)
-                data['gate_in_id'] = gate['id']
-                data['vehicle_type'] = gate['vehicle_type']
                 save_data(gate, data)
 
                 # kalau bukan member cetak struk
@@ -180,7 +181,7 @@ def gate_in_thread(gate):
                 print("Terimakasih")
                 s.sendall(b'\xa6MT00006\xa9')
                 s.recv(32)
-                time.sleep(2)
+                time.sleep(1)
 
                 # open gate
                 print("Open gate")
