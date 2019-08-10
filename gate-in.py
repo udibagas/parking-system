@@ -3,11 +3,11 @@ import time
 import sys
 import requests
 from requests.auth import HTTPDigestAuth
-import time
 from escpos.printer import Network
 import random
 import string
 import _thread
+import datetime
 
 API_URL = 'http://localhost/api'
 LOCATION = ''
@@ -48,7 +48,7 @@ def print_ticket(trx_data, gate):
         p.text(LOCATION + "\n\n")
         p.set(align='left')
         p.text('Gate'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
-        p.text('Date'.ljust(10) + ' : ' + trx_data['time_in'][:10] + "\n")
+        p.text('Date'.ljust(10) + ' : ' + datetime.datetime.strptime(trx_data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
         p.text('Time'.ljust(10) + ' : ' + trx_data['time_in'][11:] + "\n\n")
         p.set(align='center')
         p.barcode(trx_data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
@@ -101,7 +101,7 @@ def gate_in_thread(gate):
                 if b'IN1ON' in s.recv(32):
                     # Play "Selamat datang silahkan tekan tombol hijau" then clear buffer
                     print("ada motor. play selamat datang")
-                    s.sendall(b'\xa6MT00001\xa9')
+                    s.sendall(b'\xa6MT00007\xa9')
                     s.recv(32)
 
                 # detect push button or card
@@ -131,12 +131,12 @@ def gate_in_thread(gate):
                         reset = True
                         break
 
-                    elif b'IN4' in push_button_or_card:
+                    elif b'IN4ON' in push_button_or_card:
                         print('tombol bantuan')
                         reset = True
                         s.sendall(b'\xa6MT00005\xa9')
                         s.recv(32)
-                        notification = { 'message' : 'Pengunjung di ' + gate.name + ' membutuhkan bantuan Anda' }
+                        notification = { 'message' : 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda' }
 
                         try:
                             r = requests.post(API_URL + '/notification', data=notification)
@@ -200,12 +200,12 @@ def gate_in_thread(gate):
                 # open gate
                 print("Open gate")
                 s.sendall(b'\xa6OPEN1\xa9')
-                if b'OPEN1OK' in s.recv(32):
-                    print('Gate opened')
+                # if b'OPEN1OK' in s.recv(32):
+                #     print('Gate opened')
                 # gagal buka gate
-                else:
+                # else:
                     # get help
-                    print('Failed to open gate')
+                    # print('Failed to open gate')
 
                 # detect loop 2 buat reset
                 while b'IN3' not in s.recv(32):
