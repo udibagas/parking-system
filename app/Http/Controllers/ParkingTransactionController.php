@@ -118,11 +118,11 @@ class ParkingTransactionController extends Controller
 
                 $printer->setTextSize(1, 1);
                 $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text('Gate'.ljust(10) + ' : ' . $parkingTransaction->gateOut->name . "\n");
-                $printer->text('Waktu Masuk'.ljust(10) + ' : ' . $parkingTransaction->time_in . "\n");
-                $printer->text('Waktu Masuk'.ljust(10) + ' : ' . $parkingTransaction->time_out . "\n");
-                $printer->text('Durasi'.ljust(10) + ' : ' . $parkingTransaction->durasi . "\n");
-                $printer->text('Petugas'.ljust(10) + ' : ' . auth()->user()->name . "\n\n\n");
+                $printer->text(str_pad('Gate', 20, ' ') . ' : ' . $parkingTransaction->gateOut->name . "\n");
+                $printer->text(str_pad('Waktu Masuk', 20, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
+                $printer->text(str_pad('Waktu Keluar', 20, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
+                $printer->text(str_pad('Durasi', 20, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
+                $printer->text(str_pad('Petugas', 20, ' ') . ' : ' . auth()->user()->name . "\n\n\n");
                 $printer->text("TERIMAKASIH. SELAMAT JALAN.\n");
             }
 
