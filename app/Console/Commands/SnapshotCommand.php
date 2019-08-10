@@ -47,7 +47,7 @@ class SnapshotCommand extends Command
         }
 
         $client = new Client(['timeout' => 3]);
-        $fileName = 'snapshot/'.date('YmdHis').'.jpg';
+        $fileName = 'snapshot/'.date('YmdHis-test').'.jpg';
 
         try {
             $client->get($gate->camera_image_snapshot_url)
