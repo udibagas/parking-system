@@ -30,7 +30,20 @@ class NotificationController extends Controller
      */
     public function store(Request $request)
     {
-        $request->validate(['message' => 'required']);
+        $request->validate([
+            'message' => 'required',
+            'parking_gate_id' => 'required|exists:parking_gates,id'
+        ]);
+
+        // notifikasi di gate yg belum terbaca
+        $exists = Notification::where('parking_gate_id', $request->parking_gate_id)
+            ->where('read', 0)
+            ->first();
+
+        if ($exists) {
+            return $exists;
+        }
+
         return Notification::create($request->all());
     }
 

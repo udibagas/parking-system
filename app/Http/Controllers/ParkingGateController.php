@@ -80,4 +80,9 @@ class ParkingGateController extends Controller
         $parkingGate->delete();
         return ['message' => 'Parking gate telah dihapus'];
     }
+
+    public function getList()
+    {
+        return ParkingGate::orderBy('name', 'asc')->get();
+    }
 }

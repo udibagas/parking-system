@@ -17,6 +17,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::post('logout', 'AuthController@logout');
     Route::resource('user', 'UserController')->except(['create', 'edit']);
     Route::resource('locationIdentity', 'LocationIdentityController')->except(['create', 'edit']);
+    Route::get('parkingGate/getList', 'ParkingGateController@getList');
     Route::resource('parkingGate', 'ParkingGateController')->except(['create', 'edit']);
     Route::get('vehicleType/getList', 'VehicleTypeController@getList');
     Route::resource('vehicleType', 'VehicleTypeController')->except(['create', 'edit']);
