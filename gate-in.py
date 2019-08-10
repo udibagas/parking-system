@@ -6,7 +6,7 @@ from requests.auth import HTTPDigestAuth
 from escpos.printer import Network
 import random
 import string
-import _thread
+import threading
 import datetime
 
 API_URL = 'http://localhost/api'
@@ -210,7 +210,7 @@ def get_location:
         print('Please set location identity', str(e))
         sys.exit()
 
-    LOCATION = r.json()
+    return r.json()
 
 def get_gates:
     try:
@@ -222,10 +222,10 @@ def get_gates:
     return r.json()
 
 if __name__ == "__main__":
-    get_location()
+    LOCATION = get_location()
     gates = get_gates()
-    gate_in_thread(gates[0])
+    # gate_in_thread(gates[0])
 
-    # for g in gates:
-        # print(g)
-        # _thread.start_new_thread(gate_in_thread, (g,))
+    for g in gates:
+        x = threading.Thread(target=gate_in_thread, args=(g,))
+        x.start()
