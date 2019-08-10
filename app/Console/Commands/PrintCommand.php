@@ -67,12 +67,12 @@ class PrintCommand extends Command
 
             $printer->setTextSize(1, 1);
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text(str_pad('Gate', 20, ' ') . ": GATE-IN-01/MOTOR\n");
+            $printer->text(str_pad('Gate', 20, ' ') . ": GATE-OUT-01\n");
             $printer->text(str_pad('Waktu Masuk', 20, ' ') . ": 2019-10-10 08:30:21\n");
             $printer->text(str_pad('Waktu Keluar', 20, ' ') . ": 2019-10-10 10:23:13\n");
             $printer->text(str_pad('Durasi', 20, ' ') . ": 02:02:32\n");
             $printer->text(str_pad('Petugas', 20, ' ') . ": Bagas\n\n\n");
-            $printer->text("TERIMAKASIH. SELAMAT JALAN.\n");
+            $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
 
             $printer->cut();
             $printer->close();

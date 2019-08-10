@@ -105,6 +105,7 @@ class ParkingTransactionController extends Controller
             }
 
             if ($request->trx == 'OUT') {
+                $gateOut = ParkingGate::find($parkingTransaction->gate_out_id);
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text("STRUK PARKIR\n");
                 $printer->setTextSize(2, 2);
@@ -118,12 +119,12 @@ class ParkingTransactionController extends Controller
 
                 $printer->setTextSize(1, 1);
                 $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text(str_pad('Gate', 20, ' ') . ' : ' . $parkingTransaction->gateOut->name . "\n");
+                $printer->text(str_pad('Gate', 20, ' ') . ' : ' . $gateOut->name . "\n");
                 $printer->text(str_pad('Waktu Masuk', 20, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
                 $printer->text(str_pad('Waktu Keluar', 20, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
                 $printer->text(str_pad('Durasi', 20, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
                 $printer->text(str_pad('Petugas', 20, ' ') . ' : ' . auth()->user()->name . "\n\n\n");
-                $printer->text("TERIMAKASIH. SELAMAT JALAN.\n");
+                $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
             }
 
             $printer->cut();
