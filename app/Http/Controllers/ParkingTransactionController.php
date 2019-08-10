@@ -140,14 +140,15 @@ class ParkingTransactionController extends Controller
     {
         try {
             $serial = new PhpSerial;
-            $serial->deviceSet("/dev/ttyS1");
+            $serial->deviceSet("/dev/ttyS0");
             $serial->confBaudRate(2400);
-            // $serial->confParity("none");
-            // $serial->confCharacterLength(8);
-            // $serial->confStopBits(1);
-            // $serial->confFlowControl("none");
+            $serial->confParity("none");
+            $serial->confCharacterLength(8);
+            $serial->confStopBits(1);
+            $serial->confFlowControl("none");
             $serial->deviceOpen();
             $serial->sendMessage("1");
+            $serial->deviceClose();
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MEMBUKA GATE. '. $e->getMessage()], 500);
         }
