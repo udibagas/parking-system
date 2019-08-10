@@ -59,22 +59,6 @@
 
                     <el-divider></el-divider>
                     <button class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
-                    <!-- <el-row :gutter="15">
-                        <el-col :span="12">
-                            <button class="my-btn" @click="printTicket">[F1] PRINT TIKET</button>
-                        </el-col>
-                        <el-col :span="12">
-                            <button class="my-btn" @click="openGate">[F2] BUKA GATE</button>
-                        </el-col>
-                    </el-row>
-                    <el-row :gutter="15">
-                        <el-col :span="12">
-                            <button class="my-btn" @click="showTicketLostForm = true">[F3] TIKET HILANG</button>
-                        </el-col>
-                        <el-col :span="12">
-                            <button class="my-btn" @click="manualOpen">[F4] BUKA MANUAL</button>
-                        </el-col>
-                    </el-row> -->
                 </el-card>
             </el-col>
             <el-col :span="10">
@@ -98,48 +82,6 @@
                 </el-card>
             </el-col>
         </el-row>
-
-        <!-- <el-dialog title="TIKET HILANG" :visible.sync="showTicketLostForm" width="550px">
-            <el-form label-width="170px">
-                <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Nama" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
-                <el-form-item label="No. KTP/SIM" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="No. KTP/SIM" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
-                <el-form-item label="Alamat" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input type="textarea" rows="3" placeholder="Alamat" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
-                <el-form-item label="Nomor Polisi" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Nomor Polisi" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
-                <el-form-item label="Jenis Kendaraan" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Jenis Kendaraan" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
-                <el-form-item label="Merk/Tipe Kendaraan" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Merk/Tipe Kendaraan" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
-                <el-form-item label="Perkiraan Waktu Masuk" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Perkiraan Waktu Masuk" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
-                <el-form-item label="Waktu Keluar" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Waktu Keluar" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
-            </el-form>
-
-            <div slot="footer">
-                <el-button type="primary" @click="saveTicketLost"><i class="el-icon-success"></i> SAVE</el-button>
-                <el-button type="info" @click="showTicketLostForm = false"><i class="el-icon-error"></i> CANCEL</el-button>
-            </div>
-        </el-dialog> -->
     </div>
 </template>
 
@@ -283,9 +225,19 @@ export default {
             })
         },
         openGate() {
-            // TODO :
-            this.formModel = { barcode_number: '' }
-            alert('gate open')
+            axios.post('/parkingTransaction/openGate').then(r => {
+                this.$message({
+                    message: r.data.message,
+                    type: 'success',
+                    showClose: true
+                })
+            }).catch(e => {
+                this.$message({
+                    message: e.response.data.message,
+                    type: 'error',
+                    showClose: true
+                })
+            })
         },
         manualOpen() {
             this.$confirm(
@@ -295,12 +247,6 @@ export default {
             ).then(() => {
                 alert('ok')
             }).catch(e => console.log(e))
-        },
-        saveTicketLost() {
-
-        },
-        ticketLost() {
-
         },
     },
     mounted() {
@@ -354,13 +300,23 @@ export default {
 
 .my-input {
     border: 2px solid #160047;
-    height: 60px;
-    line-height: 60px;
-    font-size: 40px;
+    height: 50px;
+    line-height: 50px;
+    font-size: 30px;
     display: block;
     width: 100%;
     padding: 0px 15px;
     box-sizing: border-box;
+}
+
+.label-big {
+    box-sizing: border-box;
+    background-color: #160047;
+    color: #fff;
+    padding-left: 15px;
+    font-size: 20px;
+    height: 50px;
+    line-height: 50px;
 }
 
 .tarif-input {
@@ -368,28 +324,13 @@ export default {
     color: #fff;
 }
 
-.my-btn {
-    box-sizing: border-box;
-    width: 100%;
-    border: none;
-    font-size: 20px;
-    height: 50px;
-    line-height: 50px;
-    margin: 5px 0;
-    text-align: left;
-    padding-left: 15px;
-    background-color: #254ec1;
-    color: #fff;
-    border-radius: 4px;
-}
-
 .my-big-btn {
     box-sizing: border-box;
     width: 100%;
     border: none;
     font-size: 30px;
-    height: 80px;
-    line-height: 80px;
+    height: 60px;
+    line-height: 60px;
     background-color: #254ec1;
     color: #fff;
     border-radius: 4px;
@@ -401,16 +342,6 @@ export default {
     color: #fff;
     text-align: center;
     padding: 10px;
-}
-
-.label-big {
-    box-sizing: border-box;
-    background-color: #160047;
-    color: #fff;
-    padding-left: 15px;
-    font-size: 25px;
-    height: 60px;
-    line-height: 60px;
 }
 
 .text-center {

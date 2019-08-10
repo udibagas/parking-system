@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "109c2b9be19b204cb9027eea5030b86b",
+    "content-hash": "4eeafbd5e1a739a2d5dcec1b586ae5a1",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -608,6 +608,48 @@
                 "trusted proxy"
             ],
             "time": "2019-01-10T14:06:47+00:00"
+        },
+        {
+            "name": "gregwar/php-serial",
+            "version": "dev-master",
+            "target-dir": "PhpSerial",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Gregwar/php-serial.git",
+                "reference": "ebad100a9f5ac003164268367833a009efd03b21"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Gregwar/php-serial/zipball/ebad100a9f5ac003164268367833a009efd03b21",
+                "reference": "ebad100a9f5ac003164268367833a009efd03b21",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "PhpSerial": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-2.0"
+            ],
+            "authors": [
+                {
+                    "name": "Rémy Sanchez",
+                    "email": "thenux@gmail.com"
+                }
+            ],
+            "description": "This PHP class can be used to communicate with a serial port under Linux, OSX or Windows.",
+            "homepage": "http://code.google.com/p/php-serial/",
+            "keywords": [
+                "serial",
+                "serialport"
+            ],
+            "time": "2014-04-03T12:53:58+00:00"
         },
         {
             "name": "jakub-onderka/php-console-color",
@@ -5238,7 +5280,9 @@
     ],
     "aliases": [],
     "minimum-stability": "dev",
-    "stability-flags": [],
+    "stability-flags": {
+        "gregwar/php-serial": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

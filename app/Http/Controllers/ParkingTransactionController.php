@@ -8,6 +8,7 @@ use App\Http\Requests\ParkingTransactionRequest;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
+use PhpSerial\PhpSerial;
 
 class ParkingTransactionController extends Controller
 {
@@ -61,6 +62,25 @@ class ParkingTransactionController extends Controller
         } finally {
             $printer->close();
         }
+    }
+
+    public function openGate()
+    {
+        try {
+            $serial = new PhpSerial;
+            $serial->deviceSet("/dev/ttyS0");
+            $serial->confBaudRate(2400);
+            $serial->confParity("none");
+            $serial->confCharacterLength(8);
+            $serial->confStopBits(1);
+            $serial->confFlowControl("none");
+            $serial->deviceOpen();
+            $serial->sendMessage("1");
+        } catch (\Exception $e) {
+            return response(['message' => 'Failed to open gate! '. $e->getMessage()], 500);
+        }
+
+        return ['message' => 'Gate opened!'];
     }
 
     /**
