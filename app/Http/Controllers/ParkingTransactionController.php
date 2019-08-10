@@ -41,9 +41,7 @@ class ParkingTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        $input = $request->all();
-        $input['time_in'] = date('Y-m-d H:i:s');
-        return ParkingTransaction::create($input);
+        return ParkingTransaction::create($request->all());
     }
 
     public function takeSnapshot(Request $request, ParkingTransaction $parkingTransaction)
