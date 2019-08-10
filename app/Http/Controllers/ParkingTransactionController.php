@@ -9,6 +9,9 @@ use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use PhpSerial\PhpSerial;
+use App\LocationIdentity;
+use App\ParkingGate;
+use GuzzleHttp\Client;
 
 class ParkingTransactionController extends Controller
 {
@@ -43,11 +46,58 @@ class ParkingTransactionController extends Controller
         return ParkingTransaction::create($input);
     }
 
+    public function takeSnapshot(Request $request, ParkingTransaction $parkingTransaction)
+    {
+        if ($request->trx == 'IN') {
+            $gate = ParkingGate::find($parkingTransaction->gate_in_id);
+        }
+
+        if ($request->trx == 'OUT') {
+            $gate = ParkingGate::find($parkingTransaction->gate_out_id);
+        }
+
+        if (!$gate) {
+            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
+        }
+
+        $client = new Client(['timeout' => 3]);
+        $fileName = 'snapshot/'.date('YmdHis').'.jpg';
+
+        try {
+            $client->get($gate->camera_image_snapshot_url)
+                ->setAuth($gate->camera_username, $gate->camera_password)
+                ->setResponseBody($fileName)
+                ->send();
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. '. $e->getMessage()], 500);
+        }
+
+        if ($request->trx == 'IN') {
+            $parkingTransaction->update(['snapshot_in' => $fileName]);
+        }
+
+        if ($request->trx == 'OUT') {
+            $parkingTransaction->update(['snapshot_out' => $fileName]);
+        }
+
+        return $parkingTransaction;
+    }
+
     public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
     {
-        $connector = new NetworkPrintConnector("192.168.1.103", 9100);
-        // $connector = new FilePrintConnector("/dev/ttyS0");
-        $printer = new Printer($connector);
+        try {
+            $connector = new NetworkPrintConnector("192.168.1.103", 9100);
+            // $connector = new FilePrintConnector("/dev/ttyS0");
+            $printer = new Printer($connector);
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
+        }
+
+        $location = LocationIdentity::where('active', 1)->first();
+
+        if (!$location) {
+            return response(['message' => 'LOKASI TIDAK DISET'], 500);
+        }
 
         try {
             if ($request->trx == 'IN') {
@@ -55,15 +105,34 @@ class ParkingTransactionController extends Controller
             }
 
             if ($request->trx == 'OUT') {
-                $printer->text("TERIMAKASIH\n");
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->text("STRUK PARKIR\n");
+                $printer->setTextSize(2, 2);
+                $printer->text($location->name . "\n");
+                $printer->setTextSize(1, 1);
+                $printer->text($location->address . "\n\n");
+
+                $printer->setTextSize(2, 2);
+                $printer->text($parkingTransaction->plate_number . "\n");
+                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . "-\n");
+
+                $printer->setTextSize(1, 1);
+                $printer->setJustification(Printer::JUSTIFY_LEFT);
+                $printer->text('Gate'.ljust(10) + ' : ' . $parkingTransaction->gateOut->name . "\n");
+                $printer->text('Waktu Masuk'.ljust(10) + ' : ' . $parkingTransaction->time_in . "\n");
+                $printer->text('Waktu Masuk'.ljust(10) + ' : ' . $parkingTransaction->time_out . "\n");
+                $printer->text('Durasi'.ljust(10) + ' : ' . $parkingTransaction->durasi . "\n");
+                $printer->text('Petugas'.ljust(10) + ' : ' . auth()->user()->name . "\n\n\n");
+                $printer->text("TERIMAKASIH. SELAMAT JALAN.\n");
             }
 
             $printer->cut();
-        } catch (\Exeption $e) {
-            // print failed
-        } finally {
             $printer->close();
+        } catch (\Exeption $e) {
+            return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
         }
+
+        return ['message' => 'SILAKAN AMBIL STRUK'];
     }
 
     public function openGate()
@@ -72,17 +141,17 @@ class ParkingTransactionController extends Controller
             $serial = new PhpSerial;
             $serial->deviceSet("/dev/ttyS1");
             $serial->confBaudRate(2400);
-            $serial->confParity("none");
-            $serial->confCharacterLength(8);
-            $serial->confStopBits(1);
-            $serial->confFlowControl("none");
+            // $serial->confParity("none");
+            // $serial->confCharacterLength(8);
+            // $serial->confStopBits(1);
+            // $serial->confFlowControl("none");
             $serial->deviceOpen();
             $serial->sendMessage("1");
         } catch (\Exception $e) {
-            return response(['message' => 'Failed to open gate! '. $e->getMessage()], 500);
+            return response(['message' => 'GAGAL MEMBUKA GATE. '. $e->getMessage()], 500);
         }
 
-        return ['message' => 'Gate opened!'];
+        return ['message' => 'GATE BERHASIL DIBUKA'];
     }
 
     /**
