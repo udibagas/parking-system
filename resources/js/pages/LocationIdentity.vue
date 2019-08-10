@@ -18,7 +18,8 @@
         height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="name" label="Name" sortable="custom"></el-table-column>
+            <el-table-column prop="name" label="Name" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="address" label="Address" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column width="100px" fixed="right" prop="status" label="Status" sortable="custom">
                 <template slot-scope="scope">
                     <el-tag size="mini" :type="scope.row.active ? 'success' : 'info'">{{scope.row.active ? 'Active' : 'Inactive'}}</el-tag>
@@ -51,17 +52,22 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT USER' : 'ADD NEW USER'" width="550px" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT LOCATION' : 'ADD NEW LOCATION'" width="500px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"
                 style="margin-bottom:15px;">
             </el-alert>
 
-            <el-form label-width="170px">
+            <el-form label-width="100px">
                 <el-form-item label="Name" :class="formErrors.name ? 'is-error' : ''">
                     <el-input placeholder="Name" v-model="formModel.name"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Address" :class="formErrors.address ? 'is-error' : ''">
+                    <el-input placeholder="Address" type="textarea" rows="3" v-model="formModel.address"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.address">{{formErrors.address[0]}}</div>
                 </el-form-item>
 
                 <el-form-item label="Status" :class="formErrors.active ? 'is-error' : ''">
