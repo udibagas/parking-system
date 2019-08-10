@@ -12,4 +12,14 @@ class ParkingTransaction extends Model
         'note', 'user_id', 'parking_member_id', 'plate_number',
         'fare', 'snapshot_in', 'snapshot_out'
     ];
+
+    protected $appends = ['durasi'];
+
+    public function getDurasiAttribute()
+    {
+        $in = new \DateTime($this->time_in);
+        $out = new \DateTime($this->time_out);
+        $interval = $in->diff($out);
+        return $interval->format('%H:%i:%s');
+    }
 }

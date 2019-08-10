@@ -1,8 +1,30 @@
 <template>
-    <div>
+    <div id="gate-out-app">
         <el-row :gutter="20">
             <el-col :span="14">
-                <el-card style="height:calc(100vh - 105px);position:relative;">
+                <el-card style="height:calc(100vh - 105px)">
+                    <el-row :gutter="15" style="margin-bottom:15px;">
+                        <el-col :span="10">
+                            <div class="label-big">GATE IN</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <select :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
+                                <option v-for="g in $store.state.parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
+                            </select>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="15" style="margin-bottom:15px;">
+                        <el-col :span="10">
+                            <div class="label-big">GATE OUT</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <select v-model="formModel.gate_out_id" id="gate-out" class="my-input">
+                                <option v-for="g in $store.state.parkingGateList.filter(g => g.type == 'OUT')" :value="g.id" :key="g.id">{{g.name}}</option>
+                            </select>
+                        </el-col>
+                    </el-row>
+
                     <el-row :gutter="15" style="margin-bottom:15px;">
                         <el-col :span="10">
                             <div class="label-big">[-] NO. POLISI</div>
@@ -38,26 +60,26 @@
                             <div class="label-big">TARIF</div>
                         </el-col>
                         <el-col :span="14">
-                            <input disabled type="number" v-model="formModel.fare" class="my-input tarif-input">
+                            <input disabled v-model="formModel.fare" class="my-input tarif-input">
                         </el-col>
                     </el-row>
 
                     <el-row :gutter="15">
                         <el-col :span="8">
                             <div class="label">[/] IN</div>
-                            <input id="time-in" v-mask="'##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" type="text" placeholder="00:00:00" v-model="formModel.time_in" class="my-input text-center">
+                            <input id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
                         </el-col>
                         <el-col :span="8">
                             <div class="label">OUT</div>
-                            <input disabled type="text" placeholder="00:00:00" v-model="formModel.time_out" class="my-input text-center">
+                            <input disabled v-model="formModel.time_out" class="my-input-time text-center">
                         </el-col>
                         <el-col :span="8">
                             <div class="label">DURASI</div>
-                            <input disabled type="text" placeholder="00:00:00" v-model="formModel.duration" class="my-input text-center">
+                            <input disabled v-model="formModel.duration" class="my-input-time text-center">
                         </el-col>
                     </el-row>
 
-                    <el-divider></el-divider>
+                    <!-- <el-divider></el-divider> -->
                     <button class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
                 </el-card>
             </el-col>
@@ -65,7 +87,7 @@
                 <el-card style="height:calc(100vh - 105px)">
                     <el-divider>SNAPSHOT IN</el-divider>
                     <div class="block">
-                        <el-image src="" style="width: 100%; height: 100%" fit="cover">
+                        <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
                             <div slot="error" class="image-slot">
                                 <i class="el-icon-picture-outline"></i>
                             </div>
@@ -73,7 +95,7 @@
                     </div>
                     <el-divider>SNAPSHOT OUT</el-divider>
                     <div class="block">
-                        <el-image src="" style="width: 100%; height: 100%" fit="cover">
+                        <el-image :src="snapshot_out" style="width: 100%; height: 100%" fit="cover">
                             <div slot="error" class="image-slot">
                                 <i class="el-icon-picture-outline"></i>
                             </div>
@@ -92,18 +114,21 @@ export default {
             showTicketLostForm: false,
             formModel: { barcode_number: '' },
             formErrors: {},
+            snapshot_in: null,
+            snapshot_out: null
         }
     },
     watch: {
         'formModel.barcode_number'(v, o) {
             if (v.length == 5) {
-                this.formModel.time_out = moment().format('HH:mm:ss');
+                this.formModel.time_out = moment().format('YYYY-MM-DD HH:mm:ss');
 
                 if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
                     // todo : ticket hilang
                 } else {
                     let params = { barcode_number: v }
                     axios.get('/parkingTransaction/search', { params: params }).then(r => {
+                        this.snapshot_in = r.data.snapshot_in
                         this.formModel.id = r.data.id
                         this.formModel.time_in = moment(r.data.time_in).format('HH:mm:ss')
                         this.$forceUpdate()
@@ -140,7 +165,10 @@ export default {
             }
         },
         'formModel.time_in'(v, o) {
-            // this.formModel.duration = moment()
+            var date1 = moment(v)
+            var date2 = moment(this.formModel.time_out);
+            var duration = moment.duration(date2.diff(date1));
+            this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
         }
     },
     methods: {
@@ -163,9 +191,14 @@ export default {
             })
         },
         submit() {
-            // if (!this.formModel.barcode_number || !this.formModel.plate_number || !this.vehicle_type || !this.formModel.time_in) {
-            //     return
-            // }
+            if (!this.formModel.barcode_number
+            || !this.formModel.gate_out_id
+            || !this.formModel.plate_number
+            || !this.formModel.vehicle_type
+            || !this.formModel.time_out
+            || !this.formModel.time_in) {
+                return
+            }
 
             if (this.formModel.barcode_number.length !== 5) {
                 this.$message({
@@ -177,6 +210,7 @@ export default {
             }
 
             if (!!this.formModel.id) {
+                this.takeSnapshot(this.formModel.id, 'OUT')
                 this.update()
             } else {
                 this.store()
@@ -187,7 +221,10 @@ export default {
             data.time_out = moment().format('YYYY-MM-DD') + ' ' + this.formModel.time_out
 
             axios.post('/parkingTransaction', data).then(r => {
-                this.printTicket(r.data, 'OUT')
+                this.takeSnapshot(r.data.id, 'OUT')
+                this.printTicket(r.data.id, 'OUT')
+                this.formModel = { barcode_number: '' }
+                this.$forceUpdate()
             }).catch(e => {
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
@@ -203,6 +240,8 @@ export default {
 
             axios.put('/parkingTransaction/' + data.id, data).then(r => {
                 this.printTicket(r.data.id, 'OUT')
+                this.formModel = { barcode_number: '' }
+                this.$forceUpdate()
             }).catch(e => {
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
@@ -211,12 +250,27 @@ export default {
                 })
             })
         },
-        printTicket(id, trx) {
-            axios.post('/parkingTransaction/printTicket/' + id, { trx: trx }).then(r => {
-                console.log(r.data)
+        takeSnapshot(id, trx) {
+            axios.post('/parkingTransaction/takeSnapshot/' + id, { trx: trx }).then(r => {
+                this.snapshot_out = r.data.snapshot_out
             }).catch(e => {
                 this.$message({
-                    message: 'GAGAL MENCETAK STRUK',
+                    message: e.response.data.message,
+                    type: 'error',
+                    showClose: true
+                })
+            })
+        },
+        printTicket(id, trx) {
+            axios.post('/parkingTransaction/printTicket/' + id, { trx: trx }).then(r => {
+                this.$message({
+                    message: r.data.message,
+                    type: 'success',
+                    showClose: true
+                })
+            }).catch(e => {
+                this.$message({
+                    message: e.response.data.message,
                     type: 'error',
                     showClose: true
                 })
@@ -238,22 +292,14 @@ export default {
                     showClose: true
                 })
             })
-        },
-        manualOpen() {
-            this.$confirm(
-                'Anda yakin akan membuka gate manual?',
-                'Warning',
-                { type: 'warning' }
-            ).then(() => {
-                alert('ok')
-            }).catch(e => console.log(e))
-        },
+        }
     },
     mounted() {
         this.$store.commit('getVehicleTypeList')
+        this.$store.commit('getParkingGateList')
         document.getElementById('plate-number').focus()
 
-        document.onkeypress = (e) => {
+        document.getElementById('gate-out-app').onkeypress = (e) => {
             // console.log(e.key)
             if (e.key == 'Enter') {
                 this.submit()
@@ -309,6 +355,17 @@ export default {
     box-sizing: border-box;
 }
 
+.my-input-time {
+    border: 2px solid #160047;
+    height: 50px;
+    line-height: 50px;
+    font-size: 20px;
+    display: block;
+    width: 100%;
+    padding: 0px 10px;
+    box-sizing: border-box;
+}
+
 .label-big {
     box-sizing: border-box;
     background-color: #160047;
@@ -328,12 +385,13 @@ export default {
     box-sizing: border-box;
     width: 100%;
     border: none;
-    font-size: 30px;
-    height: 60px;
-    line-height: 60px;
+    font-size: 20px;
+    height: 50px;
+    line-height: 50px;
     background-color: #254ec1;
     color: #fff;
     border-radius: 4px;
+    margin-top: 15px;
 }
 
 .label {

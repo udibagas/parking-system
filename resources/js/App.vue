@@ -51,18 +51,25 @@ export default {
     components: { Login, Profile },
     computed: {
         menus() {
-            return [
+            let menus = [
                 {label: 'Home', icon: 'el-icon-s-home', path: '/' },
                 {label: 'Transactions', icon: 'el-icon-document-copy', path: 'parking-transaction' },
                 // {label: 'Member Renewal', icon: 'el-icon-refresh', path: 'member-renewal' },
                 {label: 'Report', icon: 'el-icon-data-analysis', path: 'report' },
-                {label: 'Gates', icon: 'el-icon-minus', path: 'parking-gate' },
-                {label: 'Vehicle Type', icon: 'el-icon-truck', path: 'vehicle-type' },
-                {label: 'Location Identity', icon: 'el-icon-office-building', path: 'location-identity' },
-                {label: 'Members', icon: 'el-icon-bank-card', path: 'parking-member' },
-                {label: 'Users', icon: 'el-icon-user', path: 'user' },
-                // {label: 'Log', icon: 'el-icon-bell', path: 'log' },
             ]
+
+            if (this.$store.state.user.role == 1) {
+                menus.push(
+                    {label: 'Gates', icon: 'el-icon-minus', path: 'parking-gate' },
+                    {label: 'Vehicle Type', icon: 'el-icon-truck', path: 'vehicle-type' },
+                    {label: 'Location Identity', icon: 'el-icon-office-building', path: 'location-identity' },
+                    {label: 'Members', icon: 'el-icon-bank-card', path: 'parking-member' },
+                    {label: 'Users', icon: 'el-icon-user', path: 'user' },
+                    // {label: 'Log', icon: 'el-icon-bell', path: 'log' }
+                )
+            }
+
+            return menus;
         }
     },
     data() {
@@ -142,7 +149,6 @@ export default {
 }
 
 .el-header {
-    /* background-color: #006098; */
     background-color: #254ec1;
     color: #fff;
     line-height: 60px;
