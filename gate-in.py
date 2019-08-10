@@ -7,7 +7,7 @@ import time
 from escpos.printer import Network
 import random
 import string
-import thread
+import _thread
 
 API_URL = 'http://127.0.0.1:8001/api'
 LOCATION = ''
@@ -71,7 +71,7 @@ def check_card(card_number):
         print("Failed to check card", str(e))
         return False
 
-    print r.json()
+    print(r.json())
     return r.json()
 
 def save_data(data):
@@ -81,11 +81,12 @@ def save_data(data):
         print("Failed save data", str(e))
         return False
 
-    print r.json()
+    print(r.json())
     return r.json()
 
 def gate_in_thread(gate):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        print('connecting to ', gate)
         try:
             s.connect((gate['controller_host'], gate['controller_port']))
         except Exception as e:
@@ -96,17 +97,17 @@ def gate_in_thread(gate):
             try:
                 # motor lewat loop detector 1
                 print("Detecting vehicle...")
-                if 'IN1ON' in s.recv(32).decode("utf-8"):
+                if 'IN1ON' in s.recv(32):
                     # Play "Selamat datang silahkan tekan tombol hijau" then clear buffer
                     print("ada motor. play selamat datang")
                     s.sendall(b'\xa6MT00001\xa9')
-                    s.recv(32).decode("utf-8")
+                    s.recv(32)
 
                 # detect push button or card
                 reset = False
 
                 while True:
-                    push_button_or_card = s.recv(32).decode("utf-8")
+                    push_button_or_card = s.recv(32)
                     if 'W' in push_button_or_card:
                         print('card detected ' + push_button_or_card)
                         card_number = push_button_or_card[3:-1]
@@ -182,20 +183,20 @@ def gate_in_thread(gate):
                     # play "Silahkam ambil dan simpan struk anda" then clear buffer
                     print("silakan ambil tiket")
                     s.sendall(b'\xa6MT00002\xa9')
-                    s.recv(32).decode("utf-8")
+                    s.recv(32)
                     time.sleep(3)
 
                 # play "Terimakasih" audio then clean buffer
                 print("Terimakasih")
                 s.sendall(b'\xa6MT00003\xa9')
-                s.recv(32).decode("utf-8")
+                s.recv(32)
                 # is it required?
                 # time.sleep(1)
 
                 # open gate
                 print("Open gate")
                 s.sendall(b'\xa6OPEN1\xa9')
-                if 'OPEN1OK' in s.recv(32).decode("utf-8"):
+                if 'OPEN1OK' in s.recv(32):
                     print('Gate opened')
                 # gagal buka gate
                 else:
@@ -203,7 +204,7 @@ def gate_in_thread(gate):
                     print('Failed to open gate')
 
                 # detect loop 2 buat reset
-                while 'IN3' not in s.recv(32).decode("utf-8"):
+                while 'IN3' not in s.recv(32):
                     time.sleep(.5)
 
                 print('Motor masuk. Selesai')
@@ -217,7 +218,7 @@ if __name__ == "__main__":
     # get location info
     try:
         r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1})
-    Exception as e:
+    except Exception as e:
         print('Please set location identity', str(e))
         sys.exit()
 
@@ -227,11 +228,11 @@ if __name__ == "__main__":
     # get gate IN info
     try:
         r = requests.get(API_URL + '/parkingGate/search', params={'type': 'IN'})
-    Exception as e:
+    except Exception as e:
         print('Please set GATE IN', str(e))
         sys.exit()
 
     gates = r.json()
 
     for g in gates:
-        thread.start_new_thread(gate_in_thread, (g,))
+        _thread.start_new_thread(gate_in_thread, (g,))
