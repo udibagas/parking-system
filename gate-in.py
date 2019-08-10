@@ -9,7 +9,7 @@ import random
 import string
 import _thread
 
-API_URL = 'http://127.0.0.1:8001/api'
+API_URL = 'http://localhost/api'
 LOCATION = ''
 
 def take_snapshot(output_file_name, gate):
@@ -86,9 +86,9 @@ def save_data(data):
 
 def gate_in_thread(gate):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        print('connecting to ', gate)
+        print('connecting to ', gate['controller_ip_address'])
         try:
-            s.connect((gate['controller_host'], gate['controller_port']))
+            s.connect((gate['controller_ip_address'], gate['controller_port']))
         except Exception as e:
             print("failed to connect to controller " + str(e))
 
@@ -234,5 +234,7 @@ if __name__ == "__main__":
 
     gates = r.json()
 
-    for g in gates:
-        _thread.start_new_thread(gate_in_thread, (g,))
+    gate_in_thread(gates[0])
+
+    # for g in gates:
+    #     _thread.start_new_thread(gate_in_thread, (g,))
