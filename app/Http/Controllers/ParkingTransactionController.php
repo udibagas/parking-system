@@ -112,17 +112,20 @@ class ParkingTransactionController extends Controller
                 $printer->setTextSize(1, 1);
                 $printer->text($location->address . "\n\n");
 
+                $printer->setTextSize(3, 3);
+                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n\n");
                 $printer->setTextSize(2, 2);
-                $printer->text($parkingTransaction->plate_number . "\n");
-                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . "-\n");
+                $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gateOut->name);
+                $printer->text("\n\n");
 
                 $printer->setTextSize(1, 1);
                 $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text(str_pad('Gate', 20, ' ') . ' : ' . $gateOut->name . "\n");
-                $printer->text(str_pad('Waktu Masuk', 20, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-                $printer->text(str_pad('Waktu Keluar', 20, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
-                $printer->text(str_pad('Durasi', 20, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
-                $printer->text(str_pad('Petugas', 20, ' ') . ' : ' . auth()->user()->name . "\n\n\n");
+                $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
+                $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
+                $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
+                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n\n");
+
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
             }
 

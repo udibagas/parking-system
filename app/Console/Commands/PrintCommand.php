@@ -61,17 +61,18 @@ class PrintCommand extends Command
             $printer->setTextSize(1, 1);
             $printer->text("Jl. Jendral Soedirman No. 555 Cirebon\n\n");
 
+            $printer->setTextSize(3, 3);
+            $printer->text('Rp. ' . number_format(3000, 0, ',', '.') . ",-\n\n");
             $printer->setTextSize(2, 2);
-            $printer->text("H 3329 CQ\n");
-            $printer->text('Rp. ' . number_format(3000, 0, ',', '.') . "-\n");
+            $printer->text("H 3329 CQ/MOTOR/GATE-1\n\n");
 
             $printer->setTextSize(1, 1);
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text(str_pad('Gate', 20, ' ') . ": GATE-OUT-01\n");
-            $printer->text(str_pad('Waktu Masuk', 20, ' ') . ": 2019-10-10 08:30:21\n");
-            $printer->text(str_pad('Waktu Keluar', 20, ' ') . ": 2019-10-10 10:23:13\n");
-            $printer->text(str_pad('Durasi', 20, ' ') . ": 02:02:32\n");
-            $printer->text(str_pad('Petugas', 20, ' ') . ": Bagas\n\n\n");
+            $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ": 2019-10-10 08:30:21\n");
+            $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ": 2019-10-10 10:23:13\n");
+            $printer->text(str_pad('DURASI', 15, ' ') . ": 02:02:32\n");
+            $printer->text(str_pad('PETUGAS', 15, ' ') . ": BAGAS\n\n\n");
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
 
             $printer->cut();
