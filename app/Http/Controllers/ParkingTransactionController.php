@@ -85,8 +85,17 @@ class ParkingTransactionController extends Controller
     public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
     {
         try {
-            $connector = new NetworkPrintConnector("192.168.1.103", 9100);
-            // $connector = new FilePrintConnector("/dev/ttyS0");
+            $printerDevice = env("PRINTER_DEVICE", "/dev/ttyS0");
+            $printerType = env("PRINTER_TYPE", "serial");
+
+            if ($printerType == "network") {
+                $connector = new NetworkPrintConnector($printerDevice, env("PRINTER_PORT", 9100));
+            } else if ($printerType == "serial") {
+                $connector = new FilePrintConnector($printerDevice);
+            } else {
+                return response(['message' => 'INVALID PRINTER'], 500);
+            }
+
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
