@@ -235,7 +235,6 @@ export default {
         },
         update() {
             let data = JSON.parse(JSON.stringify(this.formModel))
-            data.time_out = moment().format('YYYY-MM-DD') + ' ' + this.formModel.time_out
             delete data.time_in
 
             axios.put('/parkingTransaction/' + data.id, data).then(r => {
