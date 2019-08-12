@@ -56,21 +56,17 @@ class PrintCommand extends Command
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("STRUK PARKIR\n");
-            $printer->setTextSize(2, 2);
             $printer->text("TOSERBA MAJU LANCAR" . "\n");
-            $printer->setTextSize(1, 1);
             $printer->text("Jl. Jendral Soedirman No. 555 Cirebon\n\n");
 
-            $printer->setTextSize(2, 2);
             $printer->text('Rp. ' . number_format(3000, 0, ',', '.') . ",-\n\n");
             $printer->text("H 3329 CQ/MOTOR/GATE-1\n\n");
 
-            $printer->setTextSize(1, 1);
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ": 2019-10-10 08:30:21\n");
             $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ": 2019-10-10 10:23:13\n");
             $printer->text(str_pad('DURASI', 15, ' ') . ": 02:02:32\n");
-            $printer->text(str_pad('PETUGAS', 15, ' ') . ": BAGAS\n\n\n");
+            $printer->text(str_pad('PETUGAS', 15, ' ') . ": BAGAS\n\n");
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
 
