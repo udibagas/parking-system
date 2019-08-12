@@ -144,7 +144,7 @@ class ParkingTransactionController extends Controller
             $serial->confStopBits(1);
             $serial->confFlowControl("none");
             $serial->deviceOpen();
-            $serial->sendMessage("1");
+            $serial->sendMessage("AZ123");
             $serial->deviceClose();
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MEMBUKA GATE. '. $e->getMessage()], 500);

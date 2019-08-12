@@ -47,7 +47,7 @@ class GateCommand extends Command
             $serial->confStopBits(1);
             $serial->confFlowControl("none");
             $serial->deviceOpen();
-            $serial->sendMessage("1");
+            $serial->sendMessage("AZ123");
             $this->info($serial->readLine());
         } catch (\Exception $e) {
             $this->error($e->getMessage());
