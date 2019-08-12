@@ -13,22 +13,21 @@ API_URL = 'http://localhost/api'
 LOCATION = {}
 
 def take_snapshot(gate):
+    output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%m%s') + '.jpg'
+
     try:
         r = requests.get(gate['camera_image_snapshot_url'], auth=HTTPDigestAuth(gate['camera_username'], gate['camera_password']), timeout=3)
     except Exception as e:
-        print("Failed to connect to ip camera")
-        return False
+        send_notification(gate['id'], "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
 
     if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
-        output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%m%s') + '.jpg'
         with open('./public/' + output_file_name, 'wb') as f:
             for chunk in r:
                 f.write(chunk)
-        print('Saved picture: ' + output_file_name)
-        return output_file_name
     else:
-        print(str(r.status_code) + ' ' + r.headers['content-type'])
-        return False
+        send_notification(gate['id'], "Gagal mengambil snapshot di gate " + gate['name'] + " (error " + str(r.status_code) + ")")
+
+    return output_file_name
 
 def generate_barcode_number():
     return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
@@ -44,23 +43,22 @@ def print_ticket(trx_data, gate):
 
     try:
         p.set(align='center')
-        p.text("PARKING TICKET\n")
+        p.text("TIKET PARKIR\n")
         p.set(height=2, align='center')
         p.text(LOCATION['name'] + "\n\n")
         p.set(align='left')
-        p.text('Gate'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
-        p.text('Date'.ljust(10) + ' : ' + datetime.datetime.strptime(trx_data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
-        p.text('Time'.ljust(10) + ' : ' + trx_data['time_in'][11:] + "\n\n")
+        p.text('GATE'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
+        p.text('TANGGAL'.ljust(10) + ' : ' + datetime.datetime.strptime(trx_data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
+        p.text('JAM'.ljust(10) + ' : ' + trx_data['time_in'][11:] + "\n\n")
         p.set(align='center')
         p.barcode(trx_data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
         p.text("\n")
-        p.text("JANGAN MENINGGALKAN TICKET INI &\n")
+        p.text("JANGAN MENINGGALKAN TIKET INI &\n")
         p.text("BARANG BERHARGA\n")
         p.text("DI DALAM KENDARAAN ANDA")
         p.cut()
     except Exception as e:
         send_notification(gate['id'], 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
-        print("Failed to print ticket", trx_data['barcode_number'], str(e))
         return False
 
     return True
