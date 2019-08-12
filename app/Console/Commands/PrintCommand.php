@@ -61,9 +61,8 @@ class PrintCommand extends Command
             $printer->setTextSize(1, 1);
             $printer->text("Jl. Jendral Soedirman No. 555 Cirebon\n\n");
 
-            $printer->setTextSize(3, 3);
-            $printer->text('Rp. ' . number_format(3000, 0, ',', '.') . ",-\n\n");
             $printer->setTextSize(2, 2);
+            $printer->text('Rp. ' . number_format(3000, 0, ',', '.') . ",-\n\n");
             $printer->text("H 3329 CQ/MOTOR/GATE-1\n\n");
 
             $printer->setTextSize(1, 1);
