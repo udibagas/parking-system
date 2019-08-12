@@ -14,6 +14,7 @@ LOCATION = {}
 
 def take_snapshot(gate):
     output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%m%s') + '.jpg'
+    return output_file_name
 
     try:
         r = requests.get(gate['camera_image_snapshot_url'], auth=HTTPDigestAuth(gate['camera_username'], gate['camera_password']), timeout=3)
@@ -105,13 +106,16 @@ def gate_in_thread(gate):
         except Exception as e:
             send_notification(gate['id'], 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
             print("Failed to connect to controller " + str(e))
+            sys.exit()
 
         print("Controller detected")
         while True:
             try:
                 # motor lewat loop detector 1
                 print("Detecting vehicle...")
-                if b'IN1ON' in s.recv(32):
+                s.sendall(b'\xa6STAT\xa9')
+                loop_status = s.recv(32)
+                if b'IN1ON' in loop_status or b'STAT1' in loop_status:
                     print("Selamat datang")
                     s.sendall(b'\xa6MT00007\xa9')
                     s.recv(32)
@@ -169,7 +173,7 @@ def gate_in_thread(gate):
 
                 # kalau bukan member cetak struk
                 if data['is_member'] == 0:
-                    print_ticket(trx_data, gate)
+                    print_ticket(data, gate)
                     print("silakan ambil tiket")
                     s.sendall(b'\xa6MT00002\xa9')
                     s.recv(32)
@@ -178,13 +182,16 @@ def gate_in_thread(gate):
                 # play "Terimakasih" audio then clean buffer
                 print("Terimakasih")
                 s.sendall(b'\xa6MT00006\xa9')
-                s.recv(32)
-                time.sleep(1)
 
                 # open gate
                 print("Open gate")
                 s.sendall(b'\xa6OPEN1\xa9')
-                if b'OPEN1OK' in s.recv(32):
+                gate_status = s.recv(64)
+                while b'OPEN1' not in gate_status:
+                    gate_status = s.recv(64)
+                
+                print("Gate status:", gate_status)
+                if b'OPEN1OK' in gate_status:
                     print('Gate opened')
                 else:
                     print('Failed to open gate')
@@ -192,7 +199,7 @@ def gate_in_thread(gate):
 
                 # detect loop 2 buat reset
                 while b'IN3' not in s.recv(32):
-                    time.sleep(.5)
+                    pass
 
                 print('Motor masuk. Selesai')
 
@@ -224,6 +231,7 @@ if __name__ == "__main__":
     gates = get_gates()
     # gate_in_thread(gates[0])
 
+    x = {}
     for g in gates:
-        x = threading.Thread(target=gate_in_thread, args=(g,))
-        x.start()
+        x[g['name']] = threading.Thread(target=gate_in_thread, args=(g,))
+        x[g['name']].start()
