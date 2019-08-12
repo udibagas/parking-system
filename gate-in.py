@@ -13,22 +13,24 @@ API_URL = 'http://localhost/api'
 LOCATION = {}
 
 def take_snapshot(gate):
-    output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%m%s') + '.jpg'
-    return output_file_name
+    if gate['camera_status'] == 0:
+        return ''
 
     try:
+        output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%m%s') + '.jpg'
         r = requests.get(gate['camera_image_snapshot_url'], auth=HTTPDigestAuth(gate['camera_username'], gate['camera_password']), timeout=3)
     except Exception as e:
         send_notification(gate['id'], "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
+        return ''
 
     if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
         with open('./public/' + output_file_name, 'wb') as f:
             for chunk in r:
                 f.write(chunk)
+        return output_file_name
     else:
         send_notification(gate['id'], "Gagal mengambil snapshot di gate " + gate['name'] + " (error " + str(r.status_code) + ")")
-
-    return output_file_name
+        return ''
 
 def generate_barcode_number():
     return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
@@ -113,9 +115,7 @@ def gate_in_thread(gate):
             try:
                 # motor lewat loop detector 1
                 print("Detecting vehicle...")
-                s.sendall(b'\xa6STAT\xa9')
-                loop_status = s.recv(32)
-                if b'IN1ON' in loop_status or b'STAT1' in loop_status:
+                if b'IN1ON' in s.recv(32):
                     print("Selamat datang")
                     s.sendall(b'\xa6MT00007\xa9')
                     s.recv(32)
@@ -189,7 +189,7 @@ def gate_in_thread(gate):
                 gate_status = s.recv(64)
                 while b'OPEN1' not in gate_status:
                     gate_status = s.recv(64)
-                
+
                 print("Gate status:", gate_status)
                 if b'OPEN1OK' in gate_status:
                     print('Gate opened')
@@ -198,7 +198,7 @@ def gate_in_thread(gate):
                     send_notification(gate['id'], 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
 
                 # detect loop 2 buat reset
-                while b'IN3' not in s.recv(32):
+                while b'IN3OFF' not in s.recv(32):
                     pass
 
                 print('Motor masuk. Selesai')

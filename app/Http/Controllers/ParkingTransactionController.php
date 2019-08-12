@@ -59,6 +59,10 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
         }
 
+        if (!$gate->camera_status) {
+            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. KAMERA TIDAK AKTIF.'], 500);
+        }
+
         $client = new Client(['timeout' => 3]);
         $fileName = 'snapshot/'.date('YmdHis').'.jpg';
 
