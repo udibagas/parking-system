@@ -130,7 +130,8 @@ export default {
                     axios.get('/parkingTransaction/search', { params: params }).then(r => {
                         this.snapshot_in = r.data.snapshot_in
                         this.formModel.id = r.data.id
-                        this.formModel.time_in = moment(r.data.time_in).format('HH:mm:ss')
+                        this.formModel.gate_in_id = r.data.gate_in_id
+                        this.formModel.time_in = r.data.time_in
                         this.$forceUpdate()
                     }).catch(e => {
                         this.$message({
@@ -217,10 +218,7 @@ export default {
             }
         },
         store() {
-            let data = JSON.parse(JSON.stringify(this.formModel))
-            data.time_out = moment().format('YYYY-MM-DD') + ' ' + this.formModel.time_out
-
-            axios.post('/parkingTransaction', data).then(r => {
+            axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id, 'OUT')
                 this.printTicket(r.data.id, 'OUT')
                 this.formModel = { barcode_number: '' }
@@ -234,10 +232,7 @@ export default {
             })
         },
         update() {
-            let data = JSON.parse(JSON.stringify(this.formModel))
-            delete data.time_in
-
-            axios.put('/parkingTransaction/' + data.id, data).then(r => {
+            axios.put('/parkingTransaction/' + data.id, this.formModel).then(r => {
                 this.printTicket(r.data.id, 'OUT')
                 this.formModel = { barcode_number: '' }
                 this.$forceUpdate()
