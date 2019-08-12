@@ -14,7 +14,7 @@ class PrintCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'print:test {printer} {--type=network}';
+    protected $signature = 'print:test {printer} {--type=network} {--port=9100}';
 
     /**
      * The console command description.
@@ -44,7 +44,7 @@ class PrintCommand extends Command
             if ($this->option('type') == 'serial') {
                 $connector = new FilePrintConnector($this->argument('printer'));
             } else {
-                $connector = new NetworkPrintConnector($this->argument('printer'), 9100);
+                $connector = new NetworkPrintConnector($this->argument('printer'), $this->argument('port'));
             }
 
             $printer = new Printer($connector);
