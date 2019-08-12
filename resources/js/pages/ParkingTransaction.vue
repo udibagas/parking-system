@@ -40,7 +40,7 @@
             <el-table-column prop="gate_out" label="Gate Out" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="time_in" label="Time In" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="time_out" label="Time Out" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column label="Duration" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="durasi" label="Duration" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="fare" label="Fare" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="150px">
