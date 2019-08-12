@@ -59,7 +59,7 @@ class PrintCommand extends Command
             $printer->text("TOSERBA MAJU LANCAR" . "\n");
             $printer->text("Jl. Jendral Soedirman No. 555 Cirebon\n\n");
 
-            $printer->text('Rp. ' . number_format(3000, 0, ',', '.') . ",-\n\n");
+            $printer->text('Rp. ' . number_format(3000, 0, ',', '.') . ",-\n");
             $printer->text("H 3329 CQ/MOTOR/GATE-1\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
