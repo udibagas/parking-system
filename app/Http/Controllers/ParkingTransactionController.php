@@ -107,23 +107,18 @@ class ParkingTransactionController extends Controller
                 $gateOut = ParkingGate::find($parkingTransaction->gate_out_id);
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text("STRUK PARKIR\n");
-                $printer->setTextSize(2, 2);
                 $printer->text($location->name . "\n");
-                $printer->setTextSize(1, 1);
                 $printer->text($location->address . "\n\n");
 
-                $printer->setTextSize(3, 3);
-                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n\n");
-                $printer->setTextSize(2, 2);
+                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
                 $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gateOut->name);
                 $printer->text("\n\n");
 
-                $printer->setTextSize(1, 1);
                 $printer->setJustification(Printer::JUSTIFY_LEFT);
                 $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
                 $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
                 $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
-                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n\n");
+                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
 
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
