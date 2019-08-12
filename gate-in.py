@@ -201,7 +201,7 @@ def gate_in_thread(gate):
 
         sys.exit()
 
-def get_location:
+def get_location():
     try:
         r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
     except Exception as e:
@@ -210,7 +210,7 @@ def get_location:
 
     return r.json()
 
-def get_gates:
+def get_gates():
     try:
         r = requests.get(API_URL + '/parkingGate/search', params={'type': 'IN'}, timeout=3)
     except Exception as e:
