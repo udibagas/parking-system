@@ -44,7 +44,7 @@ class PrintCommand extends Command
             if ($this->option('type') == 'serial') {
                 $connector = new FilePrintConnector($this->argument('printer'));
             } else {
-                $connector = new NetworkPrintConnector($this->argument('printer'), $this->argument('port'));
+                $connector = new NetworkPrintConnector($this->argument('printer'), $this->option('port'));
             }
 
             $printer = new Printer($connector);
