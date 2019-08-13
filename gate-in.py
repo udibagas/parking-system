@@ -86,6 +86,7 @@ class ParkingApp(App):
             self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting thread for gate ' + g['name'] + '...\n'
             self.gate_threads[g['name']].start()
             self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread ' + g['name'] + ' STARTED\n'
+            time.sleep(3)
 
     def stop_app(self, instance):
         if len(self.gate_threads) == 0:
@@ -236,7 +237,7 @@ class ParkingApp(App):
 
     def gate_in_thread(self, gate):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            # s.setblocking(0)
+            s.setblocking(0)
             self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
             try:
                 s.connect((gate['controller_ip_address'], gate['controller_port']))
@@ -339,7 +340,6 @@ class ParkingApp(App):
                     # detect loop 2 buat reset
                     while b'IN3OFF' not in s.recv(32):
                         time.sleep(.2)
-
 
                     self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
 
