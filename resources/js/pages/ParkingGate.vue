@@ -162,6 +162,17 @@
                     <div class="el-form-item__error" v-if="formErrors.camera_video_snapshot_url">{{formErrors.camera_video_snapshot_url[0]}}</div>
                 </el-form-item>
 
+                <el-form-item label="Status" :class="formErrors.camera_status ? 'is-error' : ''">
+                    <el-switch
+                    :active-value="1"
+                    :inactive-value="0"
+                    v-model="formModel.camera_status"
+                    active-color="#13ce66">
+                    </el-switch>
+                    <el-tag :type="formModel.camera_status ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.camera_status ? 'Active' : 'Inactive'}}</el-tag>
+                    <div class="el-form-item__error" v-if="formErrors.camera_status">{{formErrors.camera_status[0]}}</div>
+                </el-form-item>
+
             </el-form>
             <span slot="footer" class="dialog-footer">
                 <el-button type="primary" @click="() => !!formModel.id ? update() : store()"><i class="el-icon-success"></i> SAVE</el-button>

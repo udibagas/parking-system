@@ -1,237 +1,345 @@
-import socket
-import time
+#!/usr/bin/env python3
+
 import sys
-import requests
-from requests.auth import HTTPDigestAuth
-from escpos.printer import Network
+import time
+import socket
 import random
 import string
-import threading
 import datetime
+import requests
+import threading
+from escpos.printer import Network
+from requests.auth import HTTPDigestAuth
+from kivy.app import App
+from kivy.uix.label import Label
+from kivy.uix.popup import Popup
+from kivy.uix.image import Image
+from kivy.uix.button import Button
+from kivy.uix.textinput import TextInput
+from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+
 
 API_URL = 'http://localhost/api'
-LOCATION = {}
 
-def take_snapshot(gate):
-    if gate['camera_status'] == 0:
-        return ''
+class ParkingApp(App):
 
-    try:
-        output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%m%s') + '.jpg'
-        r = requests.get(gate['camera_image_snapshot_url'], auth=HTTPDigestAuth(gate['camera_username'], gate['camera_password']), timeout=3)
-    except Exception as e:
-        send_notification(gate['id'], "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
-        return ''
+    def build(self):
+        self.location = None
+        self.gates = {}
+        self.gate_threads = {}
 
-    if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
-        with open('./public/' + output_file_name, 'wb') as f:
-            for chunk in r:
-                f.write(chunk)
-        return output_file_name
-    else:
-        send_notification(gate['id'], "Gagal mengambil snapshot di gate " + gate['name'] + " (error " + str(r.status_code) + ")")
-        return ''
+        layout = GridLayout(cols=2)
+        sidebar = BoxLayout(orientation='vertical', size_hint=(.4, 1))
+        btn_start = Button(text="START", size_hint=(1, .1))
+        btn_stop = Button(text="STOP", size_hint=(1, .1))
+        btn_restart = Button(text="RESTART", size_hint=(1, .1))
+        btn_clear = Button(text="CLEAR LOG", size_hint=(1, .1))
+        btn_exit = Button(text="EXIT", size_hint=(1, .1))
+        logo_image = Image(source='./public/images/logo.jpeg', size_hint=(1, .2))
+        logo_text = Label(text="MITRATEKNIK\nPARKING SYSTEM\nv1.0\n\n\nwww.mitrateknik.com", size_hint=(1, .3), halign='center')
 
-def generate_barcode_number():
-    return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
+        btn_start.bind(on_press=self.start_app)
+        btn_stop.bind(on_press=self.stop_app)
+        btn_restart.bind(on_press=self.restart_app)
+        btn_clear.bind(on_press=self.clear_log)
+        btn_exit.bind(on_press=self.exit_app)
 
-def print_ticket(trx_data, gate):
-    try:
-        p = Network(gate['printer_ip_address'])
-    except Exception as e:
-        print('failed to connect to printer')
-        return False
+        sidebar.add_widget(btn_start)
+        sidebar.add_widget(btn_stop)
+        sidebar.add_widget(btn_restart)
+        sidebar.add_widget(btn_clear)
+        sidebar.add_widget(btn_exit)
+        sidebar.add_widget(logo_image)
+        sidebar.add_widget(logo_text)
 
-    print('Printing ticket', trx_data['barcode_number'])
+        layout.add_widget(sidebar)
+        self.log_text = TextInput(hint_text='[Press Start]', readonly=True, text='', font_family='Consolas')
+        layout.add_widget(self.log_text)
 
-    try:
-        p.set(align='center')
-        p.text("TIKET PARKIR\n")
-        p.set(height=2, align='center')
-        p.text(LOCATION['name'] + "\n\n")
-        p.set(align='left')
-        p.text('GATE'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
-        p.text('TANGGAL'.ljust(10) + ' : ' + datetime.datetime.strptime(trx_data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
-        p.text('JAM'.ljust(10) + ' : ' + trx_data['time_in'][11:] + "\n\n")
-        p.set(align='center')
-        p.barcode(trx_data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
-        p.text("\n")
-        p.text("JANGAN MENINGGALKAN TIKET INI &\n")
-        p.text("BARANG BERHARGA\n")
-        p.text("DI DALAM KENDARAAN ANDA")
-        p.cut()
-    except Exception as e:
-        send_notification(gate['id'], 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
-        return False
+        return layout
 
-    return True
+    def start_app(self, instance):
+        if self.gates and len(self.gate_threads) > 0:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application already started\n'
+            return
 
-def send_notification(gate_id, message):
-    print("Sending notification : ", message)
-    notification = { 'parking_gate_id': gate_id, 'message': message }
-    try:
-        r = requests.post(API_URL + '/notification', data=notification, timeout=3)
-    except Exception as e:
-        print("Failed to send notification :", str(e))
-        return False
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting application...\n'
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Setting location...\n'
+        self.location = self.get_location()
 
-    return True
+        if self.location == False:
+            return
 
-def check_card(card_number):
-    payload = { 'card_number': card_number, 'active': 1 }
-    try:
-        r = r.requests.get(API_URL + '/parkingMember/', params=payload, timeout=3)
-    except Exception as e:
-        print("Failed to check card", str(e))
-        return False
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Location set : ' + self.location['name'] + '\n'
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Fetching gates data...\n'
+        self.gates = get_gates()
 
-    print(r.json())
-    return r.json()
+        if self.gates == False:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] No gate found'
+            return
 
-def save_data(gate, data):
-    print("Saving data : ", data)
-    try:
-        r = requests.post(API_URL + '/parkingTransaction', data=data, timeout=3)
-    except Exception as e:
-        print("Failed save data", str(e))
-        send_notification(gate['id'], 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda (gagal menyimpan data)')
-        return False
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(gates)) + ' gates.'
 
-    print(r.status_code)
-    return r.json()
+        for g in self.gates:
+            self.gate_threads[g['name']] = threading.Thread(target=gate_in_thread, args=(g,))
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting thread for gate ' + g['name'] + '...'
+            self.gate_threads[g['name']].start()
 
-def gate_in_thread(gate):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        print('Connecting to ', gate['controller_ip_address'], str(gate['controller_port']))
+    def stop_app(self, instance):
+        if len(self.gate_threads) == 0:
+            return
+
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Stopping application...\n'
+
+        for g in self.gates:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Stopping thread ' + g['name'] + '\n'
+            if self.gate_threads[g['name']].isAlive():
+                self.gate_threads[g['name']].join()
+                self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread ' + g['name'] + ' stopped\n'
+
+        self.gate_threads = {}
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] APPLICATION STOPPED.\n'
+
+    def restart_app(self, instance):
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Restarting application...\n'
+        self.stop_app(instance)
+        self.start_app(instance)
+
+    def clear_log(self, instance):
+        self.log_text.text = ''
+
+    def exit_app(self, instance):
+        popup = Popup(title='CONFIRM', title_align='center', auto_dismiss=False, size_hint=(.5, .5))
+        popup_content = BoxLayout(orientation='vertical')
+        popup_content.add_widget(Label(text='Anda yakin akan keluar dari aplikasi?'))
+        btn_area = BoxLayout(orientation='horizontal', size_hint=(1, .3), padding=10, spacing=10)
+        close_btn = Button(text="YA", on_press=lambda instance: sys.exit())
+        cancel_btn = Button(text="TIDAK", on_press=lambda instance: popup.dismiss())
+        btn_area.add_widget(close_btn)
+        btn_area.add_widget(cancel_btn)
+        popup_content.add_widget(btn_area)
+        popup.add_widget(popup_content)
+        popup.open()
+
+    def get_location(self):
         try:
-            s.connect((gate['controller_ip_address'], gate['controller_port']))
+            r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
+            return r.json()
         except Exception as e:
-            send_notification(gate['id'], 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
-            print("Failed to connect to controller " + str(e))
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Please set location identity. ' + str(e) + '\n'
+            return False
+
+    def get_gates(self):
+        try:
+            r = requests.get(API_URL + '/parkingGate/search', params={'type': 'IN'}, timeout=3)
+            return r.json()
+        except Exception as e:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Please set gate in.' + str(e) + '\n'
+            return False
+
+    def take_snapshot(self, gate):
+        if gate['camera_status'] == 0:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Camera not active\n'
+            return ''
+
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Taking snapshot...\n'
+
+        try:
+            output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%M%S') + '.jpg'
+            r = requests.get(gate['camera_image_snapshot_url'], auth=HTTPDigestAuth(gate['camera_username'], gate['camera_password']), timeout=3)
+        except Exception as e:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot' + str(e) + '\n'
+            self.send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
+            return ''
+
+        if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
+            with open('./public/' + output_file_name, 'wb') as f:
+                for chunk in r:
+                    f.write(chunk)
+
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Snapshot berhasil disimpan\n'
+            return output_file_name
+        else:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot ' + str(e) + '\n'
+            self.send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (error " + str(r.status_code) + ")")
+            return ''
+
+    def generate_barcode_number(self):
+        return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
+
+    def print_ticket(self, trx_data, gate):
+        try:
+            p = Network(gate['printer_ip_address'])
+        except Exception as e:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to connect to printer\n'
+            return False
+
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Mencetak tiket ' + trx_data['barcode_number'] + '...\n'
+
+        try:
+            p.set(align='center')
+            p.text("TIKET PARKIR\n")
+            p.set(height=2, align='center')
+            p.text(self.location['name'] + "\n\n")
+            p.set(align='left')
+            p.text('GATE'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
+            p.text('TANGGAL'.ljust(10) + ' : ' + datetime.datetime.strptime(trx_data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
+            p.text('JAM'.ljust(10) + ' : ' + trx_data['time_in'][11:] + "\n\n")
+            p.set(align='center')
+            p.barcode(trx_data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
+            p.text("\n")
+            p.text("JANGAN MENINGGALKAN TIKET INI &\n")
+            p.text("BARANG BERHARGA\n")
+            p.text("DI DALAM KENDARAAN ANDA")
+            p.cut()
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Tiket berhasil di cetak ' + trx_data['barcode_number'] + '\n'
+        except Exception as e:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mencetak tiket ' + trx_data['barcode_number'] + '\n'
+            self.send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
+            return False
+
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Tiket ' + trx_data['barcode_number'] + ' printed\n'
+        return True
+
+    def send_notification(self, gate, message):
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Mengirim notifikasi - ' + message + '\n'
+        notification = { 'parking_gate_id': gate['id'], 'message': message }
+        try:
+            r = requests.post(API_URL + '/notification', data=notification, timeout=3)
+        except Exception as e:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengirim notifikasi  \n'
+            return False
+
+        return True
+
+    def check_card(self, card_number):
+        payload = { 'card_number': card_number, 'active': 1 }
+        try:
+            r = r.requests.get(API_URL + '/parkingMember/', params=payload, timeout=3)
+        except Exception as e:
+            return False
+
+        return r.json()
+
+    def save_data(self, gate, data):
+        try:
+            r = requests.post(API_URL + '/parkingTransaction', data=data, timeout=3)
+        except Exception as e:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal menyimpan data  \n'
+            self.send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda (gagal menyimpan data)')
+            return False
+
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Data berhasil disimpan  \n'
+        return r.json()
+
+    def gate_in_thread(self, gate):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller... \n'
+            try:
+                s.connect((gate['controller_ip_address'], gate['controller_port']))
+            except Exception as e:
+                self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
+                self.send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
+                sys.exit()
+
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Controller connected \n'
+            while True:
+                try:
+                    # motor lewat loop detector 1
+                    self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n'
+                    if b'IN1ON' in s.recv(32):
+                        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n'
+                        s.sendall(b'\xa6MT00007\xa9')
+                        s.recv(32)
+
+                    # detect push button or card
+                    reset = False
+
+                    while True:
+                        push_button_or_card = s.recv(32)
+                        if b'W' in push_button_or_card:
+                            card_number = push_button_or_card[3:-1]
+                            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card detected - ' + card_number + '\n'
+                            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Checking card validity... \n'
+                            valid_card = self.check_card(card_number)
+
+                            if not valid_card:
+                                self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card not valid \n'
+                                continue
+
+                            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card valid \n'
+                            data = {'is_member': 1, 'card_number': card_number}
+                            break
+
+                        elif b'IN2ON' in push_button_or_card:
+                            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Green button pressed \n'
+                            data = {'is_member': 0}
+                            break
+
+                        elif b'IN3' in push_button_or_card:
+                            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Reset \n'
+                            reset = True
+                            break
+
+                        elif b'IN4ON' in push_button_or_card:
+                            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Red button pressed \n'
+                            reset = True
+                            s.sendall(b'\xa6MT00005\xa9')
+                            s.recv(32)
+                            self.send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
+                            break
+
+                        elif b'IN1OFF' in push_button_or_card:
+                            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle turn back \n'
+                            reset = True
+                            break
+
+                    if reset:
+                        continue
+
+                    # lengkapi data kemudian simpan
+                    data['gate_in_id'] = gate['id']
+                    data['time_in'] = time.strftime('%Y-%m-%d %T')
+                    data['vehicle_type'] = gate['vehicle_type']
+                    data['barcode_number'] = self.generate_barcode_number()
+                    data['snapshot_in'] = self.take_snapshot(gate)
+                    self.save_data(gate, data)
+
+                    # kalau bukan member cetak struk
+                    if data['is_member'] == 0:
+                        self.print_ticket(data, gate)
+                        s.sendall(b'\xa6MT00002\xa9')
+                        s.recv(32)
+                        time.sleep(3)
+
+                    self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n'
+                    s.sendall(b'\xa6MT00006\xa9')
+
+                    # open gate
+                    self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
+                    s.sendall(b'\xa6OPEN1\xa9')
+                    gate_status = s.recv(64)
+                    while b'OPEN1' not in gate_status:
+                        gate_status = s.recv(64)
+
+                    self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate status = ' + date_status + '\n'
+                    if b'OPEN1OK' in gate_status:
+                        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
+                    else:
+                        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to open date \n'
+                        self.send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
+
+                    # detect loop 2 buat reset
+                    while b'IN3OFF' not in s.recv(32):
+                        pass
+
+                    self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
+
+                except KeyboardInterrupt:
+                    break
+
             sys.exit()
 
-        print("Controller detected")
-        while True:
-            try:
-                # motor lewat loop detector 1
-                print("Detecting vehicle...")
-                if b'IN1ON' in s.recv(32):
-                    print("Selamat datang")
-                    s.sendall(b'\xa6MT00007\xa9')
-                    s.recv(32)
-
-                # detect push button or card
-                reset = False
-
-                while True:
-                    push_button_or_card = s.recv(32)
-                    if b'W' in push_button_or_card:
-                        print('card detected ' + push_button_or_card)
-                        card_number = push_button_or_card[3:-1]
-                        print("Checking card...")
-                        valid_card = check_card(card_number)
-
-                        if not valid_card:
-                            continue
-
-                        data = {'is_member': 1, 'card_number': card_number}
-                        break
-
-                    elif b'IN2ON' in push_button_or_card:
-                        print('push button detected')
-                        data = {'is_member': 0}
-                        break
-
-                    elif b'IN3' in push_button_or_card:
-                        print('Reset proses')
-                        reset = True
-                        break
-
-                    elif b'IN4ON' in push_button_or_card:
-                        print('tombol bantuan')
-                        reset = True
-                        s.sendall(b'\xa6MT00005\xa9')
-                        s.recv(32)
-                        send_notification(gate['id'], 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
-                        break
-
-                    elif b'IN1OFF' in push_button_or_card:
-                        print('motor balik lagi')
-                        reset = True
-                        break
-
-                if reset:
-                    continue
-
-                # lengkapi data kemudian simpan
-                data['gate_in_id'] = gate['id']
-                data['time_in'] = time.strftime('%Y-%m-%d %T')
-                data['vehicle_type'] = gate['vehicle_type']
-                data['barcode_number'] = generate_barcode_number()
-                data['snapshot_in'] = take_snapshot(gate)
-                save_data(gate, data)
-
-                # kalau bukan member cetak struk
-                if data['is_member'] == 0:
-                    print_ticket(data, gate)
-                    print("silakan ambil tiket")
-                    s.sendall(b'\xa6MT00002\xa9')
-                    s.recv(32)
-                    time.sleep(3)
-
-                # play "Terimakasih" audio then clean buffer
-                print("Terimakasih")
-                s.sendall(b'\xa6MT00006\xa9')
-
-                # open gate
-                print("Open gate")
-                s.sendall(b'\xa6OPEN1\xa9')
-                gate_status = s.recv(64)
-                while b'OPEN1' not in gate_status:
-                    gate_status = s.recv(64)
-
-                print("Gate status:", gate_status)
-                if b'OPEN1OK' in gate_status:
-                    print('Gate opened')
-                else:
-                    print('Failed to open gate')
-                    send_notification(gate['id'], 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
-
-                # detect loop 2 buat reset
-                while b'IN3OFF' not in s.recv(32):
-                    pass
-
-                print('Motor masuk. Selesai')
-
-            except KeyboardInterrupt:
-                break
-
-        sys.exit()
-
-def get_location():
-    try:
-        r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
-    except Exception as e:
-        print('Please set location identity', str(e))
-        sys.exit()
-
-    return r.json()
-
-def get_gates():
-    try:
-        r = requests.get(API_URL + '/parkingGate/search', params={'type': 'IN'}, timeout=3)
-    except Exception as e:
-        print('Please set GATE IN', str(e))
-        sys.exit()
-
-    return r.json()
-
 if __name__ == "__main__":
-    LOCATION = get_location()
-    gates = get_gates()
-    # gate_in_thread(gates[0])
-
-    x = {}
-    for g in gates:
-        x[g['name']] = threading.Thread(target=gate_in_thread, args=(g,))
-        x[g['name']].start()
+    ParkingApp().run()
