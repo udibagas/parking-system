@@ -67,10 +67,8 @@ class ParkingTransactionController extends Controller
         $fileName = 'snapshot/'.date('YmdHis').'.jpg';
 
         try {
-            $client->get($gate->camera_image_snapshot_url)
-                ->setAuth($gate->camera_username, $gate->camera_password)
-                ->setResponseBody($fileName)
-                ->send();
+            $response = $client->request('GET', $gate->camera_image_snapshot_url, ['auth' => [$gate->camera_username, $gate->camera_password]]);
+            file_put_contents($fileName, $response->getBody());
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. '. $e->getMessage()], 500);
         }
