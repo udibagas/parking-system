@@ -27,7 +27,7 @@ class ParkingApp(App):
     def build(self):
         self.location = None
         self.gates = []
-        self.gate_threads = []
+        self.gate_threads = {}
 
         layout = GridLayout(cols=2)
         sidebar = BoxLayout(orientation='vertical', size_hint=(.4, 1))
@@ -76,15 +76,16 @@ class ParkingApp(App):
         self.gates = self.get_gates()
 
         if self.gates == False:
-            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] No gate found'
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] No gate found \n'
             return
 
-        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(self.gates)) + ' gates.'
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(self.gates)) + ' gates\n'
 
         for g in self.gates:
-            self.gate_threads[g['name']] = threading.Thread(target=gate_in_thread, args=(g,))
-            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting thread for gate ' + g['name'] + '...'
+            self.gate_threads[g['name']] = threading.Thread(target=self.gate_in_thread, args=(g,))
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting thread for gate ' + g['name'] + '...\n'
             self.gate_threads[g['name']].start()
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread ' + g['name'] + ' STARTED\n'
 
     def stop_app(self, instance):
         if len(self.gate_threads) == 0:
@@ -235,7 +236,8 @@ class ParkingApp(App):
 
     def gate_in_thread(self, gate):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller... \n'
+            # s.setblocking(0)
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
             try:
                 s.connect((gate['controller_ip_address'], gate['controller_port']))
             except Exception as e:
@@ -252,6 +254,9 @@ class ParkingApp(App):
                         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n'
                         s.sendall(b'\xa6MT00007\xa9')
                         s.recv(32)
+                    else:
+                        time.sleep(1)
+                        continue
 
                     # detect push button or card
                     reset = False
@@ -315,15 +320,16 @@ class ParkingApp(App):
 
                     self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n'
                     s.sendall(b'\xa6MT00006\xa9')
-
+                    s.recv(32)
+                    time.sleep(1)
                     # open gate
                     self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
                     s.sendall(b'\xa6OPEN1\xa9')
                     gate_status = s.recv(64)
                     while b'OPEN1' not in gate_status:
                         gate_status = s.recv(64)
+                        time.sleep(.2)
 
-                    self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate status = ' + date_status + '\n'
                     if b'OPEN1OK' in gate_status:
                         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
                     else:
@@ -332,7 +338,8 @@ class ParkingApp(App):
 
                     # detect loop 2 buat reset
                     while b'IN3OFF' not in s.recv(32):
-                        pass
+                        time.sleep(.2)
+
 
                     self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
 
