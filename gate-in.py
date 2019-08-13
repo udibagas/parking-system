@@ -26,8 +26,8 @@ class ParkingApp(App):
 
     def build(self):
         self.location = None
-        self.gates = {}
-        self.gate_threads = {}
+        self.gates = []
+        self.gate_threads = []
 
         layout = GridLayout(cols=2)
         sidebar = BoxLayout(orientation='vertical', size_hint=(.4, 1))
@@ -73,13 +73,13 @@ class ParkingApp(App):
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Location set : ' + self.location['name'] + '\n'
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Fetching gates data...\n'
-        self.gates = get_gates()
+        self.gates = self.get_gates()
 
         if self.gates == False:
             self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] No gate found'
             return
 
-        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(gates)) + ' gates.'
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(self.gates)) + ' gates.'
 
         for g in self.gates:
             self.gate_threads[g['name']] = threading.Thread(target=gate_in_thread, args=(g,))
