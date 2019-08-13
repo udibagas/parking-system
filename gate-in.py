@@ -237,7 +237,7 @@ class ParkingApp(App):
 
     def gate_in_thread(self, gate):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-            s.setblocking(0)
+            # s.setblocking(0)
             self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
             try:
                 s.connect((gate['controller_ip_address'], gate['controller_port']))

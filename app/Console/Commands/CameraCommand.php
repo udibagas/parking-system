@@ -39,13 +39,11 @@ class CameraCommand extends Command
     public function handle()
     {
         $client = new Client(['timeout' => 3]);
-        $fileName = 'snapshot/'.date('YmdHis-test').'.jpg';
+        $fileName = './public/snapshot/'.date('YmdHis').'-test.jpg';
 
         try {
-            $client->get($this->argument('snapshot_url'))
-                ->setAuth($this->argument('username'), $this->argument('password'))
-                ->setResponseBody($fileName)
-                ->send();
+            $response = $client->request('GET', $this->argument('snapshot_url'), ['auth' => [$this->argument('username'), $this->argument('password')]]);
+            file_put_contents($fileName, $response->getBody());
         } catch (\Exception $e) {
             $this->error($e->getMessage());
             return;
