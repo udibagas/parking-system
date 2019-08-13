@@ -37,6 +37,7 @@ class NotificationController extends Controller
 
         // notifikasi di gate yg belum terbaca
         $exists = Notification::where('parking_gate_id', $request->parking_gate_id)
+            ->whereRaw('(TIME_TO_SEC(created_at) - TIME_TO_SEC(created_at)) < 60')
             ->where('message', $request->message)
             ->where('read', 0)
             ->first();
