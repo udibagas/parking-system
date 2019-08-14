@@ -21,14 +21,13 @@ from kivy.uix.gridlayout import GridLayout
 
 
 API_URL = 'http://localhost/api'
-LOG_TEXT = ''
 LOCATION = None
 
 class ParkingApp(App):
 
     def build(self):
         self.gates = []
-        self.gate_threads = {}
+        self.gate_threads = []
 
         layout = GridLayout(cols=2)
         sidebar = BoxLayout(orientation='vertical', size_hint=(.4, 1))
@@ -84,13 +83,18 @@ class ParkingApp(App):
         self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
         for g in self.gates:
-            self.gate_threads[g['name']] = threading.Thread(target=gate_in_thread, args=(g,)).start()
+            threading.Thread(target=gate_in_thread, args=(g,)).start()
 
     def stop_app(self, instance):
+        if len(self.gate_threads) == 0:
+            return
+
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Stopping application...\n'
-        # TODO: shutdown socket
-        socket.socket.shutdown(socket.socket.SHUT_WR)
-        self.gate_threads = {}
+
+        for s in self.gate_threads:
+            socket.socket.shutdown(socket.SHUT_WR)
+
+        self.gate_threads = []
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
 
     def restart_app(self, instance):
@@ -227,8 +231,8 @@ def save_data(gate, data):
 
 def gate_in_thread(gate):
     time.sleep(1)
+    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
         try:
             s.connect((gate['controller_ip_address'], gate['controller_port']))
         except Exception as e:
@@ -236,6 +240,7 @@ def gate_in_thread(gate):
             send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
             return
 
+        app.gate_threads.append(s)
         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Controller connected \n'
 
         while True:
@@ -247,17 +252,12 @@ def gate_in_thread(gate):
                     s.sendall(b'\xa6MT00007\xa9')
                     s.recv(32)
                 else:
-                    time.sleep(.2)
                     continue
 
                 # detect push button or card
                 reset = False
 
                 while True:
-                    if STOP_THREAD:
-                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n'
-                        break
-
                     push_button_or_card = s.recv(32)
                     if b'W' in push_button_or_card:
                         card_number = push_button_or_card[3:-1]
@@ -296,10 +296,6 @@ def gate_in_thread(gate):
                         reset = True
                         break
 
-                    else:
-                        time.sleep(.2)
-                        continue
-
                 if reset:
                     continue
 
@@ -327,9 +323,6 @@ def gate_in_thread(gate):
                 s.sendall(b'\xa6OPEN1\xa9')
                 gate_status = s.recv(32)
                 while b'OPEN1' not in gate_status:
-                    if STOP_THREAD:
-                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n'
-                        break
                     gate_status = s.recv(32)
                     time.sleep(.2)
 
@@ -341,9 +334,6 @@ def gate_in_thread(gate):
 
                 # detect loop 2 buat reset
                 while b'IN3OFF' not in s.recv(32):
-                    if STOP_THREAD:
-                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n'
-                        break
                     time.sleep(.2)
 
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
