@@ -22,7 +22,6 @@ from kivy.uix.gridlayout import GridLayout
 
 API_URL = 'http://localhost/api'
 LOG_TEXT = ''
-STOP_THREAD = False
 LOCATION = None
 
 class ParkingApp(App):
@@ -84,20 +83,15 @@ class ParkingApp(App):
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(self.gates)) + ' gates : '
         self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
-        STOP_THREAD = False
-
         for g in self.gates:
-            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting thread for gate ' + g['name'] + '...\n'
             self.gate_threads[g['name']] = threading.Thread(target=gate_in_thread, args=(g,)).start()
-            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread ' + g['name'] + ' STARTED\n'
-            time.sleep(3)
 
     def stop_app(self, instance):
-        if len(self.gate_threads) == 0:
-            return
-
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Stopping application...\n'
-        STOP_THREAD = True
+        # TODO: shutdown socket
+        socket.socket.shutdown(socket.socket.SHUT_WR)
+        self.gate_threads = {}
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
 
     def restart_app(self, instance):
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Restarting application...\n'
@@ -232,6 +226,7 @@ def save_data(gate, data):
     return r.json()
 
 def gate_in_thread(gate):
+    time.sleep(1)
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
         try:
@@ -244,10 +239,6 @@ def gate_in_thread(gate):
         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Controller connected \n'
 
         while True:
-            if STOP_THREAD:
-                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n'
-                break
-
             try:
                 # motor lewat loop detector 1
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n'
@@ -358,7 +349,7 @@ def gate_in_thread(gate):
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
 
             except Exception as e:
-                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished' + str(e) + '\n'
+                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : stopped. ' + str(e) + '\n'
                 break
 
 if __name__ == "__main__":
