@@ -47,20 +47,10 @@ class ParkingTransactionController extends Controller
 
     public function takeSnapshot(Request $request, ParkingTransaction $parkingTransaction)
     {
-        if ($request->trx == 'IN') {
-            $gate = ParkingGate::find($parkingTransaction->gate_in_id);
-        }
+        $gate = ParkingGate::find($request->gate_out_id);
 
-        if ($request->trx == 'OUT') {
-            $gate = ParkingGate::find($parkingTransaction->gate_out_id);
-        }
-
-        if (!$gate) {
+        if (!$gate || !$gate->camera_status || !$gate->camera_image_snapshot_url) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
-        }
-
-        if (!$gate->camera_status) {
-            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. KAMERA TIDAK AKTIF.'], 500);
         }
 
         $client = new Client(['timeout' => 3]);
@@ -79,18 +69,11 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. '. $e->getMessage()], 500);
         }
 
-        if ($request->trx == 'IN') {
-            $parkingTransaction->update(['snapshot_in' => $fileName]);
-        }
-
-        if ($request->trx == 'OUT') {
-            $parkingTransaction->update(['snapshot_out' => $fileName]);
-        }
-
+        $parkingTransaction->update(['snapshot_out' => $fileName]);
         return $parkingTransaction;
     }
 
-    public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
+    public function printTicket(ParkingTransaction $parkingTransaction)
     {
         try {
             $printerDevice = env("PRINTER_DEVICE", "/dev/ttyS0");
@@ -116,30 +99,24 @@ class ParkingTransactionController extends Controller
         }
 
         try {
-            if ($request->trx == 'IN') {
-                $printer->text("IN!\n");
-            }
+            $gateOut = ParkingGate::find($parkingTransaction->gate_out_id);
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("STRUK PARKIR\n");
+            $printer->text($location->name . "\n");
+            $printer->text($location->address . "\n\n");
 
-            if ($request->trx == 'OUT') {
-                $gateOut = ParkingGate::find($parkingTransaction->gate_out_id);
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text("STRUK PARKIR\n");
-                $printer->text($location->name . "\n");
-                $printer->text($location->address . "\n\n");
+            $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
+            $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gateOut->name);
+            $printer->text("\n\n");
 
-                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
-                $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gateOut->name);
-                $printer->text("\n\n");
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+            $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
+            $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
+            $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
+            $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
 
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-                $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
-                $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
-                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
-
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
-            }
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
 
             $printer->cut();
             $printer->close();

@@ -139,7 +139,7 @@ export default {
                         this.formModel.gate_in_id = r.data.gate_in_id
                         this.formModel.time_in = r.data.time_in
                         this.$forceUpdate()
-                        this.takeSnapshot(r.data.id, 'OUT')
+                        this.takeSnapshot(r.data.id)
                     }).catch(e => {
                         this.$message({
                             message: 'NOMOR TIKET INVALID!',
@@ -245,8 +245,8 @@ export default {
         },
         store() {
             axios.post('/parkingTransaction', this.formModel).then(r => {
-                this.takeSnapshot(r.data.id, 'OUT')
-                this.printTicket(r.data.id, 'OUT')
+                this.takeSnapshot(r.data.id)
+                this.printTicket(r.data.id)
                 this.resetForm()
                 this.$forceUpdate()
             }).catch(e => {
@@ -259,19 +259,19 @@ export default {
         },
         update() {
             axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
-                this.printTicket(r.data.id, 'OUT')
+                this.printTicket(r.data.id)
                 this.resetForm()
                 this.$forceUpdate()
             }).catch(e => {
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
                     type: 'error',
-                    showClose: true
+                    showClose: truetrx
                 })
             })
         },
-        takeSnapshot(id, trx) {
-            axios.post('/parkingTransaction/takeSnapshot/' + id, { trx: trx }).then(r => {
+        takeSnapshot(id) {
+            axios.post('/parkingTransaction/takeSnapshot/' + id, { gate_out_id: this.formModel.gate_out_id }).then(r => {
                 this.snapshot_out = r.data.snapshot_out
             }).catch(e => {
                 this.$message({
@@ -281,8 +281,8 @@ export default {
                 })
             })
         },
-        printTicket(id, trx) {
-            axios.post('/parkingTransaction/printTicket/' + id, { trx: trx }).then(r => {
+        printTicket(id) {
+            axios.post('/parkingTransaction/printTicket/' + id).then(r => {
                 this.$message({
                     message: r.data.message,
                     type: 'success',
