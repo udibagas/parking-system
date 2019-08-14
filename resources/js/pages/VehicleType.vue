@@ -22,7 +22,11 @@
             <el-table-column prop="shortcut_key" label="Shortcut Key" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="tarif_flat" label="Tarif Flat" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="denda_tiket_hilang" label="Denda Tiket Hilang" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-
+            <el-table-column fixed="right" prop="is_default" label="Default" sortable="custom">
+                <template slot-scope="scope">
+                    <el-tag size="mini" :type="scope.row.is_default ? 'success' : 'info'">{{scope.row.is_default ? 'Yes' : 'No'}}</el-tag>
+                </template>
+            </el-table-column>
             <el-table-column fixed="right" width="40px">
                 <template slot-scope="scope">
                     <el-dropdown>
@@ -75,6 +79,17 @@
                 <el-form-item label="Denda Tiket Hilang (Rp)" :class="formErrors.denda_tiket_hilang ? 'is-error' : ''">
                     <el-input type="number" :step="500" placeholder="Denda Tiket Hilang (Rp)" v-model="formModel.denda_tiket_hilang"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.denda_tiket_hilang">{{formErrors.denda_tiket_hilang[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Default" :class="formErrors.is_default ? 'is-error' : ''">
+                    <el-switch
+                    :active-value="1"
+                    :inactive-value="0"
+                    v-model="formModel.is_default"
+                    active-color="#13ce66">
+                    </el-switch>
+                    <el-tag :type="formModel.is_default ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.is_default ? 'Yes' : 'No'}}</el-tag>
+                    <div class="el-form-item__error" v-if="formErrors.is_default">{{formErrors.is_default[0]}}</div>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">

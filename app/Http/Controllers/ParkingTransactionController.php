@@ -67,7 +67,13 @@ class ParkingTransactionController extends Controller
         $fileName = 'snapshot/'.date('YmdHis').'.jpg';
 
         try {
-            $response = $client->request('GET', $gate->camera_image_snapshot_url, ['auth' => [$gate->camera_username, $gate->camera_password]]);
+            $response = $client->request('GET', $gate->camera_image_snapshot_url, [
+                'auth' => [
+                    $gate->camera_username,
+                    $gate->camera_password,
+                    $gate->camera_auth_type == 'digest' ? 'digest' : null
+                ]
+            ]);
             file_put_contents($fileName, $response->getBody());
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. '. $e->getMessage()], 500);
@@ -148,7 +154,7 @@ class ParkingTransactionController extends Controller
     {
         try {
             $serial = new PhpSerial;
-            $serial->deviceSet("/dev/ttyS0");
+            $serial->deviceSet(env('GATE_OUT_CONTROLLER_DEVICE', '/dev/ttyS4'));
             $serial->confBaudRate(2400);
             $serial->confParity("none");
             $serial->confCharacterLength(8);

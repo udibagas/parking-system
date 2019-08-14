@@ -9,7 +9,7 @@
                         </el-col>
                         <el-col :span="14">
                             <select :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
-                                <option v-for="g in $store.state.parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
+                                <option v-for="g in parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
                             </select>
                         </el-col>
                     </el-row>
@@ -20,17 +20,17 @@
                         </el-col>
                         <el-col :span="14">
                             <select v-model="formModel.gate_out_id" id="gate-out" class="my-input">
-                                <option v-for="g in $store.state.parkingGateList.filter(g => g.type == 'OUT')" :value="g.id" :key="g.id">{{g.name}}</option>
+                                <option v-for="g in parkingGateList.filter(g => g.type == 'OUT')" :value="g.id" :key="g.id">{{g.name}}</option>
                             </select>
                         </el-col>
                     </el-row>
 
                     <el-row :gutter="15" style="margin-bottom:15px;">
                         <el-col :span="10">
-                            <div class="label-big">[-] NO. POLISI</div>
+                            <div class="label-big">[-] NO. PLAT</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="plate-number" @blur="checkPlate" type="text" placeholder="NO. POLISI" v-model="formModel.plate_number" class="my-input">
+                            <input id="plate-number" @blur="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -48,9 +48,12 @@
                             <div class="label-big">[*] JENIS KENDARAAN</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="vehicle-type" type="text" placeholder="JENIS KENDARAAN" v-model="formModel.vehicle_type" class="my-input">
+                            <select placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
+                                <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
+                            </select>
+                            <!-- <input id="vehicle-type" type="text" placeholder="JENIS KENDARAAN" v-model="formModel.vehicle_type" class="my-input"> -->
                             <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
-                                {{$store.state.vehicleTypeList.map(vt => vt.shortcut_key + ' = ' + vt.name).join(', ')}}
+                                {{vehicleTypeList.map(vt => vt.shortcut_key + ' = ' + vt.name).join(', ')}}
                             </div>
                         </el-col>
                     </el-row>
@@ -115,7 +118,10 @@ export default {
             formModel: { barcode_number: '' },
             formErrors: {},
             snapshot_in: null,
-            snapshot_out: null
+            snapshot_out: null,
+            location: null,
+            parkingGateList: [],
+            vehicleTypeList: []
         }
     },
     watch: {
@@ -146,11 +152,18 @@ export default {
                 document.getElementById('vehicle-type').focus()
             }
         },
-        'formModel.vehicle_type'(v, o) {
-            let vehicle = this.$store.state.vehicleTypeList.find(vt => vt.shortcut_key == v)
+        'formModel.time_in'(v, o) {
+            var date1 = moment(v)
+            var date2 = moment(this.formModel.time_out);
+            var duration = moment.duration(date2.diff(date1));
+            this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
+        }
+    },
+    methods: {
+        setFare() {
+            let vehicle = this.vehicleTypeList.find(vt => vt.name == this.formModel.vehicle_type)
             if (vehicle) {
                 document.getElementById('vehicle-type').blur()
-                this.formModel.vehicle_type = vehicle.name
 
                 if (!this.formModel.is_member)
                 {
@@ -163,16 +176,27 @@ export default {
                 if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
                     document.getElementById('time-in').focus()
                 }
+
+                this.$forceUpdate()
             }
         },
-        'formModel.time_in'(v, o) {
-            var date1 = moment(v)
-            var date2 = moment(this.formModel.time_out);
-            var duration = moment.duration(date2.diff(date1));
-            this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
-        }
-    },
-    methods: {
+        resetForm() {
+            let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
+            this.formModel.gate_in_id = null
+            this.formModel.plate_number = ''
+            this.formModel.barcode_number = ''
+            this.formModel.time_out = ''
+
+            if (default_vehicle) {
+                this.formModel.vehicle_type = default_vehicle.name
+                this.formModel.fare = default_vehicle.tarif_flat
+            } else {
+                this.formModel.vehicle_type = ''
+                this.formModel.fare = ''
+            }
+
+            document.getElementById('plate-number').focus()
+        },
         checkPlate(e) {
             if (!this.formModel.plate_number) {
                 return
@@ -185,7 +209,6 @@ export default {
                 this.formModel.parking_member_id = r.data.id;
                 this.$forceUpdate();
             }).catch(e => {
-                this.formModel.fare = '';
                 this.formModel.is_member = 0;
                 this.formModel.parking_member_id = null;
                 this.$forceUpdate();
@@ -193,6 +216,7 @@ export default {
         },
         submit() {
             if (!this.formModel.barcode_number
+            || !this.formModel.gate_in_id
             || !this.formModel.gate_out_id
             || !this.formModel.plate_number
             || !this.formModel.vehicle_type
@@ -221,7 +245,7 @@ export default {
             axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id, 'OUT')
                 this.printTicket(r.data.id, 'OUT')
-                this.formModel = { barcode_number: '' }
+                this.resetForm()
                 this.$forceUpdate()
             }).catch(e => {
                 this.$message({
@@ -234,7 +258,7 @@ export default {
         update() {
             axios.put('/parkingTransaction/' + data.id, this.formModel).then(r => {
                 this.printTicket(r.data.id, 'OUT')
-                this.formModel = { barcode_number: '' }
+                this.resetForm()
                 this.$forceUpdate()
             }).catch(e => {
                 this.$message({
@@ -286,11 +310,88 @@ export default {
                     showClose: true
                 })
             })
-        }
+        },
+        getLocationIdentity() {
+            axios.get('/locationIdentity/search', {params: {active: 1}}).then(r => {
+                this.location = r.data
+                this.formModel.plate_number = r.data.default_plate_number
+            }).catch(e => {
+                this.$message({
+                    message: 'PLEASE SET LOCATION',
+                    type: 'error',
+                    showClose: true
+                })
+            })
+        },
+        getParkingGateList() {
+            axios.get('/parkingGate/getList').then(r => {
+                this.parkingGateList = r.data
+
+                if (r.data.filter(g => g.type == 'IN').length == 0) {
+                    this.$message({
+                        message: 'PLEASE SET GATE IN',
+                        type: 'error',
+                        showClose: true
+                    })
+                    return
+                }
+
+                if (r.data.filter(g => g.type == 'OUT').length == 0) {
+                    this.$message({
+                        message: 'PLEASE SET GATE OUT',
+                        type: 'error',
+                        showClose: true
+                    })
+                    return
+                }
+
+                this.formModel.gate_out_id = r.data.find(g => g.type == 'OUT').id
+            }).catch(e => {
+                this.$message({
+                    message: 'PLEASE SET GATE',
+                    type: 'error',
+                    showClose: true
+                })
+            })
+        },
+        getVehicleTypeList() {
+            axios.get('/vehicleType/getList').then(r => {
+                if (r.data.length == 0) {
+                    this.$message({
+                        message: 'PLEASE SET VEHICLE TYPE',
+                        type: 'error',
+                        showClose: true
+                    })
+                    return
+                }
+
+                this.vehicleTypeList = r.data
+                let default_vehicle = r.data.find(v => v.is_default == 1)
+
+                if (default_vehicle) {
+                    this.formModel.vehicle_type = default_vehicle.name
+                    this.formModel.fare = default_vehicle.tarif_flat
+                    this.$forceUpdate()
+                } else {
+                    this.$message({
+                        message: 'PLEASE SET DEFAULT VEHICLE TYPE',
+                        type: 'error',
+                        showClose: true
+                    })
+                }
+            }).catch(e => {
+                this.$message({
+                    message: 'PLEASE SET VEHICLE TYPE',
+                    type: 'error',
+                    showClose: true
+                })
+            })
+        },
     },
     mounted() {
-        this.$store.commit('getVehicleTypeList')
-        this.$store.commit('getParkingGateList')
+        this.getLocationIdentity()
+        this.getParkingGateList()
+        this.getVehicleTypeList()
         document.getElementById('plate-number').focus()
 
         document.getElementById('gate-out-app').onkeypress = (e) => {
@@ -299,21 +400,33 @@ export default {
                 this.submit()
             }
 
+            // ke field nomor plat
             if (e.key == '-') {
                 e.preventDefault()
-                this.formModel = { barcode_number: '' }
+                this.resetForm()
+                this.$forceUpdate()
                 document.getElementById('plate-number').focus()
             }
 
+            // ke field nomor tiket
             if (e.key == '+') {
                 e.preventDefault()
+                let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
                 this.formModel.barcode_number = ''
-                this.formModel.vehicle_type = ''
-                this.formModel.fare = ''
                 this.formModel.time_out = ''
+
+                if (default_vehicle) {
+                    this.formModel.vehicle_type = default_vehicle.name
+                    this.formModel.fare = default_vehicle.tarif_flat
+                } else {
+                    this.formModel.vehicle_type = ''
+                    this.formModel.fare = ''
+                }
+
                 document.getElementById('ticket-number').focus()
             }
 
+            // ke field jenis kendaraan
             if (e.key == '*') {
                 e.preventDefault()
                 this.formModel.vehicle_type = ''
@@ -321,6 +434,7 @@ export default {
                 document.getElementById('vehicle-type').focus()
             }
 
+            // ke field time in
             if (e.key == '/') {
                 e.preventDefault()
                 this.formModel.time_in = ''

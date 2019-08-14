@@ -31,27 +31,29 @@
                             <tr><td class="td-label">Camera IP Address</td><td class="td-value">{{scope.row.camera_ip_address}}</td></tr>
                             <tr><td class="td-label">Camera Username</td><td class="td-value">{{scope.row.camera_username}}</td></tr>
                             <tr><td class="td-label">Camera Password</td><td class="td-value">{{scope.row.camera_password}}</td></tr>
+                            <tr><td class="td-label">Camera Auth Type</td><td class="td-value">{{scope.row.camera_auth_type}}</td></tr>
                             <tr><td class="td-label">Camera Image Snapshot URL</td><td class="td-value">{{scope.row.camera_image_snapshot_url}}</td></tr>
-                            <tr><td class="td-label">Camera Video Snapshot URL</td><td class="td-value">{{scope.row.camera_video_snapshot_url}}</td></tr>
+                            <!-- <tr><td class="td-label">Camera Video Snapshot URL</td><td class="td-value">{{scope.row.camera_video_snapshot_url}}</td></tr> -->
                             <tr><td class="td-label">Status</td><td class="td-value">{{scope.row.is_active ? 'Active' : 'Inactive'}}</td></tr>
                         </tbody>
                     </table>
                 </template>
             </el-table-column>
-            <el-table-column prop="name" label="Name" sortable="custom" min-width="100px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="name" label="Name" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="type" label="Type" sortable="custom" min-width="80px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="vehicle_type" label="Vehicle Type" sortable="custom" min-width="120px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="controller_ip_address" label="Controller Address" sortable="custom" min-width="160px" show-overflow-tooltip>
+            <el-table-column prop="vehicle_type" label="Vehicle Type" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="controller_ip_address" label="Controller Address" sortable="custom" min-width="180px" show-overflow-tooltip>
                 <template slot-scope="scope">
                     {{scope.row.controller_ip_address}}:{{scope.row.controller_port}}
                 </template>
             </el-table-column>
-            <el-table-column prop="printer_ip_address" label="Printer IP Address" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_ip_address" label="Camera IP Address" sortable="custom" min-width="160px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_username" label="Camera Username" sortable="custom" min-width="160px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_password" label="Camera Password" sortable="custom" min-width="160px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="printer_ip_address" label="Printer IP Address" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_ip_address" label="Camera IP Address" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_username" label="Camera Username" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_password" label="Camera Password" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_auth_type" label="Camera Auth Type" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_image_snapshot_url" label="Camera Image Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_video_snapshot_url" label="Camera Video Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column>
+            <!-- <el-table-column prop="camera_video_snapshot_url" label="Camera Video Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column> -->
 
             <el-table-column fixed="right" prop="status" label="Status" sortable="custom" min-width="100px">
                 <template slot-scope="scope">
@@ -152,15 +154,22 @@
                     <div class="el-form-item__error" v-if="formErrors.camera_password">{{formErrors.camera_password[0]}}</div>
                 </el-form-item>
 
+                <el-form-item label="Auth Type" :class="formErrors.camera_auth_type ? 'is-error' : ''">
+                    <el-select v-model="formModel.camera_auth_type" placeholder="Auth Type" style="width:100%">
+                        <el-option v-for="(t, i) in ['basic', 'digest']" :value="t" :label="t" :key="i"></el-option>
+                    </el-select>
+                    <div class="el-form-item__error" v-if="formErrors.type">{{formErrors.camera_auth_type[0]}}</div>
+                </el-form-item>
+
                 <el-form-item label="Image Snapshot Url" :class="formErrors.camera_image_snapshot_url ? 'is-error' : ''">
                     <el-input placeholder="Image Snapshot Url" v-model="formModel.camera_image_snapshot_url"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.camera_image_snapshot_url">{{formErrors.camera_image_snapshot_url[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Video Snapshot Url" :class="formErrors.camera_video_snapshot_url ? 'is-error' : ''">
+                <!-- <el-form-item label="Video Snapshot Url" :class="formErrors.camera_video_snapshot_url ? 'is-error' : ''">
                     <el-input placeholder="Video Snapshot Url" v-model="formModel.camera_video_snapshot_url"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.camera_video_snapshot_url">{{formErrors.camera_video_snapshot_url[0]}}</div>
-                </el-form-item>
+                </el-form-item> -->
 
                 <el-form-item label="Status" :class="formErrors.camera_status ? 'is-error' : ''">
                     <el-switch

@@ -25,7 +25,8 @@ class LocationIdentityRequest extends FormRequest
     {
         return [
             'name' => 'required',
-            'active' => 'boolean'
+            'active' => 'boolean',
+            'default_plate_number' => 'required'
         ];
     }
 }

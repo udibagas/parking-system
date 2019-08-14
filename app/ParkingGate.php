@@ -11,7 +11,7 @@ class ParkingGate extends Model
         'controller_ip_address', 'controller_port',
         'printer_ip_address',
         'camera_ip_address', 'camera_username',
-        'camera_password',
+        'camera_password', 'camera_auth_type',
         'camera_image_snapshot_url',
         'camera_video_snapshot_url',
         'active', 'camera_status'
