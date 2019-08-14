@@ -139,6 +139,7 @@ export default {
                         this.formModel.gate_in_id = r.data.gate_in_id
                         this.formModel.time_in = r.data.time_in
                         this.$forceUpdate()
+                        this.takeSnapshot(r.data.id, 'OUT')
                     }).catch(e => {
                         this.$message({
                             message: 'NOMOR TIKET INVALID!',
@@ -155,7 +156,7 @@ export default {
         'formModel.time_in'(v, o) {
             var date1 = moment(v)
             var date2 = moment(this.formModel.time_out);
-            var duration = moment.duration(date2.diff(date1));
+            var duration = moment.duration(date1.diff(date2));
             this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
         }
     },
@@ -186,6 +187,8 @@ export default {
             this.formModel.plate_number = ''
             this.formModel.barcode_number = ''
             this.formModel.time_out = ''
+            this.formModel.time_in = ''
+            this.formModel.duration = ''
 
             if (default_vehicle) {
                 this.formModel.vehicle_type = default_vehicle.name
@@ -235,7 +238,6 @@ export default {
             }
 
             if (!!this.formModel.id) {
-                this.takeSnapshot(this.formModel.id, 'OUT')
                 this.update()
             } else {
                 this.store()
@@ -256,7 +258,7 @@ export default {
             })
         },
         update() {
-            axios.put('/parkingTransaction/' + data.id, this.formModel).then(r => {
+            axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
                 this.printTicket(r.data.id, 'OUT')
                 this.resetForm()
                 this.$forceUpdate()
