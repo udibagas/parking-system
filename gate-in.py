@@ -65,14 +65,12 @@ class ParkingApp(App):
             return
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting application...\n'
-        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Setting location...\n'
         LOCATION = get_location()
 
         if not LOCATION:
             return
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Location set : ' + LOCATION['name'] + '\n'
-        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Fetching gates data...\n'
         self.gates = get_gates()
 
         if self.gates == False:
@@ -92,7 +90,7 @@ class ParkingApp(App):
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Stopping application...\n'
 
         for s in self.gate_threads:
-            socket.socket.shutdown(socket.SHUT_WR)
+            s.shutdown(socket.SHUT_WR)
 
         self.gate_threads = []
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
@@ -110,13 +108,17 @@ class ParkingApp(App):
         popup_content = BoxLayout(orientation='vertical')
         popup_content.add_widget(Label(text='Anda yakin akan keluar dari aplikasi?'))
         btn_area = BoxLayout(orientation='horizontal', size_hint=(1, .3), padding=10, spacing=10)
-        close_btn = Button(text="YA", on_press=lambda instance: sys.exit())
+        close_btn = Button(text="YA", on_press=self.quit_app)
         cancel_btn = Button(text="TIDAK", on_press=lambda instance: popup.dismiss())
         btn_area.add_widget(close_btn)
         btn_area.add_widget(cancel_btn)
         popup_content.add_widget(btn_area)
         popup.add_widget(popup_content)
         popup.open()
+    
+    def quit_app(self, instance):
+        self.stop_app(instance)
+        sys.exit()
 
 def get_location():
     try:
@@ -247,10 +249,15 @@ def gate_in_thread(gate):
             try:
                 # motor lewat loop detector 1
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n'
-                if b'IN1ON' in s.recv(32):
+                vehicle_detection = s.recv(32)
+                
+                if b'IN1ON' in vehicle_detection:
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n'
                     s.sendall(b'\xa6MT00007\xa9')
                     s.recv(32)
+                # connection lost
+                elif vehicle_detection == b'':
+                    break
                 else:
                     continue
 
@@ -258,7 +265,6 @@ def gate_in_thread(gate):
                 reset = False
 
                 while True:
-                    push_button_or_card = s.recv(32)
                     if b'W' in push_button_or_card:
                         card_number = push_button_or_card[3:-1]
                         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card detected - ' + card_number + '\n'
@@ -295,6 +301,11 @@ def gate_in_thread(gate):
                         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle turn back \n'
                         reset = True
                         break
+                    
+                    # connection lost
+                    elif b'' == push_button_or_card:
+                        reset = True
+                        break
 
                 if reset:
                     continue
@@ -311,30 +322,39 @@ def gate_in_thread(gate):
                 if data['is_member'] == 0:
                     self.print_ticket(data, gate)
                     s.sendall(b'\xa6MT00002\xa9')
-                    s.recv(32)
+                    # connection lost
+                    if b'' == s.recv(32):
+                        break
                     time.sleep(3)
 
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n'
                 s.sendall(b'\xa6MT00006\xa9')
-                s.recv(32)
+                # connection lost
+                if b'' == s.recv(32):
+                    break
                 time.sleep(1)
                 # open gate
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
                 s.sendall(b'\xa6OPEN1\xa9')
                 gate_status = s.recv(32)
-                while b'OPEN1' not in gate_status:
+                if gate_status == b'':
+                    break
+                while b'OPEN1' not in gate_status and gate_status != b'':
                     gate_status = s.recv(32)
                     time.sleep(.2)
 
                 if b'OPEN1OK' in gate_status:
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
+                elif b'' == gate_status:
+                    break
                 else:
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to open date \n'
                     send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
 
                 # detect loop 2 buat reset
-                while b'IN3OFF' not in s.recv(32):
-                    time.sleep(.2)
+                loop_2 = s.recv(32)
+                while b'IN3OFF' not in loop_2 and loop_2 != b'':
+                    loop_2 = s.recv(32)
 
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
 
