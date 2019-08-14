@@ -31,19 +31,13 @@ class ParkingApp(App):
 
         layout = GridLayout(cols=2)
         sidebar = BoxLayout(orientation='vertical', size_hint=(.4, 1))
-        btn_start = Button(text="START", size_hint=(1, .1))
-        btn_stop = Button(text="STOP", size_hint=(1, .1))
-        btn_restart = Button(text="RESTART", size_hint=(1, .1))
-        btn_clear = Button(text="CLEAR LOG", size_hint=(1, .1))
-        btn_exit = Button(text="EXIT", size_hint=(1, .1))
+        btn_start = Button(text="START", size_hint=(1, .1), on_press=self.start_app)
+        btn_stop = Button(text="STOP", size_hint=(1, .1), on_press=self.stop_app)
+        btn_restart = Button(text="RESTART", size_hint=(1, .1), on_press=self.restart_app)
+        btn_clear = Button(text="CLEAR LOG", size_hint=(1, .1), on_press=self.clear_log)
+        btn_exit = Button(text="EXIT", size_hint=(1, .1), on_press=self.exit_app)
         logo_image = Image(source='./public/images/logo.jpeg', size_hint=(1, .2))
         logo_text = Label(text="MITRATEKNIK\nPARKING SYSTEM\nv1.0\n\n\nwww.mitrateknik.com", size_hint=(1, .3), halign='center')
-
-        btn_start.bind(on_press=self.start_app)
-        btn_stop.bind(on_press=self.stop_app)
-        btn_restart.bind(on_press=self.restart_app)
-        btn_clear.bind(on_press=self.clear_log)
-        btn_exit.bind(on_press=self.exit_app)
 
         sidebar.add_widget(btn_start)
         sidebar.add_widget(btn_stop)
@@ -96,7 +90,6 @@ class ParkingApp(App):
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
 
     def restart_app(self, instance):
-        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Restarting application...\n'
         self.stop_app(instance)
         self.start_app(instance)
 
@@ -115,7 +108,7 @@ class ParkingApp(App):
         popup_content.add_widget(btn_area)
         popup.add_widget(popup_content)
         popup.open()
-    
+
     def quit_app(self, instance):
         self.stop_app(instance)
         sys.exit()
@@ -250,7 +243,7 @@ def gate_in_thread(gate):
                 # motor lewat loop detector 1
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n'
                 vehicle_detection = s.recv(32)
-                
+
                 if b'IN1ON' in vehicle_detection:
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n'
                     s.sendall(b'\xa6MT00007\xa9')
@@ -301,7 +294,7 @@ def gate_in_thread(gate):
                         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle turn back \n'
                         reset = True
                         break
-                    
+
                     # connection lost
                     elif b'' == push_button_or_card:
                         reset = True
