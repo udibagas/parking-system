@@ -20,6 +20,6 @@ class ParkingTransaction extends Model
         $in = new \DateTime($this->time_in);
         $out = new \DateTime($this->time_out);
         $interval = $in->diff($out);
-        return $interval->format('%H:%i:%s');
+        return $interval->format('%H:%I:%S');
     }
 }
