@@ -63,44 +63,44 @@ class ParkingApp(App):
 
     def start_app(self, instance):
         if self.gates and len(self.gate_threads) > 0:
-            self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Application already started\n')
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application already started\n'
             return
 
-        self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Starting application...\n')
-        self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Setting location...\n')
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting application...\n'
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Setting location...\n'
         LOCATION = get_location()
 
         if not LOCATION:
             return
 
-        self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Location set : ' + LOCATION['name'] + '\n')
-        self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Fetching gates data...\n')
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Location set : ' + LOCATION['name'] + '\n'
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Fetching gates data...\n'
         self.gates = get_gates()
 
         if self.gates == False:
-            app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] No gate found \n')
+            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] No gate found \n'
             return
 
-        self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(self.gates)) + ' gates : '
-        self.log_text.insert_text(', '.join(map(lambda x: x['name'], gates)) + '\n')
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(self.gates)) + ' gates : '
+        self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
         STOP_THREAD = False
 
         for g in self.gates:
-            self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Starting thread for gate ' + g['name'] + '...\n')
-            self.gate_threads[g['name']] = threading.Thread(target=self.gate_in_thread, args=(g,)).start()
-            self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Thread ' + g['name'] + ' STARTED\n')
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting thread for gate ' + g['name'] + '...\n'
+            self.gate_threads[g['name']] = threading.Thread(target=gate_in_thread, args=(g,)).start()
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread ' + g['name'] + ' STARTED\n'
             time.sleep(3)
 
     def stop_app(self, instance):
         if len(self.gate_threads) == 0:
             return
 
-        self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Stopping application...\n')
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Stopping application...\n'
         STOP_THREAD = True
 
     def restart_app(self, instance):
-        self.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Restarting application...\n')
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Restarting application...\n'
         self.stop_app(instance)
         self.start_app(instance)
 
@@ -125,7 +125,7 @@ def get_location():
         r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
         return r.json()
     except Exception as e:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Please set location identity. ' + str(e) + '\n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Please set location identity. ' + str(e) + '\n'
         return False
 
 def get_gates():
@@ -133,22 +133,22 @@ def get_gates():
         r = requests.get(API_URL + '/parkingGate/search', params={'type': 'IN'}, timeout=3)
         return r.json()
     except Exception as e:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] Please set gate in.' + str(e) + '\n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Please set gate in.' + str(e) + '\n'
         return False
 
 def take_snapshot(gate):
     if gate['camera_status'] == 0:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Camera not active\n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Camera not active\n'
         return ''
 
-    app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Taking snapshot...\n')
+    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Taking snapshot...\n'
 
     try:
         output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%M%S') + '.jpg'
         r = requests.get(gate['camera_image_snapshot_url'], auth=HTTPDigestAuth(gate['camera_username'], gate['camera_password']), timeout=3)
     except Exception as e:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot' + str(e) + '\n')
-        self.send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot' + str(e) + '\n'
+        send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
         return ''
 
     if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
@@ -156,11 +156,11 @@ def take_snapshot(gate):
             for chunk in r:
                 f.write(chunk)
 
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Snapshot berhasil disimpan\n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Snapshot berhasil disimpan\n'
         return output_file_name
     else:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot ' + str(e) + '\n')
-        self.send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (error " + str(r.status_code) + ")")
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot ' + str(e) + '\n'
+        send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (error " + str(r.status_code) + ")")
         return ''
 
 def generate_barcode_number():
@@ -170,10 +170,10 @@ def print_ticket(trx_data, gate):
     try:
         p = Network(gate['printer_ip_address'])
     except Exception as e:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to connect to printer\n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to connect to printer\n'
         return False
 
-    app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Mencetak tiket ' + trx_data['barcode_number'] + '...\n')
+    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Mencetak tiket ' + trx_data['barcode_number'] + '...\n'
 
     try:
         p.set(align='center')
@@ -191,22 +191,22 @@ def print_ticket(trx_data, gate):
         p.text("BARANG BERHARGA\n")
         p.text("DI DALAM KENDARAAN ANDA")
         p.cut()
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Tiket berhasil di cetak ' + trx_data['barcode_number'] + '\n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Tiket berhasil di cetak ' + trx_data['barcode_number'] + '\n'
     except Exception as e:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mencetak tiket ' + trx_data['barcode_number'] + '\n')
-        self.send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mencetak tiket ' + trx_data['barcode_number'] + '\n'
+        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
         return False
 
-    app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Tiket ' + trx_data['barcode_number'] + ' printed\n')
+    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Tiket ' + trx_data['barcode_number'] + ' printed\n'
     return True
 
 def send_notification(gate, message):
-    app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Mengirim notifikasi - ' + message + '\n')
+    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Mengirim notifikasi - ' + message + '\n'
     notification = { 'parking_gate_id': gate['id'], 'message': message }
     try:
         r = requests.post(API_URL + '/notification', data=notification, timeout=3)
     except Exception as e:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengirim notifikasi  \n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengirim notifikasi  \n'
         return False
 
     return True
@@ -224,35 +224,35 @@ def save_data(gate, data):
     try:
         r = requests.post(API_URL + '/parkingTransaction', data=data, timeout=3)
     except Exception as e:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal menyimpan data  \n')
-        self.send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda (gagal menyimpan data)')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal menyimpan data  \n'
+        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda (gagal menyimpan data)')
         return False
 
-    app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Data berhasil disimpan  \n')
+    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Data berhasil disimpan  \n'
     return r.json()
 
 def gate_in_thread(gate):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
         try:
             s.connect((gate['controller_ip_address'], gate['controller_port']))
         except Exception as e:
-            app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n')
-            self.send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
+            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
+            send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
             return
 
-        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Controller connected \n')
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Controller connected \n'
 
         while True:
             if STOP_THREAD:
-                app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n')
+                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n'
                 break
 
             try:
                 # motor lewat loop detector 1
-                app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n')
+                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n'
                 if b'IN1ON' in s.recv(32):
-                    app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n')
+                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n'
                     s.sendall(b'\xa6MT00007\xa9')
                     s.recv(32)
                 else:
@@ -264,44 +264,44 @@ def gate_in_thread(gate):
 
                 while True:
                     if STOP_THREAD:
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n'
                         break
 
                     push_button_or_card = s.recv(32)
                     if b'W' in push_button_or_card:
                         card_number = push_button_or_card[3:-1]
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card detected - ' + card_number + '\n')
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Checking card validity... \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card detected - ' + card_number + '\n'
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Checking card validity... \n'
                         valid_card = self.check_card(card_number)
 
                         if not valid_card:
-                            app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card not valid \n')
+                            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card not valid \n'
                             continue
 
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card valid \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card valid \n'
                         data = {'is_member': 1, 'card_number': card_number}
                         break
 
                     elif b'IN2ON' in push_button_or_card:
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Green button pressed \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Green button pressed \n'
                         data = {'is_member': 0}
                         break
 
                     elif b'IN3' in push_button_or_card:
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Reset \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Reset \n'
                         reset = True
                         break
 
                     elif b'IN4ON' in push_button_or_card:
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Red button pressed \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Red button pressed \n'
                         reset = True
                         s.sendall(b'\xa6MT00005\xa9')
                         s.recv(32)
-                        self.send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
+                        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
                         break
 
                     elif b'IN1OFF' in push_button_or_card:
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle turn back \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle turn back \n'
                         reset = True
                         break
 
@@ -327,38 +327,38 @@ def gate_in_thread(gate):
                     s.recv(32)
                     time.sleep(3)
 
-                app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n')
+                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n'
                 s.sendall(b'\xa6MT00006\xa9')
                 s.recv(32)
                 time.sleep(1)
                 # open gate
-                app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n')
+                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
                 s.sendall(b'\xa6OPEN1\xa9')
                 gate_status = s.recv(32)
                 while b'OPEN1' not in gate_status:
                     if STOP_THREAD:
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n'
                         break
                     gate_status = s.recv(32)
                     time.sleep(.2)
 
                 if b'OPEN1OK' in gate_status:
-                    app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n')
+                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
                 else:
-                    app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to open date \n')
-                    self.send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
+                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to open date \n'
+                    send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
 
                 # detect loop 2 buat reset
                 while b'IN3OFF' not in s.recv(32):
                     if STOP_THREAD:
-                        app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n')
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread stop \n'
                         break
                     time.sleep(.2)
 
-                app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n')
+                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
 
             except Exception as e:
-                app.log_text.insert_text('[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished' + str(e) + '\n')
+                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished' + str(e) + '\n'
                 break
 
 if __name__ == "__main__":
