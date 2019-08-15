@@ -172,7 +172,7 @@ Builder.load_string("""
                 on_press: root.confirm_exit()
 
             Image:
-                source: './public/images/logo.jpeg'
+                source: 'http://localhost/images/logo.jpeg'
                 size_hint: (1, .25)
 
             Label:
@@ -291,7 +291,8 @@ def take_snapshot(gate):
         return ''
 
     if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
-        with open('./public/' + output_file_name, 'wb') as f:
+        with open(os.path.join(os.path.dirname(__file__), "public/" + output_file_name), 'wb') as f:
+        # with open('./public/' + output_file_name, 'wb') as f:
             for chunk in r:
                 f.write(chunk)
 
@@ -515,7 +516,7 @@ def gate_in_thread(gate):
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : stopped. ' + str(e) + '\n'
                 break
 
-class ParkingApp(App):
+class ParkingControllerApp(App):
 
     def build(self):
         return sm
@@ -527,4 +528,4 @@ sm.add_widget(GateOutScreen(name='gate_out'))
 sm.add_widget(LoginScreen(name='login'))
 
 if __name__ == "__main__":
-    ParkingApp().run()
+    ParkingControllerApp().run()
