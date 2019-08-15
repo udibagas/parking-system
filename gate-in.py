@@ -254,7 +254,7 @@ class GateInControllerScreen(Screen):
         popup.add_widget(popup_content)
         popup.open()
 
-    def exit_app(self):
+    def exit_app(self, instance):
         self.stop_app()
         sys.exit()
 
@@ -385,16 +385,20 @@ def gate_in_thread(gate):
             try:
                 # motor lewat loop detector 1
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n'
+                s.sendall(b'\xa6STAT\xa9')
                 vehicle_detection = s.recv(32)
 
-                if b'IN1ON' in vehicle_detection:
+                if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n'
                     s.sendall(b'\xa6MT00007\xa9')
                     s.recv(32)
                 # connection lost
                 elif vehicle_detection == b'':
+                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
+                    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                     break
                 else:
+                    time.sleep(.2)
                     continue
 
                 # detect push button or card
@@ -441,6 +445,8 @@ def gate_in_thread(gate):
 
                     # connection lost
                     elif b'' == push_button_or_card:
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
+                        send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                         reset = True
                         break
 
@@ -461,6 +467,8 @@ def gate_in_thread(gate):
                     s.sendall(b'\xa6MT00002\xa9')
                     # connection lost
                     if b'' == s.recv(32):
+                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
+                        send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                         break
                     time.sleep(3)
 
@@ -468,13 +476,19 @@ def gate_in_thread(gate):
                 s.sendall(b'\xa6MT00006\xa9')
                 # connection lost
                 if b'' == s.recv(32):
+                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
+                    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                     break
                 time.sleep(1)
                 # open gate
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
                 s.sendall(b'\xa6OPEN1\xa9')
                 gate_status = s.recv(32)
+
+                # connection lost
                 if gate_status == b'':
+                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
+                    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                     break
                 while b'OPEN1' not in gate_status and gate_status != b'':
                     gate_status = s.recv(32)
@@ -483,6 +497,8 @@ def gate_in_thread(gate):
                 if b'OPEN1OK' in gate_status:
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
                 elif b'' == gate_status:
+                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
+                    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                     break
                 else:
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to open date \n'
