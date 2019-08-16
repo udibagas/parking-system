@@ -27,6 +27,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');
     Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
     Route::post('parkingTransaction/openGate', 'ParkingTransactionController@openGate');
+    Route::put('parkingTransaction/setSudahKeluar/{parkingTransaction}', 'ParkingTransactionController@setSudahKeluar');
     Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
     Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
