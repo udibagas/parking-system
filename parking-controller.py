@@ -21,7 +21,7 @@ from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
 from kivy.uix.screenmanager import ScreenManager, Screen
 from kivy.lang import Builder
-
+import os
 
 API_URL = 'http://localhost/api'
 
@@ -385,7 +385,7 @@ def gate_in_thread(gate):
         while True:
             try:
                 # motor lewat loop detector 1
-                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n'
+                # app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Waiting for vehicle...\n'
                 s.sendall(b'\xa6STAT\xa9')
                 vehicle_detection = s.recv(32)
 
