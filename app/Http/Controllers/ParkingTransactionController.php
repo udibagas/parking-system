@@ -216,4 +216,11 @@ class ParkingTransactionController extends Controller
         $parkingTransaction->delete();
         return ['message' => 'Transaksi telah dihapus'];
     }
+
+    public function setSudahKeluar(ParkingTransaction $parkingTransaction)
+    {
+        $parkingTransaction->time_out = now();
+        $parkingTransaction->save();
+        return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
+    }
 }
