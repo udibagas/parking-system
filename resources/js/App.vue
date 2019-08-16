@@ -1,46 +1,48 @@
 <template>
-    <el-container>
-        <Login :visible.sync="!this.$store.state.is_logged_in" />
-        <Profile v-if="this.$store.state.is_logged_in" :show="showProfile" @close="showProfile = false" />
-        <el-header>
-            <el-row>
-                <el-col :span="12">
-                    <el-button type="text" class="btn-big text-white" @click.prevent="collapse = !collapse" :icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></el-button>
-                    <span class="brand"> {{appName}} </span>
-                </el-col>
-                <el-col :span="12" class="text-right">
-                    <el-dropdown @command="handleCommand">
-                        <span class="el-dropdown-link" style="cursor:pointer">Welcome, {{$store.state.user.name}}!</span>
-                        <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item command="profile">My Profile</el-dropdown-item>
-                            <el-dropdown-item command="logout">Logout</el-dropdown-item>
-                        </el-dropdown-menu>
-                    </el-dropdown>
-                </el-col>
-            </el-row>
-        </el-header>
+    <div>
+        <Login v-if="!$store.state.is_logged_in" :visible.sync="!$store.state.is_logged_in" />
+        <el-container v-else>
+            <Profile v-if="$store.state.is_logged_in" :show="showProfile" @close="showProfile = false" />
+            <el-header>
+                <el-row>
+                    <el-col :span="12">
+                        <el-button type="text" class="btn-big text-white" @click.prevent="collapse = !collapse" :icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></el-button>
+                        <span class="brand"> {{appName}} </span>
+                    </el-col>
+                    <el-col :span="12" class="text-right">
+                        <el-dropdown @command="handleCommand">
+                            <span class="el-dropdown-link" style="cursor:pointer">Welcome, {{$store.state.user.name}}!</span>
+                            <el-dropdown-menu slot="dropdown">
+                                <el-dropdown-item command="profile">My Profile</el-dropdown-item>
+                                <el-dropdown-item command="logout">Logout</el-dropdown-item>
+                            </el-dropdown-menu>
+                        </el-dropdown>
+                    </el-col>
+                </el-row>
+            </el-header>
 
-        <el-container>
-            <el-aside width="auto">
-                <el-menu
-                :collapse="collapse"
-                default-active="1"
-                background-color="#060446"
-                text-color="#fff"
-                class="sidebar"
-                active-text-color="#cc0000">
-                    <el-menu-item v-for="(m, i) in menus" :index="(++i).toString()" :key="i" @click="$router.push(m.path)">
-                        <i :class="m.icon"></i><span slot="title">{{m.label}}</span>
-                    </el-menu-item>
-                </el-menu>
-            </el-aside>
-            <el-main style="padding:20px">
-                <el-collapse-transition>
-                    <router-view @back="goBack"></router-view>
-                </el-collapse-transition>
-            </el-main>
+            <el-container>
+                <el-aside width="auto">
+                    <el-menu
+                    :collapse="collapse"
+                    default-active="1"
+                    background-color="#060446"
+                    text-color="#fff"
+                    class="sidebar"
+                    active-text-color="#cc0000">
+                        <el-menu-item v-for="(m, i) in menus" :index="(++i).toString()" :key="i" @click="$router.push(m.path)">
+                            <i :class="m.icon"></i><span slot="title">{{m.label}}</span>
+                        </el-menu-item>
+                    </el-menu>
+                </el-aside>
+                <el-main style="padding:20px">
+                    <el-collapse-transition>
+                        <router-view @back="goBack"></router-view>
+                    </el-collapse-transition>
+                </el-main>
+            </el-container>
         </el-container>
-    </el-container>
+    </div>
 </template>
 
 <script>
@@ -101,6 +103,10 @@ export default {
             }
         },
         getNotification() {
+            if (!this.$store.state.is_logged_in) {
+                return
+            }
+
             let params = { read: 0, pageSize: 1 }
             axios.get('/notification', { params: params }).then(r => {
                 if (r.data.data.length == 0) {

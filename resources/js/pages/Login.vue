@@ -1,10 +1,11 @@
 <template>
     <el-dialog center title="" fullscreen :show-close="false" :close-on-click-modal="false" :visible.sync="visible" :close-on-press-escape="false">
-
-        <el-form style="width:300px;margin: 40px auto 0;text-align:center;">
+        <div style="margin: 40px auto 0;text-align:center;">
             <img src="images/logo.jpeg" alt="" style="width:70px">
-            <h1>MITRATEKNIK PARKING SYSTEM</h1>
             <br>
+            <h2>{{appName}}</h2>
+        </div>
+        <el-form style="width:300px;margin: 30px auto 0;text-align:center;">
             <el-divider><h3>LOGIN</h3></el-divider>
 
             <el-form-item>
