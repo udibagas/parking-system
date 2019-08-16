@@ -229,7 +229,10 @@ class GateInControllerScreen(Screen):
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Stopping application...\n'
 
         for s in self.gate_threads:
-            s.shutdown(socket.SHUT_WR)
+            try:
+                s.shutdown(socket.SHUT_WR)
+            except Exception as e:
+                self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread already stopped\n'
 
         self.gate_threads = []
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
@@ -291,8 +294,8 @@ def take_snapshot(gate):
         return ''
 
     if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
-        with open(os.path.join(os.path.dirname(__file__), "public/" + output_file_name), 'wb') as f:
-        # with open('./public/' + output_file_name, 'wb') as f:
+        # with open(os.path.join(os.path.dirname(__file__), "public/" + output_file_name), 'wb') as f:
+        with open('./public/' + output_file_name, 'wb') as f:
             for chunk in r:
                 f.write(chunk)
 
