@@ -2,7 +2,20 @@
     <div>
         <el-page-header @back="$emit('back')" content="TRANSACTION"> </el-page-header>
         <el-divider></el-divider>
+
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
+            <el-form-item>
+                <el-date-picker
+                @change="requestData"
+                v-model="dateRange"
+                format="dd-MMM-yyyy"
+                value-format="yyyy-MM-dd"
+                type="daterange"
+                range-separator="To"
+                start-placeholder="Start date"
+                end-placeholder="End date">
+                </el-date-picker>
+            </el-form-item>
             <el-form-item style="margin-right:0;">
                 <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                     <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
@@ -11,43 +24,34 @@
         </el-form>
 
         <el-table :data="tableData.data" stripe
+        @row-dblclick="(row, column, event) => { trx = row; showTrxDetail = true }"
         :default-sort = "{prop: sort, order: order}"
         height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column type="expand">
+            <!-- <el-table-column prop="id" label="ID" sortable="custom"></el-table-column> -->
+            <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="vehicle_type" label="Vehicle Type" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="plate_number" label="Plate Number" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="is_member" label="Is Member" sortable="custom" show-overflow-tooltip min-width="120px">
                 <template slot-scope="scope">
-                    <table>
-                        <tbody>
-                            <tr><td class="td-label">Name</td><td class="td-value">{{scope.row.name}}</td></tr>
-                            <tr><td class="td-label">Email</td><td class="td-value">{{scope.row.email}}</td></tr>
-                            <tr><td class="td-label">Phone</td><td class="td-value">{{scope.row.phone}}</td></tr>
-                            <tr><td class="td-label">Plate Number</td><td class="td-value">{{scope.row.plate_number}}</td></tr>
-                            <tr><td class="td-label">Card Number</td><td class="td-value">{{scope.row.card_number}}</td></tr>
-                            <tr><td class="td-label">Vehicle Type</td><td class="td-value">{{scope.row.vehicle_type}}</td></tr>
-                            <tr><td class="td-label">Expiry Date</td><td class="td-value">{{scope.row.expiry_date}}</td></tr>
-                            <tr><td class="td-label">Last Trx</td><td class="td-value">{{scope.row.last_transaction}}</td></tr>
-                            <tr><td class="td-label">Status</td><td class="td-value">{{scope.row.is_active ? 'Active' : 'Inactive'}}</td></tr>
-                        </tbody>
-                    </table>
+                    {{scope.row.is_member ? 'Yes' : 'No'}}
                 </template>
             </el-table-column>
-            <el-table-column prop="id" label="ID" sortable="custom"></el-table-column>
-            <el-table-column prop="updated_at" label="Time" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="vehicle_type" label="Type" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="member" label="Member Name" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <!-- <el-table-column prop="card_number" label="Card Number" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
             <el-table-column prop="gate_in" label="Gate In" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="gate_out" label="Gate Out" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="time_in" label="Time In" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="time_out" label="Time Out" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="durasi" label="Duration" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="fare" label="Fare" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="150px">
+            <el-table-column prop="fare" label="Fare" sortable="custom" show-overflow-tooltip min-width="150px">
                 <template slot-scope="scope">
-                    {{scope.row.is_member ? 'Yes' : 'No'}}
+                    Rp. {{scope.row.fare | formatNumber }}
                 </template>
             </el-table-column>
+            <el-table-column prop="operator" label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="updated_at" label="Last Update" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
 
             <el-table-column fixed="right" width="40px">
                 <template slot-scope="scope">
@@ -56,7 +60,8 @@
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native.prevent="printTicket(scope.row)"><i class="el-icon-print"></i> Print Ticket</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="() => { trx = scope.row; showTrxDetail = true }"><i class="el-icon-list"></i> Show Detail</el-dropdown-item>
+                            <!-- <el-dropdown-item @click.native.prevent="printTicket(scope.row)"><i class="el-icon-print"></i> Print Ticket Keluar</el-dropdown-item> -->
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
@@ -73,6 +78,47 @@
         :page-sizes="[10, 25, 50, 100]"
         :total="tableData.total">
         </el-pagination>
+
+        <el-dialog center top="60px" width="80%" v-if="trx" :visible.sync="showTrxDetail" :title="'DETAIL TRANSACTION ' + trx.barcode_number">
+            <el-row :gutter="20">
+                <el-col :span="14">
+                    <table style="width:100%">
+                        <tbody>
+                            <tr><td class="td-label">Barcode Number</td><td class="td-value">{{trx.barcode_number}}</td></tr>
+                            <tr><td class="td-label">Vehicle Type</td><td class="td-value">{{trx.vehicle_type}}</td></tr>
+                            <tr><td class="td-label">Plate Number</td><td class="td-value">{{trx.plate_number}}</td></tr>
+                            <tr><td class="td-label">Member</td><td class="td-value">{{trx.is_member ? 'Yes' : 'No'}}</td></tr>
+                            <tr><td class="td-label">Card Number</td><td class="td-value">{{trx.card_number}}</td></tr>
+                            <tr><td class="td-label">Gate In</td><td class="td-value">{{trx.gate_in}}</td></tr>
+                            <tr><td class="td-label">Gate Out</td><td class="td-value">{{trx.gate_out}}</td></tr>
+                            <tr><td class="td-label">Time In</td><td class="td-value">{{trx.time_in}}</td></tr>
+                            <tr><td class="td-label">Time Out</td><td class="td-value">{{trx.time_out}}</td></tr>
+                            <tr><td class="td-label">Duration</td><td class="td-value">{{trx.durasi}}</td></tr>
+                            <tr><td class="td-label">Fare</td><td class="td-value">Rp {{trx.fare | formatNumber}}</td></tr>
+                            <tr><td class="td-label">Operator</td><td class="td-value">{{trx.operator}}</td></tr>
+                        </tbody>
+                    </table>
+                </el-col>
+                <el-col :span="10">
+                    <el-divider>SNAPSHOT IN</el-divider>
+                    <div class="block">
+                        <el-image :src="trx.snapshot_in" style="width: 100%; height: 100%" fit="cover">
+                            <div slot="error" class="image-slot">
+                                <i class="el-icon-picture-outline"></i>
+                            </div>
+                        </el-image>
+                    </div>
+                    <el-divider>SNAPSHOT OUT</el-divider>
+                    <div class="block">
+                        <el-image :src="trx.snapshot_out" style="width: 100%; height: 100%" fit="cover">
+                            <div slot="error" class="image-slot">
+                                <i class="el-icon-picture-outline"></i>
+                            </div>
+                        </el-image>
+                    </div>
+                </el-col>
+            </el-row>
+        </el-dialog>
     </div>
 </template>
 
@@ -86,7 +132,14 @@ export default {
             tableData: {},
             sort: 'updated_at',
             order: 'descending',
-            loading: false
+            loading: false,
+            trx: null,
+            showTrxDetail: false,
+            transaction: [],
+            income: [],
+            parkedVehicle: [],
+            date: moment().format('YYYY-MM-DD'),
+            dateRange: [moment().format('YYYY-MM-01'), moment().format('YYYY-MM-DD')]
         }
     },
     methods: {
@@ -105,6 +158,7 @@ export default {
                 pageSize: this.pageSize,
                 sort: this.sort,
                 order: this.order,
+                dateRange: this.dateRange
             }
 
             this.loading = true;
@@ -130,8 +184,14 @@ export default {
 </script>
 
 <style scoped>
+
+.block {
+    background-color: #eee;
+    height: calc(50vh - 170px);
+}
+
 .td-label {
-    min-width: 150px;
+    width: 200px;
     font-weight: bold;
     background-color: #ddd;
     padding: 5px 10px;
@@ -140,5 +200,22 @@ export default {
 .td-value {
     background-color: #eee;
     padding: 5px 10px;
+}
+
+.col-value, .col-label {
+    font-size: 16px;
+    color: #fff;
+}
+
+.summary-container {
+    height: 150px;
+}
+
+.summary-info {
+    font-size: 30px;
+}
+
+.text-center {
+    text-align: center;
 }
 </style>

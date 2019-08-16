@@ -25,10 +25,23 @@ class ParkingTransactionController extends Controller
         $sort = $request->sort ? $request->sort : 'updated_at';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
-        return ParkingTransaction::when($request->keyword, function ($q) use ($request) {
+        return ParkingTransaction::selectRaw('
+                parking_transactions.*,
+                users.name AS operator,
+                parking_members.name as member,
+                parking_gate_in.name as gate_in,
+                parking_gate_out.name as gate_out
+            ')
+            ->join('users', 'users.id', '=', 'parking_transactions.user_id', 'LEFT')
+            ->join('parking_members', 'parking_members.id', '=', 'parking_transactions.parking_member_id', 'LEFT')
+            ->join('parking_gates AS parking_gate_in', 'parking_gate_in.id', '=', 'parking_transactions.gate_in_id', 'LEFT')
+            ->join('parking_gates AS parking_gate_out', 'parking_gate_out.id', '=', 'parking_transactions.gate_out_id', 'LEFT')
+            ->when($request->dateRange, function($q) use ($request) {
+                return $q->whereBetween('parking_transactions.updated_at', $request->dateRange);
+            })->when($request->keyword, function ($q) use ($request) {
                 return $q->where('barcode_number', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('plate_number', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('card_number', 'LIKE', '%' . $request->keyword . '%');
+                    ->orWhere('parking_transactions.plate_number', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('parking_transactions.card_number', 'LIKE', '%' . $request->keyword . '%');
             })->when($request->is_member, function ($q) use ($request) {
                 return $q->whereIn('is_member', $request->is_member);
             })->orderBy($sort, $order)->paginate($request->pageSize);
@@ -42,7 +55,13 @@ class ParkingTransactionController extends Controller
      */
     public function store(Request $request)
     {
-        return ParkingTransaction::create($request->all());
+        $input = $request->all();
+
+        if (auth()->check()) {
+            $input['operator'] = auth()->user()->name;
+        }
+
+        return ParkingTransaction::create($input);
     }
 
     public function takeSnapshot(Request $request, ParkingTransaction $parkingTransaction)
@@ -175,7 +194,14 @@ class ParkingTransactionController extends Controller
      */
     public function update(ParkingTransactionRequest $request, ParkingTransaction $parkingTransaction)
     {
-        $parkingTransaction->update($request->all());
+        $input = $request->all();
+
+        if (auth()->check()) {
+            $input['user_id'] = auth()->user()->id;
+            $input['operator'] = auth()->user()->name;
+        }
+
+        $parkingTransaction->update($input);
         return $parkingTransaction;
     }
 

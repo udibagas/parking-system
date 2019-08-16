@@ -90,3 +90,13 @@ body {
     background-color: #060446;
     color: #fff;
 }
+
+.table {
+    width: 100%;
+    border-top: 2px solid #ddd;
+}
+
+.table th, .table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+}

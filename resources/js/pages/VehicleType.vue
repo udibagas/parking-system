@@ -20,8 +20,16 @@
         @sort-change="sortChange">
             <el-table-column prop="name" label="Name" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="shortcut_key" label="Shortcut Key" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="tarif_flat" label="Tarif Flat" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="denda_tiket_hilang" label="Denda Tiket Hilang" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="tarif_flat" label="Tarif Flat" sortable="custom" show-overflow-tooltip min-width="150px">
+                <template slot-scope="scope">
+                    Rp {{scope.row.tarif_flat | formatNumber}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="denda_tiket_hilang" label="Denda Tiket Hilang" sortable="custom" show-overflow-tooltip min-width="150px">
+                <template slot-scope="scope">
+                    Rp {{scope.row.denda_tiket_hilang | formatNumber}}
+                </template>
+            </el-table-column>
             <el-table-column fixed="right" prop="is_default" label="Default" sortable="custom">
                 <template slot-scope="scope">
                     <el-tag size="mini" :type="scope.row.is_default ? 'success' : 'info'">{{scope.row.is_default ? 'Yes' : 'No'}}</el-tag>
