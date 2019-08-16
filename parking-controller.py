@@ -519,6 +519,7 @@ def gate_in_thread(gate):
 class ParkingControllerApp(App):
 
     def build(self):
+        self.title = 'ENTRANCE GATE CONTROLLER - MITRATEKNIK PARKING SYSTEM V1.0'
         return sm
 
 sm  = ScreenManager()
