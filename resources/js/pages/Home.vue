@@ -1,9 +1,9 @@
 <template>
     <div id="gate-out-app">
-        <el-row :gutter="20">
+        <el-row :gutter="15">
             <el-col :span="14">
                 <el-card style="height:calc(100vh - 105px)">
-                    <el-row :gutter="15" style="margin-bottom:15px;">
+                    <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE IN</div>
                         </el-col>
@@ -14,7 +14,7 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="15" style="margin-bottom:15px;">
+                    <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE OUT</div>
                         </el-col>
@@ -25,30 +25,30 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="15" style="margin-bottom:15px;">
+                    <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">[-] NO. PLAT</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="plate-number" @blur="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
+                            <input id="plate-number" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="15" style="margin-bottom:15px;">
+                    <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">[+] NO. TIKET</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="ticket-number" @keyup.enter="checkTicket" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="15" style="margin-bottom:15px;">
+                    <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">[*] JENIS KENDARAAN</div>
                         </el-col>
                         <el-col :span="14">
-                            <select placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
+                            <select @keyup.enter="submit" placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
                                 <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
                             </select>
                             <!-- <input id="vehicle-type" type="text" placeholder="JENIS KENDARAAN" v-model="formModel.vehicle_type" class="my-input"> -->
@@ -58,7 +58,7 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="15" style="margin-bottom:15px;">
+                    <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">TARIF</div>
                         </el-col>
@@ -67,10 +67,10 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="15">
+                    <el-row :gutter="10">
                         <el-col :span="8">
                             <div class="label">[/] IN</div>
-                            <input id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
+                            <input @keyup.enter="submit" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
                         </el-col>
                         <el-col :span="8">
                             <div class="label">OUT</div>
@@ -125,46 +125,44 @@ export default {
         }
     },
     watch: {
-        'formModel.barcode_number'(v, o) {
-            if (v.length == 5) {
-                this.formModel.time_out = moment().format('YYYY-MM-DD HH:mm:ss');
-
-                if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
-                    // todo : ticket hilang
-                } else {
-                    let params = { barcode_number: v }
-                    axios.get('/parkingTransaction/search', { params: params }).then(r => {
-                        this.snapshot_in = r.data.snapshot_in
-                        this.formModel.id = r.data.id
-                        this.formModel.gate_in_id = r.data.gate_in_id
-                        this.formModel.time_in = r.data.time_in
-                        this.$forceUpdate()
-                        this.takeSnapshot(r.data.id)
-                    }).catch(e => {
-                        this.$message({
-                            message: 'NOMOR TIKET INVALID!',
-                            type: 'error',
-                            showClose: true,
-                        })
-                    })
-                }
-
-                document.getElementById('ticket-number').blur()
-                document.getElementById('vehicle-type').focus()
-            }
-        },
         'formModel.time_in'(v, o) {
             var date1 = moment(v)
             var date2 = moment(this.formModel.time_out);
-            var duration = moment.duration(date1.diff(date2));
-            this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss');
+            var duration = moment.duration(date2.diff(date1));
+            this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss')
+            this.$forceUpdate()
         }
     },
     methods: {
+        checkTicket() {
+            let now = moment().format('YYYY-MM-DD HH:mm:ss')
+
+            if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
+                this.formModel.time_out = now;
+                document.getElementById('vehicle-type').focus()
+            } else {
+                let params = { barcode_number: this.formModel.barcode_number }
+                axios.get('/parkingTransaction/search', { params: params }).then(r => {
+                    this.snapshot_in = r.data.snapshot_in
+                    this.formModel.id = r.data.id
+                    this.formModel.time_out = now
+                    this.formModel.gate_in_id = r.data.gate_in_id
+                    this.formModel.time_in = r.data.time_in
+                    this.$forceUpdate()
+                    this.takeSnapshot(r.data.id)
+                    document.getElementById('vehicle-type').focus()
+                }).catch(e => {
+                    this.$message({
+                        message: 'NOMOR TIKET INVALID!',
+                        type: 'error',
+                        showClose: true,
+                    })
+                })
+            }
+        },
         setFare() {
             let vehicle = this.vehicleTypeList.find(vt => vt.name == this.formModel.vehicle_type)
             if (vehicle) {
-                document.getElementById('vehicle-type').blur()
 
                 if (!this.formModel.is_member)
                 {
@@ -189,6 +187,8 @@ export default {
             this.formModel.time_out = ''
             this.formModel.time_in = ''
             this.formModel.duration = ''
+            this.snapshot_in = ''
+            this.snapshot_out = ''
 
             if (default_vehicle) {
                 this.formModel.vehicle_type = default_vehicle.name
@@ -216,24 +216,31 @@ export default {
                 this.formModel.parking_member_id = null;
                 this.$forceUpdate();
             })
+
+            document.getElementById('ticket-number').focus()
         },
         submit() {
+            // kalau tiket hilang harus isi time in dulu
+            if (this.formModel.barcode_number.toLowerCase() == 'xxxxx' && !this.formModel.time_in) {
+                document.getElementById('time-in').focus()
+                return
+            }
+
+            if (!this.formModel.gate_in_id) {
+                this.$message({
+                    message: 'MOHON ISI GATE IN',
+                    type: 'error',
+                    showClose: true,
+                })
+                return
+            }
+
             if (!this.formModel.barcode_number
-            || !this.formModel.gate_in_id
             || !this.formModel.gate_out_id
             || !this.formModel.plate_number
             || !this.formModel.vehicle_type
             || !this.formModel.time_out
             || !this.formModel.time_in) {
-                return
-            }
-
-            if (this.formModel.barcode_number.length !== 5) {
-                this.$message({
-                    message: 'NOMOR TIKET INVALID!',
-                    type: 'error',
-                    showClose: true,
-                })
                 return
             }
 
@@ -398,9 +405,9 @@ export default {
 
         document.getElementById('gate-out-app').onkeypress = (e) => {
             // console.log(e.key)
-            if (e.key == 'Enter') {
-                this.submit()
-            }
+            // if (e.key == 'Enter') {
+            //     this.submit()
+            // }
 
             // ke field nomor plat
             if (e.key == '-') {
@@ -456,8 +463,8 @@ export default {
 
 .my-input {
     border: 2px solid #160047;
-    height: 50px;
-    line-height: 50px;
+    height: 45px;
+    line-height: 45px;
     font-size: 30px;
     display: block;
     width: 100%;
@@ -467,8 +474,8 @@ export default {
 
 .my-input-time {
     border: 2px solid #160047;
-    height: 50px;
-    line-height: 50px;
+    height: 45px;
+    line-height: 45px;
     font-size: 20px;
     display: block;
     width: 100%;
@@ -482,8 +489,8 @@ export default {
     color: #fff;
     padding-left: 15px;
     font-size: 20px;
-    height: 50px;
-    line-height: 50px;
+    height: 45px;
+    line-height: 45px;
 }
 
 .tarif-input {
@@ -496,12 +503,12 @@ export default {
     width: 100%;
     border: none;
     font-size: 20px;
-    height: 50px;
-    line-height: 50px;
+    height: 45px;
+    line-height: 45px;
     background-color: #254ec1;
     color: #fff;
     border-radius: 4px;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .label {

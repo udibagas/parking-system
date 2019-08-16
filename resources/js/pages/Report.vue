@@ -9,7 +9,7 @@
                 <el-date-picker
                 @change="requestData"
                 v-model="dateRange"
-                format="dd-MMM-yyyy"
+                format="dd/MMM/yyyy"
                 value-format="yyyy-MM-dd"
                 type="daterange"
                 range-separator="To"

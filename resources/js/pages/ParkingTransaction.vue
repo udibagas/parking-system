@@ -8,7 +8,7 @@
                 <el-date-picker
                 @change="requestData"
                 v-model="dateRange"
-                format="dd-MMM-yyyy"
+                format="dd/MMM/yyyy"
                 value-format="yyyy-MM-dd"
                 type="daterange"
                 range-separator="To"
@@ -60,7 +60,8 @@
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native.prevent="() => { trx = scope.row; showTrxDetail = true }"><i class="el-icon-list"></i> Show Detail</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="() => { trx = scope.row; showTrxDetail = true }"><i class="el-icon-zoom-in"></i> Show Detail</el-dropdown-item>
+                            <el-dropdown-item v-if="!scope.row.time_out" @click.native.prevent="setSudahKeluar(scope.row.id)"><i class="el-icon-check"></i> Set Sudah Keluar</el-dropdown-item>
                             <!-- <el-dropdown-item @click.native.prevent="printTicket(scope.row)"><i class="el-icon-print"></i> Print Ticket Keluar</el-dropdown-item> -->
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -147,6 +148,23 @@ export default {
             if (c.prop != this.sort || c.order != this.order) {
                 this.sort = c.prop; this.order = c.order; this.requestData()
             }
+        },
+        setSudahKeluar(id) {
+            this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' }).then(() => {
+                axios.put('parkingTransaction/setSudahKeluar/' + id).then(r => {
+                    this.$message({
+                        message: r.data.message,
+                        type: 'success',
+                        showClose: true
+                    });
+                }).catch(e => {
+                    this.$message({
+                        message: r.response.data.message,
+                        type: 'error',
+                        showClose: true
+                    });
+                })
+            }).catch(() => console.log(e))
         },
         printTicket(data) {
 
