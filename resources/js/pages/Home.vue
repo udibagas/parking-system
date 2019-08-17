@@ -30,7 +30,7 @@
                             <div class="label-big">[-] NO. PLAT</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="plate-number" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
+                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -39,7 +39,7 @@
                             <div class="label-big">[+] NO. TIKET</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" @keyup.enter="checkTicket" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -70,7 +70,7 @@
                     <el-row :gutter="10">
                         <el-col :span="8">
                             <div class="label">[/] IN</div>
-                            <input @keyup.enter="submit" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
+                            <input @keyup.enter="submit" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
                         </el-col>
                         <el-col :span="8">
                             <div class="label">OUT</div>
@@ -124,16 +124,15 @@ export default {
             vehicleTypeList: []
         }
     },
-    watch: {
-        'formModel.time_in'(v, o) {
-            var date1 = moment(v)
+    methods: {
+        setDuration() {
+            var date1 = moment(this.formModel.time_in)
             var date2 = moment(this.formModel.time_out);
             var duration = moment.duration(date2.diff(date1));
             this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss')
+            console.log(this.formModel.duration)
             this.$forceUpdate()
-        }
-    },
-    methods: {
+        },
         checkTicket() {
             let now = moment().format('YYYY-MM-DD HH:mm:ss')
 
@@ -148,6 +147,7 @@ export default {
                     this.formModel.time_out = now
                     this.formModel.gate_in_id = r.data.gate_in_id
                     this.formModel.time_in = r.data.time_in
+                    this.setDuration()
                     this.$forceUpdate()
                     this.takeSnapshot(r.data.id)
                     document.getElementById('vehicle-type').focus()
@@ -254,7 +254,6 @@ export default {
             axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id)
                 this.printTicket(r.data.id)
-                this.resetForm()
                 this.$forceUpdate()
             }).catch(e => {
                 this.$message({
@@ -267,7 +266,6 @@ export default {
         update() {
             axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
                 this.printTicket(r.data.id)
-                this.resetForm()
                 this.$forceUpdate()
             }).catch(e => {
                 this.$message({
@@ -307,6 +305,7 @@ export default {
         },
         openGate() {
             axios.post('/parkingTransaction/openGate').then(r => {
+                this.resetForm()
                 this.$message({
                     message: r.data.message,
                     type: 'success',
@@ -470,6 +469,10 @@ export default {
     width: 100%;
     padding: 0px 15px;
     box-sizing: border-box;
+}
+
+.my-input:focus, .my-input-time:focus {
+    background: rgb(255, 246, 122);
 }
 
 .my-input-time {

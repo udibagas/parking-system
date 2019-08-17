@@ -18,7 +18,6 @@
                 <el-button type="primary" @click="login" style="width:100%">LOGIN</el-button>
             </el-form-item>
 
-            <!-- <el-divider></el-divider> -->
             <a href="http://www.mitrateknik.com">www.MitraTeknik.com</a><br>
             &copy; {{year}}
         </el-form>

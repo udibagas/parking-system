@@ -57,6 +57,7 @@ export default {
                 {label: 'Home', icon: 'el-icon-s-home', path: '/' },
                 {label: 'Transactions', icon: 'el-icon-document-copy', path: 'parking-transaction' },
                 // {label: 'Member Renewal', icon: 'el-icon-refresh', path: 'member-renewal' },
+                {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },
                 {label: 'Report', icon: 'el-icon-data-analysis', path: 'report' },
             ]
 
@@ -66,6 +67,7 @@ export default {
                     {label: 'Vehicle Type', icon: 'el-icon-truck', path: 'vehicle-type' },
                     {label: 'Location Identity', icon: 'el-icon-office-building', path: 'location-identity' },
                     {label: 'Members', icon: 'el-icon-bank-card', path: 'parking-member' },
+                    {label: 'Server Information', icon: 'el-icon-odometer', path: 'server-information' },
                     {label: 'Users', icon: 'el-icon-user', path: 'user' },
                     // {label: 'Log', icon: 'el-icon-bell', path: 'log' }
                 )
@@ -118,7 +120,8 @@ export default {
                 {
                     let n = r.data.data[0]
                     this.notif = true
-                    this.$alert(n.message, 'Notifikasi', {
+                    let h = this.$createElement
+                    this.$alert('[' + moment(n.created_at).format('DD/MMM/YYYY HH:mm:ss') + '] ' + n.message, 'Notifikasi', {
                         type: 'warning',
                         center: true,
                         roundButton: true,
@@ -139,7 +142,7 @@ export default {
         }
     },
     mounted() {
-        setInterval(this.getNotification, 3000)
+        setInterval(this.getNotification, 5000)
     }
 }
 </script>

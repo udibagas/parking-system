@@ -80,7 +80,7 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog center top="60px" width="80%" v-if="trx" :visible.sync="showTrxDetail" :title="'DETAIL TRANSACTION ' + trx.barcode_number">
+        <el-dialog center top="60px" width="70%" v-if="trx" :visible.sync="showTrxDetail" :title="'DETAIL TRANSACTION ' + trx.barcode_number">
             <el-row :gutter="20">
                 <el-col :span="14">
                     <table style="width:100%">

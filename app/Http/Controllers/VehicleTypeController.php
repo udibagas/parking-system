@@ -30,18 +30,11 @@ class VehicleTypeController extends Controller
      */
     public function store(VehicleTypeRequest $request)
     {
-        return VehicleType::create($request->all());
-    }
+        if ($request->is_default) {
+            VehicleType::where('is_default', 1)->update(['is_default' => 0]);
+        }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show(VehicleType $vehicleType)
-    {
-        return $vehicleType;
+        return VehicleType::create($request->all());
     }
 
     /**
@@ -53,6 +46,10 @@ class VehicleTypeController extends Controller
      */
     public function update(VehicleTypeRequest $request, VehicleType $vehicleType)
     {
+        if ($request->is_default) {
+            VehicleType::where('is_default', 1)->update(['is_default' => 0]);
+        }
+
         $vehicleType->update($request->all());
         return $vehicleType;
     }

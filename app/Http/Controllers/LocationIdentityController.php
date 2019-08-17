@@ -33,6 +33,10 @@ class LocationIdentityController extends Controller
      */
     public function store(LocationIdentityRequest $request)
     {
+        if ($request->active) {
+            LocationIdentity::where('active', 1)->update(['active' => 0]);
+        }
+
         return LocationIdentity::create($request->all());
     }
 
@@ -62,6 +66,10 @@ class LocationIdentityController extends Controller
      */
     public function update(LocationIdentityRequest $request, LocationIdentity $locationIdentity)
     {
+        if ($request->active) {
+            LocationIdentity::where('active', 1)->update(['active' => 0]);
+        }
+
         $locationIdentity->update($request->all());
         return $locationIdentity;
     }

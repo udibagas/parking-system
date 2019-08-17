@@ -61,7 +61,7 @@
         </el-row>
 
         <el-divider></el-divider>
-        <div v-html="report"></div>
+        <div style="height:calc(100vh - 400px);overflow:auto;" v-html="report"></div>
     </div>
 </template>
 

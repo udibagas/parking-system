@@ -9,6 +9,8 @@ import VehicleType from './pages/VehicleType'
 import ParkingTransaction from './pages/ParkingTransaction'
 import User from './pages/User'
 import Report from './pages/Report'
+import Snapshot from './pages/Snapshot'
+import ServerInformation from './pages/ServerInformation'
 // import MemberRenewal from './pages/MemberRenewal'
 
 Vue.use(VueRouter)
@@ -23,6 +25,8 @@ const router = new VueRouter({
         { path: '/parking-gate', component: ParkingGate, name: 'parking-gate' },
         { path: '/vehicle-type', component: VehicleType, name: 'vehicle-type' },
         { path: '/report', component: Report, name: 'report' },
+        { path: '/snapshot', component: Snapshot, name: 'snapshot' },
+        { path: '/server-information', component: ServerInformation, name: 'server-information' },
         // { path: '/member-renewal', component: MemberRenewal, name: 'member-renewal' },
         { path: '*', component: Home },
     ]

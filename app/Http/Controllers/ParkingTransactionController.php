@@ -35,7 +35,10 @@ class ParkingTransactionController extends Controller
             ->join('parking_gates AS parking_gate_in', 'parking_gate_in.id', '=', 'parking_transactions.gate_in_id', 'LEFT')
             ->join('parking_gates AS parking_gate_out', 'parking_gate_out.id', '=', 'parking_transactions.gate_out_id', 'LEFT')
             ->when($request->dateRange, function($q) use ($request) {
-                return $q->whereBetween('parking_transactions.updated_at', $request->dateRange);
+                return $q->whereRaw('DATE(parking_transactions.updated_at) BETWEEN :start AND :stop', [
+                    ':start' => $request->dateRange[0],
+                    ':stop' => $request->dateRange[1],
+                ]);
             })->when($request->keyword, function ($q) use ($request) {
                 return $q->where('parking_transactions.barcode_number', 'LIKE', '%' . $request->keyword . '%')
                     ->orWhere('parking_transactions.plate_number', 'LIKE', '%' . $request->keyword . '%')

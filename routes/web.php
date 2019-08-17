@@ -40,4 +40,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::get('report', 'ReportController@pendapatan');
 });
 
+Route::get('serverInformation', 'ServerInformationController@index');
+
+
 Route::get('/{any}', 'AppController@index')->where('any', '.*');
