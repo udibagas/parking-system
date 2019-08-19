@@ -24,7 +24,7 @@ from kivy.graphics import Color, Rectangle
 from kivy.uix.screenmanager import ScreenManager, Screen
 import os
 
-API_URL = 'http://localhost:8000/api'
+API_URL = 'http://localhost/api'
 
 Builder.load_string("""
 <GateOutScreen>:
