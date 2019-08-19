@@ -75,7 +75,7 @@
                 </el-form-item>
 
                 <el-form-item label="Shortcut Key" :class="formErrors.shortcut_key ? 'is-error' : ''">
-                    <el-input placeholder="Shortcut Key" v-model="formModel.shortcut_key"></el-input>
+                    <el-input maxlength="1" placeholder="Shortcut Key" v-model="formModel.shortcut_key"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.shortcut_key">{{formErrors.shortcut_key[0]}}</div>
                 </el-form-item>
 

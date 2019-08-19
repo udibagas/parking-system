@@ -1,26 +1,17 @@
 <template>
     <div id="gate-out-app">
+        <el-page-header @back="$emit('back')" content="GATE IN APP"> </el-page-header>
+        <el-divider></el-divider>
         <el-row :gutter="15">
             <el-col :span="14">
-                <el-card style="height:calc(100vh - 105px)">
+                <el-card style="height:calc(100vh - 175px)">
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE IN</div>
                         </el-col>
                         <el-col :span="14">
-                            <select :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
+                            <select v-model="formModel.gate_in_id" id="gate-in" class="my-input">
                                 <option v-for="g in parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
-                            </select>
-                        </el-col>
-                    </el-row>
-
-                    <el-row :gutter="10" style="margin-bottom:10px;">
-                        <el-col :span="10">
-                            <div class="label-big">GATE OUT</div>
-                        </el-col>
-                        <el-col :span="14">
-                            <select v-model="formModel.gate_out_id" id="gate-out" class="my-input">
-                                <option v-for="g in parkingGateList.filter(g => g.type == 'OUT')" :value="g.id" :key="g.id">{{g.name}}</option>
                             </select>
                         </el-col>
                     </el-row>
@@ -31,15 +22,6 @@
                         </el-col>
                         <el-col :span="14">
                             <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
-                        </el-col>
-                    </el-row>
-
-                    <el-row :gutter="10" style="margin-bottom:10px;">
-                        <el-col :span="10">
-                            <div class="label-big">[+] NO. TIKET</div>
-                        </el-col>
-                        <el-col :span="14">
-                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -67,43 +49,16 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="10">
-                        <el-col :span="8">
-                            <div class="label">[/] IN</div>
-                            <input @keyup.enter="submit" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="label">OUT</div>
-                            <input disabled v-model="formModel.time_out" class="my-input-time text-center">
-                        </el-col>
-                        <el-col :span="8">
-                            <div class="label">DURASI</div>
-                            <input disabled v-model="formModel.duration" class="my-input-time text-center">
-                        </el-col>
-                    </el-row>
-
-                    <!-- <el-divider></el-divider> -->
                     <button class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
                 </el-card>
             </el-col>
             <el-col :span="10">
-                <el-card style="height:calc(100vh - 105px)">
-                    <el-divider>SNAPSHOT IN</el-divider>
-                    <div class="block">
-                        <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
-                            <div slot="error" class="image-slot">
-                                <i class="el-icon-picture-outline"></i>
-                            </div>
-                        </el-image>
-                    </div>
-                    <el-divider>SNAPSHOT OUT</el-divider>
-                    <div class="block">
-                        <el-image :src="snapshot_out" style="width: 100%; height: 100%" fit="cover">
-                            <div slot="error" class="image-slot">
-                                <i class="el-icon-picture-outline"></i>
-                            </div>
-                        </el-image>
-                    </div>
+                <el-card style="height:calc(100vh - 175px)">
+                    <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
+                        <div slot="error" class="image-slot">
+                            <i class="el-icon-picture-outline"></i>
+                        </div>
+                    </el-image>
                 </el-card>
             </el-col>
         </el-row>
@@ -114,68 +69,27 @@
 export default {
     data() {
         return {
-            showTicketLostForm: false,
-            formModel: { barcode_number: '' },
+            formModel: {},
             formErrors: {},
             snapshot_in: null,
-            snapshot_out: null,
             location: null,
             parkingGateList: [],
             vehicleTypeList: []
         }
     },
     methods: {
-        setDuration() {
-            var date1 = moment(this.formModel.time_in)
-            var date2 = moment(this.formModel.time_out);
-            var duration = moment.duration(date2.diff(date1));
-            this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss')
-            console.log(this.formModel.duration)
-            this.$forceUpdate()
-        },
-        checkTicket() {
-            let now = moment().format('YYYY-MM-DD HH:mm:ss')
-
-            if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
-                this.formModel.time_out = now;
-                document.getElementById('vehicle-type').focus()
-            } else {
-                let params = { barcode_number: this.formModel.barcode_number }
-                axios.get('/parkingTransaction/search', { params: params }).then(r => {
-                    this.snapshot_in = r.data.snapshot_in
-                    this.formModel.id = r.data.id
-                    this.formModel.time_out = now
-                    this.formModel.gate_in_id = r.data.gate_in_id
-                    this.formModel.time_in = r.data.time_in
-                    this.setDuration()
-                    this.$forceUpdate()
-                    this.takeSnapshot(r.data.id)
-                    document.getElementById('vehicle-type').focus()
-                }).catch(e => {
-                    this.$message({
-                        message: 'NOMOR TIKET INVALID!',
-                        type: 'error',
-                        showClose: true,
-                    })
-                })
+        generateBarcodeNumber() {
+            let result = '';
+            let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+            for (let i = 0; i < 5; i++) {
+                result += characters.charAt(Math.floor(Math.random() * characters.length));
             }
+            return result;
         },
         setFare() {
             let vehicle = this.vehicleTypeList.find(vt => vt.name == this.formModel.vehicle_type)
             if (vehicle) {
-
-                if (!this.formModel.is_member)
-                {
-                    this.formModel.fare = vehicle.tarif_flat
-                    if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
-                        this.formModel.fare += vehicle.denda_tiket_hilang
-                    }
-                }
-
-                if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
-                    document.getElementById('time-in').focus()
-                }
-
+                this.formModel.fare = this.formModel.is_member ? 0 : vehicle.tarif_flat
                 this.$forceUpdate()
             }
         },
@@ -183,12 +97,7 @@ export default {
             let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
             this.formModel.gate_in_id = null
             this.formModel.plate_number = ''
-            this.formModel.barcode_number = ''
-            this.formModel.time_out = ''
-            this.formModel.time_in = ''
-            this.formModel.duration = ''
             this.snapshot_in = ''
-            this.snapshot_out = ''
 
             if (default_vehicle) {
                 this.formModel.vehicle_type = default_vehicle.name
@@ -217,40 +126,16 @@ export default {
                 this.$forceUpdate();
             })
 
-            document.getElementById('ticket-number').focus()
+            document.getElementById('vehicle-type').focus()
         },
         submit() {
-            // kalau tiket hilang harus isi time in dulu
-            if (this.formModel.barcode_number.toLowerCase() == 'xxxxx' && !this.formModel.time_in) {
-                document.getElementById('time-in').focus()
+            if (!this.formModel.gate_in_id || !this.formModel.plate_number || !this.formModel.vehicle_type) {
                 return
             }
 
-            if (!this.formModel.gate_in_id) {
-                this.$message({
-                    message: 'MOHON ISI GATE IN',
-                    type: 'error',
-                    showClose: true,
-                })
-                return
-            }
+            this.formModel.barcode_number = this.generateBarcodeNumber();
+            this.formModel.time_in = moment().format('YYYY-MM-DD HH:mm:ss');
 
-            if (!this.formModel.barcode_number
-            || !this.formModel.gate_out_id
-            || !this.formModel.plate_number
-            || !this.formModel.vehicle_type
-            || !this.formModel.time_out
-            || !this.formModel.time_in) {
-                return
-            }
-
-            if (!!this.formModel.id) {
-                this.update()
-            } else {
-                this.store()
-            }
-        },
-        store() {
             axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id)
                 this.printTicket(r.data.id)
@@ -263,21 +148,9 @@ export default {
                 })
             })
         },
-        update() {
-            axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
-                this.printTicket(r.data.id)
-                this.$forceUpdate()
-            }).catch(e => {
-                this.$message({
-                    message: 'DATA GAGAL DISIMPAN',
-                    type: 'error',
-                    showClose: truetrx
-                })
-            })
-        },
         takeSnapshot(id) {
-            axios.post('/parkingTransaction/takeSnapshot/' + id, { gate_out_id: this.formModel.gate_out_id }).then(r => {
-                this.snapshot_out = r.data.snapshot_out
+            axios.post('/parkingTransaction/takeSnapshot/' + id, { gate_id: this.formModel.gate_in_id }).then(r => {
+                this.snapshot_in = r.data.snapshot_in
             }).catch(e => {
                 this.$message({
                     message: e.response.data.message,
@@ -287,7 +160,7 @@ export default {
             })
         },
         printTicket(id) {
-            axios.post('/parkingTransaction/printTicket/' + id, { trx: 'OUT' }).then(r => {
+            axios.post('/parkingTransaction/printTicket/' + id, { trx: 'IN' }).then(r => {
                 this.$message({
                     message: r.data.message,
                     type: 'success',
@@ -344,16 +217,7 @@ export default {
                     return
                 }
 
-                if (r.data.filter(g => g.type == 'OUT').length == 0) {
-                    this.$message({
-                        message: 'PLEASE SET GATE OUT',
-                        type: 'error',
-                        showClose: true
-                    })
-                    return
-                }
-
-                this.formModel.gate_out_id = r.data.find(g => g.type == 'OUT').id
+                this.formModel.gate_in_id = r.data.find(g => g.type == 'IN').id
             }).catch(e => {
                 this.$message({
                     message: 'PLEASE SET GATE',
@@ -403,35 +267,12 @@ export default {
         document.getElementById('plate-number').focus()
 
         document.getElementById('gate-out-app').onkeypress = (e) => {
-            // console.log(e.key)
-            // if (e.key == 'Enter') {
-            //     this.submit()
-            // }
-
             // ke field nomor plat
             if (e.key == '-') {
                 e.preventDefault()
                 this.resetForm()
                 this.$forceUpdate()
                 document.getElementById('plate-number').focus()
-            }
-
-            // ke field nomor tiket
-            if (e.key == '+') {
-                e.preventDefault()
-                let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
-                this.formModel.barcode_number = ''
-                this.formModel.time_out = ''
-
-                if (default_vehicle) {
-                    this.formModel.vehicle_type = default_vehicle.name
-                    this.formModel.fare = default_vehicle.tarif_flat
-                } else {
-                    this.formModel.vehicle_type = ''
-                    this.formModel.fare = ''
-                }
-
-                document.getElementById('ticket-number').focus()
             }
 
             // ke field jenis kendaraan
@@ -441,13 +282,6 @@ export default {
                 this.formModel.fare = ''
                 document.getElementById('vehicle-type').focus()
             }
-
-            // ke field time in
-            if (e.key == '/') {
-                e.preventDefault()
-                this.formModel.time_in = ''
-                document.getElementById('time-in').focus()
-            }
         }
     }
 
@@ -455,11 +289,6 @@ export default {
 </script>
 
 <style lang="scss" scoped>
-.block {
-    background-color: #eee;
-    height: calc(50vh - 120px);
-}
-
 .my-input {
     border: 2px solid #160047;
     height: 45px;
@@ -473,17 +302,6 @@ export default {
 
 .my-input:focus, .my-input-time:focus {
     background: rgb(255, 246, 122);
-}
-
-.my-input-time {
-    border: 2px solid #160047;
-    height: 45px;
-    line-height: 45px;
-    font-size: 20px;
-    display: block;
-    width: 100%;
-    padding: 0px 10px;
-    box-sizing: border-box;
 }
 
 .label-big {

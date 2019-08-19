@@ -68,7 +68,8 @@ class ParkingTransactionController extends Controller
 
     public function takeSnapshot(Request $request, ParkingTransaction $parkingTransaction)
     {
-        $gate = ParkingGate::find($request->gate_out_id);
+        $gateId = $request->gate_in_id ? $request->gate_in_id : $request->gate_out_id;
+        $gate = ParkingGate::find($gateId);
 
         if (!$gate || !$gate->camera_status || !$gate->camera_image_snapshot_url) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
@@ -90,11 +91,12 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. '. $e->getMessage()], 500);
         }
 
-        $parkingTransaction->update(['snapshot_out' => $fileName]);
+        $data = $request->gate_in_id ? ['snapshot_in' => $fileName] : ['snapshot_out' => $fileName];
+        $parkingTransaction->update($data);
         return $parkingTransaction;
     }
 
-    public function printTicket(ParkingTransaction $parkingTransaction)
+    public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
     {
         try {
             $printerDevice = env("PRINTER_DEVICE", "/dev/ttyS0");
@@ -119,33 +121,64 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'LOKASI TIDAK DISET'], 500);
         }
 
-        try {
-            $gateOut = ParkingGate::find($parkingTransaction->gate_out_id);
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("STRUK PARKIR\n");
-            $printer->text($location->name . "\n");
-            $printer->text($location->address . "\n\n");
+        if ($request->trx == 'OUT')
+        {
+            try {
+                $gateOut = ParkingGate::find($parkingTransaction->gate_out_id);
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->text("STRUK PARKIR\n");
+                $printer->text($location->name . "\n");
+                $printer->text($location->address . "\n\n");
 
-            $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
-            $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gateOut->name);
-            $printer->text("\n\n");
+                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
+                $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gateOut->name);
+                $printer->text("\n\n");
 
-            $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-            $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
-            $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
-            $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
+                $printer->setJustification(Printer::JUSTIFY_LEFT);
+                $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
+                $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
+                $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
+                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
 
-            $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
 
-            $printer->cut();
-            $printer->close();
-        } catch (\Exeption $e) {
-            return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
+                $printer->cut();
+                $printer->close();
+            } catch (\Exeption $e) {
+                return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
+            }
         }
 
-        return ['message' => 'SILAKAN AMBIL STRUK'];
+        if ($request->trx == 'IN')
+        {
+            try {
+                $gateIn = ParkingGate::find($parkingTransaction->gate_in_id);
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->text("TIKET PARKIR\n");
+                $printer->text($location->name . "\n");
+                $printer->text($location->address . "\n\n");
+
+                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
+                $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type);
+                $printer->text("\n\n");
+
+                $printer->setJustification(Printer::JUSTIFY_LEFT);
+                $printer->text(str_pad('GATE', 15, ' ') . ' : ' . $gateIn->name . "\n");
+                $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
+                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
+                $printer->setJustification(Printer::JUSTIFY_CENTER);
+                $printer->setBarcodeHeight(100);
+                $printer->setBarcodeWidth0(4);
+                $printer->barcode($parkingTransaction->barcode_number, 'CODE39');
+                $printer->text("\n");
+                $printer->text($location->additional_info_ticket);
+            } catch (\Exception $e) {
+                return response(['message' => 'GAGAL MENCETAK TIKET.' . $e->getMessage()], 500);
+            }
+        }
+
+        return ['message' => 'SILAKAN AMBIL TIKET'];
     }
 
     public function openGate()

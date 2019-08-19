@@ -11,19 +11,20 @@ import threading
 from escpos.printer import Network
 from requests.auth import HTTPDigestAuth
 from kivy.app import App
-from kivy.uix.widget import Widget
+from kivy.lang import Builder
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
-from kivy.uix.image import AsyncImage
+from kivy.uix.widget import Widget
 from kivy.uix.button import Button
+from kivy.uix.image import AsyncImage
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
+from kivy.graphics import Color, Rectangle
 from kivy.uix.screenmanager import ScreenManager, Screen
-from kivy.lang import Builder
 import os
 
-API_URL = 'http://localhost/api'
+API_URL = 'http://localhost:8000/api'
 
 Builder.load_string("""
 <GateOutScreen>:
@@ -135,9 +136,9 @@ Builder.load_string("""
 
 <GateInControllerScreen>:
     gates: []
-    gate_threads: []
     location: None
     log_text: log_text
+    status_bar: status_bar
 
     GridLayout:
         cols: 2
@@ -180,10 +181,19 @@ Builder.load_string("""
                 size_hint: (1, .25)
                 halign: 'center'
 
-        TextInput:
-            id: log_text
-            hint_text: '[Press Start]'
-            readonly: True
+        BoxLayout:
+            orientation: 'vertical'
+
+            TextInput:
+                id: log_text
+                hint_text: '[Press Start]'
+                readonly: True
+                size_hint: (1, .92)
+
+            BoxLayout:
+                id: status_bar
+                orientation: 'horizontal'
+                size_hint: (1, .08)
 """)
 
 class LoginScreen(Screen):
@@ -197,6 +207,11 @@ class GateOutScreen(Screen):
 
 
 class GateInControllerScreen(Screen):
+
+    def __init__(self, **kwargs):
+        super(GateInControllerScreen, self).__init__(**kwargs)
+        self.gate_indicator = {}
+        self.gate_threads = {}
 
     def start_app(self):
         if self.gates and len(self.gate_threads) > 0:
@@ -213,14 +228,19 @@ class GateInControllerScreen(Screen):
         self.gates = get_gates()
 
         if self.gates == False:
-            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] No gate found \n'
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] No gate found \n'
             return
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Found ' + str(len(self.gates)) + ' gates : '
         self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
         for g in self.gates:
+            self.gate_indicator[g['id']] = Button(text=g['name'], color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda instance: self.reconnect_gate(g))
+            self.status_bar.add_widget(self.gate_indicator[g['id']])
             threading.Thread(target=gate_in_thread, args=(g,)).start()
+
+    def reconnect_gate(self, gate):
+        threading.Thread(target=gate_in_thread, args=(gate,)).start()
 
     def stop_app(self):
         if len(self.gate_threads) == 0:
@@ -228,11 +248,14 @@ class GateInControllerScreen(Screen):
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Stopping application...\n'
 
-        for s in self.gate_threads:
+        for i in self.gate_threads:
             try:
-                s.shutdown(socket.SHUT_WR)
+                self.gate_threads[i].shutdown(socket.SHUT_WR)
             except Exception as e:
                 self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread already stopped\n'
+
+            # indicator merah
+            self.gate_indicator[i].color = [1,0,0,1]
 
         self.gate_threads = []
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
@@ -382,7 +405,8 @@ def gate_in_thread(gate):
             send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
             return
 
-        app.gate_threads.append(s)
+        app.gate_threads[gate['id']] = s
+        app.gate_indicator[i].color = [0,1,0,1]
         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Controller connected \n'
 
         while True:
@@ -398,6 +422,7 @@ def gate_in_thread(gate):
                     s.recv(32)
                 # connection lost
                 elif vehicle_detection == b'':
+                    app.gate_indicator[i].color = [1,0,0,1]
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
                     send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                     break
@@ -449,6 +474,7 @@ def gate_in_thread(gate):
 
                     # connection lost
                     elif b'' == push_button_or_card:
+                        app.gate_indicator[i].color = [1,0,0,1]
                         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
                         send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                         reset = True
@@ -480,6 +506,7 @@ def gate_in_thread(gate):
                 s.sendall(b'\xa6MT00006\xa9')
                 # connection lost
                 if b'' == s.recv(32):
+                    app.gate_indicator[i].color = [1,0,0,1]
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
                     send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                     break
@@ -501,6 +528,7 @@ def gate_in_thread(gate):
                 if b'OPEN1OK' in gate_status:
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
                 elif b'' == gate_status:
+                    app.gate_indicator[i].color = [1,0,0,1]
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
                     send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
                     break
@@ -513,16 +541,20 @@ def gate_in_thread(gate):
                 while b'IN3OFF' not in loop_2 and loop_2 != b'':
                     loop_2 = s.recv(32)
 
+                if loop_2 == b'':
+                    app.gate_indicator[i].color = [1,0,0,1]
+
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
 
             except Exception as e:
-                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : stopped. ' + str(e) + '\n'
+                app.gate_indicator[i].color = [1,0,0,1]
+                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Disconnected. ' + str(e) + '\n'
                 break
 
 class ParkingControllerApp(App):
 
     def build(self):
-        self.title = 'ENTRANCE GATE CONTROLLER - MITRATEKNIK PARKING SYSTEM V1.0'
+        self.title = 'ENTRANCE GATE CONTROLLER - MITRATEKNIK PARKING SYSTEM V1.1'
         return sm
 
 sm  = ScreenManager()
