@@ -101,18 +101,16 @@
                     </table>
                 </el-col>
                 <el-col :span="10">
-                    <el-divider>SNAPSHOT IN</el-divider>
                     <div class="block">
                         <el-image :src="trx.snapshot_in" style="width: 100%; height: 100%" fit="cover">
-                            <div slot="error" class="image-slot">
+                            <div slot="error" class="el-image__error">
                                 <i class="el-icon-picture-outline"></i>
                             </div>
                         </el-image>
                     </div>
-                    <el-divider>SNAPSHOT OUT</el-divider>
                     <div class="block">
                         <el-image :src="trx.snapshot_out" style="width: 100%; height: 100%" fit="cover">
-                            <div slot="error" class="image-slot">
+                            <div slot="error" class="el-image__error">
                                 <i class="el-icon-picture-outline"></i>
                             </div>
                         </el-image>
@@ -205,7 +203,7 @@ export default {
 
 .block {
     background-color: #eee;
-    height: calc(50vh - 170px);
+    height: calc(50vh - 120px);
 }
 
 .td-label {

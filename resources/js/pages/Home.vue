@@ -88,19 +88,17 @@
             </el-col>
             <el-col :span="10">
                 <el-card style="height:calc(100vh - 105px)">
-                    <el-divider>SNAPSHOT IN</el-divider>
                     <div class="block">
                         <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
-                            <div slot="error" class="image-slot">
-                                <i class="el-icon-picture-outline"></i>
+                            <div slot="error" class="el-image__error">
+                                <h1>SNAPSHOT IN</h1>
                             </div>
                         </el-image>
                     </div>
-                    <el-divider>SNAPSHOT OUT</el-divider>
                     <div class="block">
                         <el-image :src="snapshot_out" style="width: 100%; height: 100%" fit="cover">
-                            <div slot="error" class="image-slot">
-                                <i class="el-icon-picture-outline"></i>
+                            <div slot="error" class="el-image__error">
+                                <h1>SNAPSHOT OUT</h1>
                             </div>
                         </el-image>
                     </div>
@@ -304,7 +302,7 @@ export default {
             })
         },
         openGate() {
-            axios.post('/parkingTransaction/openGate').then(r => {
+            axios.post('/parkingTransaction/openGate/' + this.formModel.gate_out_id).then(r => {
                 this.resetForm()
                 this.$message({
                     message: r.data.message,
@@ -457,7 +455,7 @@ export default {
 <style lang="scss" scoped>
 .block {
     background-color: #eee;
-    height: calc(50vh - 120px);
+    height: calc(50vh - 74px);
 }
 
 .my-input {

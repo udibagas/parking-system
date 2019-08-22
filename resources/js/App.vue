@@ -3,38 +3,47 @@
         <Login v-if="!$store.state.is_logged_in" :visible.sync="!$store.state.is_logged_in" />
         <el-container v-else>
             <Profile v-if="$store.state.is_logged_in" :show="showProfile" @close="showProfile = false" />
-            <el-header>
-                <el-row>
-                    <el-col :span="12">
-                        <el-button type="text" class="btn-big text-white" @click.prevent="collapse = !collapse" :icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></el-button>
-                        <span class="brand"> {{appName}} </span>
-                    </el-col>
-                    <el-col :span="12" class="text-right">
-                        <el-dropdown @command="handleCommand">
-                            <span class="el-dropdown-link" style="cursor:pointer">Welcome, {{$store.state.user.name}}!</span>
-                            <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item command="profile">My Profile</el-dropdown-item>
-                                <el-dropdown-item command="logout">Logout</el-dropdown-item>
-                            </el-dropdown-menu>
-                        </el-dropdown>
-                    </el-col>
-                </el-row>
-            </el-header>
+            <el-aside width="auto">
+                <div v-show="!collapse" class="brand-box">
+                    <img src="/images/logo.jpeg" style="height:60px;margin:25px 0" alt="">
 
+                    <div>
+                        <el-avatar :size="50" icon="el-icon-user"></el-avatar>
+                        <br>
+                        <strong>{{$store.state.user.name}}</strong><br>
+                        <small>{{$store.state.user.email}}</small>
+                    </div>
+                </div>
+                <el-menu
+                :collapse="collapse"
+                default-active="1"
+                background-color="#060446"
+                text-color="#fff"
+                class="sidebar"
+                active-text-color="#cc0000">
+                    <el-menu-item v-for="(m, i) in menus" :index="(++i).toString()" :key="i" @click="$router.push(m.path)">
+                        <i :class="m.icon"></i><span slot="title">{{m.label}}</span>
+                    </el-menu-item>
+                </el-menu>
+            </el-aside>
             <el-container>
-                <el-aside width="auto">
-                    <el-menu
-                    :collapse="collapse"
-                    default-active="1"
-                    background-color="#060446"
-                    text-color="#fff"
-                    class="sidebar"
-                    active-text-color="#cc0000">
-                        <el-menu-item v-for="(m, i) in menus" :index="(++i).toString()" :key="i" @click="$router.push(m.path)">
-                            <i :class="m.icon"></i><span slot="title">{{m.label}}</span>
-                        </el-menu-item>
-                    </el-menu>
-                </el-aside>
+                <el-header>
+                    <el-row>
+                        <el-col :span="12">
+                            <el-button type="text" class="btn-big text-white" @click.prevent="collapse = !collapse" :icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"></el-button>
+                            <span class="brand"> {{appName}} </span>
+                        </el-col>
+                        <el-col :span="12" class="text-right">
+                            <el-dropdown @command="handleCommand">
+                                <span class="el-dropdown-link" style="cursor:pointer">Welcome, {{$store.state.user.name}}!</span>
+                                <el-dropdown-menu slot="dropdown">
+                                    <el-dropdown-item command="profile">My Profile</el-dropdown-item>
+                                    <el-dropdown-item command="logout">Logout</el-dropdown-item>
+                                </el-dropdown-menu>
+                            </el-dropdown>
+                        </el-col>
+                    </el-row>
+                </el-header>
                 <el-main style="padding:20px">
                     <el-collapse-transition>
                         <router-view @back="goBack"></router-view>
@@ -55,7 +64,7 @@ export default {
         menus() {
             let menus = [
                 {label: 'Home', icon: 'el-icon-s-home', path: '/' },
-                {label: 'Gate In App', icon: 'el-icon-remove-outline', path: 'gate-in-app' },
+                // {label: 'Gate In App', icon: 'el-icon-remove-outline', path: 'gate-in-app' },
                 {label: 'Transactions', icon: 'el-icon-document-copy', path: 'parking-transaction' },
                 // {label: 'Member Renewal', icon: 'el-icon-refresh', path: 'member-renewal' },
                 {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },
@@ -68,7 +77,7 @@ export default {
                     {label: 'Vehicle Type', icon: 'el-icon-truck', path: 'vehicle-type' },
                     {label: 'Location Identity', icon: 'el-icon-office-building', path: 'location-identity' },
                     {label: 'Members', icon: 'el-icon-bank-card', path: 'parking-member' },
-                    {label: 'Server Information', icon: 'el-icon-odometer', path: 'server-information' },
+                    // {label: 'Server Information', icon: 'el-icon-odometer', path: 'server-information' },
                     {label: 'Users', icon: 'el-icon-user', path: 'user' },
                     // {label: 'Log', icon: 'el-icon-bell', path: 'log' }
                 )
@@ -79,7 +88,7 @@ export default {
     },
     data() {
         return {
-            collapse: true,
+            collapse: false,
             appName: APP_NAME,
             showProfile: false,
             loginForm: !this.$store.state.is_logged_in,
@@ -154,6 +163,14 @@ export default {
     margin-left: 20px;
 }
 
+.brand-box {
+    height: 220px;
+    background-color: #060446;
+    text-align: center;
+    color: #fff;
+}
+
+
 .btn-big {
     font-size: 22px;
 }
@@ -167,15 +184,17 @@ export default {
 .sidebar {
     background-color: #060446;
     border-color: #060446;
-    height: calc(100vh - 60px);
+    height: calc(100vh - 220px);
+    overflow: auto;
 }
 
 .sidebar:not(.el-menu--collapse) {
-    width: 180px;
+    width: 200px;
 }
 
 .el-aside {
-    height: calc(100vh - 60px);
+    height: 100vh;
+    background-color: #060446;
 }
 
 .el-main {

@@ -129,29 +129,21 @@
                     <div class="el-form-item__error" v-if="formErrors.active">{{formErrors.active[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Controller Address" :class="formErrors.controller_ip_address ? 'is-error' : ''">
-                    <el-input placeholder="IP Address" v-model="formModel.controller_ip_address" style="width:70%"></el-input>
-                    <el-input type="number" placeholder="Port" v-model="formModel.controller_port" style="width:28%;float:right;clear:right;"></el-input>
+                <el-form-item label="Controller" :class="formErrors.controller_ip_address ? 'is-error' : ''">
+                    <el-input placeholder="IP Address/Device" v-model="formModel.controller_ip_address" style="width:60%"></el-input>
+                    <el-input type="number" placeholder="Port/Baudrate" v-model="formModel.controller_port" style="width:38%;float:right;clear:right;"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.controller_ip_address">{{formErrors.controller_ip_address[0]}}</div>
                     <div class="el-form-item__error" v-if="formErrors.controller_port">{{formErrors.controller_port[0]}}</div>
                 </el-form-item>
 
-                <el-divider>PRINTER</el-divider>
-
-                <el-form-item label="Printer Type" :class="formErrors.printer_type ? 'is-error' : ''">
-                    <el-select v-model="formModel.printer_type" placeholder="Printer Type" style="width:100%">
+                <el-form-item label="Printer Type" :class="formErrors.printer_type || formErrors.printer_device || formErrors.printer_ip_address ? 'is-error' : ''">
+                    <el-select v-model="formModel.printer_type" placeholder="Printer Type" style="width:30%">
                         <el-option v-for="(t, i) in ['local', 'network']" :value="t" :label="t" :key="i"></el-option>
                     </el-select>
+                    <el-input v-show="formModel.printer_type == 'local'" placeholder="Printer Device" v-model="formModel.printer_device" style="width:68%;float:right;clear:right;"></el-input>
+                    <el-input v-show="formModel.printer_type == 'network'" placeholder="Printer IP Address" v-model="formModel.printer_ip_address" style="width:68%;float:right;clear:right;"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.printer_type">{{formErrors.printer_type[0]}}</div>
-                </el-form-item>
-
-                <el-form-item v-show="formModel.printer_type == 'local'" label="Printer Device" :class="formErrors.printer_device ? 'is-error' : ''">
-                    <el-input placeholder="Printer Device" v-model="formModel.printer_device"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.printer_device">{{formErrors.printer_device[0]}}</div>
-                </el-form-item>
-
-                <el-form-item v-show="formModel.printer_type == 'network'" label="Printer IP Address" :class="formErrors.printer_ip_address ? 'is-error' : ''">
-                    <el-input placeholder="Printer IP Address" v-model="formModel.printer_ip_address"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.printer_ip_address">{{formErrors.printer_ip_address[0]}}</div>
                 </el-form-item>
 
