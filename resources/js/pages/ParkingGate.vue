@@ -27,6 +27,8 @@
                             <tr><td class="td-label">Vehicle Type</td><td class="td-value">{{scope.row.vehicle_type}}</td></tr>
                             <tr><td class="td-label">Controller IP Address</td><td class="td-value">{{scope.row.controller_ip_address}}</td></tr>
                             <tr><td class="td-label">Controller Port</td><td class="td-value">{{scope.row.controller_port}}</td></tr>
+                            <tr><td class="td-label">Printer Type</td><td class="td-value">{{scope.row.printer_type}}</td></tr>
+                            <tr><td class="td-label">Printer Device</td><td class="td-value">{{scope.row.printer_device}}</td></tr>
                             <tr><td class="td-label">Printer IP Address</td><td class="td-value">{{scope.row.printer_ip_address}}</td></tr>
                             <tr><td class="td-label">Camera IP Address</td><td class="td-value">{{scope.row.camera_ip_address}}</td></tr>
                             <tr><td class="td-label">Camera Username</td><td class="td-value">{{scope.row.camera_username}}</td></tr>
@@ -47,6 +49,8 @@
                     {{scope.row.controller_ip_address}}:{{scope.row.controller_port}}
                 </template>
             </el-table-column>
+            <el-table-column prop="printer_type" label="Printer Type" sortable="custom" min-width="120px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="printer_device" label="Printer Device" sortable="custom" min-width="130px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="printer_ip_address" label="Printer IP Address" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_ip_address" label="Camera IP Address" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_username" label="Camera Username" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
@@ -87,7 +91,7 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog top="40px" :visible.sync="showForm" :title="!!formModel.id ? 'EDIT GATE' : 'ADD NEW GATE'" width="550px" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog top="60px" :visible.sync="showForm" :title="!!formModel.id ? 'EDIT GATE' : 'ADD NEW GATE'" width="550px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"
@@ -132,7 +136,21 @@
                     <div class="el-form-item__error" v-if="formErrors.controller_port">{{formErrors.controller_port[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Printer IP Address" :class="formErrors.printer_ip_address ? 'is-error' : ''">
+                <el-divider>PRINTER</el-divider>
+
+                <el-form-item label="Printer Type" :class="formErrors.printer_type ? 'is-error' : ''">
+                    <el-select v-model="formModel.printer_type" placeholder="Printer Type" style="width:100%">
+                        <el-option v-for="(t, i) in ['local', 'network']" :value="t" :label="t" :key="i"></el-option>
+                    </el-select>
+                    <div class="el-form-item__error" v-if="formErrors.printer_type">{{formErrors.printer_type[0]}}</div>
+                </el-form-item>
+
+                <el-form-item v-show="formModel.printer_type == 'local'" label="Printer Device" :class="formErrors.printer_device ? 'is-error' : ''">
+                    <el-input placeholder="Printer Device" v-model="formModel.printer_device"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.printer_device">{{formErrors.printer_device[0]}}</div>
+                </el-form-item>
+
+                <el-form-item v-show="formModel.printer_type == 'network'" label="Printer IP Address" :class="formErrors.printer_ip_address ? 'is-error' : ''">
                     <el-input placeholder="Printer IP Address" v-model="formModel.printer_ip_address"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.printer_ip_address">{{formErrors.printer_ip_address[0]}}</div>
                 </el-form-item>
@@ -158,7 +176,7 @@
                     <el-select v-model="formModel.camera_auth_type" placeholder="Auth Type" style="width:100%">
                         <el-option v-for="(t, i) in ['basic', 'digest']" :value="t" :label="t" :key="i"></el-option>
                     </el-select>
-                    <div class="el-form-item__error" v-if="formErrors.type">{{formErrors.camera_auth_type[0]}}</div>
+                    <div class="el-form-item__error" v-if="formErrors.camera_auth_type">{{formErrors.camera_auth_type[0]}}</div>
                 </el-form-item>
 
                 <el-form-item label="Image Snapshot Url" :class="formErrors.camera_image_snapshot_url ? 'is-error' : ''">

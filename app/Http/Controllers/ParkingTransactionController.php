@@ -98,40 +98,39 @@ class ParkingTransactionController extends Controller
 
     public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
     {
-        try {
-            $printerDevice = env("PRINTER_DEVICE", "/dev/ttyS0");
-            $printerType = env("PRINTER_TYPE", "serial");
-
-            if ($printerType == "network") {
-                $connector = new NetworkPrintConnector($printerDevice, env("PRINTER_PORT", 9100));
-            } else if ($printerType == "serial") {
-                $connector = new FilePrintConnector($printerDevice);
-            } else {
-                return response(['message' => 'INVALID PRINTER'], 500);
-            }
-
-            $printer = new Printer($connector);
-        } catch (\Exception $e) {
-            return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
-        }
-
         $location = LocationIdentity::where('active', 1)->first();
 
         if (!$location) {
             return response(['message' => 'LOKASI TIDAK DISET'], 500);
         }
 
+        $gateId = $request->trx == 'OUT' ? $parkingTransaction->gate_out_id : $parkingTransaction->gate_in_id;
+        $gate = ParkingGate::find($gateId);
+
+        try {
+            if ($gate->printer_type == "network") {
+                $connector = new NetworkPrintConnector($gate->printer_ip_address, 9100);
+            } else if ($gate->printer_type == "local") {
+                $connector = new FilePrintConnector($gate->printer_device);
+            } else {
+                return response(['message' => 'INVALID PRINTER'], 500);
+            }
+
+            $printer = new Printer($connector);
+        } catch (\Exception $e) {
+            return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+        }
+
         if ($request->trx == 'OUT')
         {
             try {
-                $gateOut = ParkingGate::find($parkingTransaction->gate_out_id);
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text("STRUK PARKIR\n");
                 $printer->text($location->name . "\n");
                 $printer->text($location->address . "\n\n");
 
                 $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
-                $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gateOut->name);
+                $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gate->name);
                 $printer->text("\n\n");
 
                 $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -153,7 +152,6 @@ class ParkingTransactionController extends Controller
         if ($request->trx == 'IN')
         {
             try {
-                $gateIn = ParkingGate::find($parkingTransaction->gate_in_id);
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text("TIKET PARKIR\n");
                 $printer->text($location->name . "\n");
@@ -164,7 +162,7 @@ class ParkingTransactionController extends Controller
                 $printer->text("\n\n");
 
                 $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text(str_pad('GATE', 15, ' ') . ' : ' . $gateIn->name . "\n");
+                $printer->text(str_pad('GATE', 15, ' ') . ' : ' . $gate->name . "\n");
                 $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
                 $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
@@ -181,12 +179,15 @@ class ParkingTransactionController extends Controller
         return ['message' => 'SILAKAN AMBIL TIKET'];
     }
 
-    public function openGate()
+    // khusus untuk membuka gate out
+    public function openGate(ParkingGate $parkingGate)
     {
+        // ip address == device
+        // port = baudrate
         try {
             $serial = new PhpSerial;
-            $serial->deviceSet(env('GATE_OUT_CONTROLLER_DEVICE', '/dev/ttyS4'));
-            $serial->confBaudRate(2400);
+            $serial->deviceSet($parkingGate->controller_ip_address);
+            $serial->confBaudRate($parkingGate->controller_port);
             $serial->confParity("none");
             $serial->confCharacterLength(8);
             $serial->confStopBits(1);

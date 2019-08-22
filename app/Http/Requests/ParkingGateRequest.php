@@ -27,14 +27,17 @@ class ParkingGateRequest extends FormRequest
             'name' => 'required',
             'type' => 'required|in:IN,OUT',
             'vehicle_type' => 'required|in:MOBIL,MOTOR,MOBIL/MOTOR',
-            'controller_ip_address' => 'required|ipv4',
+            'controller_ip_address' => 'required',
             'controller_port' => 'required|numeric',
-            'printer_ip_address' => 'required|ipv4',
+            'printer_type' => 'required|in:network,local',
+            'printer_device' => 'required_if:printer_type,local',
+            'printer_ip_address' => 'required_if:printer_type,network|ipv4',
             'camera_ip_address' => 'required|ipv4',
             'camera_username' => 'required',
             'camera_password' => 'required',
-            // 'camera_image_snapshot_url' => 'required|url',
+            'camera_image_snapshot_url' => 'required|url',
             // 'camera_video_snapshot_url' => 'required|url',
+            'camera_auth_type' => 'required|in:basic,digest',
             'active' => 'boolean'
         ];
     }

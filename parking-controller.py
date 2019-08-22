@@ -30,6 +30,7 @@ Builder.load_string("""
 <GateOutScreen>:
     BoxLayout:
         orientation: 'horizontal'
+        padding: 40
 
         GridLayout
             cols: 2
@@ -38,58 +39,75 @@ Builder.load_string("""
             Label:
                 halign: 'right'
                 text: 'NO. PLAT'
+                font_size: '35sp'
 
             TextInput:
-                multiline: False,
+                multiline: False
                 hint_text: 'NO. PLAT'
+                font_size: '35sp'
 
             Label:
                 halign: 'right'
                 text: 'NO. TIKET'
+                font_size: '35sp'
 
             TextInput:
                 multiline: False
                 hint_text: 'NO. TIKET'
+                font_size: '35sp'
 
             Label:
                 halign: 'right'
                 text: 'GATE IN'
+                font_size: '35sp'
 
             TextInput:
                 multiline: False
                 hint_text: 'GATE IN'
+                font_size: '35sp'
 
             Label:
                 halign: 'right'
                 text: 'MASUK'
+                font_size: '35sp'
 
             TextInput:
                 multiline: False
                 hint_text: 'MASUK'
+                font_size: '35sp'
 
             Label:
                 halign: 'right'
                 text: 'KELUAR'
+                font_size: '35sp'
 
             TextInput:
                 multiline: False
                 hint_text: 'KELUAR'
+                font_size: '35sp'
+                readonly: True
 
             Label:
                 halign: 'right'
                 text: 'DURASI'
+                font_size: '35sp'
 
             TextInput:
                 multiline: False
                 hint_text: 'DURASI'
+                font_size: '35sp'
+                readonly: True
 
             Label:
                 halign: 'right'
                 text: 'TARIF'
+                font_size: '35sp'
 
             TextInput:
                 multiline: False
                 hint_text: 'TARIF'
+                font_size: '35sp'
+                readonly: True
 
         BoxLayout:
             orientation: 'vertical'
@@ -177,7 +195,7 @@ Builder.load_string("""
                 size_hint: (1, .25)
 
             Label:
-                text: 'MITRATEKNIK\\nPARKING SYSTEM\\nv1.0\\n\\n\\nwww.mitrateknik.com'
+                text: 'MITRATEKNIK\\nPARKING SYSTEM\\nv1.1\\n\\n\\nwww.mitrateknik.com'
                 size_hint: (1, .25)
                 halign: 'center'
 
@@ -212,13 +230,10 @@ class GateInControllerScreen(Screen):
         super(GateInControllerScreen, self).__init__(**kwargs)
         self.gate_indicator = {}
         self.gate_threads = {}
+        self.init_app()
 
-    def start_app(self):
-        if self.gates and len(self.gate_threads) > 0:
-            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application already started\n'
-            return
-
-        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting application...\n'
+    def init_app(self):
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Initializing...\n'
         self.location = get_location()
 
         if not self.location:
@@ -235,11 +250,28 @@ class GateInControllerScreen(Screen):
         self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
         for g in self.gates:
-            self.gate_indicator[g['id']] = Button(text=g['name'], color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda instance: self.reconnect_gate(g))
+            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda instance: self.reconnect_gate(g))
             self.status_bar.add_widget(self.gate_indicator[g['id']])
+
+    def start_app(self):
+        if self.gates and len(self.gate_threads) > 0:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application already started\n'
+            return
+
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting application...\n'
+
+        for g in self.gates:
             threading.Thread(target=gate_in_thread, args=(g,)).start()
 
     def reconnect_gate(self, gate):
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] +' : Reconnecting gate...\n'
+
+        try:
+            self.gate_threads[gate['id']].shutdown(socket.SHUT_WR)
+            del self.gate_threads[gate['id']]
+        except Exception as e:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] +' : Already closed\n'
+
         threading.Thread(target=gate_in_thread, args=(gate,)).start()
 
     def stop_app(self):
@@ -255,9 +287,9 @@ class GateInControllerScreen(Screen):
                 self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread already stopped\n'
 
             # indicator merah
-            self.gate_indicator[i].color = [1,0,0,1]
+            del self.gate_threads[gate['id']]
+            self.gate_indicator[i].background_color = [1,0,0,1]
 
-        self.gate_threads = []
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
 
     def restart_app(self):
@@ -322,7 +354,7 @@ def take_snapshot(gate):
             for chunk in r:
                 f.write(chunk)
 
-        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Snapshot berhasil disimpan' + output_file_name + ' \n'
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Snapshot berhasil disimpan ' + output_file_name + ' \n'
         return output_file_name
     else:
         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot ' + str(r.status_code) + '\n'
@@ -332,14 +364,13 @@ def take_snapshot(gate):
 def generate_barcode_number():
     return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
 
+# assume semua pake printer network
 def print_ticket(trx_data, gate):
     try:
         p = Network(gate['printer_ip_address'])
     except Exception as e:
         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to connect to printer\n'
         return False
-
-    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Mencetak tiket ' + trx_data['barcode_number'] + '...\n'
 
     try:
         p.set(align='center')
@@ -394,6 +425,17 @@ def save_data(gate, data):
     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Data berhasil disimpan  \n'
     return r.json()
 
+def controller_disconnected(gate):
+    app.gate_indicator[gate['id']].background_color = [1,0,0,1]
+
+    try:
+        del app.gate_threads[gate['id']]
+    except Exception as e:
+        pass
+
+    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus. Silakan klik tombol gate untuk menyambung ulang \n'
+    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan klik tombol gate untuk menyambung ulang')
+
 def gate_in_thread(gate):
     time.sleep(1)
     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
@@ -406,7 +448,7 @@ def gate_in_thread(gate):
             return
 
         app.gate_threads[gate['id']] = s
-        app.gate_indicator[i].color = [0,1,0,1]
+        app.gate_indicator[gate['id']].background_color = [0,1,0,1]
         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Controller connected \n'
 
         while True:
@@ -422,9 +464,7 @@ def gate_in_thread(gate):
                     s.recv(32)
                 # connection lost
                 elif vehicle_detection == b'':
-                    app.gate_indicator[i].color = [1,0,0,1]
-                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
-                    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
+                    controller_disconnected(gate)
                     break
                 else:
                     time.sleep(.2)
@@ -474,9 +514,7 @@ def gate_in_thread(gate):
 
                     # connection lost
                     elif b'' == push_button_or_card:
-                        app.gate_indicator[i].color = [1,0,0,1]
-                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
-                        send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
+                        controller_disconnected(gate)
                         reset = True
                         break
 
@@ -497,8 +535,7 @@ def gate_in_thread(gate):
                     s.sendall(b'\xa6MT00002\xa9')
                     # connection lost
                     if b'' == s.recv(32):
-                        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
-                        send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
+                        controller_disconnected(gate)
                         break
                     time.sleep(3)
 
@@ -506,49 +543,45 @@ def gate_in_thread(gate):
                 s.sendall(b'\xa6MT00006\xa9')
                 # connection lost
                 if b'' == s.recv(32):
-                    app.gate_indicator[i].color = [1,0,0,1]
-                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
-                    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
+                    controller_disconnected(gate)
                     break
                 time.sleep(1)
                 # open gate
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
                 s.sendall(b'\xa6OPEN1\xa9')
-                gate_status = s.recv(32)
 
-                # connection lost
-                if gate_status == b'':
-                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
-                    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
-                    break
-                while b'OPEN1' not in gate_status and gate_status != b'':
-                    gate_status = s.recv(32)
-                    time.sleep(.2)
+                # ASUMSIKAN GATE SELALU BERHASIL DIBUKA
+                # gate_status = s.recv(32)
 
-                if b'OPEN1OK' in gate_status:
-                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
-                elif b'' == gate_status:
-                    app.gate_indicator[i].color = [1,0,0,1]
-                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus \n'
-                    send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan cek dan restart aplikasi')
-                    break
-                else:
-                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to open date \n'
-                    send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
+                # # connection lost
+                # if gate_status == b'':
+                #     controller_disconnected(gate)
+                #     break
+                # while b'OPEN1' not in gate_status and gate_status != b'':
+                #     gate_status = s.recv(32)
+                #     time.sleep(.2)
 
-                # detect loop 2 buat reset
+                # if b'OPEN1OK' in gate_status:
+                #     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
+                # elif b'' == gate_status:
+                #     controller_disconnected(gate)
+                #     break
+                # else:
+                #     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to open date \n'
+                #     send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
+
+                # detect loop 2, in 1 off (motor pergi)
                 loop_2 = s.recv(32)
-                while b'IN3OFF' not in loop_2 and loop_2 != b'':
+                while b'IN3' not in loop_2 and b'IN1OFF' not in loop_2 and loop_2 != b'':
                     loop_2 = s.recv(32)
 
                 if loop_2 == b'':
-                    app.gate_indicator[i].color = [1,0,0,1]
+                    controller_disconnected(gate)
 
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
 
             except Exception as e:
-                app.gate_indicator[i].color = [1,0,0,1]
-                app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Disconnected. ' + str(e) + '\n'
+                controller_disconnected(gate)
                 break
 
 class ParkingControllerApp(App):
