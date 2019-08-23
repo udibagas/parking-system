@@ -170,6 +170,8 @@ class ParkingTransactionController extends Controller
                 $printer->barcode($parkingTransaction->barcode_number, 'CODE39');
                 $printer->text("\n");
                 $printer->text($location->additional_info_ticket);
+                $printer->cut();
+                $printer->close();
             } catch (\Exception $e) {
                 return response(['message' => 'GAGAL MENCETAK TIKET.' . $e->getMessage()], 500);
             }
