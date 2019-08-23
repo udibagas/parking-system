@@ -286,10 +286,9 @@ class GateInControllerScreen(Screen):
             except Exception as e:
                 self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread already stopped\n'
 
-            # indicator merah
-            del self.gate_threads[i]
             self.gate_indicator[i].background_color = [1,0,0,1]
 
+        self.gate_threads = {}
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
 
     def restart_app(self):
