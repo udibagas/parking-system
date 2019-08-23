@@ -222,7 +222,7 @@ export default {
         }
     },
     methods: {
-        testDevice(device, id) {
+        testDevice(action, id) {
             axios.post('/parkingGate/' + action + '/' + id).then(r => {
                 this.$message({
                     message: r.data.message,
