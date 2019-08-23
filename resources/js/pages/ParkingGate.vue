@@ -4,7 +4,7 @@
         <el-divider></el-divider>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="openForm({role: 0, password: ''})" type="primary"><i class="el-icon-plus"></i> ADD NEW GATE</el-button>
+                <el-button @click="openForm({printer_type: 'local'})" type="primary"><i class="el-icon-plus"></i> ADD NEW GATE</el-button>
             </el-form-item>
             <el-form-item style="margin-right:0;">
                 <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
@@ -72,6 +72,9 @@
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
+                            <el-dropdown-item @click.native.prevent="testDevice('testCamera', scope.row.id)"><i class="el-icon-camera"></i> Test Camera</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="testDevice('testPrinter', scope.row.id)"><i class="el-icon-printer"></i> Test Printer</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="testDevice('openGate', scope.row.id)"><i class="el-icon-minus"></i> Test Gate</el-dropdown-item>
                             <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-edit-outline"></i> Edit</el-dropdown-item>
                             <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Delete</el-dropdown-item>
                         </el-dropdown-menu>
@@ -219,6 +222,21 @@ export default {
         }
     },
     methods: {
+        testDevice(device, id) {
+            axios.post('/parkingGate/' + action + '/' + id).then(r => {
+                this.$message({
+                    message: r.data.message,
+                    type: 'success',
+                    showClose: true
+                });
+            }).catch(e => {
+                this.$message({
+                    message: e.response.data.message,
+                    type: 'error',
+                    showClose: true
+                });
+            })
+        },
         sortChange(c) {
             if (c.prop != this.sort || c.order != this.order) {
                 this.sort = c.prop; this.order = c.order; this.requestData()

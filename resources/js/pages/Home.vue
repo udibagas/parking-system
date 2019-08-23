@@ -302,7 +302,7 @@ export default {
             })
         },
         openGate() {
-            axios.post('/parkingTransaction/openGate/' + this.formModel.gate_out_id).then(r => {
+            axios.post('/parkingGate/openGate/' + this.formModel.gate_out_id).then(r => {
                 this.resetForm()
                 this.$message({
                     message: r.data.message,

@@ -8,7 +8,6 @@ use App\Http\Requests\ParkingTransactionRequest;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
-use PhpSerial\PhpSerial;
 use App\LocationIdentity;
 use App\ParkingGate;
 use GuzzleHttp\Client;
@@ -177,29 +176,6 @@ class ParkingTransactionController extends Controller
         }
 
         return ['message' => 'SILAKAN AMBIL TIKET'];
-    }
-
-    // khusus untuk membuka gate out
-    public function openGate(ParkingGate $parkingGate)
-    {
-        // ip address == device
-        // port = baudrate
-        try {
-            $serial = new PhpSerial;
-            $serial->deviceSet($parkingGate->controller_ip_address);
-            $serial->confBaudRate($parkingGate->controller_port);
-            $serial->confParity("none");
-            $serial->confCharacterLength(8);
-            $serial->confStopBits(1);
-            $serial->confFlowControl("none");
-            $serial->deviceOpen();
-            $serial->sendMessage("AZ123");
-            $serial->deviceClose();
-        } catch (\Exception $e) {
-            return response(['message' => 'GAGAL MEMBUKA GATE. '. $e->getMessage()], 500);
-        }
-
-        return ['message' => 'GATE BERHASIL DIBUKA'];
     }
 
     /**

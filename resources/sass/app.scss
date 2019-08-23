@@ -22,6 +22,15 @@ body {
     padding: 0;
 }
 
+.el-dialog__header, .el-dialog__footer {
+    background-color: #324057;
+    padding: 15px;
+}
+
+.el-dialog__title {
+    color: #fff;
+}
+
 .el-icon-more {
     transform: rotate(90deg);
     -webkit-transform: rotate(90deg);

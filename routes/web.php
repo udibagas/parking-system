@@ -18,6 +18,9 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::resource('user', 'UserController')->except(['create', 'edit']);
     Route::get('locationIdentity/search', 'LocationIdentityController@search');
     Route::resource('locationIdentity', 'LocationIdentityController')->except(['create', 'edit']);
+    Route::post('parkingGate/openGate/{parkingGate}', 'ParkingGateController@openGate');
+    Route::post('parkingGate/testPrinter/{parkingGate}', 'ParkingGateController@testPrinter');
+    Route::post('parkingGate/testCamera/{parkingGate}', 'ParkingGateController@testCamera');
     Route::get('parkingGate/getList', 'ParkingGateController@getList');
     Route::resource('parkingGate', 'ParkingGateController')->except(['create', 'edit']);
     Route::get('vehicleType/getList', 'VehicleTypeController@getList');
@@ -26,7 +29,6 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::resource('parkingMember', 'ParkingMemberController')->except(['create', 'edit']);
     Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');
     Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
-    Route::post('parkingTransaction/openGate/{parkingGate}', 'ParkingTransactionController@openGate');
     Route::put('parkingTransaction/setSudahKeluar/{parkingTransaction}', 'ParkingTransactionController@setSudahKeluar');
     Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
