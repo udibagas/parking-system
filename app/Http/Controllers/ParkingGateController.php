@@ -115,13 +115,6 @@ class ParkingGateController extends Controller
 
     public function testPrinter(ParkingGate $parkingGate)
     {
-        $location = LocationIdentity::where('active', 1)->first();
-
-        if (!$location) {
-            return response(['message' => 'LOKASI TIDAK DISET'], 500);
-        }
-
-
         try {
             if ($parkingGate->printer_type == "network") {
                 $connector = new NetworkPrintConnector($parkingGate->printer_ip_address, 9100);
