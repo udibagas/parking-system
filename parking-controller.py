@@ -287,7 +287,7 @@ class GateInControllerScreen(Screen):
                 self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Thread already stopped\n'
 
             # indicator merah
-            del self.gate_threads[gate['id']]
+            del self.gate_threads[i]
             self.gate_indicator[i].background_color = [1,0,0,1]
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application STOPPED\n'
