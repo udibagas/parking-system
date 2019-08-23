@@ -134,6 +134,8 @@ class ParkingGateController extends Controller
             $printer->text("TEST PRINTER\n");
             $printer->text($parkingGate->name . "\n");
             $printer->text(date('d-M-Y H:i:s'));
+            $printer->cut();
+            $printer->close();
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENCETAK.' . $e->getMessage()], 500);
         }
