@@ -536,7 +536,7 @@ def gate_in_thread(gate):
                     if b'' == s.recv(32):
                         controller_disconnected(gate)
                         break
-                    time.sleep(3)
+                    # time.sleep(3)
 
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n'
                 s.sendall(b'\xa6MT00006\xa9')
@@ -544,7 +544,7 @@ def gate_in_thread(gate):
                 if b'' == s.recv(32):
                     controller_disconnected(gate)
                     break
-                time.sleep(1)
+                # time.sleep(1)
                 # open gate
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
                 s.sendall(b'\xa6OPEN1\xa9')
