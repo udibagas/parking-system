@@ -369,6 +369,7 @@ def print_ticket(trx_data, gate):
         p = Network(gate['printer_ip_address'])
     except Exception as e:
         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Failed to connect to printer\n'
+        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
         return False
 
     try:
