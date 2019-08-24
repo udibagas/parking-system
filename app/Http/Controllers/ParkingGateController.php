@@ -137,7 +137,8 @@ class ParkingGateController extends Controller
             $printer->text("\n\n");
             $printer->setBarcodeHeight(100);
             $printer->setBarcodeWidth(4);
-            $printer->barcode(str_random(5), 'CODE39');
+            $printer->setBarcodeTextPosition(Printer::BARCODE_TEXT_BELOW);
+            $printer->barcode("ABC123");
             $printer->cut();
             $printer->close();
         } catch (\Exception $e) {
