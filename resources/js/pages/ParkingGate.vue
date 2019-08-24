@@ -18,7 +18,7 @@
         height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column type="expand">
+            <el-table-column fixed="left" type="expand">
                 <template slot-scope="scope">
                     <table>
                         <tbody>
@@ -32,31 +32,37 @@
                             <tr><td class="td-label">Printer IP Address</td><td class="td-value">{{scope.row.printer_ip_address}}</td></tr>
                             <tr><td class="td-label">Camera IP Address</td><td class="td-value">{{scope.row.camera_ip_address}}</td></tr>
                             <tr><td class="td-label">Camera Username</td><td class="td-value">{{scope.row.camera_username}}</td></tr>
-                            <tr><td class="td-label">Camera Password</td><td class="td-value">{{scope.row.camera_password}}</td></tr>
+                            <tr><td class="td-label">Camera Password</td><td class="td-value">{{scope.row.camera_password}}</ td></tr>
                             <tr><td class="td-label">Camera Auth Type</td><td class="td-value">{{scope.row.camera_auth_type}}</td></tr>
                             <tr><td class="td-label">Camera Image Snapshot URL</td><td class="td-value">{{scope.row.camera_image_snapshot_url}}</td></tr>
+                            <tr><td class="td-label">Camera Status</td><td class="td-value">{{scope.row.camera_status ? 'Active' : 'Inactive'}}</td></tr>
                             <!-- <tr><td class="td-label">Camera Video Snapshot URL</td><td class="td-value">{{scope.row.camera_video_snapshot_url}}</td></tr> -->
                             <tr><td class="td-label">Status</td><td class="td-value">{{scope.row.is_active ? 'Active' : 'Inactive'}}</td></tr>
                         </tbody>
                     </table>
                 </template>
             </el-table-column>
-            <el-table-column prop="name" label="Name" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="type" label="Type" sortable="custom" min-width="80px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="vehicle_type" label="Vehicle Type" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
+            <el-table-column fixed="left" prop="name" label="Name" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
+            <el-table-column fixed="left" prop="type" label="Type" sortable="custom" min-width="80px" show-overflow-tooltip></el-table-column>
+            <el-table-column fixed="left" prop="vehicle_type" label="Vehicle Type" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="controller_ip_address" label="Controller Address" sortable="custom" min-width="180px" show-overflow-tooltip>
                 <template slot-scope="scope">
                     {{scope.row.controller_ip_address}}:{{scope.row.controller_port}}
                 </template>
             </el-table-column>
-            <el-table-column prop="printer_type" label="Printer Type" sortable="custom" min-width="120px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="printer_device" label="Printer Device" sortable="custom" min-width="130px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="printer_type" label="Printer Type" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="printer_device" label="Printer Device" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="printer_ip_address" label="Printer IP Address" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_ip_address" label="Camera IP Address" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_username" label="Camera Username" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_password" label="Camera Password" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_auth_type" label="Camera Auth Type" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_image_snapshot_url" label="Camera Image Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_status" label="Camera Image Snapshot URL" sortable="custom" min-width="100px">
+                <template slot-scope="scope">
+                    <el-tag size="mini" :type="scope.row.camera_status ? 'success' : 'info'">{{scope.row.camera_status ? 'Active' : 'Inactive'}}</el-tag>
+                </template>
+            </el-table-column>
             <!-- <el-table-column prop="camera_video_snapshot_url" label="Camera Video Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column> -->
 
             <el-table-column fixed="right" prop="status" label="Status" sortable="custom" min-width="100px">

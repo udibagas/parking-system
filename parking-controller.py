@@ -195,7 +195,7 @@ Builder.load_string("""
                 size_hint: (1, .25)
 
             Label:
-                text: 'MITRATEKNIK\\nPARKING SYSTEM\\nv1.1\\n\\n\\nwww.mitrateknik.com'
+                text: 'MITRATEKNIK\\nPARKING SYSTEM\\nv1.1\\n\\n\\nwww.mitrateknik.co.id'
                 size_hint: (1, .25)
                 halign: 'center'
 
