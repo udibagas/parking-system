@@ -180,7 +180,7 @@ export default {
         resetForm() {
             let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
             this.formModel.gate_in_id = null
-            this.formModel.plate_number = ''
+            this.formModel.plate_number = this.location.default_plate_number
             this.formModel.barcode_number = ''
             this.formModel.time_out = ''
             this.formModel.time_in = ''
@@ -350,8 +350,6 @@ export default {
                     })
                     return
                 }
-
-                this.formModel.gate_out_id = r.data.find(g => g.type == 'OUT').id
             }).catch(e => {
                 this.$message({
                     message: 'PLEASE SET GATE',
