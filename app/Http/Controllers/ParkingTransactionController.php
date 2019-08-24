@@ -163,7 +163,7 @@ class ParkingTransactionController extends Controller
                 $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->setBarcodeHeight(100);
-                $printer->setBarcodeWidth0(4);
+                $printer->setBarcodeWidth(4);
                 $printer->barcode($parkingTransaction->barcode_number, 'CODE39');
                 $printer->text("\n");
                 $printer->text($location->additional_info_ticket);

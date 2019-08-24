@@ -134,6 +134,10 @@ class ParkingGateController extends Controller
             $printer->text("TEST PRINTER\n");
             $printer->text($parkingGate->name . "\n");
             $printer->text(date('d-M-Y H:i:s'));
+            $printer->text("\n\n");
+            $printer->setBarcodeHeight(100);
+            $printer->setBarcodeWidth(4);
+            $printer->barcode(str_random(5), 'CODE39');
             $printer->cut();
             $printer->close();
         } catch (\Exception $e) {
