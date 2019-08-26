@@ -235,7 +235,7 @@ class GateInControllerScreen(Screen):
     def init_app(self):
         if len(self.gates) > 0:
             for g in self.gates:
-                self.gate_indicator.remove_widget(self.gate_indicator[g['id']])
+                self.status_bar.remove_widget(self.gate_indicator[g['id']])
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Initializing...\n'
         self.location = get_location()
