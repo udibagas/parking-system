@@ -254,7 +254,7 @@ class GateInControllerScreen(Screen):
         self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
         for g in self.gates:
-            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=self.reconnect_gate(g))
+            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda instance: self.reconnect_gate(g))
             self.status_bar.add_widget(self.gate_indicator[g['id']])
 
     def start_app(self):
