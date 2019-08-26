@@ -58,7 +58,7 @@
             <el-table-column prop="camera_password" label="Camera Password" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_auth_type" label="Camera Auth Type" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="camera_image_snapshot_url" label="Camera Image Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_status" label="Camera Image Snapshot URL" sortable="custom" min-width="100px">
+            <el-table-column prop="camera_status" label="Camera Status" sortable="custom" min-width="150px">
                 <template slot-scope="scope">
                     <el-tag size="mini" :type="scope.row.camera_status ? 'success' : 'info'">{{scope.row.camera_status ? 'Active' : 'Inactive'}}</el-tag>
                 </template>

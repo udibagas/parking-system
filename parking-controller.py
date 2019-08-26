@@ -318,6 +318,7 @@ class GateInControllerScreen(Screen):
         popup.open()
 
     def exit_app(self, instance):
+        self.stop_app()
         sys.exit()
 
 def get_location():
@@ -577,7 +578,8 @@ def gate_in_thread(gate):
 
                 # detect loop 2, in 1 off (motor pergi)
                 loop_2 = s.recv(32)
-                while b'IN3' not in loop_2 and b'IN1OFF' not in loop_2 and loop_2 != b'':
+                # while b'IN3' not in loop_2 and b'IN1OFF' not in loop_2 and loop_2 != b'':
+                while b'IN3OFF' not in loop_2 and loop_2 != b'':
                     loop_2 = s.recv(32)
 
                 if loop_2 == b'':
