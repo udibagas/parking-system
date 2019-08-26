@@ -230,9 +230,13 @@ class GateInControllerScreen(Screen):
         super(GateInControllerScreen, self).__init__(**kwargs)
         self.gate_indicator = {}
         self.gate_threads = {}
-        self.init_app()
+        self.gates = {}
 
     def init_app(self):
+        if len(self.gates) > 0:
+            for g in self.gates():
+                self.gate_indicator.remove_widget(self.gate_indicator[g['id']])
+
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Initializing...\n'
         self.location = get_location()
 
@@ -250,10 +254,13 @@ class GateInControllerScreen(Screen):
         self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
         for g in self.gates:
-            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda instance: self.reconnect_gate(g))
+            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp')
+            self.gate_indicator[g['id']].bind(on_press=self.reconnect_gate(g))
             self.status_bar.add_widget(self.gate_indicator[g['id']])
 
     def start_app(self):
+        self.init_app()
+
         if self.gates and len(self.gate_threads) > 0:
             self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application already started\n'
             return
@@ -312,7 +319,6 @@ class GateInControllerScreen(Screen):
         popup.open()
 
     def exit_app(self, instance):
-        self.stop_app()
         sys.exit()
 
 def get_location():
@@ -589,6 +595,9 @@ class ParkingControllerApp(App):
     def build(self):
         self.title = 'ENTRANCE GATE CONTROLLER - MITRATEKNIK PARKING SYSTEM V1.1'
         return sm
+
+    def on_stop(self):
+        app.stop_app()
 
 sm  = ScreenManager()
 app = GateInControllerScreen(name='gate_in')
