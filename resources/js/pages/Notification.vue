@@ -33,7 +33,7 @@
                     {{ scope.row.created_at | readableDateTime }}
                 </template>
             </el-table-column>
-            <el-table-column prop="message" label="Message" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="message" label="Message" min-width="150px"></el-table-column>
             <el-table-column width="70px" align="center">
                 <template slot-scope="scope">
                     <el-button size="small" type="danger" plain icon="el-icon-delete" @click="deleteData(scope.row.id)"></el-button>

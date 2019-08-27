@@ -20,138 +20,12 @@ from kivy.uix.image import AsyncImage
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from kivy.uix.gridlayout import GridLayout
-from kivy.graphics import Color, Rectangle
 from kivy.uix.screenmanager import ScreenManager, Screen
 import os
 
 API_URL = 'http://localhost/api'
 
 Builder.load_string("""
-<GateOutScreen>:
-    BoxLayout:
-        orientation: 'horizontal'
-        padding: 40
-
-        GridLayout
-            cols: 2
-            size_hint: (.7, 1)
-
-            Label:
-                halign: 'right'
-                text: 'NO. PLAT'
-                font_size: '35sp'
-
-            TextInput:
-                multiline: False
-                hint_text: 'NO. PLAT'
-                font_size: '35sp'
-
-            Label:
-                halign: 'right'
-                text: 'NO. TIKET'
-                font_size: '35sp'
-
-            TextInput:
-                multiline: False
-                hint_text: 'NO. TIKET'
-                font_size: '35sp'
-
-            Label:
-                halign: 'right'
-                text: 'GATE IN'
-                font_size: '35sp'
-
-            TextInput:
-                multiline: False
-                hint_text: 'GATE IN'
-                font_size: '35sp'
-
-            Label:
-                halign: 'right'
-                text: 'MASUK'
-                font_size: '35sp'
-
-            TextInput:
-                multiline: False
-                hint_text: 'MASUK'
-                font_size: '35sp'
-
-            Label:
-                halign: 'right'
-                text: 'KELUAR'
-                font_size: '35sp'
-
-            TextInput:
-                multiline: False
-                hint_text: 'KELUAR'
-                font_size: '35sp'
-                readonly: True
-
-            Label:
-                halign: 'right'
-                text: 'DURASI'
-                font_size: '35sp'
-
-            TextInput:
-                multiline: False
-                hint_text: 'DURASI'
-                font_size: '35sp'
-                readonly: True
-
-            Label:
-                halign: 'right'
-                text: 'TARIF'
-                font_size: '35sp'
-
-            TextInput:
-                multiline: False
-                hint_text: 'TARIF'
-                font_size: '35sp'
-                readonly: True
-
-        BoxLayout:
-            orientation: 'vertical'
-            size_hint: (.3, 1)
-
-            Label:
-                text: 'SNAPSHOT IN'
-
-            Label
-                text: 'SNAPSHOT OUT'
-
-<LoginScreen>:
-    username: username
-    password: password
-
-    BoxLayout:
-        orientation: 'vertical'
-        padding: 50
-
-        TextInput:
-            id: username
-            hint_text: 'Username'
-            multiline: False
-            size_hint: (1, .2)
-
-        TextInput:
-            id: password
-            hint_text: 'Password'
-            password: True
-            multiline: False
-            size_hint: (1, .2)
-
-        BoxLayout:
-            orientation: 'horizontal'
-            size_hint: (1, .2)
-
-            Button:
-                text: 'CANCEL'
-                on_press: root.manager.current = 'gate_in'
-
-            Button:
-                text: 'LOGIN'
-                on_press: root.login(username, password)
-
 <GateInControllerScreen>:
     gates: []
     location: None
@@ -213,16 +87,6 @@ Builder.load_string("""
                 orientation: 'horizontal'
                 size_hint: (1, .08)
 """)
-
-class LoginScreen(Screen):
-
-    def login(self, username, password):
-        print(username, password)
-        sm.current = 'gate_out'
-
-class GateOutScreen(Screen):
-    pass
-
 
 class GateInControllerScreen(Screen):
 
@@ -604,8 +468,6 @@ class ParkingControllerApp(App):
 sm  = ScreenManager()
 app = GateInControllerScreen(name='gate_in')
 sm.add_widget(app)
-sm.add_widget(GateOutScreen(name='gate_out'))
-sm.add_widget(LoginScreen(name='login'))
 
 if __name__ == "__main__":
     ParkingControllerApp().run()
