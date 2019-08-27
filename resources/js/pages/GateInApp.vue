@@ -122,6 +122,7 @@ export default {
             }).finally(() => {
                 this.formModel.barcode_number = this.generateBarcodeNumber();
                 this.formModel.time_in = moment().format('YYYY-MM-DD HH:mm:ss');
+                this.formModel.time_out = moment().format('YYYY-MM-DD HH:mm:ss');
                 this.$forceUpdate();
 
                 axios.post('/parkingTransaction', this.formModel).then(r => {
