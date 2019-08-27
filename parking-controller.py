@@ -328,6 +328,7 @@ def gate_in_thread(gate):
             app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
             send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
             gate_in_thread(gate)
+            return
 
         app.gate_threads[gate['id']] = s
         app.gate_indicator[gate['id']].background_color = [0,1,0,1]
