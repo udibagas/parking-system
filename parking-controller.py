@@ -95,6 +95,7 @@ class GateInControllerScreen(Screen):
         self.gate_indicator = {}
         self.gate_threads = {}
         self.gates = {}
+        self.stop_thread = False
 
     def init_app(self):
         if len(self.gates) > 0:
@@ -117,9 +118,7 @@ class GateInControllerScreen(Screen):
         self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
         for g in self.gates:
-            # self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp')
-            # self.gate_indicator[g['id']].bind(on_press=self.reconnect_gate(g))
-            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda *args: self.reconnect_gate(g, *args))
+            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda instance: self.reconnect_gate(g))
             self.status_bar.add_widget(self.gate_indicator[g['id']])
 
     def start_app(self):
@@ -127,9 +126,14 @@ class GateInControllerScreen(Screen):
 
         if self.gates and len(self.gate_threads) > 0:
             self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Application already started\n'
+
+            for g in self.gates:
+                self.gate_indicator[g['id']].background_color = [0,1,0,1]
+
             return
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Starting application...\n'
+        self.stop_thread = False
 
         for g in self.gates:
             threading.Thread(target=gate_in_thread, args=(g,)).start()
@@ -146,6 +150,8 @@ class GateInControllerScreen(Screen):
         threading.Thread(target=gate_in_thread, args=(gate,)).start()
 
     def stop_app(self):
+        self.stop_thread = True
+
         if len(self.gate_threads) == 0:
             return
 
@@ -154,7 +160,6 @@ class GateInControllerScreen(Screen):
         for i in self.gate_threads:
             try:
                 self.gate_threads[i].shutdown(socket.SHUT_WR)
-                self.gate_threads[i].close()
             except Exception as e:
                 self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Socket already closed\n'
 
@@ -215,7 +220,7 @@ def take_snapshot(gate):
         else:
             r = requests.get(gate['camera_image_snapshot_url'], auth=(gate['camera_username'], gate['camera_password']), timeout=3)
     except Exception as e:
-        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot' + str(e) + '\n'
+        app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gagal mengambil snapshot ' + str(e) + '\n'
         send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
         return ''
 
@@ -311,6 +316,9 @@ def controller_disconnected(gate):
     gate_in_thread(gate)
 
 def gate_in_thread(gate):
+    if app.stop_thread:
+        return
+
     time.sleep(1)
     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connecting to controller ' + gate['controller_ip_address'] + ' \n'
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
@@ -319,7 +327,7 @@ def gate_in_thread(gate):
         except Exception as e:
             app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
             send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
-            return
+            gate_in_thread(gate)
 
         app.gate_threads[gate['id']] = s
         app.gate_indicator[gate['id']].background_color = [0,1,0,1]
