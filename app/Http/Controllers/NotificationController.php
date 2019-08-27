@@ -17,7 +17,7 @@ class NotificationController extends Controller
         return Notification::when($request->keyword, function ($q) use ($request) {
                 return $q->where('message', 'LIKE', '%' . $request->keyword . '%');
             })->when($request->read == 0, function($q) {
-                // return $q->where('read', 0);
+                return $q->where('read', 0);
             })->when($request->dateRange, function($q) use ($request) {
                 return $q->whereRaw('DATE(updated_at) BETWEEN "'.$request->dateRange[0].'" AND "'.$request->dateRange[1].'"');
             })->orderBy($request->sort ? $request->sort : 'created_at', $request->order == 'ascending' ? 'asc' : 'desc')
