@@ -121,7 +121,6 @@ class GateInControllerScreen(Screen):
         for g in self.gates:
             self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda instance: self.reconnect_gate(g))
             self.status_bar.add_widget(self.gate_indicator[g['id']])
-            time.sleep(1)
 
     def start_app(self):
         self.init_app()

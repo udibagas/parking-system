@@ -145,7 +145,7 @@ export default {
         }
     },
     mounted() {
-        // setInterval(this.getNotification, 5000)
+        setInterval(this.getNotification, 5000)
     }
 }
 </script>
