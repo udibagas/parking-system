@@ -153,7 +153,7 @@ class GateInControllerScreen(Screen):
 
         for i in self.gate_threads:
             try:
-                # self.gate_threads[i].shutdown(socket.SHUT_WR)
+                self.gate_threads[i].shutdown(socket.SHUT_WR)
                 self.gate_threads[i].close()
             except Exception as e:
                 self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Socket already closed\n'
