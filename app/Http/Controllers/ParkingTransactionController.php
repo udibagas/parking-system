@@ -166,7 +166,7 @@ class ParkingTransactionController extends Controller
                 // $printer->setBarcodeWidth(4);
                 // $printer->barcode($parkingTransaction->barcode_number, 'CODE39');
                 // $printer->text("\n");
-                $printer->text($location->additional_info_ticket);
+                $printer->text($location->additional_info_ticket . "\n");
                 $printer->cut();
                 $printer->close();
             } catch (\Exception $e) {

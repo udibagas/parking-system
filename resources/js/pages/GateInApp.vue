@@ -92,7 +92,7 @@ export default {
         },
         resetForm() {
             let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
-            this.formModel.plate_number = ''
+            this.formModel.plate_number = this.location.default_plate_number
             this.snapshot_in = ''
 
             if (default_vehicle) {
@@ -103,6 +103,7 @@ export default {
                 this.formModel.fare = ''
             }
 
+            this.$forceUpdate()
             document.getElementById('plate-number').focus()
         },
         submit() {
@@ -115,14 +116,13 @@ export default {
                 this.formModel.fare = 0;
                 this.formModel.is_member = 1;
                 this.formModel.parking_member_id = r.data.id;
-                this.$forceUpdate();
             }).catch(e => {
                 this.formModel.is_member = 0;
                 this.formModel.parking_member_id = null;
-                this.$forceUpdate();
             }).finally(() => {
                 this.formModel.barcode_number = this.generateBarcodeNumber();
                 this.formModel.time_in = moment().format('YYYY-MM-DD HH:mm:ss');
+                this.$forceUpdate();
 
                 axios.post('/parkingTransaction', this.formModel).then(r => {
                     this.printTicket(r.data.id)
