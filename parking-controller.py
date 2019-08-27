@@ -234,8 +234,9 @@ class GateInControllerScreen(Screen):
 
     def init_app(self):
         if len(self.gates) > 0:
-            for g in self.gates:
-                self.status_bar.remove_widget(self.gate_indicator[g['id']])
+            self.status_bar.clear_widgets()
+            # for g in self.gates:
+            #     self.status_bar.remove_widget(self.gate_indicator[g['id']])
 
         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] Initializing...\n'
         self.location = get_location()
@@ -441,6 +442,7 @@ def controller_disconnected(gate):
 
     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus. Silakan klik tombol gate untuk menyambung ulang \n'
     send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan klik tombol gate untuk menyambung ulang')
+    app.reconnect_gate(gate)
 
 def gate_in_thread(gate):
     time.sleep(1)
@@ -449,9 +451,10 @@ def gate_in_thread(gate):
         try:
             s.connect((gate['controller_ip_address'], gate['controller_port']))
         except Exception as e:
-            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
+            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed. Reconnecting in 3 seconds... \n'
             send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
-            return
+            time.sleep(3)
+            gate_in_thread(gate)
 
         app.gate_threads[gate['id']] = s
         app.gate_indicator[gate['id']].background_color = [0,1,0,1]

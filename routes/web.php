@@ -32,6 +32,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::put('parkingTransaction/setSudahKeluar/{parkingTransaction}', 'ParkingTransactionController@setSudahKeluar');
     Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
+    Route::delete('notification/clearNotification', 'NotificationController@clearNotification');
     Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
     // Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
 

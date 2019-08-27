@@ -10,7 +10,11 @@ class ReportController extends Controller
 {
     public function getTransaction(Request $request)
     {
-        return DB::select('SELECT vehicle_type, COUNT(id) AS `total` FROM parking_transactions WHERE DATE(updated_at) BETWEEN :start AND :stop GROUP BY vehicle_type', [
+        return DB::select('
+            SELECT vehicle_type, COUNT(id) AS `total`
+            FROM parking_transactions
+            WHERE DATE(updated_at) BETWEEN :start AND :stop
+            GROUP BY vehicle_type', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
@@ -18,14 +22,23 @@ class ReportController extends Controller
 
     public function getIncome(Request $request)
     {
-        return DB::select('SELECT vehicle_type, SUM(fare) AS `total` FROM parking_transactions WHERE DATE(updated_at) BETWEEN :start AND :stop GROUP BY vehicle_type', [
+        return DB::select('
+            SELECT vehicle_type, SUM(fare) AS `total`
+            FROM parking_transactions
+            WHERE DATE(updated_at) BETWEEN :start AND :stop
+            GROUP BY vehicle_type', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
     }
 
     public function getParkedVehicle(Request $request) {
-        return DB::select('SELECT vehicle_type, COUNT(id) AS `total` FROM parking_transactions WHERE DATE(updated_at) BETWEEN :start AND :stop AND time_out IS NULL GROUP BY vehicle_type', [
+        return DB::select('
+            SELECT vehicle_type, COUNT(id) AS `total`
+            FROM parking_transactions
+            WHERE DATE(updated_at) BETWEEN :start AND :stop
+                AND time_out IS NULL
+            GROUP BY vehicle_type', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
@@ -33,12 +46,26 @@ class ReportController extends Controller
 
     public function pendapatan(Request $request)
     {
-        $perKendaraan = DB::select('SELECT vehicle_type, COUNT(id) AS jumlah, SUM(fare) AS `pendapatan` FROM parking_transactions WHERE DATE(updated_at) BETWEEN :start AND :stop AND time_out IS NOT NULL GROUP BY vehicle_type', [
+        $perKendaraan = DB::select('
+            SELECT vehicle_type,
+                COUNT(id) AS jumlah,
+                SUM(fare) AS `pendapatan`
+            FROM parking_transactions
+            WHERE DATE(updated_at) BETWEEN :start AND :stop
+                AND time_out IS NOT NULL
+            GROUP BY vehicle_type', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
 
-        $perPetugas = DB::select('SELECT operator, COUNT(id) AS jumlah, SUM(fare) AS `pendapatan` FROM parking_transactions WHERE DATE(updated_at) BETWEEN :start AND :stop AND time_out IS NOT NULL GROUP BY operator', [
+        $perPetugas = DB::select('
+            SELECT operator,
+                COUNT(id) AS jumlah,
+                SUM(fare) AS `pendapatan`
+            FROM parking_transactions
+            WHERE DATE(updated_at) BETWEEN :start AND :stop
+                AND time_out IS NOT NULL
+            GROUP BY operator', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);

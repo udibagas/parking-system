@@ -1,117 +1,110 @@
 <template>
     <div id="gate-out-app">
-        <el-tabs type="card">
-            <el-tab-pane label="GATE IN">
-                <GateInApp />
-            </el-tab-pane>
-            <el-tab-pane label="GATE OUT">
-                <el-row :gutter="15">
-                    <el-col :span="14">
-                        <el-card style="height:calc(100vh - 160px)">
-                            <el-row :gutter="10" style="margin-bottom:10px;">
-                                <el-col :span="10">
-                                    <div class="label-big">GATE IN</div>
-                                </el-col>
-                                <el-col :span="14">
-                                    <select :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
-                                        <option v-for="g in parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
-                                    </select>
-                                </el-col>
-                            </el-row>
+        <el-row :gutter="15">
+            <el-col :span="14">
+                <el-card style="height:calc(100vh - 160px)">
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">GATE IN</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <select :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
+                                <option v-for="g in parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
+                            </select>
+                        </el-col>
+                    </el-row>
 
-                            <el-row :gutter="10" style="margin-bottom:10px;">
-                                <el-col :span="10">
-                                    <div class="label-big">GATE OUT</div>
-                                </el-col>
-                                <el-col :span="14">
-                                    <select v-model="formModel.gate_out_id" id="gate-out" class="my-input">
-                                        <option v-for="g in parkingGateList.filter(g => g.type == 'OUT')" :value="g.id" :key="g.id">{{g.name}}</option>
-                                    </select>
-                                </el-col>
-                            </el-row>
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">GATE OUT</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <select v-model="formModel.gate_out_id" id="gate-out" class="my-input">
+                                <option v-for="g in parkingGateList.filter(g => g.type == 'OUT')" :value="g.id" :key="g.id">{{g.name}}</option>
+                            </select>
+                        </el-col>
+                    </el-row>
 
-                            <el-row :gutter="10" style="margin-bottom:10px;">
-                                <el-col :span="10">
-                                    <div class="label-big">[-] NO. PLAT</div>
-                                </el-col>
-                                <el-col :span="14">
-                                    <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
-                                </el-col>
-                            </el-row>
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">[-] NO. PLAT</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
+                        </el-col>
+                    </el-row>
 
-                            <el-row :gutter="10" style="margin-bottom:10px;">
-                                <el-col :span="10">
-                                    <div class="label-big">[+] NO. TIKET</div>
-                                </el-col>
-                                <el-col :span="14">
-                                    <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
-                                </el-col>
-                            </el-row>
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">[+] NO. TIKET</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                        </el-col>
+                    </el-row>
 
-                            <el-row :gutter="10" style="margin-bottom:10px;">
-                                <el-col :span="10">
-                                    <div class="label-big">[*] JENIS KENDARAAN</div>
-                                </el-col>
-                                <el-col :span="14">
-                                    <select @keyup.enter="submit" placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
-                                        <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
-                                    </select>
-                                    <!-- <input id="vehicle-type" type="text" placeholder="JENIS KENDARAAN" v-model="formModel.vehicle_type" class="my-input"> -->
-                                    <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
-                                        {{vehicleTypeList.map(vt => vt.shortcut_key + ' = ' + vt.name).join(', ')}}
-                                    </div>
-                                </el-col>
-                            </el-row>
-
-                            <el-row :gutter="10" style="margin-bottom:10px;">
-                                <el-col :span="10">
-                                    <div class="label-big">TARIF</div>
-                                </el-col>
-                                <el-col :span="14">
-                                    <input disabled v-model="formModel.fare" class="my-input tarif-input">
-                                </el-col>
-                            </el-row>
-
-                            <el-row :gutter="10">
-                                <el-col :span="8">
-                                    <div class="label">[/] IN</div>
-                                    <input @keyup.enter="submit" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
-                                </el-col>
-                                <el-col :span="8">
-                                    <div class="label">OUT</div>
-                                    <input disabled v-model="formModel.time_out" class="my-input-time text-center">
-                                </el-col>
-                                <el-col :span="8">
-                                    <div class="label">DURASI</div>
-                                    <input disabled v-model="formModel.duration" class="my-input-time text-center">
-                                </el-col>
-                            </el-row>
-
-                            <!-- <el-divider></el-divider> -->
-                            <button class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
-                        </el-card>
-                    </el-col>
-                    <el-col :span="10">
-                        <el-card style="height:calc(100vh - 160px)">
-                            <div class="block">
-                                <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
-                                    <div slot="error" class="el-image__error">
-                                        <h1>SNAPSHOT IN</h1>
-                                    </div>
-                                </el-image>
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">[*] JENIS KENDARAAN</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <select @keyup.enter="submit" placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
+                                <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
+                            </select>
+                            <!-- <input id="vehicle-type" type="text" placeholder="JENIS KENDARAAN" v-model="formModel.vehicle_type" class="my-input"> -->
+                            <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
+                                {{vehicleTypeList.map(vt => vt.shortcut_key + ' = ' + vt.name).join(', ')}}
                             </div>
-                            <div class="block">
-                                <el-image :src="snapshot_out" style="width: 100%; height: 100%" fit="cover">
-                                    <div slot="error" class="el-image__error">
-                                        <h1>SNAPSHOT OUT</h1>
-                                    </div>
-                                </el-image>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">TARIF</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <input disabled v-model="formModel.fare" class="my-input tarif-input">
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10">
+                        <el-col :span="8">
+                            <div class="label">[/] IN</div>
+                            <input @keyup.enter="submit" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
+                        </el-col>
+                        <el-col :span="8">
+                            <div class="label">OUT</div>
+                            <input disabled v-model="formModel.time_out" class="my-input-time text-center">
+                        </el-col>
+                        <el-col :span="8">
+                            <div class="label">DURASI</div>
+                            <input disabled v-model="formModel.duration" class="my-input-time text-center">
+                        </el-col>
+                    </el-row>
+
+                    <!-- <el-divider></el-divider> -->
+                    <button class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
+                </el-card>
+            </el-col>
+            <el-col :span="10">
+                <el-card style="height:calc(100vh - 160px)">
+                    <div class="block">
+                        <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
+                            <div slot="error" class="el-image__error">
+                                <h1>SNAPSHOT IN</h1>
                             </div>
-                        </el-card>
-                    </el-col>
-                </el-row>
-            </el-tab-pane>
-        </el-tabs>
+                        </el-image>
+                    </div>
+                    <div class="block">
+                        <el-image :src="snapshot_out" style="width: 100%; height: 100%" fit="cover">
+                            <div slot="error" class="el-image__error">
+                                <h1>SNAPSHOT OUT</h1>
+                            </div>
+                        </el-image>
+                    </div>
+                </el-card>
+            </el-col>
+        </el-row>
     </div>
 </template>
 
