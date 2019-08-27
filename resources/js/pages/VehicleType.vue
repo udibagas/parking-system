@@ -1,7 +1,5 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="VEHICLE TYPES"> </el-page-header>
-        <el-divider></el-divider>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
                 <el-button @click="openForm({})" type="primary"><i class="el-icon-plus"></i> ADD NEW VEHICLE TYPE</el-button>
@@ -15,7 +13,7 @@
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="name" label="Name" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
@@ -30,12 +28,12 @@
                     Rp {{scope.row.denda_tiket_hilang | formatNumber}}
                 </template>
             </el-table-column>
-            <el-table-column fixed="right" prop="is_default" label="Default" sortable="custom">
+            <el-table-column prop="is_default" label="Default" sortable="custom">
                 <template slot-scope="scope">
                     <el-tag size="mini" :type="scope.row.is_default ? 'success' : 'info'">{{scope.row.is_default ? 'Yes' : 'No'}}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column fixed="right" width="40px">
+            <el-table-column width="40px">
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">

@@ -1,7 +1,5 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="MEMBERS"> </el-page-header>
-        <el-divider></el-divider>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
                 <el-button @click="openForm({})" type="primary"><i class="el-icon-plus"></i> ADD NEW MEMBER</el-button>
@@ -15,7 +13,7 @@
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column type="expand">

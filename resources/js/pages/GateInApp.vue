@@ -1,5 +1,5 @@
 <template>
-    <div id="gate-out-app">
+    <div id="gate-in-app">
         <el-page-header @back="$emit('back')" content="GATE IN APP"> </el-page-header>
         <el-divider></el-divider>
         <el-row :gutter="15">
@@ -30,10 +30,9 @@
                             <div class="label-big">[*] JENIS KENDARAAN</div>
                         </el-col>
                         <el-col :span="14">
-                            <select @keyup.enter="submit" placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
+                            <select @keyup.enter="(e) => { e.preventDefault(); submit(); }" placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
                                 <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
                             </select>
-                            <!-- <input id="vehicle-type" type="text" placeholder="JENIS KENDARAAN" v-model="formModel.vehicle_type" class="my-input"> -->
                             <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
                                 {{vehicleTypeList.map(vt => vt.shortcut_key + ' = ' + vt.name).join(', ')}}
                             </div>
@@ -54,9 +53,9 @@
             </el-col>
             <el-col :span="10">
                 <el-card style="height:calc(100vh - 175px)">
-                    <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
-                        <div slot="error" class="image-slot">
-                            <i class="el-icon-picture-outline"></i>
+                    <el-image :src="snapshot_in" style="width: 100%; height: 300px" fit="cover">
+                        <div slot="error" class="el-image__error">
+                            <h1>SNAPSHOT IN</h1>
                         </div>
                     </el-image>
                 </el-card>
@@ -95,7 +94,6 @@ export default {
         },
         resetForm() {
             let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
-            this.formModel.gate_in_id = null
             this.formModel.plate_number = ''
             this.snapshot_in = ''
 
@@ -137,7 +135,7 @@ export default {
             this.formModel.time_in = moment().format('YYYY-MM-DD HH:mm:ss');
 
             axios.post('/parkingTransaction', this.formModel).then(r => {
-                this.takeSnapshot(r.data.id)
+                // this.takeSnapshot(r.data.id)
                 this.printTicket(r.data.id)
                 this.$forceUpdate()
             }).catch(e => {
@@ -177,7 +175,7 @@ export default {
             })
         },
         openGate() {
-            axios.post('/parkingTransaction/openGate').then(r => {
+            axios.post('/parkingGate/openGate/' + this.formModel.gate_in_id).then(r => {
                 this.resetForm()
                 this.$message({
                     message: r.data.message,
@@ -266,7 +264,7 @@ export default {
         this.getVehicleTypeList()
         document.getElementById('plate-number').focus()
 
-        document.getElementById('gate-out-app').onkeypress = (e) => {
+        document.getElementById('gate-in-app').onkeypress = (e) => {
             // ke field nomor plat
             if (e.key == '-') {
                 e.preventDefault()

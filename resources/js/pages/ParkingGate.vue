@@ -1,7 +1,5 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="GATES"> </el-page-header>
-        <el-divider></el-divider>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
                 <el-button @click="openForm({printer_type: 'local'})" type="primary"><i class="el-icon-plus"></i> ADD NEW GATE</el-button>
@@ -15,7 +13,7 @@
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column fixed="left" type="expand">
@@ -32,7 +30,7 @@
                             <tr><td class="td-label">Printer IP Address</td><td class="td-value">{{scope.row.printer_ip_address}}</td></tr>
                             <tr><td class="td-label">Camera IP Address</td><td class="td-value">{{scope.row.camera_ip_address}}</td></tr>
                             <tr><td class="td-label">Camera Username</td><td class="td-value">{{scope.row.camera_username}}</td></tr>
-                            <tr><td class="td-label">Camera Password</td><td class="td-value">{{scope.row.camera_password}}</ td></tr>
+                            <tr><td class="td-label">Camera Password</td><td class="td-value">{{scope.row.camera_password}}</td></tr>
                             <tr><td class="td-label">Camera Auth Type</td><td class="td-value">{{scope.row.camera_auth_type}}</td></tr>
                             <tr><td class="td-label">Camera Image Snapshot URL</td><td class="td-value">{{scope.row.camera_image_snapshot_url}}</td></tr>
                             <tr><td class="td-label">Camera Status</td><td class="td-value">{{scope.row.camera_status ? 'Active' : 'Inactive'}}</td></tr>

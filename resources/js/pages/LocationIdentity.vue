@@ -1,7 +1,5 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="LOCATION IDENTITIES"> </el-page-header>
-        <el-divider></el-divider>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
                 <el-button @click="openForm({})" type="primary"><i class="el-icon-plus"></i> ADD NEW LOCATION IDENTITY</el-button>
@@ -15,20 +13,20 @@
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="name" label="Name" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="address" label="Address" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="additional_info_ticket" label="Additional Info Ticket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="default_plate_number" label="Default Plate Number" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column width="100px" fixed="right" prop="status" label="Status" sortable="custom">
+            <el-table-column width="100px" prop="status" label="Status" sortable="custom">
                 <template slot-scope="scope">
                     <el-tag size="mini" :type="scope.row.active ? 'success' : 'info'">{{scope.row.active ? 'Active' : 'Inactive'}}</el-tag>
                 </template>
             </el-table-column>
 
-            <el-table-column fixed="right" width="40px">
+            <el-table-column width="40px">
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">

@@ -1,7 +1,5 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="USERS"> </el-page-header>
-        <el-divider></el-divider>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
                 <el-button @click="openForm({role: 0, password: ''})" type="primary"><i class="el-icon-plus"></i> ADD NEW USER</el-button>
@@ -15,7 +13,7 @@
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="name" label="Name" sortable="custom"></el-table-column>
@@ -32,7 +30,7 @@
                 </template>
             </el-table-column>
 
-            <el-table-column fixed="right" width="40px">
+            <el-table-column width="40px">
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">

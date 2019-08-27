@@ -64,7 +64,7 @@ export default {
         menus() {
             let menus = [
                 {label: 'Home', icon: 'el-icon-s-home', path: '/' },
-                // {label: 'Gate In App', icon: 'el-icon-remove-outline', path: 'gate-in-app' },
+                {label: 'Gate In App', icon: 'el-icon-remove-outline', path: 'gate-in-app' },
                 {label: 'Transactions', icon: 'el-icon-document-copy', path: 'parking-transaction' },
                 // {label: 'Member Renewal', icon: 'el-icon-refresh', path: 'member-renewal' },
                 {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },
@@ -73,13 +73,7 @@ export default {
 
             if (this.$store.state.user.role == 1) {
                 menus.push(
-                    {label: 'Gates', icon: 'el-icon-minus', path: 'parking-gate' },
-                    {label: 'Vehicle Type', icon: 'el-icon-truck', path: 'vehicle-type' },
-                    {label: 'Location Identity', icon: 'el-icon-office-building', path: 'location-identity' },
-                    {label: 'Members', icon: 'el-icon-bank-card', path: 'parking-member' },
-                    // {label: 'Server Information', icon: 'el-icon-odometer', path: 'server-information' },
-                    {label: 'Users', icon: 'el-icon-user', path: 'user' },
-                    // {label: 'Log', icon: 'el-icon-bell', path: 'log' }
+                    {label: 'Setting', icon: 'el-icon-setting', path: 'setting' },
                 )
             }
 
