@@ -2,7 +2,7 @@
     <div id="gate-out-app">
         <el-row :gutter="15">
             <el-col :span="14">
-                <el-card style="height:calc(100vh - 160px)">
+                <el-card style="height:calc(100vh - 105px)">
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE IN</div>
@@ -87,7 +87,7 @@
                 </el-card>
             </el-col>
             <el-col :span="10">
-                <el-card style="height:calc(100vh - 160px)">
+                <el-card style="height:calc(100vh - 105px)">
                     <div class="block">
                         <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
                             <div slot="error" class="el-image__error">
@@ -456,7 +456,7 @@ export default {
 <style lang="scss" scoped>
 .block {
     background-color: #eee;
-    height: calc(50vh - 100px);
+    height: calc(50vh - 75px);
 }
 
 .my-input {
