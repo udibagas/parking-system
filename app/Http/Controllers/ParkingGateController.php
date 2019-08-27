@@ -161,7 +161,9 @@ class ParkingGateController extends Controller
             $serial->confStopBits(1);
             $serial->confFlowControl("none");
             $serial->deviceOpen();
-            $serial->sendMessage("AZ123");
+            $serial->sendMessage(env("GATE_CMD_OPEN", "AZ123"));
+            sleep(1);
+            $serial->sendMessage(env("GATE_CMD_CLOSE", "W"));
             $serial->deviceClose();
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MEMBUKA GATE. '. $e->getMessage()], 500);
