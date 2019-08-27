@@ -99,7 +99,8 @@ export default {
                 pageSize: this.pageSize,
                 sort: this.sort,
                 order: this.order,
-                dateRange: this.dateRange
+                dateRange: this.dateRange,
+                read: 1
             }
 
             this.loading = true;
