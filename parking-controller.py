@@ -95,11 +95,8 @@ class GateInControllerScreen(Screen):
         self.gate_indicator = {}
         self.gate_threads = {}
         self.gates = {}
-        self.stop_retrying = False
 
     def init_app(self):
-        self.stop_retrying = False
-
         if len(self.gates) > 0:
             self.status_bar.clear_widgets()
 
@@ -120,8 +117,9 @@ class GateInControllerScreen(Screen):
         self.log_text.text += ', '.join(map(lambda x: x['name'], self.gates)) + '\n'
 
         for g in self.gates:
-            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp')
-            # self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda instance: self.reconnect_gate(g))
+            # self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp')
+            # self.gate_indicator[g['id']].bind(on_press=self.reconnect_gate(g))
+            self.gate_indicator[g['id']] = Button(text=g['name'], background_color=[1,0,0,1], bold=True, font_size='20sp', on_press=lambda *args: self.reconnect_gate(g, *args))
             self.status_bar.add_widget(self.gate_indicator[g['id']])
 
     def start_app(self):
@@ -136,20 +134,18 @@ class GateInControllerScreen(Screen):
         for g in self.gates:
             threading.Thread(target=gate_in_thread, args=(g,)).start()
 
-    # def reconnect_gate(self, gate):
-    #     self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] +' : Reconnecting gate...\n'
+    def reconnect_gate(self, gate):
+        self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] +' : Reconnecting gate...\n'
 
-    #     try:
-    #         self.gate_threads[gate['id']].shutdown(socket.SHUT_WR)
-    #         del self.gate_threads[gate['id']]
-    #     except Exception as e:
-    #         self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] +' : Already closed\n'
+        try:
+            self.gate_threads[gate['id']].shutdown(socket.SHUT_WR)
+            del self.gate_threads[gate['id']]
+        except Exception as e:
+            self.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] +' : Already closed\n'
 
-    #     threading.Thread(target=gate_in_thread, args=(gate,)).start()
+        threading.Thread(target=gate_in_thread, args=(gate,)).start()
 
     def stop_app(self):
-        self.stop_retrying = True
-
         if len(self.gate_threads) == 0:
             return
 
@@ -323,12 +319,7 @@ def gate_in_thread(gate):
         except Exception as e:
             app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
             send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
-
-            if app.stop_retrying == True:
-                return
-
-            time.sleep(3)
-            gate_in_thread(gate)
+            return
 
         app.gate_threads[gate['id']] = s
         app.gate_indicator[gate['id']].background_color = [0,1,0,1]
