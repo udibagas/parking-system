@@ -1,10 +1,8 @@
 <template>
     <div id="gate-in-app">
-        <el-page-header @back="$emit('back')" content="GATE IN APP"> </el-page-header>
-        <el-divider></el-divider>
         <el-row :gutter="15">
             <el-col :span="14">
-                <el-card style="height:calc(100vh - 175px)">
+                <el-card style="height:calc(100vh - 160px)">
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE IN</div>
@@ -18,24 +16,24 @@
 
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
-                            <div class="label-big">[-] NO. PLAT</div>
-                        </el-col>
-                        <el-col :span="14">
-                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
-                        </el-col>
-                    </el-row>
-
-                    <el-row :gutter="10" style="margin-bottom:10px;">
-                        <el-col :span="10">
                             <div class="label-big">[*] JENIS KENDARAAN</div>
                         </el-col>
                         <el-col :span="14">
-                            <select @keyup.enter="(e) => { e.preventDefault(); submit(); }" placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
+                            <select placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
                                 <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
                             </select>
                             <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
                                 {{vehicleTypeList.map(vt => vt.shortcut_key + ' = ' + vt.name).join(', ')}}
                             </div>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">[-] NO. PLAT</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <input id="plate-number" autocomplete="off" @keyup.enter="submit" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -52,7 +50,7 @@
                 </el-card>
             </el-col>
             <el-col :span="10">
-                <el-card style="height:calc(100vh - 175px)">
+                <el-card style="height:calc(100vh - 160px)">
                     <el-image :src="snapshot_in" style="width: 100%; height: 300px" fit="cover">
                         <div slot="error" class="el-image__error">
                             <h1>SNAPSHOT IN</h1>
@@ -107,8 +105,8 @@ export default {
 
             document.getElementById('plate-number').focus()
         },
-        checkPlate(e) {
-            if (!this.formModel.plate_number) {
+        submit() {
+            if (!this.formModel.gate_in_id || !this.formModel.plate_number || !this.formModel.vehicle_type) {
                 return
             }
 
@@ -122,38 +120,18 @@ export default {
                 this.formModel.is_member = 0;
                 this.formModel.parking_member_id = null;
                 this.$forceUpdate();
-            })
+            }).finally(() => {
+                this.formModel.barcode_number = this.generateBarcodeNumber();
+                this.formModel.time_in = moment().format('YYYY-MM-DD HH:mm:ss');
 
-            document.getElementById('vehicle-type').focus()
-        },
-        submit() {
-            if (!this.formModel.gate_in_id || !this.formModel.plate_number || !this.formModel.vehicle_type) {
-                return
-            }
-
-            this.formModel.barcode_number = this.generateBarcodeNumber();
-            this.formModel.time_in = moment().format('YYYY-MM-DD HH:mm:ss');
-
-            axios.post('/parkingTransaction', this.formModel).then(r => {
-                // this.takeSnapshot(r.data.id)
-                this.printTicket(r.data.id)
-                this.$forceUpdate()
-            }).catch(e => {
-                this.$message({
-                    message: 'DATA GAGAL DISIMPAN',
-                    type: 'error',
-                    showClose: true
-                })
-            })
-        },
-        takeSnapshot(id) {
-            axios.post('/parkingTransaction/takeSnapshot/' + id, { gate_id: this.formModel.gate_in_id }).then(r => {
-                this.snapshot_in = r.data.snapshot_in
-            }).catch(e => {
-                this.$message({
-                    message: e.response.data.message,
-                    type: 'error',
-                    showClose: true
+                axios.post('/parkingTransaction', this.formModel).then(r => {
+                    this.printTicket(r.data.id)
+                }).catch(e => {
+                    this.$message({
+                        message: 'DATA GAGAL DISIMPAN',
+                        type: 'error',
+                        showClose: true
+                    })
                 })
             })
         },

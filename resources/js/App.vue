@@ -64,7 +64,6 @@ export default {
         menus() {
             let menus = [
                 {label: 'Home', icon: 'el-icon-s-home', path: '/' },
-                {label: 'Gate In App', icon: 'el-icon-remove-outline', path: 'gate-in-app' },
                 {label: 'Transactions', icon: 'el-icon-document-copy', path: 'parking-transaction' },
                 // {label: 'Member Renewal', icon: 'el-icon-refresh', path: 'member-renewal' },
                 {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },

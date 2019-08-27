@@ -7,7 +7,6 @@ import User from './pages/User'
 import Report from './pages/Report'
 import Snapshot from './pages/Snapshot'
 // import ServerInformation from './pages/ServerInformation'
-import GateInApp from './pages/GateInApp'
 import Setting from './pages/Setting'
 // import MemberRenewal from './pages/MemberRenewal'
 
@@ -21,7 +20,6 @@ const router = new VueRouter({
         { path: '/report', component: Report, name: 'report' },
         { path: '/snapshot', component: Snapshot, name: 'snapshot' },
         // { path: '/server-information', component: ServerInformation, name: 'server-information' },
-        { path: '/gate-in-app', component: GateInApp, name: 'gate-in-app' },
         { path: '/setting', component: Setting, name: 'setting' },
         // { path: '/member-renewal', component: MemberRenewal, name: 'member-renewal' },
         { path: '*', component: Home },
