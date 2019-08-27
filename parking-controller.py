@@ -442,7 +442,6 @@ def controller_disconnected(gate):
 
     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus. Silakan klik tombol gate untuk menyambung ulang \n'
     send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus. Silakan klik tombol gate untuk menyambung ulang')
-    app.reconnect_gate(gate)
 
 def gate_in_thread(gate):
     time.sleep(1)
@@ -451,10 +450,9 @@ def gate_in_thread(gate):
         try:
             s.connect((gate['controller_ip_address'], gate['controller_port']))
         except Exception as e:
-            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed. Reconnecting in 3 seconds... \n'
+            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
             send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
-            time.sleep(3)
-            gate_in_thread(gate)
+            return
 
         app.gate_threads[gate['id']] = s
         app.gate_indicator[gate['id']].background_color = [0,1,0,1]

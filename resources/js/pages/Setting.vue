@@ -19,6 +19,9 @@
             <el-tab-pane label="User">
                 <User />
             </el-tab-pane>
+            <el-tab-pane label="Notification">
+                <Notification />
+            </el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -29,9 +32,10 @@ import User from './User'
 import LocationIdentity from './LocationIdentity'
 import VehicleType from './VehicleType'
 import ParkingMember from './ParkingMember'
+import Notification from './Notification'
 
 export default {
-    components: { ParkingGate, User, LocationIdentity, VehicleType, ParkingMember }
+    components: { ParkingGate, User, LocationIdentity, VehicleType, ParkingMember, Notification }
 }
 </script>
 
