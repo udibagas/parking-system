@@ -336,9 +336,9 @@ def gate_in_thread(gate):
                     s.sendall(b'\xa6MT00007\xa9')
                     s.recv(32)
                 # connection lost
-                elif vehicle_detection == b'':
-                    controller_disconnected(gate)
-                    break
+                # elif vehicle_detection == b'':
+                #     controller_disconnected(gate)
+                #     break
                 else:
                     time.sleep(.2)
                     continue
@@ -386,10 +386,10 @@ def gate_in_thread(gate):
                         break
 
                     # connection lost
-                    elif b'' == push_button_or_card:
-                        controller_disconnected(gate)
-                        reset = True
-                        break
+                    # elif b'' == push_button_or_card:
+                    #     controller_disconnected(gate)
+                    #     reset = True
+                    #     break
 
                 if reset:
                     continue
@@ -406,18 +406,25 @@ def gate_in_thread(gate):
                 if data['is_member'] == 0:
                     print_ticket(data, gate)
                     s.sendall(b'\xa6MT00002\xa9')
+
+                    while b'PLAYEND' not in s.recv(32)
+                        time.sleep(.3)
+
                     # connection lost
-                    if b'' == s.recv(32):
-                        controller_disconnected(gate)
-                        break
+                    # if b'' == s.recv(32):
+                    #     controller_disconnected(gate)
+                    #     break
                     # time.sleep(3)
 
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n'
                 s.sendall(b'\xa6MT00006\xa9')
+
+                while b'PLAYEND' not in s.recv(32)
+                    time.sleep(.3)
                 # connection lost
-                if b'' == s.recv(32):
-                    controller_disconnected(gate)
-                    break
+                # if b'' == s.recv(32):
+                #     controller_disconnected(gate)
+                #     break
                 # time.sleep(1)
                 # open gate
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
@@ -444,13 +451,14 @@ def gate_in_thread(gate):
                 #     send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda. Gate gagal dibuka.')
 
                 # detect loop 2, in 1 off (motor pergi)
-                loop_2 = s.recv(32)
+                # loop_2 = s.recv(32)
                 # while b'IN3' not in loop_2 and b'IN1OFF' not in loop_2 and loop_2 != b'':
-                while b'IN3OFF' not in loop_2 and loop_2 != b'':
-                    loop_2 = s.recv(32)
+                while b'IN3OFF' not in s.recv(32):
+                    time.sleep(.2)
+                    # loop_2 = s.recv(32)
 
-                if loop_2 == b'':
-                    controller_disconnected(gate)
+                # if loop_2 == b'':
+                #     controller_disconnected(gate)
 
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Thread finished\n'
 
