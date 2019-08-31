@@ -19,9 +19,9 @@
             <el-tab-pane label="User">
                 <User />
             </el-tab-pane>
-            <!-- <el-tab-pane label="Notifikasi">
+            <el-tab-pane label="Notifikasi">
                 <Notification />
-            </el-tab-pane> -->
+            </el-tab-pane>
         </el-tabs>
     </div>
 </template>

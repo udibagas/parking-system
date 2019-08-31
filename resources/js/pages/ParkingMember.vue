@@ -38,9 +38,9 @@
             <el-table-column prop="phone" label="Nomor HP" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="plate_number" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="expiry_date" label="Tanggal Kedaluarsa" sortable="custom" show-overflow-tooltip min-width="170px"></el-table-column>
-            <el-table-column prop="last_transaction" label="Transaksi Terkakhir" sortable="custom" show-overflow-tooltip min-width="170px"></el-table-column>
+            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" show-overflow-tooltip min-width="160px"></el-table-column>
+            <el-table-column prop="expiry_date" label="Tanggal Kedaluarsa" sortable="custom" show-overflow-tooltip min-width="180px"></el-table-column>
+            <el-table-column prop="last_transaction" label="Transaksi Terkakhir" sortable="custom" show-overflow-tooltip min-width="180px"></el-table-column>
             <el-table-column fixed="right" prop="is_active" label="Status" sortable="custom" min-width="100px">
                 <template slot-scope="scope">
                     <el-tag size="mini" :type="scope.row.is_active ? 'success' : 'info'">{{scope.row.is_active ? 'Active' : 'Inactive'}}</el-tag>

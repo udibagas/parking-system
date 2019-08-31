@@ -1,8 +1,8 @@
 <template>
     <div id="gate-out-app">
-        <el-row :gutter="15">
+        <el-row :gutter="20">
             <el-col :span="14">
-                <el-card style="height:calc(100vh - 105px)">
+                <!-- <el-card style="height:calc(100vh - 105px)"> -->
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE IN</div>
@@ -52,9 +52,9 @@
                                 <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
                             </select>
                             <!-- <input id="vehicle-type" type="text" placeholder="JENIS KENDARAAN" v-model="formModel.vehicle_type" class="my-input"> -->
-                            <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
+                            <!-- <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
                                 {{vehicleTypeList.map(vt => vt.shortcut_key + ' = ' + vt.name).join(', ')}}
-                            </div>
+                            </div> -->
                         </el-col>
                     </el-row>
 
@@ -84,10 +84,10 @@
 
                     <!-- <el-divider></el-divider> -->
                     <button class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
-                </el-card>
+                <!-- </el-card> -->
             </el-col>
             <el-col :span="10">
-                <el-card style="height:calc(100vh - 105px)">
+                <!-- <el-card style="height:calc(100vh - 105px)"> -->
                     <div class="block">
                         <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
                             <div slot="error" class="el-image__error">
@@ -102,7 +102,7 @@
                             </div>
                         </el-image>
                     </div>
-                </el-card>
+                <!-- </el-card> -->
             </el-col>
         </el-row>
     </div>
@@ -456,7 +456,7 @@ export default {
 <style lang="scss" scoped>
 .block {
     background-color: #eee;
-    height: calc(50vh - 75px);
+    height: calc(50vh - 80px);
 }
 
 .my-input {

@@ -42,7 +42,7 @@
             </el-table-column>
             <el-table-column fixed="left" prop="name" label="Nama" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
             <el-table-column fixed="left" prop="type" label="Jenis" sortable="custom" min-width="80px" show-overflow-tooltip></el-table-column>
-            <el-table-column fixed="left" prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
+            <el-table-column fixed="left" prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" min-width="160px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="controller_ip_address" label="Controller Address" sortable="custom" min-width="180px" show-overflow-tooltip>
                 <template slot-scope="scope">
                     {{scope.row.controller_ip_address}}:{{scope.row.controller_port}}
@@ -105,7 +105,7 @@
                 style="margin-bottom:15px;">
             </el-alert>
 
-            <el-form label-width="160px" label-position="left">
+            <el-form label-width="180px" label-position="left">
                 <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
                     <el-input placeholder="Nama" v-model="formModel.name"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
