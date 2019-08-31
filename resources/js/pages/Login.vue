@@ -1,11 +1,10 @@
 <template>
-    <el-dialog center title="" fullscreen :show-close="false" :close-on-click-modal="false" :visible.sync="visible" :close-on-press-escape="false">
-        <div style="margin: 40px auto 0;text-align:center;">
+    <el-container>
+        <el-form id="login-form" style="width:300px;margin: 80px auto 0;text-align:center;">
             <img src="images/logo.jpeg" alt="" style="width:70px">
             <br>
-            <h2>{{appName}}</h2>
-        </div>
-        <el-form style="width:300px;margin: 30px auto 0;text-align:center;">
+            <h3>{{appName}}</h3>
+            <br>
             <el-divider><h3>LOGIN</h3></el-divider>
 
             <el-form-item>
@@ -21,15 +20,13 @@
             <a href="http://www.mitrateknik.co.id">www.MitraTeknik.co.id</a><br>
             &copy; {{year}}
         </el-form>
-
-    </el-dialog>
+    </el-container>
 </template>
 
 <script>
 import moment from 'moment'
 
 export default {
-    props: ['visible'],
     data() {
         return {
             appName: APP_NAME,
@@ -56,8 +53,7 @@ export default {
                 this.$store.state.user = r.data.user
                 this.$store.state.token = r.data.token
                 this.$store.state.is_logged_in = true
-                this.email = ''
-                this.password = ''
+                this.$router.push('home')
             }).catch(e => {
                 this.$message({
                     message: e.response.data.message || e.response.message,
@@ -65,6 +61,13 @@ export default {
                     showClose: true
                 })
             })
+        }
+    },
+    mounted() {
+        document.getElementById('login-form').onkeypress = (e) => {
+            if (e.key == 'Enter') {
+                this.login()
+            }
         }
     }
 }

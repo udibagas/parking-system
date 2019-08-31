@@ -13,6 +13,11 @@ use GuzzleHttp\Client;
 
 class ParkingGateController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:1')->except(['getList', 'search', 'openGate']);
+    }
+
     /**
      * Display a listing of the resource.
      *

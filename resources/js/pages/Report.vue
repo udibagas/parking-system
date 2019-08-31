@@ -2,7 +2,7 @@
     <div>
         <el-row>
             <el-col :span="8">
-                <el-page-header @back="$emit('back')" content="REPORT"> </el-page-header>
+                <el-page-header @back="$emit('back')" content="LAPORAN"> </el-page-header>
             </el-col>
             <el-col :span="16" style="text-align:right">
                 Pilih Tanggal :
@@ -26,7 +26,7 @@
                 <!-- jumlah transaksi -->
                 <el-card class="summary-container bg-cyan">
                     <div slot="header" class="text-center text-white">
-                        <span>Transaction</span>
+                        <span>Transaksi</span>
                     </div>
                     <el-row v-for="(t, id) in transaction" :key="id" :gutter="10">
                         <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
@@ -38,7 +38,7 @@
                 <!-- total tarif -->
                 <el-card class="summary-container bg-pink">
                     <div slot="header" class="text-center text-white">
-                        <span>Income</span>
+                        <span>Pendapatan</span>
                     </div>
                     <el-row v-for="(t, id) in income" :key="id">
                         <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
@@ -50,7 +50,7 @@
                 <!-- Kendaraan masih di dalam -->
                 <el-card class="summary-container bg-teal">
                     <div slot="header" class="text-center text-white">
-                        <span>Parked Vehicle</span>
+                        <span>Kendaraan Masih Terparkir</span>
                     </div>
                     <el-row v-for="(t, id) in parkedVehicle" :key="id">
                         <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>

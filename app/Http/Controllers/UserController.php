@@ -8,6 +8,11 @@ use App\Http\Requests\UserRequest;
 
 class UserController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:1');
+    }
+
     /**
      * Display a listing of the resource.
      *

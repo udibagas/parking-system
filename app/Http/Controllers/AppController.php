@@ -16,8 +16,15 @@ class AppController extends Controller
         return view('layouts.app');
     }
 
-    public function checkAuth()
+    public function checkAuth(Request $request)
     {
+        $operatorPath = [ '/home', '/parking-transaction', '/member', '/report' ];
+
+        if ($request->user()->role == 0 && !in_array($request->route, $operatorPath)) {
+            return response(['message' => 'Anda tidak berhak mengakses halaman ini'], 401);
+
+        }
+
         return ['message' => 'ok'];
     }
 

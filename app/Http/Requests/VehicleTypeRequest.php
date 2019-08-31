@@ -30,4 +30,14 @@ class VehicleTypeRequest extends FormRequest
             'denda_tiket_hilang' => 'numeric'
         ];
     }
+
+    public function attributes()
+    {
+        return [
+            'name' => 'Nama',
+            'shortcut_key' => 'Shortcut Key',
+            'tarif_flat' => 'Tarif Flat',
+            'denda_tiket_hilang' => 'Denda Tiket Hilang'
+        ];
+    }
 }

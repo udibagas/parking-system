@@ -8,6 +8,11 @@ use App\VehicleType;
 
 class VehicleTypeController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:1')->except(['getList']);
+    }
+
     /**
      * Display a listing of the resource.
      *

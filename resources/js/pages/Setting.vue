@@ -4,24 +4,24 @@
         <el-divider></el-divider>
 
         <el-tabs type="card">
-            <el-tab-pane label="Gates">
+            <el-tab-pane label="Gate">
                 <ParkingGate />
             </el-tab-pane>
-            <el-tab-pane label="Location Identity">
+            <el-tab-pane label="Identitas Lokasi">
                 <LocationIdentity />
             </el-tab-pane>
-            <el-tab-pane label="Vehicle Type">
+            <el-tab-pane label="Jenis Kendaraan">
                 <VehicleType />
             </el-tab-pane>
-            <el-tab-pane label="Parking Member">
+            <el-tab-pane label="Member">
                 <ParkingMember />
             </el-tab-pane>
             <el-tab-pane label="User">
                 <User />
             </el-tab-pane>
-            <el-tab-pane label="Notification">
+            <!-- <el-tab-pane label="Notifikasi">
                 <Notification />
-            </el-tab-pane>
+            </el-tab-pane> -->
         </el-tabs>
     </div>
 </template>

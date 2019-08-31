@@ -41,4 +41,24 @@ class ParkingGateRequest extends FormRequest
             'active' => 'boolean'
         ];
     }
+
+    public function attributes()
+    {
+        return [
+            'name' => 'Nama',
+            'type' => 'Jenis',
+            'vehicle_type' => 'Jenis Kendaraan',
+            'controller_ip_address' => 'Alamat IP Kontroller',
+            'controller_port' => 'Port Kontroller',
+            'printer_type' => 'Jenis Printer',
+            'printer_device' => 'Device Printer',
+            'printer_ip_address' => 'Alamat IP Printer',
+            'camera_ip_address' => 'Alamat IP Kamera',
+            'camera_username' => 'Username Kamera',
+            'camera_password' => 'Password Kamera',
+            'camera_image_snapshot_url' => 'URL Snapshot Kamera',
+            'camera_auth_type' => 'Tipe Otentifikasi Kamera',
+            'active' => 'Aktif'
+        ];
+    }
 }

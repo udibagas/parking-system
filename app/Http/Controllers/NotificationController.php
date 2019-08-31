@@ -7,6 +7,11 @@ use App\Notification;
 
 class NotificationController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:1')->except(['index', 'update', 'store']);
+    }
+
     /**
      * Display a listing of the resource.
      *

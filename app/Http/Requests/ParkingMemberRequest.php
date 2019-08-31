@@ -34,4 +34,18 @@ class ParkingMemberRequest extends FormRequest
             'email' => 'required|email'
         ];
     }
+
+    public function attributes()
+    {
+        return [
+            'name' => 'Nama',
+            'card_number' => 'Nomor Kartu',
+            'plate_number' => 'Nomor Plat',
+            'vehicle_type' => 'Jenis Kendaraan',
+            'is_active' => 'Aktif',
+            'expiry_date' => 'Tanggal Kedaluarsa',
+            'phone' => 'Nomor HP',
+            'email' => 'ALamat Email'
+        ];
+    }
 }

@@ -2,7 +2,7 @@
     <div>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="openForm({})" type="primary"><i class="el-icon-plus"></i> ADD NEW VEHICLE TYPE</el-button>
+                <el-button @click="openForm({})" type="primary"><i class="el-icon-plus"></i> TAMBAH JENIS KENDARAAN</el-button>
             </el-form-item>
             <el-form-item style="margin-right:0;">
                 <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
@@ -16,7 +16,7 @@
         height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="name" label="Name" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="name" label="Nama" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="shortcut_key" label="Shortcut Key" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="tarif_flat" label="Tarif Flat" sortable="custom" show-overflow-tooltip min-width="150px">
                 <template slot-scope="scope">
@@ -28,9 +28,9 @@
                     Rp {{scope.row.denda_tiket_hilang | formatNumber}}
                 </template>
             </el-table-column>
-            <el-table-column prop="is_default" label="Default" sortable="custom">
+            <el-table-column prop="is_default" label="Default" sortable="custom" align="center" header-align="center">
                 <template slot-scope="scope">
-                    <el-tag size="mini" :type="scope.row.is_default ? 'success' : 'info'">{{scope.row.is_default ? 'Yes' : 'No'}}</el-tag>
+                    <el-tag size="mini" :type="scope.row.is_default ? 'success' : 'info'">{{scope.row.is_default ? 'Ya' : 'Tidak'}}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column width="40px">
@@ -41,7 +41,7 @@
                         </span>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-edit-outline"></i> Edit</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Delete</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Hapus</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
@@ -59,16 +59,16 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT VEHICLE TYPE' : 'ADD NEW VEHICLE TYPE'" width="550px" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT JENIS KENDARAAN' : 'TAMBAH JENIS KENDARAAN'" width="550px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"
                 style="margin-bottom:15px;">
             </el-alert>
 
-            <el-form label-width="180px">
-                <el-form-item label="Name" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Name" v-model="formModel.name"></el-input>
+            <el-form label-width="170px" label-position="left">
+                <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
+                    <el-input placeholder="Nama" v-model="formModel.name"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
                 </el-form-item>
 
@@ -94,13 +94,13 @@
                     v-model="formModel.is_default"
                     active-color="#13ce66">
                     </el-switch>
-                    <el-tag :type="formModel.is_default ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.is_default ? 'Yes' : 'No'}}</el-tag>
+                    <el-tag :type="formModel.is_default ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.is_default ? 'Ya' : 'Tidak'}}</el-tag>
                     <div class="el-form-item__error" v-if="formErrors.is_default">{{formErrors.is_default[0]}}</div>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="() => !!formModel.id ? update() : store()"><i class="el-icon-success"></i> SAVE</el-button>
-                <el-button type="info" @click="showForm = false"><i class="el-icon-error"></i> CANCEL</el-button>
+                <el-button type="primary" @click="() => !!formModel.id ? update() : store()"><i class="el-icon-success"></i> SIMPAN</el-button>
+                <el-button type="info" @click="showForm = false"><i class="el-icon-error"></i> BATAL</el-button>
             </span>
         </el-dialog>
     </div>

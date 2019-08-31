@@ -2,7 +2,7 @@
     <div>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="openForm({})" type="primary"><i class="el-icon-plus"></i> ADD NEW LOCATION IDENTITY</el-button>
+                <el-button @click="openForm({})" type="primary" icon="el-icon-plus">TAMBAH LOKASI</el-button>
             </el-form-item>
             <el-form-item style="margin-right:0;">
                 <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
@@ -16,13 +16,13 @@
         height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="name" label="Name" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="address" label="Address" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="additional_info_ticket" label="Additional Info Ticket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="default_plate_number" label="Default Plate Number" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column width="100px" prop="status" label="Status" sortable="custom">
+            <el-table-column prop="name" label="Nama" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="address" label="Alamat" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="additional_info_ticket" label="Informasi Tambahan Tiket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="default_plate_number" label="Plat Nomor Default" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column width="100px" prop="status" label="Status" sortable="custom" align="center" header-align="center">
                 <template slot-scope="scope">
-                    <el-tag size="mini" :type="scope.row.active ? 'success' : 'info'">{{scope.row.active ? 'Active' : 'Inactive'}}</el-tag>
+                    <el-tag size="mini" :type="scope.row.active ? 'success' : 'info'">{{scope.row.active ? 'Aktif' : 'Nonaktif'}}</el-tag>
                 </template>
             </el-table-column>
 
@@ -52,31 +52,31 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT LOCATION' : 'ADD NEW LOCATION'" width="500px" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog top="60px" :visible.sync="showForm" :title="!!formModel.id ? 'EDIT LOKASI' : 'TAMBAH LOKASI'" width="500px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"
                 style="margin-bottom:15px;">
             </el-alert>
 
-            <el-form label-width="170px">
-                <el-form-item label="Name" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Name" v-model="formModel.name"></el-input>
+            <el-form label-width="170px" label-position="left">
+                <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
+                    <el-input placeholder="Nama" v-model="formModel.name"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Address" :class="formErrors.address ? 'is-error' : ''">
-                    <el-input placeholder="Address" type="textarea" rows="3" v-model="formModel.address"></el-input>
+                <el-form-item label="Alamat" :class="formErrors.address ? 'is-error' : ''">
+                    <el-input placeholder="Alamat" type="textarea" rows="3" v-model="formModel.address"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.address">{{formErrors.address[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Additional Info Ticket" :class="formErrors.additional_info_ticket ? 'is-error' : ''">
-                    <el-input placeholder="Additional Info Ticket" type="textarea" rows="3" v-model="formModel.additional_info_ticket"></el-input>
+                <el-form-item label="Info Tambahan Tiket" :class="formErrors.additional_info_ticket ? 'is-error' : ''">
+                    <el-input placeholder="Info Tambahan Tiket" type="textarea" rows="5" v-model="formModel.additional_info_ticket"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.additional_info_ticket">{{formErrors.additional_info_ticket[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Default Plate Number" :class="formErrors.default_plate_number ? 'is-error' : ''">
-                    <el-input placeholder="Default Plate Number" v-model="formModel.default_plate_number"></el-input>
+                <el-form-item label="Plat Nomor Default" :class="formErrors.default_plate_number ? 'is-error' : ''">
+                    <el-input placeholder="Plat Nomor Default" v-model="formModel.default_plate_number"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.default_plate_number">{{formErrors.default_plate_number[0]}}</div>
                 </el-form-item>
 
@@ -92,8 +92,8 @@
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="() => !!formModel.id ? update() : store()"><i class="el-icon-success"></i> SAVE</el-button>
-                <el-button type="info" @click="showForm = false"><i class="el-icon-error"></i> CANCEL</el-button>
+                <el-button type="primary" icon="el-icon-success" @click="() => !!formModel.id ? update() : store()"> SIMPAN</el-button>
+                <el-button type="info" icon="el-icon-error" @click="showForm = false">BATAL</el-button>
             </span>
         </el-dialog>
     </div>

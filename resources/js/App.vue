@@ -1,6 +1,6 @@
 <template>
     <div>
-        <Login v-if="!$store.state.is_logged_in" :visible.sync="!$store.state.is_logged_in" />
+        <Login v-if="!$store.state.is_logged_in" />
         <el-container v-else>
             <Profile v-if="$store.state.is_logged_in" :show="showProfile" @close="showProfile = false" />
             <el-aside width="auto">
@@ -35,10 +35,10 @@
                         </el-col>
                         <el-col :span="12" class="text-right">
                             <el-dropdown @command="handleCommand">
-                                <span class="el-dropdown-link" style="cursor:pointer">Welcome, {{$store.state.user.name}}!</span>
+                                <span class="el-dropdown-link" style="cursor:pointer">Selamat Datang, {{$store.state.user.name}}!</span>
                                 <el-dropdown-menu slot="dropdown">
-                                    <el-dropdown-item command="profile">My Profile</el-dropdown-item>
-                                    <el-dropdown-item command="logout">Logout</el-dropdown-item>
+                                    <el-dropdown-item command="profile"><i class="el-icon-user"></i> Profil Saya</el-dropdown-item>
+                                    <el-dropdown-item command="logout"><i class="el-icon-arrow-right"></i> Keluar</el-dropdown-item>
                                 </el-dropdown-menu>
                             </el-dropdown>
                         </el-col>
@@ -63,11 +63,11 @@ export default {
     computed: {
         menus() {
             let menus = [
-                {label: 'Home', icon: 'el-icon-s-home', path: '/' },
-                {label: 'Transactions', icon: 'el-icon-document-copy', path: 'parking-transaction' },
-                // {label: 'Member Renewal', icon: 'el-icon-refresh', path: 'member-renewal' },
-                {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },
-                {label: 'Report', icon: 'el-icon-data-analysis', path: 'report' },
+                {label: 'Home', icon: 'el-icon-s-home', path: 'home' },
+                {label: 'Transaksi', icon: 'el-icon-document-copy', path: 'parking-transaction' },
+                {label: 'Member', icon: 'el-icon-bank-card', path: 'member' },
+                // {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },
+                {label: 'Laporan', icon: 'el-icon-data-analysis', path: 'report' },
             ]
 
             if (this.$store.state.user.role == 1) {
@@ -145,7 +145,7 @@ export default {
         }
     },
     mounted() {
-        setInterval(this.getNotification, 5000)
+        // setInterval(this.getNotification, 5000)
     }
 }
 </script>

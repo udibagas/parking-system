@@ -29,4 +29,14 @@ class LocationIdentityRequest extends FormRequest
             'default_plate_number' => 'required'
         ];
     }
+
+    public function attributes()
+    {
+        return [
+            'name' => 'Nama',
+            'address' => 'Alamat',
+            'active' => 'Aktif',
+            'default_plate_number' => 'Plat Nomor Default'
+        ];
+    }
 }

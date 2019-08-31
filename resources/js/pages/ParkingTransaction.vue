@@ -1,6 +1,6 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="TRANSACTION"> </el-page-header>
+        <el-page-header @back="$emit('back')" content="TRANSAKSI"> </el-page-header>
         <el-divider></el-divider>
 
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
@@ -31,27 +31,27 @@
         @sort-change="sortChange">
             <!-- <el-table-column prop="id" label="ID" sortable="custom"></el-table-column> -->
             <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="vehicle_type" label="Vehicle Type" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="plate_number" label="Plate Number" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="is_member" label="Is Member" sortable="custom" show-overflow-tooltip min-width="120px">
+            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="plate_number" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
                 <template slot-scope="scope">
-                    {{scope.row.is_member ? 'Yes' : 'No'}}
+                    {{scope.row.is_member ? 'Ya' : 'Tidak'}}
                 </template>
             </el-table-column>
-            <el-table-column prop="member" label="Member Name" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="member" label="Nama Member" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <!-- <el-table-column prop="card_number" label="Card Number" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
-            <el-table-column prop="gate_in" label="Gate In" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="gate_out" label="Gate Out" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="time_in" label="Time In" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="time_out" label="Time Out" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="durasi" label="Duration" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="fare" label="Fare" sortable="custom" show-overflow-tooltip min-width="150px">
+            <el-table-column prop="gate_in" label="Gate Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="gate_out" label="Gate Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="time_in" label="Waktu Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="time_out" label="Waktu Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="durasi" label="Durasi" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="fare" label="Tarif" sortable="custom" show-overflow-tooltip min-width="150px">
                 <template slot-scope="scope">
                     Rp. {{scope.row.fare | formatNumber }}
                 </template>
             </el-table-column>
             <el-table-column prop="operator" label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="updated_at" label="Last Update" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="updated_at" label="Update Terakhir" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
 
             <el-table-column fixed="right" width="40px">
                 <template slot-scope="scope">
@@ -60,7 +60,7 @@
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native.prevent="() => { trx = scope.row; showTrxDetail = true }"><i class="el-icon-zoom-in"></i> Show Detail</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="() => { trx = scope.row; showTrxDetail = true }"><i class="el-icon-zoom-in"></i> Lihat Detail</el-dropdown-item>
                             <el-dropdown-item v-if="!scope.row.time_out" @click.native.prevent="setSudahKeluar(scope.row.id)"><i class="el-icon-check"></i> Set Sudah Keluar</el-dropdown-item>
                             <!-- <el-dropdown-item @click.native.prevent="printTicket(scope.row)"><i class="el-icon-print"></i> Print Ticket Keluar</el-dropdown-item> -->
                         </el-dropdown-menu>
@@ -80,22 +80,22 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog center top="60px" width="70%" v-if="trx" :visible.sync="showTrxDetail" :title="'DETAIL TRANSACTION ' + trx.barcode_number">
+        <el-dialog center top="60px" width="70%" v-if="trx" :visible.sync="showTrxDetail" :title="'DETAIL TRANSAKSI ' + trx.barcode_number">
             <el-row :gutter="20">
                 <el-col :span="14">
                     <table style="width:100%">
                         <tbody>
-                            <tr><td class="td-label">Barcode Number</td><td class="td-value">{{trx.barcode_number}}</td></tr>
-                            <tr><td class="td-label">Vehicle Type</td><td class="td-value">{{trx.vehicle_type}}</td></tr>
-                            <tr><td class="td-label">Plate Number</td><td class="td-value">{{trx.plate_number}}</td></tr>
-                            <tr><td class="td-label">Member</td><td class="td-value">{{trx.is_member ? 'Yes' : 'No'}}</td></tr>
-                            <tr><td class="td-label">Card Number</td><td class="td-value">{{trx.card_number}}</td></tr>
-                            <tr><td class="td-label">Gate In</td><td class="td-value">{{trx.gate_in}}</td></tr>
-                            <tr><td class="td-label">Gate Out</td><td class="td-value">{{trx.gate_out}}</td></tr>
-                            <tr><td class="td-label">Time In</td><td class="td-value">{{trx.time_in}}</td></tr>
-                            <tr><td class="td-label">Time Out</td><td class="td-value">{{trx.time_out}}</td></tr>
-                            <tr><td class="td-label">Duration</td><td class="td-value">{{trx.durasi}}</td></tr>
-                            <tr><td class="td-label">Fare</td><td class="td-value">Rp {{trx.fare | formatNumber}}</td></tr>
+                            <tr><td class="td-label">Nomor Barcode</td><td class="td-value">{{trx.barcode_number}}</td></tr>
+                            <tr><td class="td-label">Jenis Kendarran</td><td class="td-value">{{trx.vehicle_type}}</td></tr>
+                            <tr><td class="td-label">Plat Nomor</td><td class="td-value">{{trx.plate_number}}</td></tr>
+                            <tr><td class="td-label">Member</td><td class="td-value">{{trx.is_member ? 'Ya' : 'Tidak'}}</td></tr>
+                            <tr><td class="td-label">Nomor Kartu</td><td class="td-value">{{trx.card_number}}</td></tr>
+                            <tr><td class="td-label">Gate Masuk</td><td class="td-value">{{trx.gate_in}}</td></tr>
+                            <tr><td class="td-label">Gate Keluar</td><td class="td-value">{{trx.gate_out}}</td></tr>
+                            <tr><td class="td-label">Waktu Masuk</td><td class="td-value">{{trx.time_in}}</td></tr>
+                            <tr><td class="td-label">Waktu Keluar</td><td class="td-value">{{trx.time_out}}</td></tr>
+                            <tr><td class="td-label">Durasi</td><td class="td-value">{{trx.durasi}}</td></tr>
+                            <tr><td class="td-label">Tarif</td><td class="td-value">Rp {{trx.fare | formatNumber}}</td></tr>
                             <tr><td class="td-label">Operator</td><td class="td-value">{{trx.operator}}</td></tr>
                         </tbody>
                     </table>

@@ -8,6 +8,11 @@ use App\Http\Requests\LocationIdentityRequest;
 
 class LocationIdentityController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:1')->except(['search']);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -67,7 +72,9 @@ class LocationIdentityController extends Controller
     public function update(LocationIdentityRequest $request, LocationIdentity $locationIdentity)
     {
         if ($request->active) {
-            LocationIdentity::where('active', 1)->update(['active' => 0]);
+            LocationIdentity::where('active', 1)
+                ->where('id', '!=', $request->id)
+                ->update(['active' => 0]);
         }
 
         $locationIdentity->update($request->all());

@@ -2,10 +2,10 @@
     <div>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="openForm({role: 0, password: ''})" type="primary"><i class="el-icon-plus"></i> ADD NEW USER</el-button>
+                <el-button @click="openForm({role: 0, password: ''})" type="primary" icon="el-icon-plus">TAMBAH USER</el-button>
             </el-form-item>
             <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
+                <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                     <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
                 </el-input>
             </el-form-item>
@@ -16,17 +16,17 @@
         height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="name" label="Name" sortable="custom"></el-table-column>
-            <el-table-column prop="email" label="Email" sortable="custom"></el-table-column>
-            <el-table-column prop="phone" label="Phone" sortable="custom"></el-table-column>
-            <el-table-column prop="role" label="Role" sortable="custom">
+            <el-table-column prop="name" label="Nama" sortable="custom"></el-table-column>
+            <el-table-column prop="email" label="Alamat Email" sortable="custom"></el-table-column>
+            <el-table-column prop="phone" label="Nomor HP" sortable="custom"></el-table-column>
+            <el-table-column prop="role" label="Level" sortable="custom">
                 <template slot-scope="scope">
                     {{scope.row.role ? 'Admin' : 'Operator'}}
                 </template>
             </el-table-column>
-            <el-table-column prop="status" label="Status" sortable="custom">
+            <el-table-column prop="status" label="Status" sortable="custom" align="center" header-align="center">
                 <template slot-scope="scope">
-                    <el-tag size="mini" :type="scope.row.status ? 'success' : 'info'">{{scope.row.status ? 'Active' : 'Inactive'}}</el-tag>
+                    <el-tag size="mini" :type="scope.row.status ? 'success' : 'info'">{{scope.row.status ? 'Aktif' : 'Nonaktif'}}</el-tag>
                 </template>
             </el-table-column>
 
@@ -38,7 +38,7 @@
                         </span>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-edit-outline"></i> Edit</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Delete</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Hapus</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
@@ -56,31 +56,31 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT USER' : 'ADD NEW USER'" width="550px" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT USER' : 'TAMBAH USER'" width="500px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"
                 style="margin-bottom:15px;">
             </el-alert>
 
-            <el-form label-width="180px">
-                <el-form-item label="Name" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Name" v-model="formModel.name"></el-input>
+            <el-form label-width="160px" label-position="left">
+                <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
+                    <el-input placeholder="Nama" v-model="formModel.name"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Email" :class="formErrors.email ? 'is-error' : ''">
-                    <el-input placeholder="Email" v-model="formModel.email"></el-input>
+                <el-form-item label="Alamat Email" :class="formErrors.email ? 'is-error' : ''">
+                    <el-input placeholder="Alamat Email" v-model="formModel.email"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.email">{{formErrors.email[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Phone" :class="formErrors.phone ? 'is-error' : ''">
-                    <el-input placeholder="Phone" v-model="formModel.phone"></el-input>
+                <el-form-item label="Nomor HP" :class="formErrors.phone ? 'is-error' : ''">
+                    <el-input placeholder="Nomor HP" v-model="formModel.phone"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.phone">{{formErrors.phone[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Role" :class="formErrors.role ? 'is-error' : ''">
-                    <el-select v-model="formModel.role" placeholder="Role" style="width:100%">
+                <el-form-item label="Level" :class="formErrors.role ? 'is-error' : ''">
+                    <el-select v-model="formModel.role" placeholder="Level" style="width:100%">
                         <el-option v-for="(t, i) in [{value: 0, label: 'Operator'}, {value: 1, label: 'Admin'}]"
                         :value="t.value"
                         :label="t.label"
@@ -95,8 +95,8 @@
                     <div class="el-form-item__error" v-if="formErrors.password">{{formErrors.password[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Password Confirmation" :class="formErrors.password ? 'is-error' : ''">
-                    <el-input type="password" placeholder="Password Confirmation" v-model="formModel.password_confirmation"></el-input>
+                <el-form-item label="Konfirmasi Password" :class="formErrors.password ? 'is-error' : ''">
+                    <el-input type="password" placeholder="Konfirmasi Password" v-model="formModel.password_confirmation"></el-input>
                 </el-form-item>
 
                 <el-form-item label="Status" :class="formErrors.status ? 'is-error' : ''">
@@ -106,14 +106,14 @@
                     v-model="formModel.status"
                     active-color="#13ce66">
                     </el-switch>
-                    <el-tag :type="formModel.status ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.status ? 'Active' : 'Inactive'}}</el-tag>
+                    <el-tag :type="formModel.status ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.status ? 'Aktif' : 'Nonaktif'}}</el-tag>
 
                     <div class="el-form-item__error" v-if="formErrors.status">{{formErrors.status[0]}}</div>
                 </el-form-item>
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="() => !!formModel.id ? update() : store()"><i class="el-icon-success"></i> SAVE</el-button>
-                <el-button type="info" @click="showForm = false"><i class="el-icon-error"></i> CANCEL</el-button>
+                <el-button type="primary" icon="el-icon-success" @click="() => !!formModel.id ? update() : store()">SIMPAN</el-button>
+                <el-button type="info" icon="el-icon-error" @click="showForm = false">BATAL</el-button>
             </span>
         </el-dialog>
     </div>
@@ -153,7 +153,7 @@ export default {
             axios.post('/user', this.formModel).then(r => {
                 this.showForm = false;
                 this.$message({
-                    message: 'Data BERHASIL disimpan.',
+                    message: 'Data berhasil disimpan.',
                     type: 'success',
                     showClose: true
                 });
@@ -177,7 +177,7 @@ export default {
             axios.put('/user/' + this.formModel.id, this.formModel).then(r => {
                 this.showForm = false
                 this.$message({
-                    message: 'Data BERHASIL disimpan.',
+                    message: 'Data berhasil disimpan.',
                     type: 'success',
                     showClose: true
                 });

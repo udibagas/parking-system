@@ -407,7 +407,7 @@ def gate_in_thread(gate):
                     print_ticket(data, gate)
                     s.sendall(b'\xa6MT00002\xa9')
 
-                    while b'PLAYEND' not in s.recv(32)
+                    while b'PLAYEND' not in s.recv(32):
                         time.sleep(.3)
 
                     # connection lost
@@ -419,7 +419,7 @@ def gate_in_thread(gate):
                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n'
                 s.sendall(b'\xa6MT00006\xa9')
 
-                while b'PLAYEND' not in s.recv(32)
+                while b'PLAYEND' not in s.recv(32):
                     time.sleep(.3)
                 # connection lost
                 # if b'' == s.recv(32):

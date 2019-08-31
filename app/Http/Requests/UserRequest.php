@@ -31,4 +31,15 @@ class UserRequest extends FormRequest
             'role' => 'required|numeric|in:0,1'
         ];
     }
+
+    public function attributes()
+    {
+        return [
+            'name' => 'Nama',
+            'email' => 'Alamat Email',
+            'password' => 'Password',
+            'is_active' => 'Aktif',
+            'role' => 'Level'
+        ];
+    }
 }
