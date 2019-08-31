@@ -95,8 +95,8 @@
                     <div class="el-form-item__error" v-if="formErrors.phone">{{formErrors.phone[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Plate Number" :class="formErrors.plate_number ? 'is-error' : ''">
-                    <el-input placeholder="Plate Number" v-model="formModel.plate_number"></el-input>
+                <el-form-item label="Plat Nomor" :class="formErrors.plate_number ? 'is-error' : ''">
+                    <el-input placeholder="Plat Nomor" v-model="formModel.plate_number"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.plate_number">{{formErrors.plate_number[0]}}</div>
                 </el-form-item>
 

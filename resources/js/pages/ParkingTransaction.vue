@@ -29,29 +29,29 @@
         height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <!-- <el-table-column prop="id" label="ID" sortable="custom"></el-table-column> -->
-            <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="plate_number" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
+            <!-- <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
+            <el-table-column prop="time_in" label="Waktu Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" show-overflow-tooltip min-width="140px"></el-table-column>
+            <el-table-column prop="plate_number" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="110px"></el-table-column>
+            <el-table-column prop="operator" label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <!-- <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
                 <template slot-scope="scope">
                     {{scope.row.is_member ? 'Ya' : 'Tidak'}}
                 </template>
-            </el-table-column>
+            </el-table-column> -->
             <el-table-column prop="member" label="Nama Member" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <!-- <el-table-column prop="card_number" label="Card Number" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
-            <el-table-column prop="gate_in" label="Gate Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="gate_out" label="Gate Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="time_in" label="Waktu Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="time_out" label="Waktu Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="durasi" label="Durasi" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="fare" label="Tarif" sortable="custom" show-overflow-tooltip min-width="150px">
+            <!-- <el-table-column prop="gate_in" label="Gate Masuk" sortable="custom" show-overflow-tooltip min-width="120px"></el-table-column>
+            <el-table-column prop="gate_out" label="Gate Keluar" sortable="custom" show-overflow-tooltip min-width="120px"></el-table-column> -->
+            <!-- <el-table-column prop="time_in" label="Waktu Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
+            <!-- <el-table-column prop="time_out" label="Waktu Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
+            <!-- <el-table-column prop="durasi" label="Durasi" show-overflow-tooltip min-width="100px"></el-table-column> -->
+            <el-table-column prop="fare" label="Tarif" sortable="custom" align="right" header-align="right" min-width="100px">
                 <template slot-scope="scope">
                     Rp. {{scope.row.fare | formatNumber }}
                 </template>
             </el-table-column>
-            <el-table-column prop="operator" label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="updated_at" label="Update Terakhir" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <!-- <el-table-column prop="updated_at" label="Waktu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
 
             <el-table-column fixed="right" width="40px">
                 <template slot-scope="scope">
