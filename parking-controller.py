@@ -301,13 +301,16 @@ def save_data(gate, data):
 
 def controller_disconnected(gate):
     app.gate_indicator[gate['id']].background_color = [1,0,0,1]
-    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus. \n'
+    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Koneksi ke controller terputus. Reconnect dalam 3 detik... \n'
     send_notification(gate, 'Koneksi ke controller ' + gate['name'] + ' terputus.')
 
     try:
         del app.gate_threads[gate['id']]
     except Exception as e:
         pass
+
+    time.sleep(3)
+    gate_in_thread(gate)
 
 def gate_in_thread(gate):
     time.sleep(1)
@@ -316,9 +319,10 @@ def gate_in_thread(gate):
         try:
             s.connect((gate['controller_ip_address'], gate['controller_port']))
         except Exception as e:
-            app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
-            send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
-            return
+            controller_disconnected(gate)
+            # app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Connection to controller failed... \n'
+            # send_notification(gate, 'Controller gate ' + gate['name'] + ' tidak terdeteksi oleh sistem')
+            # return
 
         app.gate_threads[gate['id']] = s
         app.gate_indicator[gate['id']].background_color = [0,1,0,1]
@@ -464,7 +468,6 @@ def gate_in_thread(gate):
 
             except Exception as e:
                 controller_disconnected(gate)
-                break
 
 class ParkingControllerApp(App):
 
