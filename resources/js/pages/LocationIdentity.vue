@@ -17,8 +17,16 @@
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="name" label="Nama" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="address" label="Alamat" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="additional_info_ticket" label="Informasi Tambahan Tiket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="address" label="Alamat" sortable="custom" min-width="150px">
+                <template slot-scope="scope">
+                    <span v-if="!!scope.row.address" v-html="scope.row.address.replace(/(?:\r\n|\r|\n)/g, '<br>')"></span>
+                </template>
+            </el-table-column>
+            <el-table-column prop="additional_info_ticket" label="Informasi Tambahan Tiket" sortable="custom" min-width="150px">
+                <template slot-scope="scope">
+                    <span v-if="!!scope.row.additional_info_ticket" v-html="scope.row.additional_info_ticket.replace(/(?:\r\n|\r|\n)/g, '<br>')"></span>
+                </template>
+            </el-table-column>
             <el-table-column prop="default_plate_number" label="Plat Nomor Default" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column width="100px" prop="status" label="Status" sortable="custom" align="center" header-align="center">
                 <template slot-scope="scope">
@@ -71,7 +79,7 @@
                 </el-form-item>
 
                 <el-form-item label="Info Tambahan Tiket" :class="formErrors.additional_info_ticket ? 'is-error' : ''">
-                    <el-input placeholder="Info Tambahan Tiket" type="textarea" rows="5" v-model="formModel.additional_info_ticket"></el-input>
+                    <el-input placeholder="Info Tambahan Tiket" type="textarea" rows="8" v-model="formModel.additional_info_ticket"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.additional_info_ticket">{{formErrors.additional_info_ticket[0]}}</div>
                 </el-form-item>
 

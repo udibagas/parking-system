@@ -23,11 +23,11 @@
                             <tr><td class="td-label">Nama</td><td class="td-value">{{scope.row.name}}</td></tr>
                             <tr><td class="td-label">Jenis</td><td class="td-value">{{scope.row.type}}</td></tr>
                             <tr><td class="td-label">Jenis Kendaraan</td><td class="td-value">{{scope.row.vehicle_type}}</td></tr>
-                            <tr><td class="td-label">ALamat IP Kontroller</td><td class="td-value">{{scope.row.controller_ip_address}}</td></tr>
+                            <tr><td class="td-label">Alamat IP Kontroller</td><td class="td-value">{{scope.row.controller_ip_address}}</td></tr>
                             <tr><td class="td-label">Port Kontroller</td><td class="td-value">{{scope.row.controller_port}}</td></tr>
                             <tr><td class="td-label">Jenis Printer</td><td class="td-value">{{scope.row.printer_type}}</td></tr>
                             <tr><td class="td-label">Device Printer</td><td class="td-value">{{scope.row.printer_device}}</td></tr>
-                            <tr><td class="td-label">ALamat IP Printer</td><td class="td-value">{{scope.row.printer_ip_address}}</td></tr>
+                            <tr><td class="td-label">Alamat IP Printer</td><td class="td-value">{{scope.row.printer_ip_address}}</td></tr>
                             <tr><td class="td-label">Alamat IP Kamera</td><td class="td-value">{{scope.row.camera_ip_address}}</td></tr>
                             <tr><td class="td-label">Username Kamera</td><td class="td-value">{{scope.row.camera_username}}</td></tr>
                             <tr><td class="td-label">Password Kamera</td><td class="td-value">{{scope.row.camera_password}}</td></tr>
@@ -46,6 +46,11 @@
             <el-table-column prop="controller_ip_address" label="Controller Address" sortable="custom" min-width="180px" show-overflow-tooltip>
                 <template slot-scope="scope">
                     {{scope.row.controller_ip_address}}:{{scope.row.controller_port}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="controller_device" label="Controller Device" sortable="custom" min-width="180px" show-overflow-tooltip>
+                <template slot-scope="scope">
+                    {{scope.row.controller_device}}:{{scope.row.controller_baudrate}}
                 </template>
             </el-table-column>
             <el-table-column prop="printer_type" label="Jenis Printer" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
@@ -98,7 +103,7 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog top="60px" :visible.sync="showForm" :title="!!formModel.id ? 'EDIT GATE' : 'TAMBAH GATE'" width="550px" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog top="60px" :visible.sync="showForm" :title="!!formModel.id ? 'EDIT GATE' : 'TAMBAH GATE'" width="950px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"
@@ -106,98 +111,107 @@
             </el-alert>
 
             <el-form label-width="180px" label-position="left">
-                <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
-                    <el-input placeholder="Nama" v-model="formModel.name"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
-                </el-form-item>
+                <el-row :gutter="30">
+                    <el-col :span="12">
+                        <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
+                            <el-input placeholder="Nama" v-model="formModel.name"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="Jenis" :class="formErrors.type ? 'is-error' : ''">
-                    <el-select v-model="formModel.type" placeholder="Jenis" style="width:100%">
-                        <el-option v-for="(t, i) in ['IN', 'OUT']" :value="t" :label="t" :key="i"></el-option>
-                    </el-select>
-                    <div class="el-form-item__error" v-if="formErrors.type">{{formErrors.type[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Jenis" :class="formErrors.type ? 'is-error' : ''">
+                            <el-select v-model="formModel.type" placeholder="Jenis" style="width:100%">
+                                <el-option v-for="(t, i) in ['IN', 'OUT']" :value="t" :label="t" :key="i"></el-option>
+                            </el-select>
+                            <div class="el-form-item__error" v-if="formErrors.type">{{formErrors.type[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="Jenis Kendaraan" :class="formErrors.vehicle_type ? 'is-error' : ''">
-                    <el-select v-model="formModel.vehicle_type" placeholder="Jenis Kendaraan" style="width:100%">
-                        <el-option v-for="(t, i) in ['MOBIL', 'MOTOR', 'MOBIL/MOTOR']" :value="t" :label="t" :key="i"></el-option>
-                    </el-select>
-                    <div class="el-form-item__error" v-if="formErrors.vehicle_type">{{formErrors.vehicle_type[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Jenis Kendaraan" :class="formErrors.vehicle_type ? 'is-error' : ''">
+                            <el-select v-model="formModel.vehicle_type" placeholder="Jenis Kendaraan" style="width:100%">
+                                <el-option v-for="(t, i) in ['MOBIL', 'MOTOR', 'MOBIL/MOTOR']" :value="t" :label="t" :key="i"></el-option>
+                            </el-select>
+                            <div class="el-form-item__error" v-if="formErrors.vehicle_type">{{formErrors.vehicle_type[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="Status" :class="formErrors.active ? 'is-error' : ''">
-                    <el-switch
-                    :active-value="1"
-                    :inactive-value="0"
-                    v-model="formModel.active"
-                    active-color="#13ce66">
-                    </el-switch>
-                    <el-tag :type="formModel.active ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.active ? 'Active' : 'Inactive'}}</el-tag>
-                    <div class="el-form-item__error" v-if="formErrors.active">{{formErrors.active[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Status Gate" :class="formErrors.active ? 'is-error' : ''">
+                            <el-switch
+                            :active-value="1"
+                            :inactive-value="0"
+                            v-model="formModel.active"
+                            active-color="#13ce66">
+                            </el-switch>
+                            <el-tag :type="formModel.active ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.active ? 'Active' : 'Inactive'}}</el-tag>
+                            <div class="el-form-item__error" v-if="formErrors.active">{{formErrors.active[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="Kontroller" :class="formErrors.controller_ip_address ? 'is-error' : ''">
-                    <el-input placeholder="Alamat IP/Device" v-model="formModel.controller_ip_address" style="width:60%"></el-input>
-                    <el-input type="number" placeholder="Port/Baudrate" v-model="formModel.controller_port" style="width:38%;float:right;clear:right;"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.controller_ip_address">{{formErrors.controller_ip_address[0]}}</div>
-                    <div class="el-form-item__error" v-if="formErrors.controller_port">{{formErrors.controller_port[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Controller IP" :class="formErrors.controller_ip_address ? 'is-error' : ''">
+                            <el-input placeholder="Alamat IP" v-model="formModel.controller_ip_address" style="width:60%"></el-input>
+                            <el-input type="number" placeholder="Port" v-model="formModel.controller_port" style="width:38%;float:right;clear:right;"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.controller_ip_address">{{formErrors.controller_ip_address[0]}}</div>
+                            <div class="el-form-item__error" v-if="formErrors.controller_port">{{formErrors.controller_port[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="Jenis Printer" :class="formErrors.printer_type || formErrors.printer_device || formErrors.printer_ip_address ? 'is-error' : ''">
-                    <el-select v-model="formModel.printer_type" placeholder="Jenis Printer" style="width:30%">
-                        <el-option v-for="(t, i) in ['local', 'network']" :value="t" :label="t" :key="i"></el-option>
-                    </el-select>
-                    <el-input v-show="formModel.printer_type == 'local'" placeholder="Device Printer" v-model="formModel.printer_device" style="width:68%;float:right;clear:right;"></el-input>
-                    <el-input v-show="formModel.printer_type == 'network'" placeholder="Alamat IP Printer" v-model="formModel.printer_ip_address" style="width:68%;float:right;clear:right;"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.printer_type">{{formErrors.printer_type[0]}}</div>
-                    <div class="el-form-item__error" v-if="formErrors.printer_device">{{formErrors.printer_device[0]}}</div>
-                    <div class="el-form-item__error" v-if="formErrors.printer_ip_address">{{formErrors.printer_ip_address[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Controller Device">
+                            <el-input placeholder="Device" v-model="formModel.controller_device" style="width:60%"></el-input>
+                            <el-input type="number" placeholder="Port" v-model="formModel.controller_baudrate" style="width:38%;float:right;clear:right;"></el-input>
+                        </el-form-item>
 
-                <el-divider>CAMERA</el-divider>
+                        <el-form-item label="Jenis Printer" :class="formErrors.printer_type || formErrors.printer_device || formErrors.printer_ip_address ? 'is-error' : ''">
+                            <el-select v-model="formModel.printer_type" placeholder="Jenis Printer" style="width:30%">
+                                <el-option v-for="(t, i) in ['local', 'network']" :value="t" :label="t" :key="i"></el-option>
+                            </el-select>
+                            <el-input v-show="formModel.printer_type == 'local'" placeholder="Device Printer" v-model="formModel.printer_device" style="width:68%;float:right;clear:right;"></el-input>
+                            <el-input v-show="formModel.printer_type == 'network'" placeholder="Alamat IP Printer" v-model="formModel.printer_ip_address" style="width:68%;float:right;clear:right;"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.printer_type">{{formErrors.printer_type[0]}}</div>
+                            <div class="el-form-item__error" v-if="formErrors.printer_device">{{formErrors.printer_device[0]}}</div>
+                            <div class="el-form-item__error" v-if="formErrors.printer_ip_address">{{formErrors.printer_ip_address[0]}}</div>
+                        </el-form-item>
+                    </el-col>
 
-                <el-form-item label="Alamat IP" :class="formErrors.camera_ip_address ? 'is-error' : ''">
-                    <el-input placeholder="Alamat IP" v-model="formModel.camera_ip_address"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.camera_ip_address">{{formErrors.camera_ip_address[0]}}</div>
-                </el-form-item>
+                    <el-col :span="12">
+                        <el-form-item label="Alamat IP Kamera" :class="formErrors.camera_ip_address ? 'is-error' : ''">
+                            <el-input placeholder="Alamat IP Kamera" v-model="formModel.camera_ip_address"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.camera_ip_address">{{formErrors.camera_ip_address[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="Username" :class="formErrors.camera_username ? 'is-error' : ''">
-                    <el-input placeholder="Username" v-model="formModel.camera_username"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.camera_username">{{formErrors.camera_username[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Username Kamera" :class="formErrors.camera_username ? 'is-error' : ''">
+                            <el-input placeholder="Username Kamera" v-model="formModel.camera_username"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.camera_username">{{formErrors.camera_username[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="Password" :class="formErrors.camera_password ? 'is-error' : ''">
-                    <el-input placeholder="Password" v-model="formModel.camera_password"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.camera_password">{{formErrors.camera_password[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Password Kamera" :class="formErrors.camera_password ? 'is-error' : ''">
+                            <el-input placeholder="Password Kamera" v-model="formModel.camera_password"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.camera_password">{{formErrors.camera_password[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="Otentifikasi" :class="formErrors.camera_auth_type ? 'is-error' : ''">
-                    <el-select v-model="formModel.camera_auth_type" placeholder="Otentifikasi" style="width:100%">
-                        <el-option v-for="(t, i) in ['basic', 'digest']" :value="t" :label="t" :key="i"></el-option>
-                    </el-select>
-                    <div class="el-form-item__error" v-if="formErrors.camera_auth_type">{{formErrors.camera_auth_type[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Otentifikasi Kamera" :class="formErrors.camera_auth_type ? 'is-error' : ''">
+                            <el-select v-model="formModel.camera_auth_type" placeholder="Otentifikasi" style="width:100%">
+                                <el-option v-for="(t, i) in ['basic', 'digest']" :value="t" :label="t" :key="i"></el-option>
+                            </el-select>
+                            <div class="el-form-item__error" v-if="formErrors.camera_auth_type">{{formErrors.camera_auth_type[0]}}</div>
+                        </el-form-item>
 
-                <el-form-item label="URL Snapshot Kamera" :class="formErrors.camera_image_snapshot_url ? 'is-error' : ''">
-                    <el-input placeholder="URL Snapshot Kamera" v-model="formModel.camera_image_snapshot_url"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.camera_image_snapshot_url">{{formErrors.camera_image_snapshot_url[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="URL Snapshot Kamera" :class="formErrors.camera_image_snapshot_url ? 'is-error' : ''">
+                            <el-input placeholder="URL Snapshot Kamera" v-model="formModel.camera_image_snapshot_url"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.camera_image_snapshot_url">{{formErrors.camera_image_snapshot_url[0]}}</div>
+                        </el-form-item>
 
-                <!-- <el-form-item label="Video Snapshot Url" :class="formErrors.camera_video_snapshot_url ? 'is-error' : ''">
-                    <el-input placeholder="Video Snapshot Url" v-model="formModel.camera_video_snapshot_url"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.camera_video_snapshot_url">{{formErrors.camera_video_snapshot_url[0]}}</div>
-                </el-form-item> -->
+                        <!-- <el-form-item label="Video Snapshot Url" :class="formErrors.camera_video_snapshot_url ? 'is-error' : ''">
+                            <el-input placeholder="Video Snapshot Url" v-model="formModel.camera_video_snapshot_url"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.camera_video_snapshot_url">{{formErrors.camera_video_snapshot_url[0]}}</div>
+                        </el-form-item> -->
 
-                <el-form-item label="Status" :class="formErrors.camera_status ? 'is-error' : ''">
-                    <el-switch
-                    :active-value="1"
-                    :inactive-value="0"
-                    v-model="formModel.camera_status"
-                    active-color="#13ce66">
-                    </el-switch>
-                    <el-tag :type="formModel.camera_status ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.camera_status ? 'Active' : 'Inactive'}}</el-tag>
-                    <div class="el-form-item__error" v-if="formErrors.camera_status">{{formErrors.camera_status[0]}}</div>
-                </el-form-item>
+                        <el-form-item label="Status Kamera" :class="formErrors.camera_status ? 'is-error' : ''">
+                            <el-switch
+                            :active-value="1"
+                            :inactive-value="0"
+                            v-model="formModel.camera_status"
+                            active-color="#13ce66">
+                            </el-switch>
+                            <el-tag :type="formModel.camera_status ? 'success' : 'info'" size="small" style="margin-left:10px">{{!!formModel.camera_status ? 'Active' : 'Inactive'}}</el-tag>
+                            <div class="el-form-item__error" v-if="formErrors.camera_status">{{formErrors.camera_status[0]}}</div>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
 
             </el-form>
             <span slot="footer" class="dialog-footer">
