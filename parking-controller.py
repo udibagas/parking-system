@@ -318,10 +318,12 @@ def gate_in_thread(gate):
                 try:
                     # motor lewat loop detector 1
                     s.sendall(b'\xa6STAT\xa9')
+                    s.settimeout(None)
                     vehicle_detection = s.recv(1024)
 
                     if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
                         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n'
+                        s.settimeout(3)
                         s.sendall(b'\xa6MT00007\xa9')
                     else:
                         time.sleep(1)
@@ -331,6 +333,7 @@ def gate_in_thread(gate):
                     reset = False
 
                     while True:
+                        s.settimeout(None)
                         push_button_or_card = s.recv(1024)
                         if b'W' in push_button_or_card:
                             card_number = push_button_or_card[3:-1]
@@ -359,6 +362,7 @@ def gate_in_thread(gate):
                         elif b'IN4ON' in push_button_or_card:
                             app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Red button pressed \n'
                             reset = True
+                            s.settimeout(3)
                             s.sendall(b'\xa6MT00005\xa9')
                             send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
                             break
@@ -382,24 +386,30 @@ def gate_in_thread(gate):
                     # kalau bukan member cetak struk
                     if data['is_member'] == 0:
                         print_ticket(data, gate)
+                        s.settimeout(3)
                         s.sendall(b'\xa6MT00002\xa9')
 
                         # wait until selesai play silakan ambil tiket
+                        s.settimeout(None)
                         while b'PLAYEND' not in s.recv(1024):
                             time.sleep(.3)
 
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Play "Terimakasih" \n'
+                    s.settimeout(3)
                     s.sendall(b'\xa6MT00006\xa9')
 
                     # wait until selesai play terimakasih
+                    s.settimeout(None)
                     while b'PLAYEND' not in s.recv(1024):
                         time.sleep(.2)
 
                     # open gate
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Open gate \n'
+                    s.settimeout(3)
                     s.sendall(b'\xa6OPEN1\xa9')
 
                     # wait until gate opened
+                    s.settimeout(None)
                     while b'OPEN1OK' not in s.recv(1024):
                         time.sleep(.2)
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
@@ -410,10 +420,7 @@ def gate_in_thread(gate):
 
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle IN\n'
 
-                except socket.timeout as e:
-                    print(str(e))
-
-                except socket.error as e:
+                except Exception as e:
                     # exit sensing, reconnecting
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : DISCONNECTED ' + str(e) + '\n'
                     send_notification(gate, gate['name'] + ' DISCONNECTED')
