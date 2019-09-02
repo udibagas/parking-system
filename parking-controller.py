@@ -318,7 +318,7 @@ def gate_in_thread(gate):
                 try:
                     # motor lewat loop detector 1
                     s.sendall(b'\xa6STAT\xa9')
-                    s.settimeout(0)
+                    s.settimeout(None)
                     vehicle_detection = s.recv(1024)
 
                     if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
@@ -333,7 +333,7 @@ def gate_in_thread(gate):
                     reset = False
 
                     while True:
-                        s.settimeout(0)
+                        s.settimeout(None)
                         push_button_or_card = s.recv(1024)
                         if b'W' in push_button_or_card:
                             card_number = push_button_or_card[3:-1]
@@ -362,8 +362,8 @@ def gate_in_thread(gate):
                         elif b'IN4ON' in push_button_or_card:
                             app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Red button pressed \n'
                             reset = True
+                            s.settimeout(3)
                             s.sendall(b'\xa6MT00005\xa9')
-                            s.recv(1024)
                             send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
                             break
 
@@ -390,7 +390,7 @@ def gate_in_thread(gate):
                         s.sendall(b'\xa6MT00002\xa9')
 
                         # wait until selesai play silakan ambil tiket
-                        s.settimeout(0)
+                        s.settimeout(None)
                         while b'PLAYEND' not in s.recv(1024):
                             time.sleep(.3)
 
@@ -399,7 +399,7 @@ def gate_in_thread(gate):
                     s.sendall(b'\xa6MT00006\xa9')
 
                     # wait until selesai play terimakasih
-                    s.settimeout(0)
+                    s.settimeout(None)
                     while b'PLAYEND' not in s.recv(1024):
                         time.sleep(.2)
 
@@ -409,7 +409,7 @@ def gate_in_thread(gate):
                     s.sendall(b'\xa6OPEN1\xa9')
 
                     # wait until gate opened
-                    s.settimeout(0)
+                    s.settimeout(None)
                     while b'OPEN1OK' not in s.recv(1024):
                         time.sleep(.2)
                     app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Gate opened \n'
