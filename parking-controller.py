@@ -323,9 +323,8 @@ def gate_in_thread(gate):
                     if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
                         app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Vehicle detected \n'
                         s.sendall(b'\xa6MT00007\xa9')
-                        s.recv(1024)
                     else:
-                        time.sleep(.2)
+                        time.sleep(1)
                         continue
 
                     # detect push button or card
@@ -414,7 +413,7 @@ def gate_in_thread(gate):
 
                 except Exception as e:
                     # exit sensing, reconnecting
-                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : DISCONNECTED\n'
+                    app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : DISCONNECTED ' + str(e) + '\n'
                     send_notification(gate, gate['name'] + ' DISCONNECTED')
                     app.gate_indicator[gate['id']].background_color = [1,0,0,1]
 
