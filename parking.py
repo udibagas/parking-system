@@ -141,7 +141,7 @@ def gate_in_thread(gate):
 
             try:
                 s.connect((gate['controller_ip_address'], gate['controller_port']))
-            except Exception as e:
+            except Exception:
                 time.sleep(3)
                 continue
 
@@ -151,111 +151,138 @@ def gate_in_thread(gate):
 
             while True:
                 try:
-                    # motor lewat loop detector 1
                     s.sendall(b'\xa6STAT\xa9')
                     vehicle_detection = s.recv(1024)
-
-                    if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
-                        logging.info(gate['name'] + ' : Vehicle detected')
-                        s.sendall(b'\xa6MT00007\xa9')
-                    else:
-                        time.sleep(1)
-                        continue
-
-                    # detect push button or card
-                    reset = False
-
-                    while True:
-                        push_button_or_card = s.recv(1024)
-                        if b'W' in push_button_or_card:
-                            card_number = push_button_or_card[3:-1]
-                            valid_card = check_card(gate, card_number)
-
-                            if not valid_card:
-                                continue
-
-                            data = {'is_member': 1, 'card_number': card_number}
-                            logging.info(gate['name'] + ' : Card detected :' + card_number)
-                            break
-
-                        elif b'IN2ON' in push_button_or_card:
-                            logging.info(gate['name'] + ' : Ticket button pressed')
-                            data = {'is_member': 0}
-                            break
-
-                        elif b'IN3' in push_button_or_card:
-                            logging.info(gate['name'] + ' : Reset')
-                            reset = True
-                            break
-
-                        elif b'IN4ON' in push_button_or_card:
-                            reset = True
-                            s.sendall(b'\xa6MT00005\xa9')
-                            logging.info(gate['name'] + ' : Help button pressed')
-                            send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
-                            break
-
-                        elif b'IN1OFF' in push_button_or_card:
-                            logging.info(gate['name'] + ' : Vehicle turn back')
-                            reset = True
-                            break
-
-                    if reset:
-                        continue
-
-                    # lengkapi data kemudian simpan
-                    data['gate_in_id'] = gate['id']
-                    data['time_in'] = time.strftime('%Y-%m-%d %T')
-                    data['vehicle_type'] = gate['vehicle_type']
-                    data['barcode_number'] = generate_barcode_number()
-                    data['snapshot_in'] = take_snapshot(gate)
-                    save_data(gate, data)
-
-                    # kalau bukan member cetak struk
-                    if data['is_member'] == 0:
-                        print_ticket(data, gate)
-                        s.sendall(b'\xa6MT00002\xa9')
-
-                        # wait until selesai play silakan ambil tiket
-                        while b'PLAYEND' not in s.recv(1024):
-                            pass
-
-                    s.sendall(b'\xa6MT00006\xa9')
-
-                    # wait until selesai play terimakasih
-                    while b'PLAYEND' not in s.recv(1024):
-                        pass
-
-                    # open gate
-                    s.sendall(b'\xa6OPEN1\xa9')
-
-                    # wait until gate opened
-                    while b'OPEN1OK' not in s.recv(1024):
-                        pass
-
-                    # wait until vehicle in
-                    while b'IN3OFF' not in s.recv(1024):
-                        pass
-
                 except socket.timeout:
-                    pass
-
-                except socket.error as e:
-                    # exit sensing, reconnecting
-                    try:
-                        del GATE_SOCKET[gate['id']]
-                    except Exception as e:
-                        pass
-
-                    logging.error(gate['name'] + ' DISCONNECTED')
-                    send_notification(gate, gate['name'] + ' DISCONNECTED')
-                    break
-
+                    # keluar dari loop cek kendaraan untuk sambung ulang controller
+                    continue
                 except Exception as e:
-                    logging.error('Unhandled error ' + str(e))
-                    send_notification(gate, gate['name'] + ' Unhandled error' + str(e))
-                    DISCONNECT_GATE = True
+                    logging.error(gate['name'] + ' : Failed to detect vehicle ' + str(e))
                     break
+
+                if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
+                    logging.info(gate['name'] + ' : Vehicle detected')
+
+                    # play selamat datang
+                    try:
+                        s.sendall(b'\xa6MT00007\xa9')
+                    except Exception as e:
+                        logging.error(gate['name'] + ' : Failed to play Selamat Datang ' + str(e))
+                        # keluar dari loop cek kendaraan untuk sambung ulang controller
+                        break
+                else:
+                    time.sleep(1)
+                    continue
+
+                reset = False
+                error = False
+
+                # detect push button or card
+                while True:
+                    try:
+                        push_button_or_card = s.recv(1024)
+                    except socket.timeout:
+                        continue
+                    except Exception:
+                        logging.error(gate['name'] + ' : Failed to sense button and card')
+                        error = True
+                        break
+
+                    if b'W' in push_button_or_card:
+                        card_number = push_button_or_card[3:-1]
+                        valid_card = check_card(gate, card_number)
+
+                        if not valid_card:
+                            continue
+
+                        data = {'is_member': 1, 'card_number': card_number}
+                        logging.info(gate['name'] + ' : Card detected :' + card_number)
+                        break
+
+                    elif b'IN2ON' in push_button_or_card:
+                        logging.info(gate['name'] + ' : Ticket button pressed')
+                        data = {'is_member': 0}
+                        break
+
+                    elif b'IN3' in push_button_or_card:
+                        logging.info(gate['name'] + ' : Reset')
+                        reset = True
+                        break
+
+                    elif b'IN4ON' in push_button_or_card:
+                        reset = True
+                        try:
+                            s.sendall(b'\xa6MT00005\xa9')
+                        except Exception as e:
+                            logging.error(gate['name'] + ' : Failed to respon help button ' + str(e))
+                            error = True
+                            break
+
+                        logging.info(gate['name'] + ' : Help button pressed')
+                        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
+                        break
+
+                    elif b'IN1OFF' in push_button_or_card:
+                        logging.info(gate['name'] + ' : Vehicle turn back')
+                        reset = True
+                        break
+
+                # kalau error keluar dari loop cek kendaraan biar sambung ulang controller
+                if error:
+                    break
+
+                # kalau reset kembali ke loop cek kendaraan
+                if reset:
+                    continue
+
+                # lengkapi data kemudian simpan
+                data['gate_in_id'] = gate['id']
+                data['time_in'] = time.strftime('%Y-%m-%d %T')
+                data['vehicle_type'] = gate['vehicle_type']
+                data['barcode_number'] = generate_barcode_number()
+                data['snapshot_in'] = take_snapshot(gate)
+                save_data(gate, data)
+
+                # kalau bukan member cetak struk
+                if data['is_member'] == 0:
+                    print_ticket(data, gate)
+
+                    # play silakan ambil tiket
+                    try:
+                        s.sendall(b'\xa6MT00002\xa9')
+                        s.recv(1024)
+                    except Exception as e:
+                        logging.error(gate['name'] + ' : Failed to play silakan ambil tiket' + str(e))
+                        break
+
+                # play terimakasih
+                try:
+                    s.sendall(b'\xa6MT00006\xa9')
+                    s.recv(1024)
+                except Exception:
+                    logging.error(gate['name'] + ' : Failed to play terimakasih' + str(e))
+                    break
+
+                # open gate
+                try:
+                    s.sendall(b'\xa6OPEN1\xa9')
+                    s.recv(1024)
+                except Exception as e:
+                    logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
+                    break
+
+                # wait until vehicle in
+                while True:
+                    try:
+                        vehicle_in = s.recv(1024)
+                    except socket.timeout:
+                        continue
+                    except Exception as e:
+                        logging.error(gate['name'] + ' : Failed to sense loop 2 ' + str(e))
+                        break
+
+                    if b'IN3OFF' in vehicle_in:
+                        break
 
 def start_app():
     DISCONNECT_GATE = False
