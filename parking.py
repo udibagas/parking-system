@@ -13,7 +13,7 @@ from requests.auth import HTTPDigestAuth
 import os
 import logging
 
-API_URL = 'http://localhost/api'
+API_URL = 'http://localhost:8000/api'
 LOCATION = False
 GATES = False
 DISCONNECT_GATE = False
@@ -78,7 +78,7 @@ def print_ticket(trx_data, gate):
         p.set(align='center')
         p.text("TIKET PARKIR\n")
         p.set(height=2, align='center')
-        p.text(app.location['name'] + "\n\n")
+        p.text(LOCATION['name'] + "\n\n")
         p.set(align='left')
         p.text('GATE'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
         p.text('TANGGAL'.ljust(10) + ' : ' + datetime.datetime.strptime(trx_data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
@@ -86,7 +86,7 @@ def print_ticket(trx_data, gate):
         p.set(align='center')
         p.barcode(trx_data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
         p.text("\n")
-        p.text(app.location['additional_info_ticket'])
+        p.text(LOCATION['additional_info_ticket'])
         p.cut()
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to print ticket ' + trx_data['barcode_number'] + ' ' + str(e))
@@ -99,17 +99,17 @@ def print_ticket(trx_data, gate):
 def send_notification(gate, message):
     notification = { 'parking_gate_id': gate['id'], 'message': message }
     try:
-        r = requests.post(API_URL + '/notification', data=notification, timeout=3)
+        requests.post(API_URL + '/notification', data=notification, timeout=3)
     except Exception as e:
         logging.info(gate['name'] + ' : Failed to send notification ' + str(e))
         return False
 
     return True
 
-def check_card(card_number):
+def check_card(gate, card_number):
     payload = { 'card_number': card_number, 'active': 1 }
     try:
-        r = r.requests.get(API_URL + '/parkingMember/', params=payload, timeout=3)
+        r = requests.get(API_URL + '/parkingMember/', params=payload, timeout=3)
     except Exception as e:
         logging.info(gate['name'] + ' : Failed to check card ' + str(e))
         return False
@@ -169,7 +169,7 @@ def gate_in_thread(gate):
                         push_button_or_card = s.recv(1024)
                         if b'W' in push_button_or_card:
                             card_number = push_button_or_card[3:-1]
-                            valid_card = self.check_card(card_number)
+                            valid_card = check_card(gate, card_number)
 
                             if not valid_card:
                                 continue
@@ -252,7 +252,7 @@ def gate_in_thread(gate):
                     break
 
                 except Exception as e:
-                    logging.error('Unhandled error', str(e))
+                    logging.error('Unhandled error ' + str(e))
                     send_notification(gate, gate['name'] + ' Unhandled error' + str(e))
                     DISCONNECT_GATE = True
                     break
@@ -290,7 +290,7 @@ def stop_app():
         try:
             GATE_SOCKET[i].shutdown(socket.SHUT_WR)
         except Exception as e:
-            logging.info('Socket already closed')
+            logging.info('Socket already closed ' + str(e))
 
 def restart_app():
     stop_app()
@@ -298,5 +298,5 @@ def restart_app():
     start_app()
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='parking.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename='parking.log', filemode='a', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     start_app()
