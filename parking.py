@@ -13,12 +13,6 @@ from requests.auth import HTTPDigestAuth
 import os
 import logging
 
-API_URL = 'http://localhost/api'
-LOCATION = False
-GATES = False
-DISCONNECT_GATE = False
-GATE_SOCKET = {}
-
 def get_location():
     try:
         r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
@@ -290,5 +284,10 @@ def restart_app():
     start_app()
 
 if __name__ == "__main__":
+    API_URL = 'http://localhost/api'
+    LOCATION = False
+    GATES = False
+    DISCONNECT_GATE = False
+    GATE_SOCKET = {}
     logging.basicConfig(filename='parking.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s')
     start_app()
