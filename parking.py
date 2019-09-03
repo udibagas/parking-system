@@ -72,7 +72,7 @@ def print_ticket(trx_data, gate):
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to print ticket ' + trx_data['barcode_number'] + ' ' + str(e))
         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
-        return False
+        return
 
     try:
         p.set(align='center')
@@ -91,10 +91,9 @@ def print_ticket(trx_data, gate):
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to print ticket ' + trx_data['barcode_number'] + ' ' + str(e))
         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
-        return False
+        return
 
     logging.info(gate['name'] + ' : Ticket printed ' + trx_data['barcode_number'])
-    return True
 
 def send_notification(gate, message):
     notification = { 'parking_gate_id': gate['id'], 'message': message }
@@ -153,11 +152,9 @@ def gate_in_thread(gate):
                 try:
                     s.sendall(b'\xa6STAT\xa9')
                     vehicle_detection = s.recv(1024)
-                except socket.timeout:
-                    # keluar dari loop cek kendaraan untuk sambung ulang controller
-                    continue
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to detect vehicle ' + str(e))
+                    # keluar dari loop cek kendaraan untuk sambung ulang controller
                     break
 
                 if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
@@ -271,6 +268,8 @@ def gate_in_thread(gate):
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
                     break
 
+                logging.info(gate['name'] + ' : Gate Opened')
+
                 # wait until vehicle in
                 while True:
                     try:
@@ -283,6 +282,8 @@ def gate_in_thread(gate):
 
                     if b'IN3OFF' in vehicle_in:
                         break
+
+                logging.info(gate['name'] + ' : Vehicle in')
 
 def start_app():
     DISCONNECT_GATE = False
