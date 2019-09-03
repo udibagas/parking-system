@@ -224,6 +224,8 @@ def gate_in_thread(gate):
                         reset = True
                         break
 
+                # END LOOP SENSING BUTTON OR CARD WHEN VEHICLE DETECTED
+
                 # kalau error keluar dari loop cek kendaraan biar sambung ulang controller
                 if error:
                     break
@@ -278,12 +280,17 @@ def gate_in_thread(gate):
                         continue
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to sense loop 2 ' + str(e))
+                        error = True
+                        # break sensing loop 2
                         break
 
                     if b'IN3OFF' in vehicle_in:
+                        logging.info(gate['name'] + ' : Vehicle in')
                         break
 
-                logging.info(gate['name'] + ' : Vehicle in')
+                if error:
+                    # break loop cek kendaraan, sambung ulang controller
+                    break
 
 def start_app():
     DISCONNECT_GATE = False
