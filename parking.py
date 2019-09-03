@@ -177,9 +177,8 @@ def gate_in_thread(gate):
                 # detect push button or card
                 while True:
                     try:
+                        s.sendall(b'\xa6STAT\xa9')
                         push_button_or_card = s.recv(1024)
-                    except socket.timeout:
-                        continue
                     except Exception:
                         logging.error(gate['name'] + ' : Failed to sense button and card')
                         error = True
@@ -196,7 +195,7 @@ def gate_in_thread(gate):
                         logging.info(gate['name'] + ' : Card detected :' + card_number)
                         break
 
-                    elif b'IN2ON' in push_button_or_card:
+                    elif b'IN2ON' in push_button_or_card or b'STAT11' in push_button_or_card:
                         logging.info(gate['name'] + ' : Ticket button pressed')
                         data = {'is_member': 0}
                         break
@@ -275,9 +274,8 @@ def gate_in_thread(gate):
                 # wait until vehicle in
                 while True:
                     try:
+                        s.sendall(b'\xa6STAT\xa9')
                         vehicle_in = s.recv(1024)
-                    except socket.timeout:
-                        continue
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to sense loop 2 ' + str(e))
                         error = True
@@ -287,6 +285,8 @@ def gate_in_thread(gate):
                     if b'IN3OFF' in vehicle_in:
                         logging.info(gate['name'] + ' : Vehicle in')
                         break
+
+                    time.sleep(.5)
 
                 if error:
                     # break loop cek kendaraan, sambung ulang controller
