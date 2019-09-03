@@ -13,7 +13,7 @@ from requests.auth import HTTPDigestAuth
 import os
 import logging
 
-API_URL = 'http://localhost:8000/api'
+API_URL = 'http://localhost/api'
 LOCATION = False
 GATES = False
 DISCONNECT_GATE = False
@@ -137,7 +137,7 @@ def gate_in_thread(gate):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(3)
 
-            logging.info(gate['name'] + ' : Connecting..')
+            logging.info(gate['name'] + ' : Connecting to ' + gate['controller_ip_address'] + ':' + str(gate['controller_port']))
 
             try:
                 s.connect((gate['controller_ip_address'], gate['controller_port']))
@@ -262,7 +262,7 @@ def start_app():
     LOCATION = get_location()
 
     if LOCATION == False:
-        logging.info('Location not set')
+        logging.info('Location not set. Exit application.')
         sys.exit()
 
     logging.info('Location set: ' + LOCATION['name'])
@@ -270,7 +270,7 @@ def start_app():
     GATES = get_gates()
 
     if GATES == False:
-        logging.info('Gate not set')
+        logging.info('Gate not set. Exit application.')
         sys.exit()
 
     logging.info('Gate set : ' + ', '.join(map(lambda x: x['name'], GATES)))
