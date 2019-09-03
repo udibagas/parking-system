@@ -223,6 +223,10 @@ def gate_in_thread(gate):
                         reset = True
                         break
 
+                    else:
+                        # delay 1 detik baru cek lagi status button
+                        time.sleep(1)
+
                 # END LOOP SENSING BUTTON OR CARD WHEN VEHICLE DETECTED
 
                 # kalau error keluar dari loop cek kendaraan biar sambung ulang controller
