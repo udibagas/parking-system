@@ -13,6 +13,12 @@ from requests.auth import HTTPDigestAuth
 import os
 import logging
 
+API_URL = 'http://localhost/api'
+LOCATION = False
+GATES = False
+DISCONNECT_GATE = False
+GATE_SOCKET = {}
+
 def get_location():
     try:
         r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
@@ -121,6 +127,9 @@ def save_data(gate, data):
     return r.json()
 
 def gate_in_thread(gate):
+    global DISCONNECT_GATE
+    global GATE_SOCKET
+
     while True:
         if DISCONNECT_GATE:
             break
@@ -256,11 +265,16 @@ def start_app():
         logging.info('Location not set')
         sys.exit()
 
+    logging.info('Location set: ' + LOCATION['name'])
+
     GATES = get_gates()
 
     if GATES == False:
         logging.info('Gate not set')
         sys.exit()
+
+    logging.info('Gate set : ' + ', '.join(map(lambda x: x['name'], GATES)))
+    logging.info('Starting application...')
 
     for g in GATES:
         threading.Thread(target=gate_in_thread, args=(g,)).start()
@@ -284,10 +298,5 @@ def restart_app():
     start_app()
 
 if __name__ == "__main__":
-    API_URL = 'http://localhost/api'
-    LOCATION = False
-    GATES = False
-    DISCONNECT_GATE = False
-    GATE_SOCKET = {}
     logging.basicConfig(filename='parking.log', filemode='a', format='%(asctime)s - %(levelname)s - %(message)s')
     start_app()
