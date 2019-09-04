@@ -20,12 +20,17 @@ DISCONNECT_GATE = False
 GATE_SOCKET = {}
 
 def get_location():
-    try:
-        r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
-        return r.json()
-    except Exception as e:
-        logging.error('Failed to get location ' + str(e))
-        return False
+    attempt = 0
+    while True:
+        attempt += 1
+        try:
+            r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
+            return r.json()
+        except Exception as e:
+            logging.error('Failed to get location ' + str(e))
+            time.sleep(3)
+            if attempt == 10:
+                return False
 
 def get_gates():
     try:
@@ -51,8 +56,8 @@ def take_snapshot(gate):
         return ''
 
     if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
-        # with open(os.path.join(os.path.dirname(__file__), "public/" + output_file_name), 'wb') as f:
-        with open('./public/' + output_file_name, 'wb') as f:
+        with open(os.path.join(os.path.dirname(__file__), "public/" + output_file_name), 'wb') as f:
+        # with open('./public/' + output_file_name, 'wb') as f:
             for chunk in r:
                 f.write(chunk)
 
@@ -337,5 +342,6 @@ def restart_app():
     start_app()
 
 if __name__ == "__main__":
-    logging.basicConfig(filename='parking.log', filemode='a', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    log_file = os.path.join(os.path.dirname(__file__), "parking.log")
+    logging.basicConfig(filename=log_file, filemode='a', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
     start_app()
