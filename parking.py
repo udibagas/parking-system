@@ -106,6 +106,12 @@ def send_notification(gate, message):
         logging.info(gate['name'] + ' : Failed to send notification ' + str(e))
         return False
 
+    try:
+        data = { 'text': message, 'chat_id': 527538821 }
+        requests.post('https://api.telegram.org/bot682525135:AAH5H-rqnDlyODgWzNpKiUZGszGz9Oys49g/sendMessage', data=data, timeout=3)
+    except Exception:
+        pass
+
     return True
 
 def check_card(gate, card_number):
@@ -142,7 +148,7 @@ def gate_in_thread(gate):
                 continue
 
             logging.info(gate['name'] + ' : CONNECTED')
-            send_notification(gate, gate['name'] + ' CONNECTED')
+            send_notification(gate, gate['name'] + ' Terhubung')
 
             while True:
                 try:
@@ -150,6 +156,7 @@ def gate_in_thread(gate):
                     vehicle_detection = s.recv(1024)
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to detect vehicle ' + str(e))
+                    send_notification(gate, gate['name'] + ' : Gagal deteksi kendaraan')
                     # keluar dari loop cek kendaraan untuk sambung ulang controller
                     break
 
@@ -161,6 +168,7 @@ def gate_in_thread(gate):
                         s.sendall(b'\xa6MT00007\xa9')
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play Selamat Datang ' + str(e))
+                        send_notification(gate, gate['name'] + ' : Gagal play Selamat Datang ')
                         # keluar dari loop cek kendaraan untuk sambung ulang controller
                         break
                 else:
@@ -177,6 +185,7 @@ def gate_in_thread(gate):
                         push_button_or_card = s.recv(1024)
                     except Exception:
                         logging.error(gate['name'] + ' : Failed to sense button and card')
+                        send_notification(gate, gate['name'] + ' : Gagal mendeteksi tombol tiket')
                         error = True
                         break
 
@@ -207,6 +216,7 @@ def gate_in_thread(gate):
                             s.sendall(b'\xa6MT00005\xa9')
                         except Exception as e:
                             logging.error(gate['name'] + ' : Failed to respon help button ' + str(e))
+                            send_notification(gate, gate['name'] + ' : Gagal merespon tombol bantuan')
                             error = True
                             break
 
@@ -251,6 +261,7 @@ def gate_in_thread(gate):
                         s.recv(1024)
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play silakan ambil tiket' + str(e))
+                        send_notification(gate, gate['name'] + ' : Gagal play silakan ambil tiket')
                         break
 
                 # play terimakasih
@@ -259,6 +270,7 @@ def gate_in_thread(gate):
                     s.recv(1024)
                 except Exception:
                     logging.error(gate['name'] + ' : Failed to play terimakasih' + str(e))
+                    send_notification(gate, gate['name'] + ' : Gagal play terimakasih')
                     break
 
                 # open gate
@@ -267,6 +279,7 @@ def gate_in_thread(gate):
                     s.recv(1024)
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
+                    send_notification(gate, gate['name'] + ' : Gagal membuka gate')
                     break
 
                 logging.info(gate['name'] + ' : Gate Opened')
@@ -278,6 +291,7 @@ def gate_in_thread(gate):
                         vehicle_in = s.recv(1024)
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to sense loop 2 ' + str(e))
+                        send_notification(gate, gate['name'] + ' : Gagal deteksi kendaraan sudah masuk')
                         error = True
                         # break sensing loop 2
                         break
