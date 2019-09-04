@@ -16,8 +16,6 @@ import logging
 API_URL = 'http://localhost/api'
 LOCATION = False
 GATES = False
-DISCONNECT_GATE = False
-GATE_SOCKET = {}
 
 def get_location():
     attempt = 0
@@ -56,8 +54,8 @@ def take_snapshot(gate):
         return ''
 
     if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
-        with open(os.path.join(os.path.dirname(__file__), "public/" + output_file_name), 'wb') as f:
         # with open('./public/' + output_file_name, 'wb') as f:
+        with open(os.path.join(os.path.dirname(__file__), "public/" + output_file_name), 'wb') as f:
             for chunk in r:
                 f.write(chunk)
 
@@ -131,13 +129,7 @@ def save_data(gate, data):
     return r.json()
 
 def gate_in_thread(gate):
-    global DISCONNECT_GATE
-    global GATE_SOCKET
-
     while True:
-        if DISCONNECT_GATE:
-            break
-
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(3)
 
@@ -149,7 +141,6 @@ def gate_in_thread(gate):
                 time.sleep(3)
                 continue
 
-            GATE_SOCKET[gate['id']] = s
             logging.info(gate['name'] + ' : CONNECTED')
             send_notification(gate, gate['name'] + ' CONNECTED')
 
@@ -302,7 +293,6 @@ def gate_in_thread(gate):
                     break
 
 def start_app():
-    DISCONNECT_GATE = False
     LOCATION = get_location()
 
     if LOCATION == False:
@@ -322,24 +312,6 @@ def start_app():
 
     for g in GATES:
         threading.Thread(target=gate_in_thread, args=(g,)).start()
-
-def stop_app():
-    DISCONNECT_GATE = True
-
-    if len(GATE_SOCKET) == 0:
-        logging.info('No gate connected')
-        return
-
-    for i in GATE_SOCKET:
-        try:
-            GATE_SOCKET[i].shutdown(socket.SHUT_WR)
-        except Exception as e:
-            logging.info('Socket already closed ' + str(e))
-
-def restart_app():
-    stop_app()
-    time.sleep(3)
-    start_app()
 
 if __name__ == "__main__":
     log_file = os.path.join(os.path.dirname(__file__), "parking.log")
