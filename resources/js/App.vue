@@ -66,7 +66,7 @@ export default {
                 {label: 'Home', icon: 'el-icon-s-home', path: 'home' },
                 {label: 'Transaksi', icon: 'el-icon-document-copy', path: 'parking-transaction' },
                 {label: 'Member', icon: 'el-icon-bank-card', path: 'member' },
-                // {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },
+                {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },
                 {label: 'Laporan', icon: 'el-icon-data-analysis', path: 'report' },
             ]
 
@@ -145,7 +145,7 @@ export default {
         }
     },
     mounted() {
-        // setInterval(this.getNotification, 5000)
+        setInterval(this.getNotification, 5000)
     }
 }
 </script>
