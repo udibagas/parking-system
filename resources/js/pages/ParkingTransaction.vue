@@ -29,7 +29,7 @@
         height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="barcode_number" label="Barcode No." sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="barcode_number" label="No. Tiket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" show-overflow-tooltip min-width="160px"></el-table-column>
             <el-table-column prop="plate_number" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <!-- <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
@@ -38,7 +38,7 @@
                 </template>
             </el-table-column> -->
             <el-table-column prop="member" label="Nama Member" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="card_number" label="Card Number" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="gate_in" label="Gate Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="gate_out" label="Gate Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="time_in" label="Waktu Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>

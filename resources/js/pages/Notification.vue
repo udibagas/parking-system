@@ -2,7 +2,7 @@
     <div>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="clearNotification" type="danger" plain icon="el-icon-delete">CLEAR NOTIFICATION</el-button>
+                <el-button @click="clearNotification" type="danger" plain icon="el-icon-delete">HAPUS NOTIFIKASI</el-button>
             </el-form-item>
             <el-form-item>
                 <el-date-picker

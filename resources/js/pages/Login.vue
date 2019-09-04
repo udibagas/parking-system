@@ -1,25 +1,25 @@
 <template>
     <el-container>
-        <el-form id="login-form" style="width:300px;margin: 80px auto 0;text-align:center;">
-            <img src="images/logo.jpeg" alt="" style="width:70px">
-            <br>
-            <h3>{{appName}}</h3>
-            <br>
-            <el-divider><h3>LOGIN</h3></el-divider>
+        <el-main style="text-align:center">
+            <img src="images/logo.jpeg" alt="" style="width:70px;margin-top:80px">
+            <h2>{{appName}}</h2>
+            <el-form id="login-form" style="width:300px;margin: 20px auto 0;text-align:center;">
+                <el-divider><h3>LOGIN</h3></el-divider>
 
-            <el-form-item>
-                <el-input v-model="email" placeholder="Email/Username"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-input type="password" v-model="password" placeholder="Password"></el-input>
-            </el-form-item>
-            <el-form-item>
-                <el-button type="primary" @click="login" style="width:100%">LOGIN</el-button>
-            </el-form-item>
+                <el-form-item>
+                    <el-input v-model="email" placeholder="Email/Username"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-input type="password" v-model="password" placeholder="Password"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <el-button type="primary" @click="login" style="width:100%">LOGIN</el-button>
+                </el-form-item>
 
-            <a href="http://www.mitrateknik.co.id">www.MitraTeknik.co.id</a><br>
-            &copy; {{year}}
-        </el-form>
+                <a href="http://www.mitrateknik.co.id">www.MitraTeknik.co.id</a><br>
+                &copy; {{year}}
+            </el-form>
+        </el-main>
     </el-container>
 </template>
 
