@@ -15,7 +15,6 @@ import logging
 
 API_URL = 'http://localhost/api'
 LOCATION = False
-GATES = False
 
 def get_location():
     attempt = 0
@@ -94,7 +93,7 @@ def send_notification(gate, message):
         return False
 
     try:
-        data = { 'text': message, 'chat_id': 527538821 }
+        data = { 'text': LOCATION['name'] + ' - ' + message, 'chat_id': 527538821 }
         requests.post('https://api.telegram.org/bot682525135:AAH5H-rqnDlyODgWzNpKiUZGszGz9Oys49g/sendMessage', data=data, timeout=3)
     except Exception:
         pass
@@ -147,19 +146,22 @@ def gate_in_thread(gate):
                     # keluar dari loop cek kendaraan untuk sambung ulang controller
                     break
 
+                logging.debug(vehicle_detection)
+
                 if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
                     logging.info(gate['name'] + ' : Vehicle detected')
 
                     # play selamat datang
                     try:
                         s.sendall(b'\xa6MT00007\xa9')
+                        logging.debug(s.recv(1024))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play Selamat Datang ' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play Selamat Datang ')
                         # keluar dari loop cek kendaraan untuk sambung ulang controller
                         break
                 else:
-                    time.sleep(1)
+                    time.sleep(3)
                     continue
 
                 reset = False
@@ -175,6 +177,8 @@ def gate_in_thread(gate):
                         send_notification(gate, gate['name'] + ' : Gagal mendeteksi tombol tiket')
                         error = True
                         break
+
+                    logging.debug(push_button_or_card)
 
                     if b'W' in push_button_or_card:
                         card_number = push_button_or_card[3:-1]
@@ -245,7 +249,7 @@ def gate_in_thread(gate):
                     # play silakan ambil tiket
                     try:
                         s.sendall(b'\xa6MT00002\xa9')
-                        s.recv(1024)
+                        logging.debug(s.recv(1024))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play silakan ambil tiket' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play silakan ambil tiket')
@@ -254,16 +258,18 @@ def gate_in_thread(gate):
                 # play terimakasih
                 try:
                     s.sendall(b'\xa6MT00006\xa9')
-                    s.recv(1024)
+                    logging.debug(s.recv(1024))
                 except Exception:
                     logging.error(gate['name'] + ' : Failed to play terimakasih' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal play terimakasih')
                     break
 
+                time.sleep(1)
+
                 # open gate
                 try:
                     s.sendall(b'\xa6OPEN1\xa9')
-                    s.recv(1024)
+                    logging.debug(s.recv(1024))
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal membuka gate')
@@ -276,6 +282,7 @@ def gate_in_thread(gate):
                     try:
                         s.sendall(b'\xa6STAT\xa9')
                         vehicle_in = s.recv(1024)
+                        logging.debug(vehicle_in)
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to sense loop 2 ' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal deteksi kendaraan sudah masuk')
@@ -287,7 +294,7 @@ def gate_in_thread(gate):
                         logging.info(gate['name'] + ' : Vehicle in')
                         break
 
-                    time.sleep(.5)
+                    time.sleep(1)
 
                 if error:
                     # break loop cek kendaraan, sambung ulang controller
@@ -303,19 +310,19 @@ def start_app():
 
     logging.info('Location set: ' + LOCATION['name'])
 
-    GATES = get_gates()
+    gates = get_gates()
 
-    if GATES == False:
+    if gates == False:
         logging.info('Gate not set. Exit application.')
         sys.exit()
 
-    logging.info('Gate set : ' + ', '.join(map(lambda x: x['name'], GATES)))
+    logging.info('Gate set : ' + ', '.join(map(lambda x: x['name'], gates)))
     logging.info('Starting application...')
 
-    for g in GATES:
+    for g in gates:
         threading.Thread(target=gate_in_thread, args=(g,)).start()
 
 if __name__ == "__main__":
     log_file = os.path.join(os.path.dirname(__file__), "parking.log")
-    logging.basicConfig(filename=log_file, filemode='a', level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     start_app()
