@@ -15,7 +15,7 @@ class ParkingGateController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:1')->except(['getList', 'search', 'openGate']);
+        $this->middleware('role:1')->except(['getList', 'search', 'openGate', 'takeSnapshot']);
     }
 
     /**
@@ -175,5 +175,30 @@ class ParkingGateController extends Controller
         }
 
         return ['message' => 'GATE BERHASIL DIBUKA'];
+    }
+
+    public function takeSnapshot(ParkingGate $parkingGate)
+    {
+        if (!$parkingGate->camera_status || !$parkingGate->camera_image_snapshot_url) {
+            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
+        }
+
+        $client = new Client(['timeout' => 3]);
+        $fileName = 'snapshot/'.date('YmdHis').'.jpg';
+
+        try {
+            $response = $client->request('GET', $parkingGate->camera_image_snapshot_url, [
+                'auth' => [
+                    $parkingGate->camera_username,
+                    $parkingGate->camera_password,
+                    $parkingGate->camera_auth_type == 'digest' ? 'digest' : null
+                ]
+            ]);
+            file_put_contents($fileName, $response->getBody());
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. '. $e->getMessage()], 500);
+        }
+
+        return ['filename' => $fileName];
     }
 }

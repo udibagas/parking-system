@@ -43,27 +43,14 @@ def take_snapshot(gate):
         return ''
 
     try:
-        output_file_name = 'snapshot/' + time.strftime('%Y%m%d%H%M%S') + '.jpg'
-        if gate['camera_auth_type'] == 'digest':
-            r = requests.get(gate['camera_image_snapshot_url'], auth=HTTPDigestAuth(gate['camera_username'], gate['camera_password']), timeout=3)
-        else:
-            r = requests.get(gate['camera_image_snapshot_url'], auth=(gate['camera_username'], gate['camera_password']), timeout=3)
+        r = requests.get(API_URL + '/parkingGate/takeSnapshot/' + gate['id'])
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to take snapshot ' + str(e))
         send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
         return ''
 
-    if r.status_code == 200 and r.headers['content-type'] =='image/jpeg':
-        # with open('./public/' + output_file_name, 'wb') as f:
-        with open(os.path.join(os.path.dirname(__file__), "public/" + output_file_name), 'wb') as f:
-            for chunk in r:
-                f.write(chunk)
-
-        return output_file_name
-    else:
-        logging.error(gate['name'] + ' : Failed to take snapshot ' + str(r.status_code))
-        send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (error " + str(r.status_code) + ")")
-        return ''
+    respons = r.json()
+    return respons['filename']
 
 def generate_barcode_number():
     return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
@@ -307,6 +294,7 @@ def gate_in_thread(gate):
                     break
 
 def start_app():
+    global LOCATION
     LOCATION = get_location()
 
     if LOCATION == False:
