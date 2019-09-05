@@ -274,7 +274,7 @@ def send_notification(gate, message):
 def check_card(card_number):
     payload = { 'card_number': card_number, 'active': 1 }
     try:
-        r = r.requests.get(API_URL + '/parkingMember/', params=payload, timeout=3)
+        r = requests.get(API_URL + '/parkingMember/', params=payload, timeout=3)
     except Exception as e:
         return False
 
@@ -339,7 +339,7 @@ def gate_in_thread(gate):
                             card_number = push_button_or_card[3:-1]
                             app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card detected - ' + card_number + '\n'
                             app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Checking card validity... \n'
-                            valid_card = self.check_card(card_number)
+                            valid_card = check_card(card_number)
 
                             if not valid_card:
                                 app.log_text.text += '[' + time.strftime('%Y-%m-%d %T') + '] ' + gate['name'] + ' : Card not valid \n'
