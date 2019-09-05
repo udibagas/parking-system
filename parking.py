@@ -43,7 +43,7 @@ def take_snapshot(gate):
         return ''
 
     try:
-        r = requests.get(API_URL + '/parkingGate/takeSnapshot/' + gate['id'])
+        r = requests.get(API_URL + '/parkingGate/takeSnapshot/' + str(gate['id']))
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to take snapshot ' + str(e))
         send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
