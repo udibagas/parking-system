@@ -188,7 +188,7 @@ class ParkingGateController extends Controller
                 return response(['message' => 'GAGAL MEMBUKA GATE. Failed to create socket.'], 500);
             }
 
-            $command = "OPEN";
+            $command = "\xa6OPEN\xa9";
             $length = strlen($command);
 
             socket_connect($socket, $parkingGate->controller_ip_address, $parkingGate->controller_port);
