@@ -43,7 +43,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
                 logging.debug('Command : ' + str(data))
 
-                if data == 'OPEN':
+                if data == b'OPEN':
                     try:
                         with Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1) as ser:
                             ser.write(GATE_CMD_OPEN)
