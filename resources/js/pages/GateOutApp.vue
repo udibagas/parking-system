@@ -253,8 +253,6 @@ export default {
         store() {
             axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id)
-                this.printTicket(r.data.id)
-                this.$forceUpdate()
             }).catch(e => {
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
@@ -284,6 +282,9 @@ export default {
                     type: 'error',
                     showClose: true
                 })
+            }).finally(() => {
+                this.printTicket(r.data.id)
+                this.$forceUpdate()
             })
         },
         printTicket(id) {
