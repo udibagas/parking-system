@@ -33,29 +33,40 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     while True:
         conn, addr = s.accept()
         logging.info('Connected by ' + str(addr))
-        data = conn.recv(1024)
-        logging.debug('Command : ' + str(data))
 
-        if data == b'OPEN':
-            try:
-                ser = Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1)
-            except Exception as e:
-                conn.sendall(b'GATE GAGAL DIBUKA ' + str(e))
-                logging.error('Socket connection failed ' + str(e))
-                continue
+        with conn:
+            while True:
+                data = conn.recv(1024)
+                if not data:
+                    break
 
-            try:
-                ser.write(GATE_CMD_OPEN)
+                logging.debug('Command : ' + str(data))
 
-                if GATE_CMD_CLOSE is not None:
-                    time.sleep(1)
-                    ser.write(GATE_CMD_CLOSE)
+                if data == b'OPEN':
+                    try:
+                        ser = Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1)
+                    except PermissionError:
+                        conn.sendall(b'Failed to open serial. Permission error.')
+                        logging.error('Failed to open serial. Permission error.')
+                        break
+                    except Exception as e:
+                        logging.error('Failed to open serial ' + str(e))
+                        conn.sendall(b'Failed to open serial. Unhandle error')
 
-                conn.sendall(b'OK')
-                logging.info("Gate opened")
-            except Exception as e:
-                logging.error(str(e))
-                conn.sendall(b'GATE GAGAL DIBUKA ' + str(e))
-        else:
-            conn.sendall(b'Invalid command')
-            logging.error('Invalid command')
+                    try:
+                        ser.write(GATE_CMD_OPEN)
+
+                        if GATE_CMD_CLOSE is not None:
+                            time.sleep(1)
+                            ser.write(GATE_CMD_CLOSE)
+
+                        conn.sendall(b'OK')
+                        logging.info("Gate opened")
+                    except Exception as e:
+                        logging.error(str(e))
+                        conn.sendall(b'GATE GAGAL DIBUKA ' + str(e))
+                    finally:
+                        ser.close()
+                else:
+                    conn.sendall(b'Invalid command')
+                    logging.error('Invalid command')
