@@ -40,6 +40,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             try:
                 ser = Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1)
             except Exception as e:
+                conn.sendall(b'GATE GAGAL DIBUKA ' + str(e))
                 logging.error('Socket connection failed ' + str(e))
                 continue
 
