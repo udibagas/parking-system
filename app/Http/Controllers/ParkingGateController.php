@@ -192,7 +192,7 @@ class ParkingGateController extends Controller
                 return response(['message' => 'GAGAL MEMBUKA GATE. Socket connection failed.'], 500);
             }
 
-            $command = "\xa6OPEN\xa9";
+            $command = "OPEN";
             $length = strlen($command);
 
             if (!socket_write($socket, $command, $length)) {
