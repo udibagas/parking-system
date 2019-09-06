@@ -181,7 +181,7 @@ def gate_in_thread(gate):
                     logging.debug(gate['name'] + ' : ' + str(push_button_or_card))
 
                     if b'W' in push_button_or_card:
-                        card_number = push_button_or_card[3:-1]
+                        card_number = push_button_or_card[2:-1]
                         valid_card = check_card(gate, card_number)
 
                         if not valid_card:
