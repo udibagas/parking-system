@@ -193,7 +193,7 @@ def gate_in_thread(gate):
 
                     if b'W' in push_button_or_card:
                         card_number = push_button_or_card[2:-1]
-                        valid_card = check_card(gate, card_number)
+                        valid_card = check_card(gate, str(int(card_number, 16)))
 
                         if not valid_card:
                             # TODO : play audio
