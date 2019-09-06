@@ -1,38 +1,60 @@
 import socket
 import time
 from serial import Serial
+import requests
+import logging
+import os
+import sys
 
-def get_gate_info():
-    # TODO: get gate where status = active, type: OUT, ip_address = sama dengan ip computer ini
-    pass
+API_URL = 'http://192.168.1.100/api'
+IP_ADDRESS = '192.168.1.111'
+GATE_CMD_OPEN = "A"
+# GATE_CMD_OPEN = "AZ123"
+GATE_CMD_CLOSE = "W"
 
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind(('127.0.0.1', 5000))
-    s.listen()
+if __file__ == "__main__":
+    log_file = os.path.join(os.path.dirname(__file__), "gate.log")
+    logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-    while True:
-        conn, addr = s.accept()
+    try:
+        r = requests.get('/parkingGate/search', params={ 'controller_ip_address': IP_ADDRESS }, timeout=3)
+    except Exception as e:
+        logging.error('Failed to get gate. Quit program.' + str(e))
+        sys.exit()
 
-        with conn:
-            print('Connected by', addr)
+    gate = r.json()[0]
 
-            while True:
-                data = conn.recv(32)
-                if not data:
-                    break
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+        s.bind((gate['controller_ip_address'], int(gate['controller_port'])))
+        s.listen()
 
-                print(str(data))
+        while True:
+            conn, addr = s.accept()
 
-                if data == b'OPEN':
-                    conn.sendall(b'OK')
+            with conn:
+                logging.info('Connected by ' + str(addr))
 
-                    try:
-                        with Serial('/dev/ttyS0', 2400, timeout=1) as s:
-                            s.write('A')
-                            time.sleep(1)
-                            s.write('W')
-                    except Exception as e:
-                        print(str(e))
+                while True:
+                    data = conn.recv(1024)
+                    if not data:
+                        break
 
-                else:
-                    conn.sendall(b'INVALID COMMAND')
+                    logging.debug('Command : ' + str(data))
+
+                    if data == b'OPEN':
+                        conn.sendall(b'OK')
+
+                        try:
+                            with Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1) as ser:
+                                ser.write(GATE_CMD_OPEN)
+                                if GATE_CMD_CLOSE is not None:
+                                    time.sleep(1)
+                                    ser.write(GATE_CMD_CLOSE)
+                        except Exception as e:
+                            logging.error(str(e))
+                        
+                        logging.info("Gate opened")
+
+                    else:
+                        conn.sendall(b'Invalid command')
+                        logging.error('Invalid command')

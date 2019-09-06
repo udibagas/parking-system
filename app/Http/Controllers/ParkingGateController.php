@@ -55,9 +55,11 @@ class ParkingGateController extends Controller
      */
     public function search(Request $request)
     {
-        $gate = ParkingGate::where('type', $request->type)
-            ->where('active', 1)
-            ->get();
+        $gate = ParkingGate::when($request->type, function($q) use ($request) {
+                return $q->where('type', $request->type);
+            })->when($request->controller_ip_address, function($q) use ($request) {
+                return $q->where('C', $request->controller_ip_address);
+            })->where('active', 1)->get();
 
         if (!$gate) {
             return response(['message' => 'Not found'], 404);
@@ -155,23 +157,46 @@ class ParkingGateController extends Controller
 
     public function openGate(ParkingGate $parkingGate)
     {
-        // ip address == device
+        // ip_address == device
         // port = baudrate
-        try {
-            $serial = new PhpSerial;
-            $serial->deviceSet($parkingGate->controller_ip_address);
-            $serial->confBaudRate($parkingGate->controller_port);
-            $serial->confParity("none");
-            $serial->confCharacterLength(8);
-            $serial->confStopBits(1);
-            $serial->confFlowControl("none");
-            $serial->deviceOpen();
-            $serial->sendMessage(env("GATE_CMD_OPEN", "AZ123"));
-            sleep(1);
-            $serial->sendMessage(env("GATE_CMD_CLOSE", "W"));
-            $serial->deviceClose();
-        } catch (\Exception $e) {
-            return response(['message' => 'GAGAL MEMBUKA GATE. '. $e->getMessage()], 500);
+        // kalau controller_ip_address kosong berarti interface langsung nancep
+        if (!$parkingGate->controller_ip_address)
+        {
+            try {
+                $serial = new PhpSerial;
+                $serial->deviceSet($parkingGate->controller_device);
+                $serial->confBaudRate($parkingGate->controller_baudrate);
+                $serial->confParity("none");
+                $serial->confCharacterLength(8);
+                $serial->confStopBits(1);
+                $serial->confFlowControl("none");
+                $serial->deviceOpen();
+                $serial->sendMessage(env("GATE_CMD_OPEN", "AZ123"));
+                sleep(1);
+                $serial->sendMessage(env("GATE_CMD_CLOSE", "W"));
+                $serial->deviceClose();
+            } catch (\Exception $e) {
+                return response(['message' => 'GAGAL MEMBUKA GATE. '. $e->getMessage()], 500);
+            }
+        }
+        
+        else 
+        {
+            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
+            
+            if (!is_resource($socket)) {
+                return response(['message' => 'GAGAL MEMBUKA GATE. Failed to create socket.'], 500);
+            }
+
+            $command = "OPEN";
+            $length = strlen($command);
+
+            $sent = socket_sendto($socket, $command, $length, 0, $parkingGate->controller_ip_address, $parkingGate->controller_port);
+            
+            // perintah ga kekirim lengkap
+            if ($sent < $length) {
+                return response(['message' => 'GAGAL MEMBUKA GATE. Message truncated'], 500);
+            }
         }
 
         return ['message' => 'GATE BERHASIL DIBUKA'];
