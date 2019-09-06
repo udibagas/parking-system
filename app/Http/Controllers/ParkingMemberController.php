@@ -58,7 +58,10 @@ class ParkingMemberController extends Controller
 
     public function search(Request $request)
     {
-        $member = ParkingMember::where('plate_number', $request->plate_number)
+        $member = ParkingMember::where(function($q) use ($request) {
+                return $q->where('plate_number', $request->plate_number)
+                    ->orWhere('card_number', $request->card_number);
+            })
             ->where('expiry_date', '>=', date('Y-m-d'))
             ->where('is_active', 1)
             ->first();

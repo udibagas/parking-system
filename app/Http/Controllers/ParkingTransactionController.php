@@ -186,6 +186,7 @@ class ParkingTransactionController extends Controller
     public function search(Request $request)
     {
         $data = ParkingTransaction::where('barcode_number', $request->barcode_number)
+            ->orWhere('card_number', $request->barcode_number)
             ->where('time_out', null)
             ->first();
 

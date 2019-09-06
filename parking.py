@@ -22,20 +22,28 @@ def get_location():
         attempt += 1
         try:
             r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
-            return r.json()
         except Exception as e:
             logging.error('Failed to get location ' + str(e))
             time.sleep(3)
             if attempt == 10:
                 return False
 
+        if r.status_code == 200:
+            return r.json()
+
+        return False
+
 def get_gates():
     try:
         r = requests.get(API_URL + '/parkingGate/search', params={'type': 'IN'}, timeout=3)
-        return r.json()
     except Exception as e:
         logging.error('Failed to get gates ' + str(e))
         return False
+
+    if r.status_code == 200:
+        return r.json()
+
+    return False
 
 def take_snapshot(gate):
     if gate['camera_status'] == 0:
@@ -103,12 +111,15 @@ def send_notification(gate, message):
 def check_card(gate, card_number):
     payload = { 'card_number': card_number, 'active': 1 }
     try:
-        r = requests.get(API_URL + '/parkingMember/', params=payload, timeout=3)
+        r = requests.get(API_URL + '/parkingMember/search', params=payload, timeout=3)
     except Exception as e:
         logging.info(gate['name'] + ' : Failed to check card ' + str(e))
         return False
 
-    return r.json()
+    if r.status_code == 200:
+        return r.json()
+
+    return False
 
 def save_data(gate, data):
     try:
@@ -185,6 +196,15 @@ def gate_in_thread(gate):
                         valid_card = check_card(gate, card_number)
 
                         if not valid_card:
+                            # TODO : play audio
+                            try:
+                                s.sendall(b'\xa6MT00005\xa9') # change this
+                            except Exception as e:
+                                logging.error(gate['name'] + ' : Failed to respon invalid card ' + str(e))
+                                send_notification(gate, gate['name'] + ' : Gagal merespon kartu invalid')
+                                error = True
+                                break
+
                             continue
 
                         data = {'is_member': 1, 'card_number': card_number}

@@ -36,10 +36,10 @@
 
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
-                            <div class="label-big">[+] NO. TIKET</div>
+                            <div class="label-big">[+] NO. TIKET/KARTU</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" maxlength="5" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -253,6 +253,7 @@ export default {
         store() {
             axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id)
+                this.printTicket(r.data.id)
             }).catch(e => {
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
@@ -282,9 +283,6 @@ export default {
                     type: 'error',
                     showClose: true
                 })
-            }).finally(() => {
-                this.printTicket(r.data.id)
-                this.$forceUpdate()
             })
         },
         printTicket(id) {
@@ -306,7 +304,6 @@ export default {
         },
         openGate() {
             axios.post('/parkingGate/openGate/' + this.formModel.gate_out_id).then(r => {
-                this.resetForm()
                 this.$message({
                     message: r.data.message,
                     type: 'success',
@@ -318,6 +315,8 @@ export default {
                     type: 'error',
                     showClose: true
                 })
+            }).finally(() => {
+                this.resetForm()
             })
         },
         getLocationIdentity() {
