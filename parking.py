@@ -192,7 +192,7 @@ def gate_in_thread(gate):
                     logging.debug(gate['name'] + ' : ' + str(push_button_or_card))
 
                     if b'W' in push_button_or_card:
-                        card_number = push_button_or_card[2:-1]
+                        card_number = push_button_or_card.split('W')[1].split('\xa9')[0]
                         valid_card = check_card(gate, str(int(card_number, 16)))
 
                         if not valid_card:
@@ -207,8 +207,8 @@ def gate_in_thread(gate):
 
                             continue
 
-                        data = {'is_member': 1, 'card_number': card_number}
-                        logging.info(gate['name'] + ' : Card detected :' + card_number)
+                        data = {'is_member': 1, 'card_number': valid_card['card_number']}
+                        logging.info(gate['name'] + ' : Card detected :' + valid_card['card_number'])
                         break
 
                     elif b'IN2ON' in push_button_or_card or b'STAT11' in push_button_or_card:
