@@ -198,7 +198,7 @@ def gate_in_thread(gate):
                         if not valid_card:
                             # TODO : play audio
                             try:
-                                s.sendall(b'\xa6MT00005\xa9') # change this
+                                s.sendall(b'\xa6MT00003\xa9') # change this
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon invalid card ' + str(e))
                                 send_notification(gate, gate['name'] + ' : Gagal merespon kartu invalid')
