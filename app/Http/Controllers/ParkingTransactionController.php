@@ -10,6 +10,7 @@ use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\LocationIdentity;
 use App\ParkingGate;
+use App\ParkingMember;
 use GuzzleHttp\Client;
 
 class ParkingTransactionController extends Controller
@@ -185,13 +186,35 @@ class ParkingTransactionController extends Controller
      */
     public function search(Request $request)
     {
-        $data = ParkingTransaction::where('barcode_number', $request->barcode_number)
-            ->orWhere('card_number', $request->barcode_number)
-            ->where('time_out', null)
-            ->first();
+        $data = ParkingTransaction::when($request->barcode_number, function($q) use ($request) {
+                return $q->where('barcode_number', $request->barcode_number);
+            })->when($request->card_number, function($q) use ($request) {
+                return $q->where('card_number', $request->card_number);
+            })->where('time_out', null)->first();
 
         if ($data) {
             return $data;
+        }
+
+        // member, tapi gak tap in
+        if ($request->card_number)
+        {
+            $member = ParkingMember::where('card_member', $request->card_member)->first();
+
+            if ($member)
+            {
+                $data = [
+                    'barcode_number' => 'NOTAP',
+                    'vehicle_type' => $member->vehicle_type,
+                    'is_member' => 1,
+                    'parking_member_id' => $member->id,
+                    'time_in' => date('Y-m-d H:i:s'),
+                    'gate_in_id' => $request->gate_in_id,
+                    'card_number' => $member->card_number
+                ];
+
+                return ParkingTransaction::create($data);
+            }
         }
 
         return response(['message' => 'Data tidak ditemukan'], 404);

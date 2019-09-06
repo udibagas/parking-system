@@ -36,10 +36,19 @@
 
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
-                            <div class="label-big">[+] NO. TIKET/KARTU</div>
+                            <div class="label-big">[.] NO. KARTU</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="card-number" autocomplete="off" @keyup.enter="checkCard" type="text" placeholder="NO. KARTU" v-model="formModel.card_number" class="my-input">
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">[+] NO. TIKET</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <input id="ticket-number" maxlength="5" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -160,9 +169,56 @@ export default {
                 })
             }
         },
+        checkCard() {
+            let now = moment().format('YYYY-MM-DD HH:mm:ss')
+            let params = { card_number: this.formModel.card_number }
+            axios.get('/parkingTransaction/search', { params: params }).then(r => {
+                this.formModel.id = r.data.id
+                this.formModel.gate_in_id = r.data.gate_in_id
+                this.formModel.barcode_number = r.data.barcode_number
+                this.formModel.vehicle_type = r.data.vehicle_type
+                this.formModel.time_in = r.data.time_in
+                this.formModel.time_out = now
+                this.formModel.fare = 0
+                this.snapshot_in = r.data.snapshot_in
+                this.setDuration()
+                this.$forceUpdate()
+                this.takeSnapshot(r.data.id)
+                // langsung update & buka gate. gak perlu print tiket
+                this.update()
+                this.openGate()
+                document.getElementById('vehicle-type').focus()
+            }).catch(e => {
+                this.$message({
+                    message: e.response.data.message,
+                    type: 'error',
+                    showClose: true,
+                })
+            })
+        },
+        checkPlate(e) {
+            if (!this.formModel.plate_number) {
+                return
+            }
+
+            let params = { plate_number: this.formModel.plate_number }
+            axios.get('/parkingMember/search', { params: params }).then(r => {
+                this.formModel.fare = 0;
+                this.formModel.is_member = 1;
+                this.formModel.parking_member_id = r.data.id;
+                this.$forceUpdate();
+            }).catch(e => {
+                this.formModel.is_member = 0;
+                this.formModel.parking_member_id = null;
+                this.$forceUpdate();
+            })
+
+            document.getElementById('ticket-number').focus()
+        },
         setFare() {
             let vehicle = this.vehicleTypeList.find(vt => vt.name == this.formModel.vehicle_type)
             if (vehicle) {
+                document.getElementById('vehicle-type').blur()
 
                 if (!this.formModel.is_member)
                 {
@@ -199,25 +255,6 @@ export default {
             }
 
             document.getElementById('plate-number').focus()
-        },
-        checkPlate(e) {
-            if (!this.formModel.plate_number) {
-                return
-            }
-
-            let params = { plate_number: this.formModel.plate_number }
-            axios.get('/parkingMember/search', { params: params }).then(r => {
-                this.formModel.fare = 0;
-                this.formModel.is_member = 1;
-                this.formModel.parking_member_id = r.data.id;
-                this.$forceUpdate();
-            }).catch(e => {
-                this.formModel.is_member = 0;
-                this.formModel.parking_member_id = null;
-                this.$forceUpdate();
-            })
-
-            document.getElementById('ticket-number').focus()
         },
         submit() {
             // kalau tiket hilang harus isi time in dulu
@@ -264,7 +301,10 @@ export default {
         },
         update() {
             axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
-                this.printTicket(r.data.id)
+                // print tiket hanya untuk non member
+                if (r.data.is_member == 0) {
+                    this.printTicket(r.data.id)
+                }
                 this.$forceUpdate()
             }).catch(e => {
                 this.$message({
