@@ -10,7 +10,7 @@ import sys
 
 API_URL = 'http://192.168.1.6/api'
 IP_ADDRESS = '192.168.1.13'
-GATE_CMD_OPEN = "AZ123"
+GATE_CMD_OPEN = b'AZ123'
 GATE_CMD_CLOSE = None
 
 log_file = os.path.join(os.path.dirname(__file__), "gate.log")
@@ -23,9 +23,11 @@ except Exception as e:
     sys.exit()
 
 gate = r.json()[0]
+logging.info(gate)
 
 with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     s.bind((gate['controller_ip_address'], int(gate['controller_port'])))
+    logging.info('Listen on ' + gate['controller_ip_address'] + ':' + str(gate['controller_port']))
     s.listen()
 
     while True:
@@ -41,20 +43,20 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
                 logging.debug('Command : ' + str(data))
 
-                if b'OPEN' in data:
-                    conn.sendall(b'OK')
-
+                if data == 'OPEN':
                     try:
                         with Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1) as ser:
                             ser.write(GATE_CMD_OPEN)
+
                             if GATE_CMD_CLOSE is not None:
                                 time.sleep(1)
                                 ser.write(GATE_CMD_CLOSE)
+
+                            conn.sendall(b'OK')
+                            logging.info("Gate opened")
                     except Exception as e:
                         logging.error(str(e))
-
-                    logging.info("Gate opened")
-
+                        conn.sendall(b'GATE GAGAL DIBUKA ' + str(e))
                 else:
                     conn.sendall(b'Invalid command')
                     logging.error('Invalid command')

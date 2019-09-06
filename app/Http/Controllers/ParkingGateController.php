@@ -188,11 +188,25 @@ class ParkingGateController extends Controller
                 return response(['message' => 'GAGAL MEMBUKA GATE. Failed to create socket.'], 500);
             }
 
+            if (!socket_connect($socket, $parkingGate->controller_ip_address, $parkingGate->controller_port)) {
+                return response(['message' => 'GAGAL MEMBUKA GATE. Socket connection failed.'], 500);
+            }
+
             $command = "\xa6OPEN\xa9";
             $length = strlen($command);
 
-            socket_connect($socket, $parkingGate->controller_ip_address, $parkingGate->controller_port);
-            socket_write($socket, $command, $length);
+            if (!socket_write($socket, $command, $length)) {
+                return response(['message' => 'GAGAL MEMBUKA GATE. Failed to send command.'], 500);
+            }
+
+            $response = socket_read($socket, 1024);
+
+            if (!$response) {
+                return response(['message' => 'GAGAL MEMBUKA GATE. Empty respons.'], 500);
+            } elseif ($response != 'OK') {
+                return response(['message' => $response], 500);
+            }
+
             socket_shutdown($socket);
             socket_close($socket);
         }
