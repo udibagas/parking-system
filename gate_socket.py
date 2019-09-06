@@ -32,31 +32,29 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     while True:
         conn, addr = s.accept()
+        logging.info('Connected by ' + str(addr))
 
-        with conn:
-            logging.info('Connected by ' + str(addr))
+        while True:
+            data = conn.recv(1024)
+            if not data:
+                break
 
-            while True:
-                data = conn.recv(1024)
-                if not data:
-                    break
+            logging.debug('Command : ' + str(data))
 
-                logging.debug('Command : ' + str(data))
+            if data == b'OPEN':
+                try:
+                    ser = Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1)
+                    ser.write(GATE_CMD_OPEN)
 
-                if data == b'OPEN':
-                    try:
-                        with Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1) as ser:
-                            ser.write(GATE_CMD_OPEN)
+                    if GATE_CMD_CLOSE is not None:
+                        time.sleep(1)
+                        ser.write(GATE_CMD_CLOSE)
 
-                            if GATE_CMD_CLOSE is not None:
-                                time.sleep(1)
-                                ser.write(GATE_CMD_CLOSE)
-
-                            conn.sendall(b'OK')
-                            logging.info("Gate opened")
-                    except Exception as e:
-                        logging.error(str(e))
-                        conn.sendall(b'GATE GAGAL DIBUKA ' + str(e))
-                else:
-                    conn.sendall(b'Invalid command')
-                    logging.error('Invalid command')
+                    conn.sendall(b'OK')
+                    logging.info("Gate opened")
+                except Exception as e:
+                    logging.error(str(e))
+                    conn.sendall(b'GATE GAGAL DIBUKA ' + str(e))
+            else:
+                conn.sendall(b'Invalid command')
+                logging.error('Invalid command')
