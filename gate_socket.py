@@ -45,13 +45,10 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                 if data == b'OPEN':
                     try:
                         ser = Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1)
-                    except PermissionError:
-                        conn.sendall(b'Failed to open serial. Permission error.')
-                        logging.error('Failed to open serial. Permission error.')
-                        break
                     except Exception as e:
-                        logging.error('Failed to open serial ' + str(e))
-                        conn.sendall(b'Failed to open serial. Unhandle error')
+                        conn.sendall(b'Failed to open serial')
+                        logging.error('Failed to open serial. Permission error.' + str(e))
+                        break
 
                     try:
                         ser.write(GATE_CMD_OPEN)
@@ -60,13 +57,12 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
                             time.sleep(1)
                             ser.write(GATE_CMD_CLOSE)
 
+                        ser.close()
                         conn.sendall(b'OK')
                         logging.info("Gate opened")
                     except Exception as e:
                         logging.error(str(e))
-                        conn.sendall(b'GATE GAGAL DIBUKA ' + str(e))
-                    finally:
-                        ser.close()
+                        conn.sendall(b'GATE GAGAL DIBUKA')
                 else:
                     conn.sendall(b'Invalid command')
                     logging.error('Invalid command')
