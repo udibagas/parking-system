@@ -191,12 +191,17 @@ class ParkingGateController extends Controller
             $command = "OPEN";
             $length = strlen($command);
 
-            $sent = socket_sendto($socket, $command, $length, 0, $parkingGate->controller_ip_address, $parkingGate->controller_port);
+            socket_connect($socket, $parkingGate->controller_ip_address, $parkingGate->controller_port);
+            socket_write($socket, $command, $length);
+            socket_shutdown($socket);
+            socket_close($socket);
 
-            // perintah ga kekirim lengkap
-            if ($sent < $length) {
-                return response(['message' => 'GAGAL MEMBUKA GATE. Message truncated'], 500);
-            }
+            // $sent = socket_sendto($socket, $command, $length, 0, $parkingGate->controller_ip_address, $parkingGate->controller_port);
+
+            // // perintah ga kekirim lengkap
+            // if ($sent < $length) {
+            //     return response(['message' => 'GAGAL MEMBUKA GATE. Message truncated'], 500);
+            // }
         }
 
         return ['message' => 'GATE BERHASIL DIBUKA'];
