@@ -9,7 +9,7 @@
                         </el-col>
                         <el-col :span="14">
                             <select :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
-                                <option v-for="g in parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
+                                <option v-for="g in parkingGateList" :value="g.id" :key="g.id">{{g.name}}</option>
                             </select>
                         </el-col>
                     </el-row>
@@ -170,8 +170,17 @@ export default {
             }
         },
         checkCard() {
+            if (!this.formModel.gate_out_id) {
+                this.$message({
+                    message: 'MOHON PILIH GATE OUT',
+                    type: 'error',
+                    showClose: true,
+                })
+                return
+            }
+
             let now = moment().format('YYYY-MM-DD HH:mm:ss')
-            let params = { card_number: this.formModel.card_number }
+            let params = { card_number: this.formModel.card_number, gate_in_id: this.formModel.gate_out_id }
             axios.get('/parkingTransaction/search', { params: params }).then(r => {
                 this.formModel.id = r.data.id
                 this.formModel.gate_in_id = r.data.gate_in_id
@@ -185,8 +194,10 @@ export default {
                 this.$forceUpdate()
                 this.takeSnapshot(r.data.id)
                 // langsung update & buka gate. gak perlu print tiket
-                this.update()
-                this.openGate()
+                setTimeout(() => {
+                    this.update()
+                    this.openGate()
+                }, 1000)
                 document.getElementById('vehicle-type').focus()
             }).catch(e => {
                 this.$message({
@@ -240,6 +251,7 @@ export default {
             this.formModel.gate_in_id = null
             this.formModel.plate_number = this.location.default_plate_number
             this.formModel.barcode_number = ''
+            this.formModel.card_number = ''
             this.formModel.time_out = ''
             this.formModel.time_in = ''
             this.formModel.duration = ''

@@ -199,7 +199,7 @@ class ParkingTransactionController extends Controller
         // member, tapi gak tap in
         if ($request->card_number)
         {
-            $member = ParkingMember::where('card_member', $request->card_member)->first();
+            $member = ParkingMember::where('card_number', $request->card_number)->first();
 
             if ($member)
             {
