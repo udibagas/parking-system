@@ -136,7 +136,7 @@ def play_audio(s, gate, audio, wait=False):
         'take_ticket' : b'\xa6MT0002\xa9',
         'invalid_card' : b'\xa6MT0003\xa9',
         'help' : b'\xa6MT0005\xa9',
-        'tanks' : b'\xa6MT0006\xa9',
+        'thanks' : b'\xa6MT0006\xa9',
         'welcome' : b'\xa6MT0007\xa9'
     }
 
@@ -239,7 +239,7 @@ def gate_in_thread(gate):
 
                         elif push_button_or_card == b'':
                             raise BrokenPipeError('Connection dropped when sensing button and card')
-                        
+
                     # END LOOP SENSING BUTTON OR CARD WHEN VEHICLE DETECTED
 
                     if reset:
@@ -261,7 +261,7 @@ def gate_in_thread(gate):
                     # play terimakasih
                     play_audio(s, gate, 'thanks')
                     time.sleep(1)
-                    open_date(s, gate)
+                    open_gate(s, gate)
 
                     # wait until vehicle in
                     while True:
@@ -272,7 +272,7 @@ def gate_in_thread(gate):
                             logging.info(gate['name'] + ' : Vehicle in')
                             break
 
-                        elif vehicle_in == b''
+                        elif vehicle_in == b'':
                             raise BrokenPipeError('Connection dropped when sensing loop 2')
 
                 except BrokenPipeError as e:
