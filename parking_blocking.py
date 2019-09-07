@@ -134,11 +134,11 @@ def save_data(gate, data):
 def play_audio(s, gate, audio, wait=False):
     logging.info(gate['name'] + ' : Playing "' + audio + '"')
     cmd_list = {
-        'take_ticket' : b'\xa6MT0002\xa9',
-        'invalid_card' : b'\xa6MT0003\xa9',
-        'help' : b'\xa6MT0005\xa9',
-        'thanks' : b'\xa6MT0006\xa9',
-        'welcome' : b'\xa6MT0007\xa9'
+        'take_ticket' : b'\xa6MT00002\xa9',
+        'invalid_card' : b'\xa6MT00003\xa9',
+        'help' : b'\xa6MT00005\xa9',
+        'thanks' : b'\xa6MT00006\xa9',
+        'welcome' : b'\xa6MT00007\xa9'
     }
 
     s.sendall(cmd_list[audio])
