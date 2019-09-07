@@ -132,6 +132,7 @@ def save_data(gate, data):
     return r.json()
 
 def play_audio(s, gate, audio, wait=False):
+    logging.info(gate['name'] + ' : Playing "' + audio + '"')
     cmd_list = {
         'take_ticket' : b'\xa6MT0002\xa9',
         'invalid_card' : b'\xa6MT0003\xa9',
@@ -143,7 +144,6 @@ def play_audio(s, gate, audio, wait=False):
     s.sendall(cmd_list[audio])
     response = s.recv(1024)
     logging.debug(gate['name'] + ' : ' + str(response))
-    logging.info(gate['name'] + ' : Playing "' + audio + '"')
 
     if response == b'':
         raise BrokenPipeError('Connection dropped when playing "' + audio + '"')
