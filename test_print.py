@@ -26,10 +26,14 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         'JAM'.ljust(10) + ' : ' + time.strftime('%T'),
         '\x0a\x0a', # 2x new line
         '\x1b\x61\x49', # align center
+        '\x1d\x48\x50', # set barcode text = below
+        '\x1d\x6b100', # set barcode height = 100
+        '\x1d\x774', # set barcode width = 4
+        '\x1d\x6b4ABC123\x00', #print barcode
         'Simpan tiket anda',
         '\x0a', # new line
         '\x1b\x69', # cut
         '\xa9' # end command
     ]
 
-    s.sendall(format(''.join(command)))
+    s.sendall(str.encode(''.join(command)))
