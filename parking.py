@@ -92,6 +92,35 @@ def print_ticket(trx_data, gate):
 
     logging.info(gate['name'] + ' : Ticket printed ' + trx_data['barcode_number'])
 
+def print_ticket1(s, gate, data):
+    command = [
+        '\xa6PR4', # start print command, baudrate 19200
+        '\x1b\x61\x49', # align center
+        'TIKET PARKIR\x0a',
+        '\x1b\x21\x10', # double height
+        LOCATION['name'],
+        '\x0a\x0a', # 2x new line
+        '\x1b\x21\x00', # normal height
+        '\x1b\x61\x48', # align left
+        'GATE'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'],
+        '\x0a', # new line
+        'TANGGAL'.ljust(10) + ' : ' + datetime.datetime.strptime(data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y'),
+        '\x0a', # new line
+        'JAM'.ljust(10) + ' : ' + data['time_in'][11:],
+        '\x0a\x0a', # 2x new line
+        '\x1b\x61\x49', # align center
+        '\x1d\x48\x50', # set barcode text = below
+        '\x1d\x6b100', # set barcode height = 100
+        '\x1d\x774', # set barcode width = 4
+        '\x1d\x6b4ABC123\x00', #print barcode
+        LOCATION['additional_info_ticket'],
+        '\x0a', # new line
+        '\x1b\x69', # cut
+        '\xa9' # end command
+    ]
+
+    s.sendall(str.encode(''.join(command)))
+
 def send_notification(gate, message):
     notification = { 'parking_gate_id': gate['id'], 'message': message }
     try:
