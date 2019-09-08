@@ -13,27 +13,22 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
     command = [
         '\xa6PR4', # start print command, baudrate 19200
         '\x1b\x61\x49', # align center
-        'TIKET PARKIR\x0a',
-        '\x1b\x21\x10', # double height
-        'MITRATEKNIK',
-        '\x0a\x0a', # 2x new line
+        'TIKET PARKIR\n',
+        '\x1b\x21\x10MITRATEKNIK\n\n', # double height
         '\x1b\x21\x00', # normal height
         '\x1b\x61\x48', # align left
-        'GATE'.ljust(10) + ' : GATE-IN-MOTOR',
-        '\x0a', # new line
-        'TANGGAL'.ljust(10) + ' : ' + time.strftime('%d %b %Y'),
-        '\x0a', # new line
-        'JAM'.ljust(10) + ' : ' + time.strftime('%T'),
-        '\x0a\x0a', # 2x new line
+        'GATE    : GATE-IN-MOTOR\n',
+        'TANGGAL : ' + time.strftime('%d %b %Y') + '\n',
+        'JAM     : ' + time.strftime('%T') + '\n\n',
         '\x1b\x61\x49', # align center
+        '\x1d\x6bd', # set barcode height = 100
+        '\x1d\x77\xa4', # set barcode width = 4, GS w 4
         '\x1d\x48\x50', # set barcode text = below
-        '\x1d\x6b100', # set barcode height = 100
-        '\x1d\x774', # set barcode width = 4
-        '\x1d\x6b4ABC123\x00', #print barcode
-        'Simpan tiket anda',
-        '\x0a', # new line
-        '\x1b\x69', # cut
+        '\x1d\x6b\x04ABC123\x00', #print barcode : GS k 4 [TEXT] NUL
+        '\nSimpan tiket anda\n',
+        '\x1d\x56A\x03', # full cut, add 3 lines: GS V 65 3
         '\xa9' # end command
     ]
 
     s.sendall(str.encode(''.join(command)))
+    print(s.recv(1024))
