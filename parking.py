@@ -62,13 +62,12 @@ def take_snapshot(gate):
 def generate_barcode_number():
     return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])
 
-# assume semua pake printer network
-def print_ticket(trx_data, gate):
+def print_ticket_network(gate, data):
     try:
         p = Network(gate['printer_ip_address'])
     except Exception as e:
-        logging.error(gate['name'] + ' : Failed to print ticket ' + trx_data['barcode_number'] + ' ' + str(e))
-        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
+        logging.error(gate['name'] + ' : Failed to print ticket ' + data['barcode_number'] + ' ' + str(e))
+        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
         return
 
     try:
@@ -77,49 +76,51 @@ def print_ticket(trx_data, gate):
         p.set(height=2, align='center')
         p.text(LOCATION['name'] + "\n\n")
         p.set(align='left')
-        p.text('GATE'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
-        p.text('TANGGAL'.ljust(10) + ' : ' + datetime.datetime.strptime(trx_data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
-        p.text('JAM'.ljust(10) + ' : ' + trx_data['time_in'][11:] + "\n\n")
+        p.text('GATE         : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
+        p.text('TANGGAL      : ' + datetime.datetime.strptime(data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
+        p.text('JAM          : ' + data['time_in'][11:] + "\n\n")
         p.set(align='center')
-        p.barcode(trx_data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
+        p.barcode(data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
         p.text("\n")
         p.text(LOCATION['additional_info_ticket'])
         p.cut()
     except Exception as e:
-        logging.error(gate['name'] + ' : Failed to print ticket ' + trx_data['barcode_number'] + ' ' + str(e))
-        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + trx_data['barcode_number'])
+        logging.error(gate['name'] + ' : Failed to print ticket ' + data['barcode_number'] + ' ' + str(e))
+        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
         return
 
-    logging.info(gate['name'] + ' : Ticket printed ' + trx_data['barcode_number'])
+    logging.info(gate['name'] + ' : Ticket printed ' + data['barcode_number'])
 
-def print_ticket1(s, gate, data):
+def print_ticket_serial(gate, data, s):
     command = [
-        '\xa6PR4', # start print command, baudrate 19200
-        '\x1b\x61\x49', # align center
-        'TIKET PARKIR\x0a',
-        '\x1b\x21\x10', # double height
-        LOCATION['name'],
-        '\x0a\x0a', # 2x new line
+        '\xa6PR4', # start print command, baudrate 9600
+        '\x1b\x61\x01TIKET PARKIR\n', # align center
+        '\x1b\x21\x10' + LOCATION['name'] +'\n\n', # double height
         '\x1b\x21\x00', # normal height
-        '\x1b\x61\x48', # align left
-        'GATE'.ljust(10) + ' : ' + gate['name'] + "/" + gate['vehicle_type'],
-        '\x0a', # new line
-        'TANGGAL'.ljust(10) + ' : ' + datetime.datetime.strptime(data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y'),
-        '\x0a', # new line
-        'JAM'.ljust(10) + ' : ' + data['time_in'][11:],
-        '\x0a\x0a', # 2x new line
-        '\x1b\x61\x49', # align center
-        '\x1d\x48\x50', # set barcode text = below
-        '\x1d\x6b100', # set barcode height = 100
-        '\x1d\x774', # set barcode width = 4
-        '\x1d\x6b4ABC123\x00', #print barcode
-        LOCATION['additional_info_ticket'],
-        '\x0a', # new line
-        '\x1b\x69', # cut
+        '\x1b\x61\x00', # align left
+        'GATE         : ' + gate['name'] + '/' +  gate['vehicle_type'] + '\n',
+        'TANGGAL      : ' + datetime.datetime.strptime(data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + '\n',
+        'JAM          : ' + data['time_in'][11:] + '\n\n',
+        '\x1b\x61\x01', # align center
+        '\x1dhd', # set barcode height = 100, GS h 100
+        '\x1dH\x02', # set barcode text = below, GS H 2
+        '\x1dkE', # GS k 69 
+        chr(len(data['barcode_number'])), # barcode length
+        data['barcode_number'], # barcode content
+        '\n' + LOCATION['additional_info_ticket'] + '\n',
+        '\x1d\x56A', # full cut, add 3 lines: GS V 65
         '\xa9' # end command
     ]
 
-    s.sendall(str.encode(''.join(command)))
+    try:
+        s.sendall(str.encode(''.join(command)))
+        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+    except Exception as e:
+        logging.error(gate['name'] + ' : Failed to print ticket ' + data['barcode_number'] + ' ' + str(e))
+        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
+        return
+    
+    logging.info(gate['name'] + ' : Ticket printed ' + data['barcode_number'])
 
 def send_notification(gate, message):
     notification = { 'parking_gate_id': gate['id'], 'message': message }
@@ -293,8 +294,11 @@ def gate_in_thread(gate):
 
                 # kalau bukan member cetak struk
                 if data['is_member'] == 0:
-                    print_ticket(data, gate)
-
+                    if gate['printer_type'] == 'network':
+                        print_ticket_network(gate, data)
+                    elif gate['printer_type'] == 'local':
+                        print_ticket_serial(gate, data, s)
+                    
                     # play silakan ambil tiket
                     try:
                         s.sendall(b'\xa6MT00002\xa9')
@@ -303,6 +307,20 @@ def gate_in_thread(gate):
                         logging.error(gate['name'] + ' : Failed to play silakan ambil tiket' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play silakan ambil tiket')
                         break
+                    
+                    # bisa jadi di sini tekan tombol help karena tiket gak keluar
+                    # TODO: need improvement
+                    if b'IN4ON' in s.recv(1024):
+                        try:
+                            s.sendall(b'\xa6MT00005\xa9')
+                        except Exception as e:
+                            logging.error(gate['name'] + ' : Failed to respon help button ' + str(e))
+                            send_notification(gate, gate['name'] + ' : Gagal merespon tombol bantuan')
+                            error = True
+                            break
+
+                        logging.info(gate['name'] + ' : Help button pressed')
+                        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
 
                 # play terimakasih
                 try:
@@ -323,6 +341,20 @@ def gate_in_thread(gate):
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal membuka gate')
                     break
+                
+                # bisa jadi di sini tekan tombol help karena gate tidak terbuka
+                # TODO: need improvement
+                if b'IN4ON' in s.recv(1024):
+                    try:
+                        s.sendall(b'\xa6MT00005\xa9')
+                    except Exception as e:
+                        logging.error(gate['name'] + ' : Failed to respon help button ' + str(e))
+                        send_notification(gate, gate['name'] + ' : Gagal merespon tombol bantuan')
+                        error = True
+                        break
+
+                    logging.info(gate['name'] + ' : Help button pressed')
+                    send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
 
                 logging.info(gate['name'] + ' : Gate Opened')
 
