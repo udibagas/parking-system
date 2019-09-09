@@ -36,16 +36,7 @@
 
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
-                            <div class="label-big">[.] NO. KARTU</div>
-                        </el-col>
-                        <el-col :span="14">
-                            <input id="card-number" autocomplete="off" @keyup.enter="checkCard" type="text" placeholder="NO. KARTU" v-model="formModel.card_number" class="my-input">
-                        </el-col>
-                    </el-row>
-
-                    <el-row :gutter="10" style="margin-bottom:10px;">
-                        <el-col :span="10">
-                            <div class="label-big">[+] NO. TIKET</div>
+                            <div class="label-big">[+] NO. TIKET/KARTU</div>
                         </el-col>
                         <el-col :span="14">
                             <input id="ticket-number" maxlength="5" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
@@ -169,44 +160,44 @@ export default {
                 })
             }
         },
-        checkCard() {
-            if (!this.formModel.gate_out_id) {
-                this.$message({
-                    message: 'MOHON PILIH GATE OUT',
-                    type: 'error',
-                    showClose: true,
-                })
-                return
-            }
+        // checkCard() {
+        //     if (!this.formModel.gate_out_id) {
+        //         this.$message({
+        //             message: 'MOHON PILIH GATE OUT',
+        //             type: 'error',
+        //             showClose: true,
+        //         })
+        //         return
+        //     }
 
-            let now = moment().format('YYYY-MM-DD HH:mm:ss')
-            let params = { card_number: this.formModel.card_number, gate_in_id: this.formModel.gate_out_id }
-            axios.get('/parkingTransaction/search', { params: params }).then(r => {
-                this.formModel.id = r.data.id
-                this.formModel.gate_in_id = r.data.gate_in_id
-                this.formModel.barcode_number = r.data.barcode_number
-                this.formModel.vehicle_type = r.data.vehicle_type
-                this.formModel.time_in = r.data.time_in
-                this.formModel.time_out = now
-                this.formModel.fare = 0
-                this.snapshot_in = r.data.snapshot_in
-                this.setDuration()
-                this.$forceUpdate()
-                this.takeSnapshot(r.data.id)
-                // langsung update & buka gate. gak perlu print tiket
-                setTimeout(() => {
-                    this.update()
-                    this.openGate()
-                }, 1000)
-                document.getElementById('vehicle-type').focus()
-            }).catch(e => {
-                this.$message({
-                    message: e.response.data.message,
-                    type: 'error',
-                    showClose: true,
-                })
-            })
-        },
+        //     let now = moment().format('YYYY-MM-DD HH:mm:ss')
+        //     let params = { card_number: this.formModel.card_number, gate_in_id: this.formModel.gate_out_id }
+        //     axios.get('/parkingTransaction/search', { params: params }).then(r => {
+        //         this.formModel.id = r.data.id
+        //         this.formModel.gate_in_id = r.data.gate_in_id
+        //         this.formModel.barcode_number = r.data.barcode_number
+        //         this.formModel.vehicle_type = r.data.vehicle_type
+        //         this.formModel.time_in = r.data.time_in
+        //         this.formModel.time_out = now
+        //         this.formModel.fare = 0
+        //         this.snapshot_in = r.data.snapshot_in
+        //         this.setDuration()
+        //         this.$forceUpdate()
+        //         this.takeSnapshot(r.data.id)
+        //         // langsung update & buka gate. gak perlu print tiket
+        //         setTimeout(() => {
+        //             this.update()
+        //             this.openGate()
+        //         }, 1000)
+        //         document.getElementById('vehicle-type').focus()
+        //     }).catch(e => {
+        //         this.$message({
+        //             message: e.response.data.message,
+        //             type: 'error',
+        //             showClose: true,
+        //         })
+        //     })
+        // },
         checkPlate(e) {
             if (!this.formModel.plate_number) {
                 return

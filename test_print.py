@@ -12,7 +12,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
 
     command = [
         '\xa6PR4', # start print command, baudrate 9600
-        '\x1b\x61\x01TIKET PARKIR\n',
+        '\x1b\x61\x01TIKET PARKIR\n', # align center
         '\x1b\x21\x10MITRATEKNIK\n\n', # double height
         '\x1b\x21\x00', # normal height
         '\x1b\x61\x00', # align left

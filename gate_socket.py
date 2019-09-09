@@ -7,19 +7,18 @@ import requests
 import logging
 import os
 import sys
+import configparser
 
-API_URL = 'http://192.168.1.6/api'
-IP_ADDRESS = '192.168.1.13'
-GATE_CMD_OPEN = b'AZ123'
-GATE_CMD_CLOSE = None
+CFG = configparser.ConfigParser()
+CFG.read_file(open(os.path.join(os.path.dirname(__file__), 'gate.cfg')))
 
-log_file = os.path.join(os.path.dirname(__file__), "gate.log")
+log_file = os.path.join(os.path.dirname(__file__), CFG['log']['file'])
 logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
 try:
-    r = requests.get(API_URL + '/parkingGate/search', params={ 'controller_ip_address': IP_ADDRESS }, timeout=3)
+    r = requests.get(CFG['api']['url'] + '/parkingGate/search', params={ 'controller_ip_address': CFG['host']['address'] }, timeout=3)
 except Exception as e:
-    logging.error('Failed to get gate. Quit program.' + str(e))
+    logging.error('Failed to get gate. Quit program. ' + str(e))
     sys.exit()
 
 gate = r.json()[0]
@@ -35,34 +34,30 @@ with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         logging.info('Connected by ' + str(addr))
 
         with conn:
-            while True:
-                data = conn.recv(1024)
-                if not data:
+            data = conn.recv(1024)
+            logging.debug('Command : ' + str(data))
+
+            if data == b'OPEN':
+                try:
+                    ser = Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1)
+                except Exception as e:
+                    conn.sendall(b'Failed to open serial')
+                    logging.error('Failed to open serial. ' + str(e))
                     break
 
-                logging.debug('Command : ' + str(data))
+                try:
+                    ser.write(CFG['cmd']['open'].encode())
 
-                if data == b'OPEN':
-                    try:
-                        ser = Serial(gate['controller_device'], int(gate['controller_baudrate']), timeout=1)
-                    except Exception as e:
-                        conn.sendall(b'Failed to open serial')
-                        logging.error('Failed to open serial. Permission error.' + str(e))
-                        break
+                    if CFG['cmd']['close'] is not None:
+                        time.sleep(1)
+                        ser.write(CFG['cmd']['close'].encode())
 
-                    try:
-                        ser.write(GATE_CMD_OPEN)
-
-                        if GATE_CMD_CLOSE is not None:
-                            time.sleep(1)
-                            ser.write(GATE_CMD_CLOSE)
-
-                        ser.close()
-                        conn.sendall(b'OK')
-                        logging.info("Gate opened")
-                    except Exception as e:
-                        logging.error(str(e))
-                        conn.sendall(b'GATE GAGAL DIBUKA')
-                else:
-                    conn.sendall(b'Invalid command')
-                    logging.error('Invalid command')
+                    ser.close()
+                    conn.sendall(b'OK')
+                    logging.info("Gate opened")
+                except Exception as e:
+                    logging.error(str(e))
+                    conn.sendall(b'GATE GAGAL DIBUKA')
+            else:
+                conn.sendall(b'Invalid command')
+                logging.error('Invalid command')
