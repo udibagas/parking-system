@@ -51,7 +51,6 @@
                             <select @keyup.enter="submit" placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
                                 <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
                             </select>
-                            <!-- <input id="vehicle-type" type="text" placeholder="JENIS KENDARAAN" v-model="formModel.vehicle_type" class="my-input"> -->
                             <!-- <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
                                 {{vehicleTypeList.map(vt => vt.shortcut_key + ' = ' + vt.name).join(', ')}}
                             </div> -->
@@ -199,22 +198,6 @@ export default {
         //     })
         // },
         checkPlate(e) {
-            if (!this.formModel.plate_number) {
-                return
-            }
-
-            let params = { plate_number: this.formModel.plate_number }
-            axios.get('/parkingMember/search', { params: params }).then(r => {
-                this.formModel.fare = 0;
-                this.formModel.is_member = 1;
-                this.formModel.parking_member_id = r.data.id;
-                this.$forceUpdate();
-            }).catch(e => {
-                this.formModel.is_member = 0;
-                this.formModel.parking_member_id = null;
-                this.$forceUpdate();
-            })
-
             document.getElementById('ticket-number').focus()
         },
         setFare() {

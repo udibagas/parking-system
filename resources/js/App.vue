@@ -8,8 +8,8 @@
                     <img src="/images/logo.jpeg" style="height:60px;margin:25px 0" alt="">
 
                     <div>
-                        <el-avatar :size="50" icon="el-icon-user"></el-avatar>
-                        <br>
+                        <!-- <el-avatar :size="100" icon="el-icon-user"></el-avatar>
+                        <br> -->
                         <strong>{{$store.state.user.name}}</strong><br>
                         <small>{{$store.state.user.email}}</small>
                     </div>
@@ -72,6 +72,8 @@ export default {
 
             if (this.$store.state.user.role == 1) {
                 menus.push(
+                    {label: 'User', icon: 'el-icon-user', path: 'user' },
+                    {label: 'Notifikasi', icon: 'el-icon-bell', path: 'notification' },
                     {label: 'Setting', icon: 'el-icon-setting', path: 'setting' },
                 )
             }
@@ -157,7 +159,7 @@ export default {
 }
 
 .brand-box {
-    height: 220px;
+    height: 160px;
     background-color: #060446;
     text-align: center;
     color: #fff;

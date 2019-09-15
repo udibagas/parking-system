@@ -26,12 +26,15 @@ class ParkingMemberRequest extends FormRequest
         return [
             'name' => 'required',
             'card_number' => 'required',
-            'plate_number' => 'required',
-            'vehicle_type' => 'required|in:MOBIL,MOTOR',
             'is_active' => 'boolean',
             'expiry_date' => 'required|date',
             'phone' => 'required',
-            'email' => 'required|email'
+            'email' => 'required|email',
+            'group_member_id' => 'required',
+            'paid' => 'boolean',
+            'register_date' => 'required|date',
+            'billing_cycle' => 'numeric',
+            'fare' => 'numeric'
         ];
     }
 
@@ -40,12 +43,15 @@ class ParkingMemberRequest extends FormRequest
         return [
             'name' => 'Nama',
             'card_number' => 'Nomor Kartu',
-            'plate_number' => 'Nomor Plat',
-            'vehicle_type' => 'Jenis Kendaraan',
             'is_active' => 'Aktif',
             'expiry_date' => 'Tanggal Kedaluarsa',
             'phone' => 'Nomor HP',
-            'email' => 'ALamat Email'
+            'email' => 'ALamat Email',
+            'group_member_id' => 'Group',
+            'paid' => 'Berbayar',
+            'register_date' => 'Tanggal Daftar',
+            'billing_cycle' => 'Siklus Pembayaran',
+            'fare' => 'Tarif'
         ];
     }
 }

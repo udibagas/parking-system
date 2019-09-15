@@ -40,35 +40,35 @@
                     </table>
                 </template>
             </el-table-column>
-            <el-table-column fixed="left" prop="name" label="Nama" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
-            <el-table-column fixed="left" prop="type" label="Jenis" sortable="custom" min-width="80px" show-overflow-tooltip></el-table-column>
-            <el-table-column fixed="left" prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" min-width="160px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="controller_ip_address" label="Controller Address" sortable="custom" min-width="180px" show-overflow-tooltip>
+            <el-table-column fixed="left" prop="name" label="Nama" min-width="100px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="type" label="Jenis" min-width="80px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" min-width="160px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="controller_ip_address" label="Controller Address" min-width="180px" show-overflow-tooltip>
                 <template slot-scope="scope">
                     {{scope.row.controller_ip_address}}:{{scope.row.controller_port}}
                 </template>
             </el-table-column>
-            <el-table-column prop="controller_device" label="Controller Device" sortable="custom" min-width="180px" show-overflow-tooltip>
+            <el-table-column prop="controller_device" label="Controller Device" min-width="180px" show-overflow-tooltip>
                 <template slot-scope="scope">
                     {{scope.row.controller_device}}:{{scope.row.controller_baudrate}}
                 </template>
             </el-table-column>
-            <el-table-column prop="printer_type" label="Jenis Printer" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="printer_device" label="Device Printer" sortable="custom" min-width="150px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="printer_ip_address" label="Alamat IP Printer" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_ip_address" label="Alamat IP Kamera" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_username" label="Username Kamera" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_password" label="Password Kamera" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_auth_type" label="Otentifikasi Kamera" sortable="custom" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_image_snapshot_url" label="URL Snapshot Kamera" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_status" label="Status Kamera" sortable="custom" min-width="150px">
+            <el-table-column prop="printer_type" label="Jenis Printer" min-width="150px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="printer_device" label="Device Printer" min-width="150px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="printer_ip_address" label="Alamat IP Printer" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_ip_address" label="Alamat IP Kamera" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_username" label="Username Kamera" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_password" label="Password Kamera" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_auth_type" label="Otentifikasi Kamera" min-width="180px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_image_snapshot_url" label="URL Snapshot Kamera" min-width="250px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="camera_status" label="Status Kamera" min-width="150px">
                 <template slot-scope="scope">
                     <el-tag size="mini" :type="scope.row.camera_status ? 'success' : 'info'">{{scope.row.camera_status ? 'Active' : 'Inactive'}}</el-tag>
                 </template>
             </el-table-column>
-            <!-- <el-table-column prop="camera_video_snapshot_url" label="Camera Video Snapshot URL" sortable="custom" min-width="250px" show-overflow-tooltip></el-table-column> -->
+            <!-- <el-table-column prop="camera_video_snapshot_url" label="Camera Video Snapshot URL" min-width="250px" show-overflow-tooltip></el-table-column> -->
 
-            <el-table-column fixed="right" prop="status" label="Status" sortable="custom" min-width="100px">
+            <el-table-column fixed="right" prop="status" label="Status" min-width="100px">
                 <template slot-scope="scope">
                     <el-tag size="mini" :type="scope.row.active ? 'success' : 'info'">{{scope.row.active ? 'Active' : 'Inactive'}}</el-tag>
                 </template>

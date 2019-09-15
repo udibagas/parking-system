@@ -17,7 +17,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::post('logout', 'AuthController@logout');
     Route::resource('user', 'UserController')->except(['create', 'edit']);
     Route::get('locationIdentity/search', 'LocationIdentityController@search');
-    Route::resource('locationIdentity', 'LocationIdentityController')->except(['create', 'edit']);
+    Route::resource('locationIdentity', 'LocationIdentityController')->except(['create', 'edit', 'show']);
     Route::post('parkingGate/openGate/{parkingGate}', 'ParkingGateController@openGate');
     Route::post('parkingGate/testPrinter/{parkingGate}', 'ParkingGateController@testPrinter');
     Route::post('parkingGate/testCamera/{parkingGate}', 'ParkingGateController@testCamera');
@@ -27,6 +27,8 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::resource('vehicleType', 'VehicleTypeController')->except(['create', 'edit']);
     Route::get('parkingMember/search', 'ParkingMemberController@search');
     Route::resource('parkingMember', 'ParkingMemberController')->except(['create', 'edit']);
+    Route::get('groupMember/getList', 'GroupMemberController@getList');
+    Route::resource('groupMember', 'GroupMemberController')->except(['create', 'edit', 'show']);
     Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');
     Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
     Route::put('parkingTransaction/setSudahKeluar/{parkingTransaction}', 'ParkingTransactionController@setSudahKeluar');
@@ -34,6 +36,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
     Route::delete('notification/clearNotification', 'NotificationController@clearNotification');
     Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
+    Route::delete('memberVehicle/{memberVehicle}', 'MemberVehicleController@destroy');
     // Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
 
     // Report

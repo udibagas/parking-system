@@ -13,11 +13,16 @@ export default new Vuex.Store({
         token: window.localStorage.getItem('token'),
         is_logged_in: !!currentUser,
         vehicleTypeList: [],
-        parkingGateList: []
+        parkingGateList: [],
+        groupMemberList: [],
     },
     mutations: {
         getVehicleTypeList(state) {
             axios.get('/vehicleType/getList').then(r => state.vehicleTypeList = r.data)
+                .catch(e => console.log(e))
+        },
+        getGroupMemberList(state) {
+            axios.get('/groupMember/getList').then(r => state.groupMemberList = r.data)
                 .catch(e => console.log(e))
         },
         getParkingGateList(state) {

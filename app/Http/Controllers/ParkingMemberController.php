@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ParkingMember;
 use App\Http\Requests\ParkingMemberRequest;
+use Illuminate\Support\Facades\DB;
 
 class ParkingMemberController extends Controller
 {
@@ -23,14 +24,21 @@ class ParkingMemberController extends Controller
         $sort = $request->sort ? $request->sort : 'name';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
-        return ParkingMember::when($request->keyword, function ($q) use ($request) {
-                return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('card_number', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('plate_number', 'LIKE', '%' . $request->keyword . '%');
+        return ParkingMember::selectRaw('
+                parking_members.*,
+                group_members.name AS `group`,
+                CASE WHEN expiry_date < DATE(NOW()) THEN 1 ELSE 0 END AS `expired`
+            ')
+            ->join('group_members', 'group_members.id', '=', 'parking_members.group_member_id', 'LEFT')
+            ->when($request->keyword, function ($q) use ($request) {
+                return $q->where('parking_members.name', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('parking_members.card_number', 'LIKE', '%' . $request->keyword . '%');
             })->when($request->is_active, function ($q) use ($request) {
-                return $q->whereIn('is_active', $request->is_active);
-            })->when($request->vehicle_type, function ($q) use ($request) {
-                return $q->whereIn('vehicle_type', $request->vehicle_type);
+                return $q->whereIn('parking_members.is_active', $request->is_active);
+            })->when($request->expired == ['y'], function ($q) {
+                return $q->whereRaw('parking_members.expiry_date < DATE(NOW())');
+            })->when($request->expired == ['n'], function ($q) {
+                return $q->whereRaw('parking_members.expiry_date >= DATE(NOW())');
             })->orderBy($sort, $order)->paginate($request->pageSize);
     }
 
@@ -42,7 +50,24 @@ class ParkingMemberController extends Controller
      */
     public function store(ParkingMemberRequest $request)
     {
-        return ParkingMember::create($request->all());
+        try {
+            DB::transaction(function () use ($request) {
+                $id = DB::table('parking_members')->insertGetId($request->only([
+                    'group_member_id', 'name', 'card_number',
+                    'is_active', 'expiry_date', 'email', 'phone',
+                    'paid', 'register_date', 'billing_cycle', 'fare'
+                ]));
+
+                DB::table('member_vehicles')->insert(array_map(function($vehicle) use ($id) {
+                    $vehicle['parking_member_id'] = $id;
+                    return $vehicle;
+                }, $request->vehicles));
+            });
+        } catch (\Exception $e) {
+            return response(['message' => 'Data gagal disimpan. ' . $e->getMessage()], 500);
+        }
+
+        return ['message' => 'Data berhasil disimpan'];
     }
 
     /**
@@ -58,17 +83,14 @@ class ParkingMemberController extends Controller
 
     public function search(Request $request)
     {
-        // harus salah 1, kalo gak plat ya kartu
-        if (!$request->plate_number && !$request->card_number) {
+        if (!$request->card_number) {
             return response(['message' => 'No member found'], 404);
         }
 
-        $member = ParkingMember::when($request->plate_number, function($q) use ($request) {
-                return $q->where('plate_number', $request->plate_number);
-            })->when($request->card_number, function($q) use ($request) {
-                return $q->where('card_number', 'LIKE', '%'.$request->card_number.'%');
-            })->where('expiry_date', '>=', date('Y-m-d'))
-            ->where('is_active', 1)->first();
+        $member = ParkingMember::where('is_active', 1)
+            ->where('expiry_date', '>=', date('Y-m-d'))
+            ->where('card_number', 'LIKE', '%'.$request->card_number)
+            ->first();
 
         if (!$member) {
             return response(['message' => 'No member found'], 404);
@@ -86,8 +108,30 @@ class ParkingMemberController extends Controller
      */
     public function update(ParkingMemberRequest $request, ParkingMember $parkingMember)
     {
-        $parkingMember->update($request->all());
-        return $parkingMember;
+        try {
+            DB::transaction(function () use ($request, $parkingMember) {
+                DB::table('parking_members')
+                    ->where('id', $parkingMember->id)
+                    ->update($request->only([
+                        'group_member_id', 'name', 'card_number',
+                        'is_active', 'expiry_date', 'email', 'phone',
+                        'paid', 'register_date', 'billing_cycle', 'fare'
+                    ]));
+
+                DB::table('member_vehicles')
+                    ->where('parking_member_id', $parkingMember->id)
+                    ->delete();
+
+                DB::table('member_vehicles')->insert(array_map(function($vehicle) use ($parkingMember) {
+                    $vehicle['parking_member_id'] = $parkingMember->id;
+                    return $vehicle;
+                }, $request->vehicles));
+            });
+        } catch (\Exception $e) {
+            return response(['message' => 'Data gagal disimpan. ' . $e->getMessage()], 500);
+        }
+
+        return ['message' => 'Data berhasil disimpan'];
     }
 
     /**

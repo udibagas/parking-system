@@ -1,5 +1,7 @@
 <template>
     <div>
+        <el-page-header @back="$emit('back')" content="USER"> </el-page-header>
+        <el-divider></el-divider>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
                 <el-button @click="clearNotification" type="danger" plain icon="el-icon-delete">HAPUS NOTIFIKASI</el-button>
@@ -25,7 +27,7 @@
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 345px)"
+        height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="created_at" label="Time" sortable="custom" width="150px">

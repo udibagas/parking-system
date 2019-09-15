@@ -50,7 +50,7 @@
                 </template>
             </el-table-column>
             <el-table-column prop="operator" label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="updated_at" label="Waktu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <!-- <el-table-column prop="updated_at" label="Waktu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
 
             <el-table-column fixed="right" width="40px">
                 <template slot-scope="scope">

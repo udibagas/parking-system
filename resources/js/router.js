@@ -8,7 +8,8 @@ import Report from './pages/Report'
 import Snapshot from './pages/Snapshot'
 // import ServerInformation from './pages/ServerInformation'
 import Setting from './pages/Setting'
-import Member from './pages/Member'
+import ParkingMember from './pages/ParkingMember'
+import Notification from './pages/Notification'
 
 Vue.use(VueRouter)
 
@@ -21,7 +22,8 @@ const router = new VueRouter({
         { path: '/snapshot', component: Snapshot, name: 'snapshot' },
         // { path: '/server-information', component: ServerInformation, name: 'server-information' },
         { path: '/setting', component: Setting, name: 'setting' },
-        { path: '/member', component: Member, name: 'member' },
+        { path: '/member', component: ParkingMember, name: 'member' },
+        { path: '/notification', component: Notification, name: 'notification' },
         { path: '*', component: Home },
     ]
 })

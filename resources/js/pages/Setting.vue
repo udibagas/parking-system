@@ -13,14 +13,8 @@
             <el-tab-pane label="Jenis Kendaraan">
                 <VehicleType />
             </el-tab-pane>
-            <el-tab-pane label="Member">
-                <ParkingMember />
-            </el-tab-pane>
-            <el-tab-pane label="User">
-                <User />
-            </el-tab-pane>
-            <el-tab-pane label="Notifikasi">
-                <Notification />
+            <el-tab-pane label="Group Member">
+                <GroupMember />
             </el-tab-pane>
         </el-tabs>
     </div>
@@ -28,17 +22,11 @@
 
 <script>
 import ParkingGate from './ParkingGate'
-import User from './User'
 import LocationIdentity from './LocationIdentity'
 import VehicleType from './VehicleType'
-import ParkingMember from './ParkingMember'
-import Notification from './Notification'
+import GroupMember from './GroupMember'
 
 export default {
-    components: { ParkingGate, User, LocationIdentity, VehicleType, ParkingMember, Notification }
+    components: { ParkingGate, LocationIdentity, VehicleType, GroupMember }
 }
 </script>
-
-<style lang="scss" scoped>
-
-</style>

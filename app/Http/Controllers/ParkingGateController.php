@@ -122,6 +122,10 @@ class ParkingGateController extends Controller
 
     public function testPrinter(ParkingGate $parkingGate)
     {
+        if ($parkingGate->type == 'IN' && $parkingGate->printer_type == 'local') {
+            return response(['message' => 'PRINTER GATE IN SERIAL TIDAK BISA DITEST DARI WEB'], 500);
+        }
+
         try {
             if ($parkingGate->printer_type == "network") {
                 $connector = new NetworkPrintConnector($parkingGate->printer_ip_address, 9100);
