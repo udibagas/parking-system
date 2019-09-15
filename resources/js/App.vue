@@ -5,10 +5,11 @@
             <Profile v-if="$store.state.is_logged_in" :show="showProfile" @close="showProfile = false" />
             <el-aside width="auto">
                 <div v-show="!collapse" class="brand-box">
-                    <img src="/images/logo.jpeg" style="height:60px;margin:25px 0" alt="">
+                    <img src="/images/logo.jpeg" style="height:60px;width:60px;margin:25px 0 10px 0;border-radius:5px;" alt="">
 
                     <div>
-                        <!-- <el-avatar :size="100" icon="el-icon-user"></el-avatar>
+                        <!-- <el-avatar shape="square" :size="70" icon="el-icon-user" src="/images/logo.jpeg" fit="contain"></el-avatar>
+                        <br>
                         <br> -->
                         <strong>{{$store.state.user.name}}</strong><br>
                         <small>{{$store.state.user.email}}</small>
@@ -147,7 +148,7 @@ export default {
         }
     },
     mounted() {
-        // setInterval(this.getNotification, 5000)
+        setInterval(this.getNotification, 5000)
     }
 }
 </script>
@@ -159,12 +160,11 @@ export default {
 }
 
 .brand-box {
-    height: 160px;
+    height: 150px;
     background-color: #060446;
     text-align: center;
     color: #fff;
 }
-
 
 .btn-big {
     font-size: 22px;

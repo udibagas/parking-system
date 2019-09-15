@@ -15,6 +15,10 @@ class ParkingTransaction extends Model
 
     protected $appends = ['durasi'];
 
+    public function member() {
+        return $this->belongsTo(ParkingMember::class, 'parking_member_id');
+    }
+
     public function getDurasiAttribute()
     {
         $in = new \DateTime($this->time_in);

@@ -161,8 +161,6 @@ class ParkingGateController extends Controller
 
     public function openGate(ParkingGate $parkingGate)
     {
-        // ip_address == device
-        // port = baudrate
         // kalau controller_ip_address kosong berarti interface langsung nancep
         if (!$parkingGate->controller_ip_address)
         {

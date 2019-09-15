@@ -19,14 +19,24 @@
             </table>
         </el-col>
         <el-col :span="16">
-            <el-table :data="member.vehicles">
-                <el-table-column prop="vehicle_type" label="Jenis Kendaraan"></el-table-column>
-                <el-table-column prop="plate_number" label="Plat Nomor"></el-table-column>
-                <el-table-column prop="merk" label="Merk"></el-table-column>
-                <el-table-column prop="type" label="Type" show-overflow-tooltip></el-table-column>
-                <el-table-column prop="tahun" label="Tahun"></el-table-column>
-                <el-table-column prop="warna" label="Warna"></el-table-column>
-            </el-table>
+            <el-tabs type="card">
+                <el-tab-pane label="Kendaraan">
+                    <el-table :data="member.vehicles">
+                        <el-table-column prop="vehicle_type" label="Jenis Kendaraan"></el-table-column>
+                        <el-table-column prop="plate_number" label="Plat Nomor"></el-table-column>
+                        <el-table-column prop="merk" label="Merk"></el-table-column>
+                        <el-table-column prop="type" label="Type" show-overflow-tooltip></el-table-column>
+                        <el-table-column prop="tahun" label="Tahun"></el-table-column>
+                        <el-table-column prop="warna" label="Warna"></el-table-column>
+                    </el-table>
+                </el-tab-pane>
+                <el-tab-pane label="Histori Transaksi">
+
+                </el-tab-pane>
+                <el-tab-pane label="Histori Pembayaran">
+
+                </el-tab-pane>
+            </el-tabs>
         </el-col>
     </el-row>
 </template>

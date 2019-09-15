@@ -152,15 +152,15 @@
 
                         <el-form-item label="Controller Device">
                             <el-input placeholder="Device" v-model="formModel.controller_device" style="width:60%"></el-input>
-                            <el-input type="number" placeholder="Port" v-model="formModel.controller_baudrate" style="width:38%;float:right;clear:right;"></el-input>
+                            <el-input type="number" placeholder="Baudrate" v-model="formModel.controller_baudrate" style="width:38%;float:right;clear:right;"></el-input>
                         </el-form-item>
 
                         <el-form-item label="Jenis Printer" :class="formErrors.printer_type || formErrors.printer_device || formErrors.printer_ip_address ? 'is-error' : ''">
-                            <el-select v-model="formModel.printer_type" placeholder="Jenis Printer" style="width:30%">
+                            <el-select v-model="formModel.printer_type" placeholder="Jenis Printer" style="width:40%">
                                 <el-option v-for="(t, i) in ['local', 'network']" :value="t" :label="t" :key="i"></el-option>
                             </el-select>
-                            <el-input v-show="formModel.printer_type == 'local'" placeholder="Device Printer" v-model="formModel.printer_device" style="width:68%;float:right;clear:right;"></el-input>
-                            <el-input v-show="formModel.printer_type == 'network'" placeholder="Alamat IP Printer" v-model="formModel.printer_ip_address" style="width:68%;float:right;clear:right;"></el-input>
+                            <el-input v-show="formModel.printer_type == 'local'" placeholder="Device Printer" v-model="formModel.printer_device" style="width:58%;float:right;clear:right;"></el-input>
+                            <el-input v-show="formModel.printer_type == 'network'" placeholder="Alamat IP Printer" v-model="formModel.printer_ip_address" style="width:58%;float:right;clear:right;"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.printer_type">{{formErrors.printer_type[0]}}</div>
                             <div class="el-form-item__error" v-if="formErrors.printer_device">{{formErrors.printer_device[0]}}</div>
                             <div class="el-form-item__error" v-if="formErrors.printer_ip_address">{{formErrors.printer_ip_address[0]}}</div>

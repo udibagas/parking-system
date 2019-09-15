@@ -186,10 +186,9 @@ class ParkingTransactionController extends Controller
      */
     public function search(Request $request)
     {
-        $data = ParkingTransaction::when($request->barcode_number, function($q) use ($request) {
-                return $q->where('barcode_number', $request->barcode_number);
-            })->when($request->card_number, function($q) use ($request) {
-                return $q->where('card_number', $request->card_number);
+        $data = ParkingTransaction::with(['member'])->when($request->barcode_number, function($q) use ($request) {
+                return $q->where('barcode_number', $request->barcode_number)
+                        ->orWhere('card_number', $request->barcode_number);
             })->where('time_out', null)->first();
 
         if ($data) {
@@ -197,27 +196,25 @@ class ParkingTransactionController extends Controller
         }
 
         // member, tapi gak tap in
-        if ($request->card_number)
+        $member = ParkingMember::where('card_number', $request->barcode_number)->first();
+
+        if ($member)
         {
-            $member = ParkingMember::where('card_number', $request->card_number)->first();
+            $data = [
+                'barcode_number' => 'NOTAP',
+                'vehicle_type' => $member->vehicles[0]->vehicle_type,
+                'is_member' => 1,
+                'parking_member_id' => $member->id,
+                'time_in' => date('Y-m-d H:i:s'),
+                'gate_in_id' => ParkingGate::where('type', 'IN')->where('active', 1)->first()->id,
+                'card_number' => $member->card_number
+            ];
 
-            if ($member)
-            {
-                $data = [
-                    'barcode_number' => 'NOTAP',
-                    'vehicle_type' => $member->vehicle_type,
-                    'is_member' => 1,
-                    'parking_member_id' => $member->id,
-                    'time_in' => date('Y-m-d H:i:s'),
-                    'gate_in_id' => $request->gate_in_id,
-                    'card_number' => $member->card_number
-                ];
-
-                return ParkingTransaction::create($data);
-            }
+            $trx = ParkingTransaction::create($data);
+            return ParkingTransaction::with(['member'])->find($trx->id);
         }
 
-        return response(['message' => 'Data tidak ditemukan'], 404);
+        return response(['message' => 'NOMOR TIKET/KARTU INVALID'], 404);
     }
 
     /**
@@ -235,6 +232,10 @@ class ParkingTransactionController extends Controller
             $input['user_id'] = auth()->user()->id;
             $input['operator'] = auth()->user()->name;
         }
+
+        // value ini ga perlu diupdate
+        unset($input['card_number']);
+        unset($input['barcode_number']);
 
         $parkingTransaction->update($input);
         return $parkingTransaction;

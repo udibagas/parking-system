@@ -80,6 +80,8 @@
                         </span>
                         <el-dropdown-menu slot="dropdown">
                             <el-dropdown-item @click.native.prevent="() => { selectedData = scope.row; showDetail = true; }"><i class="el-icon-zoom-in"></i> Lihat Detail</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-money"></i> Bayar Tagihan</el-dropdown-item>
+                            <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-printer"></i> Cetak Bukti Bayar Terakhir</el-dropdown-item>
                             <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-edit-outline"></i> Edit</el-dropdown-item>
                             <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Hapus</el-dropdown-item>
                         </el-dropdown-menu>
@@ -99,11 +101,11 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog v-if="!!selectedData" center top="60px" title="INFORMASI MEMBER" :visible.sync="showDetail" width="95%">
+        <el-dialog v-if="!!selectedData" center fullscreen title="INFORMASI MEMBER" :visible.sync="showDetail">
             <ParkingMemberDetail :member="selectedData" />
         </el-dialog>
 
-        <el-dialog fullscreen :visible.sync="showForm" :title="!!formModel.id ? 'EDIT MEMBER' : 'TAMBAH MEMBER'" width="95%" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog fullscreen center :visible.sync="showForm" :title="!!formModel.id ? 'EDIT MEMBER' : 'TAMBAH MEMBER'" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"

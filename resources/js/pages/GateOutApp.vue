@@ -2,7 +2,7 @@
     <div id="gate-out-app">
         <el-row :gutter="20">
             <el-col :span="14">
-                <el-card style="height:calc(100vh - 105px)">
+                <el-card style="height:calc(100vh - 105px)" v-loading="loading">
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE IN</div>
@@ -30,7 +30,7 @@
                             <div class="label-big">[-] NO. PLAT</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
+                            <input id="plate-number" autocomplete="off" onkeyup="javascript: if (event.keyCode == 13) document.getElementById('ticket-number').focus()" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -39,7 +39,7 @@
                             <div class="label-big">[+] NO. TIKET/KARTU</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" maxlength="5" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -48,7 +48,7 @@
                             <div class="label-big">[*] JENIS KENDARAAN</div>
                         </el-col>
                         <el-col :span="14">
-                            <select @keyup.enter="submit" placeholder="JENIS KENDARAAN" @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
+                            <select @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
                                 <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
                             </select>
                             <!-- <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
@@ -81,7 +81,7 @@
                         </el-col>
                     </el-row>
 
-                    <button class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
+                    <button id="submit-btn" @keydown.enter="submit" class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
                 </el-card>
             </el-col>
             <el-col :span="10">
@@ -120,7 +120,8 @@ export default {
             snapshot_out: null,
             location: null,
             parkingGateList: [],
-            vehicleTypeList: []
+            vehicleTypeList: [],
+            loading: false
         }
     },
     methods: {
@@ -129,7 +130,7 @@ export default {
             var date2 = moment(this.formModel.time_out);
             var duration = moment.duration(date2.diff(date1));
             this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss')
-            console.log(this.formModel.duration)
+            // console.log(this.formModel.duration)
             this.$forceUpdate()
         },
         checkTicket() {
@@ -140,65 +141,47 @@ export default {
                 document.getElementById('vehicle-type').focus()
             } else {
                 let params = { barcode_number: this.formModel.barcode_number }
+                this.loading = true
                 axios.get('/parkingTransaction/search', { params: params }).then(r => {
+                    if (r.data.is_member) {
+                        let vehicle = r.data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
+
+                        if (!vehicle) {
+                            this.$alert('Nomor plat tidak cocok dengan kartu. Nomor plat yang terdaftar adalah '
+                            + r.data.member.vehicles.map(v => v.plate_number).join(', '), 'Notifikasi', {
+                                type: 'warning',
+                                center: true,
+                                roundButton: true,
+                                confirmButtonText: 'SAYA TELAH MEMBACA NOTIFIKASI INI',
+                                confirmButtonClass: 'bg-red'
+                            })
+                        }
+
+                        this.formModel.fare = 0
+                    }
+
                     this.snapshot_in = r.data.snapshot_in
                     this.formModel.id = r.data.id
                     this.formModel.time_out = now
                     this.formModel.gate_in_id = r.data.gate_in_id
                     this.formModel.time_in = r.data.time_in
+                    this.formModel.is_member = r.data.is_member
                     this.setDuration()
                     this.$forceUpdate()
-                    this.takeSnapshot(r.data.id)
                     document.getElementById('vehicle-type').focus()
+                }).then(() => {
+                    this.takeSnapshot(this.formModel.id)
                 }).catch(e => {
+                    console.log(e)
                     this.$message({
-                        message: 'NOMOR TIKET INVALID!',
+                        message: e.response.data.message,
                         type: 'error',
                         showClose: true,
                     })
+                }).finally(() => {
+                    this.loading = false
                 })
             }
-        },
-        // checkCard() {
-        //     if (!this.formModel.gate_out_id) {
-        //         this.$message({
-        //             message: 'MOHON PILIH GATE OUT',
-        //             type: 'error',
-        //             showClose: true,
-        //         })
-        //         return
-        //     }
-
-        //     let now = moment().format('YYYY-MM-DD HH:mm:ss')
-        //     let params = { card_number: this.formModel.card_number, gate_in_id: this.formModel.gate_out_id }
-        //     axios.get('/parkingTransaction/search', { params: params }).then(r => {
-        //         this.formModel.id = r.data.id
-        //         this.formModel.gate_in_id = r.data.gate_in_id
-        //         this.formModel.barcode_number = r.data.barcode_number
-        //         this.formModel.vehicle_type = r.data.vehicle_type
-        //         this.formModel.time_in = r.data.time_in
-        //         this.formModel.time_out = now
-        //         this.formModel.fare = 0
-        //         this.snapshot_in = r.data.snapshot_in
-        //         this.setDuration()
-        //         this.$forceUpdate()
-        //         this.takeSnapshot(r.data.id)
-        //         // langsung update & buka gate. gak perlu print tiket
-        //         setTimeout(() => {
-        //             this.update()
-        //             this.openGate()
-        //         }, 1000)
-        //         document.getElementById('vehicle-type').focus()
-        //     }).catch(e => {
-        //         this.$message({
-        //             message: e.response.data.message,
-        //             type: 'error',
-        //             showClose: true,
-        //         })
-        //     })
-        // },
-        checkPlate(e) {
-            document.getElementById('ticket-number').focus()
         },
         setFare() {
             let vehicle = this.vehicleTypeList.find(vt => vt.name == this.formModel.vehicle_type)
@@ -211,13 +194,17 @@ export default {
                     if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
                         this.formModel.fare += vehicle.denda_tiket_hilang
                     }
-                }
-
-                if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
-                    document.getElementById('time-in').focus()
+                } else {
+                    this.formModel.fare = 0
                 }
 
                 this.$forceUpdate()
+
+                if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
+                    document.getElementById('time-in').focus()
+                } else {
+                    document.getElementById('submit-btn').focus()
+                }
             }
         },
         resetForm() {
@@ -225,7 +212,6 @@ export default {
             this.formModel.gate_in_id = null
             this.formModel.plate_number = this.location.default_plate_number
             this.formModel.barcode_number = ''
-            this.formModel.card_number = ''
             this.formModel.time_out = ''
             this.formModel.time_in = ''
             this.formModel.duration = ''
@@ -247,6 +233,8 @@ export default {
             if (this.formModel.barcode_number.toLowerCase() == 'xxxxx' && !this.formModel.time_in) {
                 document.getElementById('time-in').focus()
                 return
+            } else {
+                document.getElementById('submit-btn').blur()
             }
 
             if (!this.formModel.gate_in_id) {
@@ -274,6 +262,7 @@ export default {
             }
         },
         store() {
+            this.loading = true
             axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id)
                 this.printTicket(r.data.id)
@@ -283,21 +272,27 @@ export default {
                     type: 'error',
                     showClose: true
                 })
+            }).finally(() => {
+                this.loading = false
             })
         },
         update() {
+            this.loading = true
             axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
                 // print tiket hanya untuk non member
                 if (r.data.is_member == 0) {
                     this.printTicket(r.data.id)
+                } else {
+                    this.openGate()
                 }
-                this.$forceUpdate()
             }).catch(e => {
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
                     type: 'error',
-                    showClose: truetrx
+                    showClose: true
                 })
+            }).finally(() => {
+                this.loading = false
             })
         },
         takeSnapshot(id) {
@@ -329,6 +324,7 @@ export default {
             })
         },
         openGate() {
+            this.loading = true
             axios.post('/parkingGate/openGate/' + this.formModel.gate_out_id).then(r => {
                 this.$message({
                     message: r.data.message,
@@ -342,6 +338,7 @@ export default {
                     showClose: true
                 })
             }).finally(() => {
+                this.loading = false
                 this.resetForm()
             })
         },
@@ -427,17 +424,11 @@ export default {
         document.getElementById('plate-number').focus()
 
         document.getElementById('gate-out-app').onkeypress = (e) => {
-            // console.log(e.key)
-            // if (e.key == 'Enter') {
-            //     this.submit()
-            // }
-
             // ke field nomor plat
             if (e.key == '-') {
                 e.preventDefault()
                 this.resetForm()
                 this.$forceUpdate()
-                document.getElementById('plate-number').focus()
             }
 
             // ke field nomor tiket
@@ -536,6 +527,10 @@ export default {
     color: #fff;
     border-radius: 4px;
     margin-top: 10px;
+}
+
+.my-big-btn:focus {
+    border: 3px dotted red;
 }
 
 .label {
