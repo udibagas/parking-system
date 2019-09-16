@@ -89,7 +89,7 @@ def print_ticket_network(gate, data):
         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
         return
 
-    logging.info(gate['name'] + ' : Ticket printed ' + data['barcode_number'])
+    logger.info(gate['name'] + ' : Ticket printed ' + data['barcode_number'])
 
 def print_ticket_serial(gate, data, s):
     command = [
@@ -114,20 +114,20 @@ def print_ticket_serial(gate, data, s):
 
     try:
         s.sendall(str.encode(''.join(command)))
-        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+        logger.debug(gate['name'] + ' : ' + str(s.recv(1024)))
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to print ticket ' + data['barcode_number'] + ' ' + str(e))
         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
         return
 
-    logging.info(gate['name'] + ' : Ticket printed ' + data['barcode_number'])
+    logger.info(gate['name'] + ' : Ticket printed ' + data['barcode_number'])
 
 def send_notification(gate, message):
     notification = { 'parking_gate_id': gate['id'], 'message': message }
     try:
         requests.post(API_URL + '/notification', data=notification, timeout=3)
     except Exception as e:
-        logging.info(gate['name'] + ' : Failed to send notification ' + str(e))
+        logger.info(gate['name'] + ' : Failed to send notification ' + str(e))
         return False
 
     try:
@@ -143,7 +143,7 @@ def check_card(gate, card_number):
     try:
         r = requests.get(API_URL + '/parkingMember/search', params=payload, timeout=3)
     except Exception as e:
-        logging.info(gate['name'] + ' : Failed to check card ' + str(e))
+        logger.info(gate['name'] + ' : Failed to check card ' + str(e))
         return False
 
     if r.status_code == 200:
@@ -155,7 +155,7 @@ def save_data(gate, data):
     try:
         r = requests.post(API_URL + '/parkingTransaction', data=data, timeout=3)
     except Exception as e:
-        logging.info(gate['name'] + ' : Failed to save data ' + str(e))
+        logger.info(gate['name'] + ' : Failed to save data ' + str(e))
         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda (gagal menyimpan data)')
         return False
 
@@ -166,7 +166,7 @@ def gate_in_thread(gate):
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
             s.settimeout(3)
 
-            logging.info(gate['name'] + ' : Connecting to ' + gate['controller_ip_address'] + ':' + str(gate['controller_port']))
+            logger.info(gate['name'] + ' : Connecting to ' + gate['controller_ip_address'] + ':' + str(gate['controller_port']))
 
             try:
                 s.connect((gate['controller_ip_address'], gate['controller_port']))
@@ -174,7 +174,7 @@ def gate_in_thread(gate):
                 time.sleep(3)
                 continue
 
-            logging.info(gate['name'] + ' : CONNECTED')
+            logger.info(gate['name'] + ' : CONNECTED')
             send_notification(gate, gate['name'] + ' Terhubung')
 
             while True:
@@ -187,15 +187,15 @@ def gate_in_thread(gate):
                     # keluar dari loop cek kendaraan untuk sambung ulang controller
                     break
 
-                logging.debug(gate['name'] + ' : ' + str(vehicle_detection))
+                logger.debug(gate['name'] + ' : ' + str(vehicle_detection))
 
                 if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
-                    logging.info(gate['name'] + ' : Vehicle detected')
+                    logger.info(gate['name'] + ' : Vehicle detected')
 
                     # play selamat datang
                     try:
                         s.sendall(b'\xa6MT00007\xa9')
-                        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+                        logger.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play Selamat Datang ' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play Selamat Datang ')
@@ -219,7 +219,7 @@ def gate_in_thread(gate):
                         error = True
                         break
 
-                    logging.debug(gate['name'] + ' : ' + str(push_button_or_card))
+                    logger.debug(gate['name'] + ' : ' + str(push_button_or_card))
 
                     if b'W' in push_button_or_card:
                         card_number = str(push_button_or_card).split('W')[1].split('\\xa9')[0]
@@ -238,16 +238,16 @@ def gate_in_thread(gate):
                             continue
 
                         data = {'is_member': 1, 'card_number': valid_card['card_number']}
-                        logging.info(gate['name'] + ' : Card detected :' + valid_card['card_number'])
+                        logger.info(gate['name'] + ' : Card detected :' + valid_card['card_number'])
                         break
 
                     elif b'IN2ON' in push_button_or_card or b'STAT11' in push_button_or_card:
-                        logging.info(gate['name'] + ' : Ticket button pressed')
+                        logger.info(gate['name'] + ' : Ticket button pressed')
                         data = {'is_member': 0}
                         break
 
                     elif b'IN3' in push_button_or_card:
-                        logging.info(gate['name'] + ' : Reset')
+                        logger.info(gate['name'] + ' : Reset')
                         reset = True
                         break
 
@@ -261,12 +261,12 @@ def gate_in_thread(gate):
                             error = True
                             break
 
-                        logging.info(gate['name'] + ' : Help button pressed')
+                        logger.info(gate['name'] + ' : Help button pressed')
                         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
                         break
 
                     elif b'IN1OFF' in push_button_or_card:
-                        logging.info(gate['name'] + ' : Vehicle turn back')
+                        logger.info(gate['name'] + ' : Vehicle turn back')
                         reset = True
                         break
 
@@ -302,7 +302,7 @@ def gate_in_thread(gate):
                     # play silakan ambil tiket
                     try:
                         s.sendall(b'\xa6MT00002\xa9')
-                        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+                        logger.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play silakan ambil tiket' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play silakan ambil tiket')
@@ -319,13 +319,13 @@ def gate_in_thread(gate):
                             error = True
                             break
 
-                        logging.info(gate['name'] + ' : Help button pressed')
+                        logger.info(gate['name'] + ' : Help button pressed')
                         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
 
                 # play terimakasih
                 try:
                     s.sendall(b'\xa6MT00006\xa9')
-                    logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+                    logger.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                 except Exception:
                     logging.error(gate['name'] + ' : Failed to play terimakasih' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal play terimakasih')
@@ -336,7 +336,7 @@ def gate_in_thread(gate):
                 # open gate
                 try:
                     s.sendall(b'\xa6OPEN1\xa9')
-                    logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+                    logger.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal membuka gate')
@@ -353,17 +353,17 @@ def gate_in_thread(gate):
                         error = True
                         break
 
-                    logging.info(gate['name'] + ' : Help button pressed')
+                    logger.info(gate['name'] + ' : Help button pressed')
                     send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
 
-                logging.info(gate['name'] + ' : Gate Opened')
+                logger.info(gate['name'] + ' : Gate Opened')
 
                 # wait until vehicle in
                 while True:
                     try:
                         s.sendall(b'\xa6STAT\xa9')
                         vehicle_in = s.recv(1024)
-                        logging.debug(gate['name'] + ' : ' + str(vehicle_in))
+                        logger.debug(gate['name'] + ' : ' + str(vehicle_in))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to sense loop 2 ' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal deteksi kendaraan sudah masuk')
@@ -372,7 +372,7 @@ def gate_in_thread(gate):
                         break
 
                     if b'IN3OFF' in vehicle_in:
-                        logging.info(gate['name'] + ' : Vehicle in')
+                        logger.info(gate['name'] + ' : Vehicle in')
                         break
 
                     time.sleep(1)
@@ -386,26 +386,33 @@ def start_app():
     LOCATION = get_location()
 
     if LOCATION == False:
-        logging.info('Location not set. Exit application.')
+        logger.info('Location not set. Exit application.')
         sys.exit()
 
-    logging.info('Location set: ' + LOCATION['name'])
+    logger.info('Location set: ' + LOCATION['name'])
 
     gates = get_gates()
 
     if gates == False:
-        logging.info('Gate not set. Exit application.')
+        logger.info('Gate not set. Exit application.')
         sys.exit()
 
-    logging.info('Gate set : ' + ', '.join(map(lambda x: x['name'], gates)))
-    logging.info('Starting application...')
+    logger.info('Gate set : ' + ', '.join(map(lambda x: x['name'], gates)))
+    logger.info('Starting application...')
 
     for g in gates:
         threading.Thread(target=gate_in_thread, args=(g,)).start()
 
 if __name__ == "__main__":
     # log_file = os.path.join(os.path.dirname(__file__), "parking.log")
-    log_file = '/var/log/parking.log'
-    logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-    logging.handlers.RotatingFileHandler(log_file, maxBytes=1024000, backupCount=10)
+    # log_file = '/var/log/parking.log'
+    # logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    log_file_path = '/var/log/parking.log'
+    logger = logging.getLogger(__name__)
+    logger.setLevel(logging.DEBUG)
+    handler = logging.handlers.RotatingFileHandler(log_file_path, maxBytes=1024000, backupCount=10)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
     start_app()
