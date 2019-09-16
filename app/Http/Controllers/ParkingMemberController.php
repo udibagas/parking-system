@@ -83,14 +83,19 @@ class ParkingMemberController extends Controller
 
     public function search(Request $request)
     {
-        if (!$request->card_number) {
-            return response(['message' => 'No member found'], 404);
+        if (!$request->card_number && !$request->plate_number) {
+            return response(['message' => 'Card/Plate number required'], 500);
         }
 
-        $member = ParkingMember::where('is_active', 1)
-            ->where('expiry_date', '>=', date('Y-m-d'))
-            ->where('card_number', 'LIKE', '%'.$request->card_number)
-            ->first();
+        $member = ParkingMember::selectRaw('parking_members.*')
+            ->join('member_vehicles', 'member_vehicles.parking_member_id', '=', 'parking_members.id')
+            ->where('parking_members.is_active', 1)
+            ->where('parking_members.expiry_date', '>=', date('Y-m-d'))
+            ->when($request->card_number, function($q) use ($request) {
+                return $q->where('parking_members.card_number', 'LIKE', '%'.$request->card_number);
+            })->when($request->plate_number, function($q) use ($request) {
+                return $q->where('member_vehicles.plate_number', 'LIKE', $request->plate_number);
+            })->first();
 
         if (!$member) {
             return response(['message' => 'No member found'], 404);
