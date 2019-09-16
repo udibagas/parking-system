@@ -200,6 +200,14 @@ class ParkingTransactionController extends Controller
 
         if ($member)
         {
+            if (!$member->is_active) {
+                return response(['message' => 'KARTU TIDAK AKTIF'], 500);
+            }
+
+            if (strtotime($member->expiry_date) < strtotime(date('Y-m-d'))) {
+                return response(['message' => 'KARTU SUDAH KEDALUARSA'], 500);
+            }
+
             $data = [
                 'barcode_number' => 'NOTAP',
                 'vehicle_type' => $member->vehicles[0]->vehicle_type,
