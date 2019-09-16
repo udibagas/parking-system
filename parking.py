@@ -104,7 +104,7 @@ def print_ticket_serial(gate, data, s):
         '\x1b\x61\x01', # align center
         '\x1dhd', # set barcode height = 100, GS h 100
         '\x1dH\x02', # set barcode text = below, GS H 2
-        '\x1dkE', # GS k 69 
+        '\x1dkE', # GS k 69
         chr(len(data['barcode_number'])), # barcode length
         data['barcode_number'], # barcode content
         '\n' + LOCATION['additional_info_ticket'] + '\n',
@@ -119,7 +119,7 @@ def print_ticket_serial(gate, data, s):
         logging.error(gate['name'] + ' : Failed to print ticket ' + data['barcode_number'] + ' ' + str(e))
         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
         return
-    
+
     logging.info(gate['name'] + ' : Ticket printed ' + data['barcode_number'])
 
 def send_notification(gate, message):
@@ -298,7 +298,7 @@ def gate_in_thread(gate):
                         print_ticket_network(gate, data)
                     elif gate['printer_type'] == 'local':
                         print_ticket_serial(gate, data, s)
-                    
+
                     # play silakan ambil tiket
                     try:
                         s.sendall(b'\xa6MT00002\xa9')
@@ -307,7 +307,7 @@ def gate_in_thread(gate):
                         logging.error(gate['name'] + ' : Failed to play silakan ambil tiket' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play silakan ambil tiket')
                         break
-                    
+
                     # bisa jadi di sini tekan tombol help karena tiket gak keluar
                     # TODO: need improvement
                     if b'IN4ON' in s.recv(1024):
@@ -341,7 +341,7 @@ def gate_in_thread(gate):
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal membuka gate')
                     break
-                
+
                 # bisa jadi di sini tekan tombol help karena gate tidak terbuka
                 # TODO: need improvement
                 if b'IN4ON' in s.recv(1024):
@@ -404,6 +404,8 @@ def start_app():
         threading.Thread(target=gate_in_thread, args=(g,)).start()
 
 if __name__ == "__main__":
-    log_file = os.path.join(os.path.dirname(__file__), "parking.log")
+    # log_file = os.path.join(os.path.dirname(__file__), "parking.log")
+    log_file = '/var/log/parking.log'
     logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+    logging.handlers.RotatingFileHandler(log_file, maxBytes=1024000, backupCount=10)
     start_app()
