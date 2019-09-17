@@ -2,7 +2,7 @@
     <div id="gate-out-app">
         <el-row :gutter="20">
             <el-col :span="14">
-                <el-card style="height:calc(100vh - 105px)" v-loading="loading">
+                <el-card style="height:calc(100vh - 105px)">
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE IN</div>
@@ -30,7 +30,7 @@
                             <div class="label-big">[-] NO. PLAT</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="plate-number" autocomplete="off" onkeyup="javascript: if (event.keyCode == 13) document.getElementById('ticket-number').focus()" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
+                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -121,7 +121,6 @@ export default {
             location: null,
             parkingGateList: [],
             vehicleTypeList: [],
-            loading: false
         }
     },
     methods: {
@@ -133,6 +132,18 @@ export default {
             // console.log(this.formModel.duration)
             this.$forceUpdate()
         },
+        checkPlate() {
+            let params = { plate_number: this.formModel.plate_number }
+            axios.get('/parkingMember/search', { params: params }).then(r => {
+                this.formModel.is_member = 1
+                this.formModel.fare = 0
+            }).catch(e => {
+                this.formModel.is_member = 0
+            }).finally(() => {
+                document.getElementById('ticket-number').focus()
+                this.$forceUpdate()
+            })
+        },
         checkTicket() {
             let now = moment().format('YYYY-MM-DD HH:mm:ss')
 
@@ -141,7 +152,6 @@ export default {
                 document.getElementById('vehicle-type').focus()
             } else {
                 let params = { barcode_number: this.formModel.barcode_number }
-                this.loading = true
                 axios.get('/parkingTransaction/search', { params: params }).then(r => {
                     if (r.data.is_member) {
                         let vehicle = r.data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
@@ -178,8 +188,6 @@ export default {
                         type: 'error',
                         showClose: true,
                     })
-                }).finally(() => {
-                    this.loading = false
                 })
             }
         },
@@ -262,7 +270,6 @@ export default {
             }
         },
         store() {
-            this.loading = true
             axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id)
                 this.printTicket(r.data.id)
@@ -272,12 +279,9 @@ export default {
                     type: 'error',
                     showClose: true
                 })
-            }).finally(() => {
-                this.loading = false
             })
         },
         update() {
-            this.loading = true
             axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
                 // print tiket hanya untuk non member
                 if (r.data.is_member == 0) {
@@ -291,8 +295,6 @@ export default {
                     type: 'error',
                     showClose: true
                 })
-            }).finally(() => {
-                this.loading = false
             })
         },
         takeSnapshot(id) {
@@ -324,7 +326,6 @@ export default {
             })
         },
         openGate() {
-            this.loading = true
             axios.post('/parkingGate/openGate/' + this.formModel.gate_out_id).then(r => {
                 this.$message({
                     message: r.data.message,
@@ -338,7 +339,6 @@ export default {
                     showClose: true
                 })
             }).finally(() => {
-                this.loading = false
                 this.resetForm()
             })
         },

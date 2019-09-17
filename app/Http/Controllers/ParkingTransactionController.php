@@ -60,6 +60,12 @@ class ParkingTransactionController extends Controller
             $input['operator'] = auth()->user()->name;
         }
 
+        if ($request->is_member) {
+            ParkingMember::where('id', $request->parking_member_id)->update([
+                'last_transaction' => now()
+            ]);
+        }
+
         return ParkingTransaction::create($input);
     }
 
@@ -239,6 +245,12 @@ class ParkingTransactionController extends Controller
         if (auth()->check()) {
             $input['user_id'] = auth()->user()->id;
             $input['operator'] = auth()->user()->name;
+        }
+
+        if ($request->is_member) {
+            ParkingMember::where('id', $request->parking_member_id)->update([
+                'last_transaction' => now()
+            ]);
         }
 
         // value ini ga perlu diupdate

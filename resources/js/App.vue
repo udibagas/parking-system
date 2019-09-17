@@ -179,7 +179,7 @@ export default {
 .sidebar {
     background-color: #060446;
     border-color: #060446;
-    height: calc(100vh - 220px);
+    height: calc(100vh - 150px);
     overflow: auto;
 }
 
