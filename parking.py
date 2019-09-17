@@ -307,20 +307,6 @@ def gate_in_thread(gate):
                         send_notification(gate, gate['name'] + ' : Gagal play silakan ambil tiket')
                         break
 
-                    # bisa jadi di sini tekan tombol help karena tiket gak keluar
-                    # TODO: need improvement
-                    if b'IN4ON' in s.recv(1024):
-                        try:
-                            s.sendall(b'\xa6MT00005\xa9')
-                        except Exception as e:
-                            logging.error(gate['name'] + ' : Failed to respon help button ' + str(e))
-                            send_notification(gate, gate['name'] + ' : Gagal merespon tombol bantuan')
-                            error = True
-                            break
-
-                        logging.info(gate['name'] + ' : Help button pressed')
-                        send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
-
                 # play terimakasih
                 try:
                     s.sendall(b'\xa6MT00006\xa9')
@@ -340,20 +326,6 @@ def gate_in_thread(gate):
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal membuka gate')
                     break
-
-                # bisa jadi di sini tekan tombol help karena gate tidak terbuka
-                # TODO: need improvement
-                if b'IN4ON' in s.recv(1024):
-                    try:
-                        s.sendall(b'\xa6MT00005\xa9')
-                    except Exception as e:
-                        logging.error(gate['name'] + ' : Failed to respon help button ' + str(e))
-                        send_notification(gate, gate['name'] + ' : Gagal merespon tombol bantuan')
-                        error = True
-                        break
-
-                    logging.info(gate['name'] + ' : Help button pressed')
-                    send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
 
                 logging.info(gate['name'] + ' : Gate Opened')
 
