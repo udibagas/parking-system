@@ -226,9 +226,8 @@ def gate_in_thread(gate):
                         valid_card = check_card(gate, str(int(card_number, 16)))
 
                         if not valid_card:
-                            # TODO : play audio
                             try:
-                                s.sendall(b'\xa6MT00003\xa9') # change this
+                                s.sendall(b'\xa6MT00003\xa9')
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon invalid card ' + str(e))
                                 send_notification(gate, gate['name'] + ' : Gagal merespon kartu invalid')
@@ -237,7 +236,7 @@ def gate_in_thread(gate):
 
                             continue
 
-                        data = {'is_member': 1, 'card_number': valid_card['card_number']}
+                        data = {'is_member': 1, 'card_number': valid_card['card_number'], 'parking_member_id': valid_card['id']}
                         logging.info(gate['name'] + ' : Card detected :' + valid_card['card_number'])
                         break
 
@@ -359,7 +358,16 @@ def gate_in_thread(gate):
                 logging.info(gate['name'] + ' : Gate Opened')
 
                 # wait until vehicle in
+                counter = 0
+
                 while True:
+                    # 10x cek aja biar ga kelamaan
+                    if counter > 10:
+                        logging.info(gate['name'] + ' : Vehicle in')
+                        break
+
+                    counter += 1
+
                     try:
                         s.sendall(b'\xa6STAT\xa9')
                         vehicle_in = s.recv(1024)
@@ -404,15 +412,7 @@ def start_app():
         threading.Thread(target=gate_in_thread, args=(g,)).start()
 
 if __name__ == "__main__":
-    # log_file = os.path.join(os.path.dirname(__file__), "parking.log")
-    log_file = '/var/log/parking.log'
+    log_file = os.path.join(os.path.dirname(__file__), "parking.log")
+    # log_file = '/var/log/parking.log'
     logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
-    # log_file_path = '/var/log/parking.log'
-    # logger = logging.getLogger(__name__)
-    # logger.setLevel(logging.DEBUG)
-    # handler = logging.handlers.RotatingFileHandler(log_file_path, maxBytes=1024000, backupCount=10)
-    # handler.setLevel(logging.DEBUG)
-    # formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
-    # handler.setFormatter(formatter)
-    # logger.addHandler(handler)
     start_app()
