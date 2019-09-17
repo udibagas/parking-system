@@ -333,8 +333,8 @@ def gate_in_thread(gate):
                 counter = 0
 
                 while True:
-                    # 10x cek aja biar ga kelamaan
-                    if counter > 10:
+                    # 5x cek aja biar ga kelamaan
+                    if counter > 5:
                         logging.info(gate['name'] + ' : Vehicle in')
                         break
 
@@ -355,7 +355,7 @@ def gate_in_thread(gate):
                         logging.info(gate['name'] + ' : Vehicle in')
                         break
 
-                    time.sleep(1)
+                    time.sleep(3)
 
                 if error:
                     # break loop cek kendaraan, sambung ulang controller
