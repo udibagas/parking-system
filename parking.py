@@ -335,7 +335,7 @@ def gate_in_thread(gate):
                 while True:
                     # 5x cek aja biar ga kelamaan
                     if counter > 5:
-                        logging.info(gate['name'] + ' : Vehicle in')
+                        logging.info(gate['name'] + ' : Waiting too long')
                         break
 
                     counter += 1
@@ -384,7 +384,7 @@ def start_app():
         threading.Thread(target=gate_in_thread, args=(g,)).start()
 
 if __name__ == "__main__":
-    log_file = os.path.join(os.path.dirname(__file__), "parking.log")
-    # log_file = '/var/log/parking.log'
+    # log_file = os.path.join(os.path.dirname(__file__), "parking.log")
+    log_file = '/var/log/parking.log'
     logging.basicConfig(filename=log_file, filemode='a', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
     start_app()
