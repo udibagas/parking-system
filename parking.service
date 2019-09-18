@@ -1,0 +1,13 @@
+[Unit]
+Description=Parking controller service
+After=network.target
+After=apache2.service
+
+[Service]
+User=root
+ExecStart=/etc/init.d/parking start
+ExecStop=/etc/init.d/parking stop
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
