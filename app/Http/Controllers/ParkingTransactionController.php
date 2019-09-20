@@ -192,16 +192,31 @@ class ParkingTransactionController extends Controller
      */
     public function search(Request $request)
     {
+        // ambil transaksi terakhir yg blm tap out
         $data = ParkingTransaction::with(['member'])->when($request->barcode_number, function($q) use ($request) {
                 return $q->where('barcode_number', $request->barcode_number)
                         ->orWhere('card_number', $request->barcode_number);
-            })->where('time_out', null)->first();
+            })->where('time_out', null)
+            ->orderBy('time_in', 'DESC')->first();
 
         if ($data) {
+            // kalau member cek dulu ada yg masih blm tap out ga selain data yg ini
+            if ($data->is_member) {
+                ParkingTransaction::where('parking_member_id', $data->parking_member_id)
+                    ->where('id', '!=', $data->id)
+                    ->where('time_out', null)
+                    ->update([
+                        'time_out' => now(),
+                        'operator' => $request->user()->name,
+                        'user_id' => $request->user()->id,
+                        'gate_out_id' => ParkingGate::where('type', 'OUT')->where('active', 1)->first()->id
+                    ]);
+            }
+
             return $data;
         }
 
-        // member, tapi gak tap in
+        // member, tapi gak tap in karena rusak gate in
         $member = ParkingMember::where('card_number', $request->barcode_number)->first();
 
         if ($member)

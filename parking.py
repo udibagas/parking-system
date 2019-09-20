@@ -223,9 +223,9 @@ def gate_in_thread(gate):
 
                     if b'W' in push_button_or_card:
                         card_number = str(push_button_or_card).split('W')[1].split('\\xa9')[0]
-                        valid_card = check_card(gate, str(int(card_number, 16)))
+                        member = check_card(gate, str(int(card_number, 16)))
 
-                        if not valid_card:
+                        if not member:
                             try:
                                 s.sendall(b'\xa6MT00003\xa9')
                             except Exception as e:
@@ -236,8 +236,8 @@ def gate_in_thread(gate):
 
                             continue
 
-                        data = {'is_member': 1, 'card_number': valid_card['card_number'], 'parking_member_id': valid_card['id']}
-                        logging.info(gate['name'] + ' : Card detected :' + valid_card['card_number'])
+                        data = {'is_member': 1, 'card_number': member['card_number'], 'parking_member_id': member['id']}
+                        logging.info(gate['name'] + ' : Card detected :' + member['card_number'])
                         break
 
                     elif b'IN2ON' in push_button_or_card or b'STAT11' in push_button_or_card:
