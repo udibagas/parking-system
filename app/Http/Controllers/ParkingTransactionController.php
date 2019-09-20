@@ -197,13 +197,13 @@ class ParkingTransactionController extends Controller
                 return $q->where('barcode_number', $request->barcode_number)
                         ->orWhere('card_number', $request->barcode_number);
             })->where('time_out', null)
-            ->orderBy('time_in', 'DESC')->first();
+            ->orderBy('id', 'DESC')->first();
 
         if ($data) {
             // kalau member cek dulu ada yg masih blm tap out ga selain data yg ini
             if ($data->is_member) {
                 ParkingTransaction::where('parking_member_id', $data->parking_member_id)
-                    ->where('id', '!=', $data->id)
+                    ->where('id', '<', $data->id)
                     ->where('time_out', null)
                     ->update([
                         'time_out' => now(),
