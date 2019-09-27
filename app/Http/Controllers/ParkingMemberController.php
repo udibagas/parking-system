@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ParkingMember;
 use App\Http\Requests\ParkingMemberRequest;
+use App\ParkingTransaction;
 use Illuminate\Support\Facades\DB;
 
 class ParkingMemberController extends Controller
@@ -99,6 +100,17 @@ class ParkingMemberController extends Controller
 
         if (!$member) {
             return response(['message' => 'No member found'], 404);
+        }
+
+        // kalau cari berdasarkan kartu berarti di gate in, cari apa dia ada transaksi yg blm closed
+        if ($request->card_number) {
+            $unclosed = ParkingTransaction::where('card_number', 'LIKE', '%'.$request->card_number)
+                ->where('time_out', null)
+                ->first();
+
+            if ($unclosed) {
+                return response(['message' => 'Member has unclosed transaction'], 404);
+            }
         }
 
         return $member;
