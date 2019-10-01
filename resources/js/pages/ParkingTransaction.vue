@@ -178,7 +178,7 @@ export default {
                     this.requestData()
                 }).catch(e => {
                     this.$message({
-                        message: r.response.data.message,
+                        message: e.response.data.message,
                         type: 'error',
                         showClose: true
                     });

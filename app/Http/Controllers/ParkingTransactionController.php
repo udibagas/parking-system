@@ -12,6 +12,7 @@ use App\LocationIdentity;
 use App\ParkingGate;
 use App\ParkingMember;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\DB;
 
 class ParkingTransactionController extends Controller
 {
@@ -298,12 +299,17 @@ class ParkingTransactionController extends Controller
 
     public function setSudahKeluarSemua(Request $request)
     {
-        ParkingTransaction::whereRaw('time_out IS NULL AND DATE(time_in) BETWEEN :start AND :stop', [
+        $sql = 'UPDATE parking_transactions
+            SET time_out = :time_out,
+                operator = :operator
+            WHERE time_out IS NULL
+                AND DATE(time_in) BETWEEN :start AND :stop';
+
+        DB::update($sql, [
+            ':time_out' => now(),
+            ':operator' => $request->user()->name,
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
-        ])->update([
-            'time_out' => now(),
-            'operator' => $request->user()->name
         ]);
 
         return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
