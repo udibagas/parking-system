@@ -111,7 +111,7 @@ class ParkingGateController extends Controller
                 ]
             ]);
 
-            if ($response->getHeader('Content-Type') != 'image/jpeg') {
+            if ($response->getHeader('Content-Type')[0] != 'image/jpeg') {
                 return response(['message' => 'GAGAL MENGAMBIL GAMBAR. URL SNAPSHOT KAMERA TIDAK SESUAI'], 500);
             }
 
@@ -239,7 +239,7 @@ class ParkingGateController extends Controller
                 ]
             ]);
 
-            if ($response->getHeader('Content-Type') == 'image/jpeg') {
+            if ($response->getHeader('Content-Type')[0] == 'image/jpeg') {
                 file_put_contents($fileName, $response->getBody());
             } else {
                 return response(['message' => 'GAGAL MENGAMBIL GAMBAR. URL SNAPSHOT KAMERA TIDAK SESUAI'], 500);
