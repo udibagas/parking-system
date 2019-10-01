@@ -110,6 +110,11 @@ class ParkingGateController extends Controller
                     $parkingGate->camera_auth_type == 'digest' ? 'digest' : null
                 ]
             ]);
+
+            if ($response->getHeader('Content-Type') != 'image/jpeg') {
+                return response(['message' => 'GAGAL MENGAMBIL GAMBAR. URL SNAPSHOT KAMERA TIDAK SESUAI'], 500);
+            }
+
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. '. $e->getMessage()], 500);
         }
