@@ -104,6 +104,7 @@ class ParkingMemberController extends Controller
 
         // kalau cari berdasarkan kartu berarti di gate in, cari apa dia ada transaksi yg blm closed
         if ($request->card_number) {
+            // cari dia di group mana, boleh apa gak tap in kalau masih ada yg blm closed
             $unclosed = ParkingTransaction::where('card_number', 'LIKE', '%'.$request->card_number)
                 ->where('time_out', null)
                 ->first();

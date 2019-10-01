@@ -172,12 +172,12 @@ export default {
 
                     this.snapshot_in = r.data.snapshot_in
                     this.formModel.id = r.data.id
-                    this.formModel.time_out = now
                     this.formModel.gate_in_id = r.data.gate_in_id
                     this.formModel.time_in = r.data.time_in
                     this.formModel.is_member = r.data.is_member
-                    this.setDuration()
+                    this.formModel.time_out = now
                     this.$forceUpdate()
+                    this.setDuration()
                     document.getElementById('vehicle-type').focus()
                 }).then(() => {
                     this.takeSnapshot(this.formModel.id)
