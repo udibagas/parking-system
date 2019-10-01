@@ -16,6 +16,9 @@
                 end-placeholder="End date">
                 </el-date-picker>
             </el-form-item>
+            <el-form-item>
+                <el-button type="primary" icon="el-icon-finished" @click="setSudahKeluarSemua">SET KENDARAAN SUDAH KELUAR SEMUA</el-button>
+            </el-form-item>
             <el-form-item style="margin-right:0;">
                 <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                     <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
@@ -137,7 +140,7 @@ export default {
             income: [],
             parkedVehicle: [],
             date: moment().format('YYYY-MM-DD'),
-            dateRange: [moment().format('YYYY-MM-01'), moment().format('YYYY-MM-DD')]
+            dateRange: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
         }
     },
     methods: {
@@ -154,6 +157,25 @@ export default {
                         type: 'success',
                         showClose: true
                     });
+                    this.requestData()
+                }).catch(e => {
+                    this.$message({
+                        message: r.response.data.message,
+                        type: 'error',
+                        showClose: true
+                    });
+                })
+            }).catch(() => console.log(e))
+        },
+        setSudahKeluarSemua() {
+            this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' }).then(() => {
+                axios.put('parkingTransaction/setSudahKeluarSemua', { dateRange: this.dateRange }).then(r => {
+                    this.$message({
+                        message: r.data.message,
+                        type: 'success',
+                        showClose: true
+                    });
+                    this.requestData()
                 }).catch(e => {
                     this.$message({
                         message: r.response.data.message,

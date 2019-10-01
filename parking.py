@@ -47,17 +47,23 @@ def get_gates():
 
 def take_snapshot(gate):
     if gate['camera_status'] == 0:
+        logging.info(gate['name'] + ' : Not taking snapshot. Camera not active')
         return ''
 
     try:
         r = requests.get(API_URL + '/parkingGate/takeSnapshot/' + str(gate['id']))
+
+        if r.status_code != 200:
+            logging.error(gate['name'] + ' : Failed to take snapshot. Status code : ' + r.status_code)
+            send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + ". Status Code : " + r.status_code)
+            return ''
+
+        respons = r.json()
+        return respons['filename']
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to take snapshot ' + str(e))
         send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + " (" + str(e) + ")")
         return ''
-
-    respons = r.json()
-    return respons['filename']
 
 def generate_barcode_number():
     return ''.join([random.choice(string.ascii_uppercase + string.digits) for n in range(5)])

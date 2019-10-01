@@ -291,7 +291,21 @@ class ParkingTransactionController extends Controller
     public function setSudahKeluar(ParkingTransaction $parkingTransaction)
     {
         $parkingTransaction->time_out = now();
+        $parkingTransaction->operator = auth()->user()->name;
         $parkingTransaction->save();
+        return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
+    }
+
+    public function setSudahKeluarSemua(Request $request)
+    {
+        ParkingTransaction::whereRaw('time_out IS NULL AND DATE(time_in) BETWEEN :start AND :stop', [
+            ':start' => $request->dateRange[0],
+            ':stop' => $request->dateRange[1]
+        ])->update([
+            'time_out' => now(),
+            'operator' => $request->user()->name
+        ]);
+
         return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
     }
 }

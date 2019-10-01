@@ -1,3 +1,8 @@
+# taruh di /etc/systemd/system
+# systemctl daemon-reload
+# systemctl enable parking
+# systemctl start parking
+
 [Unit]
 Description=Parking controller service
 Requires=network.target

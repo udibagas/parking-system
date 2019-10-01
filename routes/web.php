@@ -31,6 +31,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::resource('groupMember', 'GroupMemberController')->except(['create', 'edit', 'show']);
     Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');
     Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
+    Route::put('parkingTransaction/setSudahKeluarSemua', 'ParkingTransactionController@setSudahKeluarSemua');
     Route::put('parkingTransaction/setSudahKeluar/{parkingTransaction}', 'ParkingTransactionController@setSudahKeluar');
     Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
