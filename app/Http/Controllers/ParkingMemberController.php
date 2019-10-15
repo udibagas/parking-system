@@ -52,11 +52,7 @@ class ParkingMemberController extends Controller
     {
         try {
             DB::transaction(function () use ($request) {
-                $id = DB::table('parking_members')->insertGetId($request->only([
-                    'group_member_id', 'name', 'card_number',
-                    'is_active', 'expiry_date', 'email', 'phone',
-                    'paid', 'register_date', 'billing_cycle', 'fare'
-                ]));
+                $id = DB::table('parking_members')->insertGetId($request->only((new ParkingMember())->getFillable()));
 
                 DB::table('member_vehicles')->insert(array_map(function($vehicle) use ($id) {
                     $vehicle['parking_member_id'] = $id;
@@ -129,11 +125,7 @@ class ParkingMemberController extends Controller
             DB::transaction(function () use ($request, $parkingMember) {
                 DB::table('parking_members')
                     ->where('id', $parkingMember->id)
-                    ->update($request->only([
-                        'group_member_id', 'name', 'card_number',
-                        'is_active', 'expiry_date', 'email', 'phone',
-                        'paid', 'register_date', 'billing_cycle', 'fare'
-                    ]));
+                    ->update($request->only((new ParkingMember())->getFillable()));
 
                 DB::table('member_vehicles')
                     ->where('parking_member_id', $parkingMember->id)
