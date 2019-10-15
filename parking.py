@@ -208,7 +208,7 @@ def gate_in_thread(gate):
                         # keluar dari loop cek kendaraan untuk sambung ulang controller
                         break
                 else:
-                    time.sleep(3)
+                    time.sleep(1)
                     continue
 
                 reset = False

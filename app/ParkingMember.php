@@ -2,6 +2,7 @@
 
 namespace App;
 
+use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
 class ParkingMember extends Model
@@ -14,9 +15,22 @@ class ParkingMember extends Model
         'register_date', 'billing_cycle', 'fare'
     ];
 
+    protected $appends = ['expired_in', 'expired'];
+
     protected $with = ['vehicles'];
 
-    public function vehicles() {
+    public function vehicles()
+    {
         return $this->hasMany(MemberVehicle::class);
+    }
+
+    public function getExpiredInAttribute()
+    {
+        return (new DateTime($this->expiry_date))->diff(new DateTime())->format('%a');
+    }
+
+    public function getExpiredAttribute()
+    {
+        return strtotime(now()) > strtotime($this->expiry_date);
     }
 }

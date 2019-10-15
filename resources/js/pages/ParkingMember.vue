@@ -218,7 +218,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column width="70px" align="right" header-align="right">
-                    <template slot="header">
+                    <template slot="header" v-if="formModel.vehicles.length < $store.state.setting.jml_kendaraan_per_kartu">
                         <el-button icon="el-icon-plus" @click="addVehicle" size="small" type="primary"></el-button>
                     </template>
                     <template slot-scope="scope">
@@ -351,14 +351,23 @@ export default {
             }).catch(() => console.log(e));
         },
         addVehicle() {
-            this.formModel.vehicles.push({
-                plate_number: '',
-                vehicle_type: '',
-                type: '',
-                merk: '',
-                tahun: '',
-                warna: '',
-            })
+            if (this.formModel.vehicles.length < this.$store.state.setting.jml_kendaraan_per_kartu
+            || this.$store.state.setting.jml_kendaraan_per_kartu == 0) {
+                this.formModel.vehicles.push({
+                    plate_number: '',
+                    vehicle_type: '',
+                    type: '',
+                    merk: '',
+                    tahun: '',
+                    warna: '',
+                })
+            } else {
+                this.$message({
+                    message: 'Jumlah maksimal kendaraan per kartu adalah ' + this.$store.state.setting.jml_kendaraan_per_kartu ,
+                    type: 'error',
+                    showClose: true
+                });
+            }
         },
         deleteVehicle(index, id) {
             if (!id) {
@@ -403,6 +412,7 @@ export default {
     mounted() {
         this.requestData();
         this.$store.commit('getGroupMemberList')
+        this.$store.commit('getSetting')
     }
 }
 </script>

@@ -47,7 +47,7 @@
             <el-table-column prop="time_in" label="Waktu Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="time_out" label="Waktu Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="durasi" label="Durasi" show-overflow-tooltip min-width="100px"></el-table-column>
-            <el-table-column prop="fare" label="Tarif" sortable="custom" align="right" header-align="right" min-width="100px">
+            <el-table-column v-if="$store.state.user.role == 1" prop="fare" label="Tarif" sortable="custom" align="right" header-align="right" min-width="100px">
                 <template slot-scope="scope">
                     Rp. {{scope.row.fare | formatNumber }}
                 </template>
@@ -97,7 +97,7 @@
                             <tr><td class="td-label">Waktu Masuk</td><td class="td-value">{{trx.time_in}}</td></tr>
                             <tr><td class="td-label">Waktu Keluar</td><td class="td-value">{{trx.time_out}}</td></tr>
                             <tr><td class="td-label">Durasi</td><td class="td-value">{{trx.durasi}}</td></tr>
-                            <tr><td class="td-label">Tarif</td><td class="td-value">Rp {{trx.fare | formatNumber}}</td></tr>
+                            <tr><td class="td-label" v-if="$store.state.user.role == 1">Tarif</td><td class="td-value">Rp {{trx.fare | formatNumber}}</td></tr>
                             <tr><td class="td-label">Operator</td><td class="td-value">{{trx.operator}}</td></tr>
                         </tbody>
                     </table>

@@ -14,6 +14,7 @@ Route::post('login', 'AuthController@login');
 
 Route::group(['middleware' => 'auth.jwt'], function () {
     Route::get('checkAuth', 'AppController@checkAuth');
+    Route::get('getNavigation', 'AppController@getNavigation');
     Route::post('logout', 'AuthController@logout');
     Route::resource('user', 'UserController')->except(['create', 'edit']);
     Route::get('locationIdentity/search', 'LocationIdentityController@search');
@@ -37,6 +38,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
     Route::delete('notification/clearNotification', 'NotificationController@clearNotification');
     Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
+    Route::resource('setting', 'SettingController')->only(['index', 'update', 'store']);
     Route::delete('memberVehicle/{memberVehicle}', 'MemberVehicleController@destroy');
     // Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
 

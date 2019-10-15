@@ -178,8 +178,10 @@ class ParkingGateController extends Controller
                 $serial->confStopBits(1);
                 $serial->confFlowControl("none");
                 $serial->deviceOpen();
+                // ada 2 jenis: A, B, C, D (tergantung relay nomor berapa) atau AZ123
                 $serial->sendMessage(env("GATE_CMD_OPEN", "AZ123"));
                 sleep(1);
+                // W,X,Y,Z (tergantung relay nomor berapa)
                 $serial->sendMessage(env("GATE_CMD_CLOSE", "W"));
                 $serial->deviceClose();
             } catch (\Exception $e) {

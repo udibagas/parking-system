@@ -20,7 +20,7 @@
             <el-table-column prop="description" label="Deskripsi" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="contact_person_name" label="Nama Contact Person" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="contact_person_phone" label="No. HP Contact Person" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="contact_person_email" label="Alamat Email Contact Person" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="contact_person_email" label="Alamat Email Contact Person" sortable="custom" show-overflow-tooltip min-width="170px"></el-table-column>
             <el-table-column fixed="right" width="40px" v-if="$store.state.user.role == 1">
                 <template slot-scope="scope">
                     <el-dropdown>
@@ -54,7 +54,7 @@
                 style="margin-bottom:15px;">
             </el-alert>
 
-            <el-form label-width="200px" label-position="left">
+            <el-form label-width="220px" label-position="left">
                 <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
                     <el-input placeholder="Nama" v-model="formModel.name"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
@@ -79,6 +79,21 @@
                     <el-input placeholder="Alamat Email Contact Person" v-model="formModel.contact_person_email"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.contact_person_email">{{formErrors.contact_person_email[0]}}</div>
                 </el-form-item>
+
+                <!-- <el-form-item label="Buka Gate OUT Otomatis" :class="formErrors.contact_person_email ? 'is-error' : ''">
+                    <el-input placeholder="Ya/Tidak" v-model="formModel.contact_person_email"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.contact_person_email">{{formErrors.contact_person_email[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Keluar Tanpa Kartu" :class="formErrors.contact_person_email ? 'is-error' : ''">
+                    <el-input placeholder="Boleh/Tidak" v-model="formModel.contact_person_email"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.contact_person_email">{{formErrors.contact_person_email[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Tap IN tanpa Tap OUT" :class="formErrors.contact_person_email ? 'is-error' : ''">
+                    <el-input placeholder="Boleh/Tidak" v-model="formModel.contact_person_email"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.contact_person_email">{{formErrors.contact_person_email[0]}}</div>
+                </el-form-item> -->
 
             </el-form>
             <span slot="footer" class="dialog-footer">

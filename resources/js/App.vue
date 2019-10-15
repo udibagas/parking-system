@@ -63,23 +63,7 @@ export default {
     components: { Login, Profile },
     computed: {
         menus() {
-            let menus = [
-                {label: 'Home', icon: 'el-icon-s-home', path: 'home' },
-                {label: 'Transaksi', icon: 'el-icon-document-copy', path: 'parking-transaction' },
-                {label: 'Member', icon: 'el-icon-bank-card', path: 'member' },
-                {label: 'Snapshot', icon: 'el-icon-camera', path: 'snapshot' },
-                {label: 'Laporan', icon: 'el-icon-data-analysis', path: 'report' },
-            ]
-
-            if (this.$store.state.user.role == 1) {
-                menus.push(
-                    {label: 'User', icon: 'el-icon-user', path: 'user' },
-                    {label: 'Notifikasi', icon: 'el-icon-bell', path: 'notification' },
-                    {label: 'Setting', icon: 'el-icon-setting', path: 'setting' },
-                )
-            }
-
-            return menus;
+            return this.$store.state.navigationList
         }
     },
     data() {
@@ -148,6 +132,7 @@ export default {
         }
     },
     mounted() {
+        this.$store.commit('getNavigationList')
         setInterval(this.getNotification, 5000)
     }
 }

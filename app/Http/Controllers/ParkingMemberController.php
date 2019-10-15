@@ -27,8 +27,7 @@ class ParkingMemberController extends Controller
 
         return ParkingMember::selectRaw('
                 parking_members.*,
-                group_members.name AS `group`,
-                CASE WHEN expiry_date < DATE(NOW()) THEN 1 ELSE 0 END AS `expired`
+                group_members.name AS `group`
             ')
             ->join('group_members', 'group_members.id', '=', 'parking_members.group_member_id', 'LEFT')
             ->when($request->keyword, function ($q) use ($request) {

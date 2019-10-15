@@ -8,6 +8,11 @@ use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:1');
+    }
+
     public function getTransaction(Request $request)
     {
         return DB::select('

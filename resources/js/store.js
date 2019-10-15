@@ -15,6 +15,8 @@ export default new Vuex.Store({
         vehicleTypeList: [],
         parkingGateList: [],
         groupMemberList: [],
+        navigationList: [],
+        setting: {}
     },
     mutations: {
         getVehicleTypeList(state) {
@@ -27,6 +29,14 @@ export default new Vuex.Store({
         },
         getParkingGateList(state) {
             axios.get('/parkingGate/getList').then(r => state.parkingGateList = r.data)
+                .catch(e => console.log(e))
+        },
+        getNavigationList(state) {
+            axios.get('/getNavigation').then(r => state.navigationList = r.data)
+                .catch(e => console.log(e))
+        },
+        getSetting(state) {
+            axios.get('/setting').then(r => state.setting = r.data)
                 .catch(e => console.log(e))
         }
     }

@@ -81,7 +81,14 @@
                         </el-col>
                     </el-row>
 
-                    <button id="submit-btn" @keydown.enter="submit" class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
+                    <el-row :gutter="10">
+                        <el-col :span="12">
+                            <button id="submit-btn" @keyup.right="nextBtn" @keydown.enter="submit(false)" class="my-big-btn" @click="submit(false)">BUKA GATE TANPA PRINT TIKET</button>
+                        </el-col>
+                        <el-col :span="12">
+                            <button id="submit-btn1" @keyup.left="prevBtn" @keydown.enter="submit(true)" class="my-big-btn" @click="submit(true)">PRINT TIKET & BUKA GATE</button>
+                        </el-col>
+                    </el-row>
                 </el-card>
             </el-col>
             <el-col :span="10">
@@ -124,6 +131,12 @@ export default {
         }
     },
     methods: {
+        nextBtn() {
+            document.getElementById('submit-btn1').focus()
+        },
+        prevBtn() {
+            document.getElementById('submit-btn').focus()
+        },
         setDuration() {
             var date1 = moment(this.formModel.time_in)
             var date2 = moment(this.formModel.time_out);
@@ -236,7 +249,7 @@ export default {
 
             document.getElementById('plate-number').focus()
         },
-        submit() {
+        submit(ticket) {
             // kalau tiket hilang harus isi time in dulu
             if (this.formModel.barcode_number.toLowerCase() == 'xxxxx' && !this.formModel.time_in) {
                 document.getElementById('time-in').focus()
@@ -264,30 +277,33 @@ export default {
             }
 
             if (!!this.formModel.id) {
-                this.update()
+                this.update(ticket)
             } else {
-                this.store()
+                this.store(ticket)
             }
         },
-        store() {
+        store(ticket) {
             axios.post('/parkingTransaction', this.formModel).then(r => {
                 this.takeSnapshot(r.data.id)
-                this.printTicket(r.data.id)
+                if (ticket) {
+                    this.printTicket(r.data.id)
+                }
             }).catch(e => {
+                // kecil kemungkinan
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
                     type: 'error',
                     showClose: true
                 })
+            }).finally(() => {
+                setTimeout(this.openGate, 3000);
             })
         },
-        update() {
+        update(ticket) {
             axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
                 // print tiket hanya untuk non member
-                if (r.data.is_member == 0) {
+                if (r.data.is_member == 0 || ticket) {
                     this.printTicket(r.data.id)
-                } else {
-                    this.openGate()
                 }
             }).catch(e => {
                 this.$message({
@@ -295,6 +311,8 @@ export default {
                     type: 'error',
                     showClose: true
                 })
+            }).finally(() => {
+                setTimeout(this.openGate, 3000);
             })
         },
         takeSnapshot(id) {
@@ -321,8 +339,6 @@ export default {
                     type: 'error',
                     showClose: true
                 })
-            }).finally(() => {
-                setTimeout(this.openGate, 3000);
             })
         },
         openGate() {
@@ -530,7 +546,8 @@ export default {
 }
 
 .my-big-btn:focus {
-    border: 3px dotted red;
+    // border: 3px dotted red;
+    background-color: #cd0000;
 }
 
 .label {

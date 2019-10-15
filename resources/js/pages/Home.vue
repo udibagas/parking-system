@@ -11,6 +11,9 @@ import GateInApp from './GateInApp'
 import GateOutApp from './GateOutApp'
 
 export default {
-    components: { GateInApp, GateOutApp }
+    components: { GateInApp, GateOutApp },
+    mounted() {
+        this.$store.commit('getNavigationList')
+    }
 }
 </script>
