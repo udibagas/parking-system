@@ -6,7 +6,7 @@
         <el-tabs type="card">
             <el-tab-pane lazy label="Global Setting" v-loading="loading">
                 <el-card>
-                    <el-form label-position="left" label-width="200px">
+                    <el-form label-position="left" label-width="250px">
                         <el-form-item label="Jumlah Kendaraan Per Kartu" :class="formErrors.jml_kendaraan_per_kartu ? 'is-error' : ''">
                             <el-input type="number" placeholder="Jumlah Kendaraan Per Kartu (0 untuk tak terbatas)" v-model="formModel.jml_kendaraan_per_kartu"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.jml_kendaraan_per_kartu">{{formErrors.jml_kendaraan_per_kartu[0]}}</div>

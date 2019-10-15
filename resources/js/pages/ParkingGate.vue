@@ -12,34 +12,11 @@
         </el-form>
 
         <el-table :data="tableData.data" stripe
+        @row-dblclick="(row, column, event) => { selectedData = row; showDetail = true }"
         :default-sort = "{prop: sort, order: order}"
         height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column fixed="left" type="expand">
-                <template slot-scope="scope">
-                    <table>
-                        <tbody>
-                            <tr><td class="td-label">Nama</td><td class="td-value">{{scope.row.name}}</td></tr>
-                            <tr><td class="td-label">Jenis</td><td class="td-value">{{scope.row.type}}</td></tr>
-                            <tr><td class="td-label">Jenis Kendaraan</td><td class="td-value">{{scope.row.vehicle_type}}</td></tr>
-                            <tr><td class="td-label">Alamat IP Kontroller</td><td class="td-value">{{scope.row.controller_ip_address}}</td></tr>
-                            <tr><td class="td-label">Port Kontroller</td><td class="td-value">{{scope.row.controller_port}}</td></tr>
-                            <tr><td class="td-label">Jenis Printer</td><td class="td-value">{{scope.row.printer_type}}</td></tr>
-                            <tr><td class="td-label">Device Printer</td><td class="td-value">{{scope.row.printer_device}}</td></tr>
-                            <tr><td class="td-label">Alamat IP Printer</td><td class="td-value">{{scope.row.printer_ip_address}}</td></tr>
-                            <tr><td class="td-label">Alamat IP Kamera</td><td class="td-value">{{scope.row.camera_ip_address}}</td></tr>
-                            <tr><td class="td-label">Username Kamera</td><td class="td-value">{{scope.row.camera_username}}</td></tr>
-                            <tr><td class="td-label">Password Kamera</td><td class="td-value">{{scope.row.camera_password}}</td></tr>
-                            <tr><td class="td-label">Tipe Otentifikasi Kamera</td><td class="td-value">{{scope.row.camera_auth_type}}</td></tr>
-                            <tr><td class="td-label">URL Snapshot Kamera</td><td class="td-value">{{scope.row.camera_image_snapshot_url}}</td></tr>
-                            <tr><td class="td-label">Status Kamera</td><td class="td-value">{{scope.row.camera_status ? 'Active' : 'Inactive'}}</td></tr>
-                            <!-- <tr><td class="td-label">Camera Video Snapshot URL</td><td class="td-value">{{scope.row.camera_video_snapshot_url}}</td></tr> -->
-                            <tr><td class="td-label">Status Gate</td><td class="td-value">{{scope.row.is_active ? 'Active' : 'Inactive'}}</td></tr>
-                        </tbody>
-                    </table>
-                </template>
-            </el-table-column>
             <el-table-column fixed="left" prop="name" label="Nama" min-width="100px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="type" label="Jenis" min-width="80px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="vehicle_type" label="Jenis Kendaraan" min-width="160px" show-overflow-tooltip></el-table-column>
@@ -81,11 +58,12 @@
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native.prevent="testDevice('testCamera', scope.row.id)"><i class="el-icon-camera"></i> Test Kamera</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="testDevice('testPrinter', scope.row.id)"><i class="el-icon-printer"></i> Test Printer</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="testDevice('openGate', scope.row.id)"><i class="el-icon-minus"></i> Test Gate</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-edit-outline"></i> Edit</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Hapus</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-zoom-in" @click.native.prevent="() => { selectedData = scope.row; showDetail = true; }">Lihat Detail</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-camera" @click.native.prevent="testDevice('testCamera', scope.row.id)">Test Kamera</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-printer" @click.native.prevent="testDevice('testPrinter', scope.row.id)">Test Printer</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-minus" @click.native.prevent="testDevice('openGate', scope.row.id)">Test Gate</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-edit-outline" @click.native.prevent="openForm(scope.row)">Edit</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-delete" @click.native.prevent="deleteData(scope.row.id)">Hapus</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
@@ -195,11 +173,6 @@
                             <div class="el-form-item__error" v-if="formErrors.camera_image_snapshot_url">{{formErrors.camera_image_snapshot_url[0]}}</div>
                         </el-form-item>
 
-                        <!-- <el-form-item label="Video Snapshot Url" :class="formErrors.camera_video_snapshot_url ? 'is-error' : ''">
-                            <el-input placeholder="Video Snapshot Url" v-model="formModel.camera_video_snapshot_url"></el-input>
-                            <div class="el-form-item__error" v-if="formErrors.camera_video_snapshot_url">{{formErrors.camera_video_snapshot_url[0]}}</div>
-                        </el-form-item> -->
-
                         <el-form-item label="Status Kamera" :class="formErrors.camera_status ? 'is-error' : ''">
                             <el-switch
                             :active-value="1"
@@ -215,9 +188,31 @@
 
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="() => !!formModel.id ? update() : store()"><i class="el-icon-success"></i> SIMPAN</el-button>
-                <el-button type="info" @click="showForm = false"><i class="el-icon-error"></i> BATAL</el-button>
+                <el-button icon="el-icon-success" type="primary" @click="() => !!formModel.id ? update() : store()">SIMPAN</el-button>
+                <el-button icon="el-icon-error" type="info" @click="showForm = false">BATAL</el-button>
             </span>
+        </el-dialog>
+
+        <el-dialog title="DETAIL GATE" center top="60px" :visible.sync="showDetail">
+            <table v-if="!!selectedData.id" style="width:100%">
+                <tbody>
+                    <tr><td class="td-label">Nama</td><td class="td-value">{{selectedData.name}}</td></tr>
+                    <tr><td class="td-label">Jenis</td><td class="td-value">{{selectedData.type}}</td></tr>
+                    <tr><td class="td-label">Jenis Kendaraan</td><td class="td-value">{{selectedData.vehicle_type}}</td></tr>
+                    <tr><td class="td-label">Alamat IP Kontroller</td><td class="td-value">{{selectedData.controller_ip_address}}</td></tr>
+                    <tr><td class="td-label">Port Kontroller</td><td class="td-value">{{selectedData.controller_port}}</td></tr>
+                    <tr><td class="td-label">Jenis Printer</td><td class="td-value">{{selectedData.printer_type}}</td></tr>
+                    <tr><td class="td-label">Device Printer</td><td class="td-value">{{selectedData.printer_device}}</td></tr>
+                    <tr><td class="td-label">Alamat IP Printer</td><td class="td-value">{{selectedData.printer_ip_address}}</td></tr>
+                    <tr><td class="td-label">Alamat IP Kamera</td><td class="td-value">{{selectedData.camera_ip_address}}</td></tr>
+                    <tr><td class="td-label">Username Kamera</td><td class="td-value">{{selectedData.camera_username}}</td></tr>
+                    <tr><td class="td-label">Password Kamera</td><td class="td-value">{{selectedData.camera_password}}</td></tr>
+                    <tr><td class="td-label">Tipe Otentifikasi Kamera</td><td class="td-value">{{selectedData.camera_auth_type}}</td></tr>
+                    <tr><td class="td-label">URL Snapshot Kamera</td><td class="td-value">{{selectedData.camera_image_snapshot_url}}</td></tr>
+                    <tr><td class="td-label">Status Kamera</td><td class="td-value">{{selectedData.camera_status ? 'Active' : 'Inactive'}}</td></tr>
+                    <tr><td class="td-label">Status Gate</td><td class="td-value">{{selectedData.is_active ? 'Active' : 'Inactive'}}</td></tr>
+                </tbody>
+            </table>
         </el-dialog>
     </div>
 </template>
@@ -236,7 +231,9 @@ export default {
             tableData: {},
             sort: 'name',
             order: 'ascending',
-            loading: false
+            loading: false,
+            showDetail: false,
+            selectedData: {}
         }
     },
     methods: {

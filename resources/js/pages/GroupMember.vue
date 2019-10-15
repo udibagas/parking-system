@@ -20,7 +20,7 @@
             <el-table-column prop="description" label="Deskripsi" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="contact_person_name" label="Nama Contact Person" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="contact_person_phone" label="No. HP Contact Person" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="contact_person_email" label="Alamat Email Contact Person" sortable="custom" show-overflow-tooltip min-width="170px"></el-table-column>
+            <el-table-column prop="contact_person_email" label="Alamat Email Contact Person" sortable="custom" show-overflow-tooltip min-width="220px"></el-table-column>
             <el-table-column fixed="right" width="40px" v-if="$store.state.user.role == 1">
                 <template slot-scope="scope">
                     <el-dropdown>

@@ -26,12 +26,12 @@
             <el-table-column prop="phone" label="Nomor HP" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="register_date" label="Tgl Daftar" sortable="custom" show-overflow-tooltip min-width="120px"></el-table-column>
-            <el-table-column prop="billing_cycle" label="Siklus Bayar" sortable="custom" min-width="120px">
+            <el-table-column prop="billing_cycle" label="Siklus Bayar" sortable="custom" min-width="150px">
                 <template slot-scope="scope">
                     {{scope.row.billing_cycle}} bulan
                 </template>
             </el-table-column>
-            <el-table-column prop="expiry_date" label="Tgl Kedaluarsa" sortable="custom" show-overflow-tooltip min-width="130px"></el-table-column>
+            <el-table-column prop="expiry_date" label="Tgl Kedaluarsa" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="paid" label="Jenis" sortable="custom" min-width="100px">
                 <template slot-scope="scope">
                     {{scope.row.paid ? 'Berbayar' : 'Gratis'}}
@@ -42,7 +42,7 @@
                     Rp. {{scope.row.fare | formatNumber}}
                 </template>
             </el-table-column>
-            <el-table-column prop="last_transaction" label="Trx Terkakhir" sortable="custom" show-overflow-tooltip min-width="120px"></el-table-column>
+            <el-table-column prop="last_transaction" label="Trx Terkakhir" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column
             :filters="[{value: 'y', text: 'Ya'}, {value: 'n', text: 'Tidak'}]"
             :filter-multiple="false"
