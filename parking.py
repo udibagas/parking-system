@@ -199,6 +199,7 @@ def gate_in_thread(gate):
                     logging.info(gate['name'] + ' : Vehicle detected')
                     # play selamat datang
                     try:
+                        logging.debug(gate['name'] + ' : Playing welcome')
                         s.sendall(b'\xa6MT00007\xa9')
                         logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                     except Exception as e:
