@@ -104,10 +104,11 @@ class MemberRenewalController extends Controller
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text(str_pad('TANGGAL TRX', 15, ' ') . ' : ' . $memberRenewal->created_at . "\n");
-            $printer->text(str_pad('NAMA MEMBER', 15, ' ') . ' : ' . $memberRenewal->parkingMember->name . "\n");
-            $printer->text(str_pad('DARI TANGGAL', 15, ' ') . ' : ' . $memberRenewal->from_date . "\n");
-            $printer->text(str_pad('SAMPAI TANGGAL', 15, ' ') . ' : ' . $memberRenewal->to_date . "\n");
+            $printer->text(str_pad('TANGGAL TRX', 15, ' ') . ' : ' . date('d-M-Y H:i:s', strtotime($memberRenewal->created_at)) . "\n");
+            $printer->text(str_pad('NAMA MEMBER', 15, ' ') . ' : ' . strtoupper($memberRenewal->parkingMember->name) . "\n");
+            $printer->text(str_pad('NOMOR KARTU', 15, ' ') . ' : ' . $memberRenewal->parkingMember->card_number . "\n");
+            $printer->text(str_pad('DARI TANGGAL', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->from_date)) . "\n");
+            $printer->text(str_pad('SAMPAI TANGGAL', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->to_date)) . "\n");
             $printer->text(str_pad('JUMLAH', 15, ' ') . ' : ' .'Rp. ' . number_format($memberRenewal->amount, 0, ',', '.') . ",-\n");
             $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper($memberRenewal->user->name) . "\n\n");
             $printer->cut();
