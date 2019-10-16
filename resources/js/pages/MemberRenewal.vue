@@ -16,7 +16,7 @@
         height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="created_at" label="Tanggal Transaksi" sortable="custom">
+            <el-table-column prop="created_at" label="Tanggal Trx" sortable="custom">
                 <template slot-scope="scope">
                     {{scope.row.created_at | readableDateTime}}
                 </template>
