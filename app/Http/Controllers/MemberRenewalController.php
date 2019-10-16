@@ -6,6 +6,9 @@ use Illuminate\Http\Request;
 use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
 use App\ParkingGate;
+use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+use Mike42\Escpos\Printer;
 
 class MemberRenewalController extends Controller
 {
