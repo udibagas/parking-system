@@ -197,7 +197,6 @@ def gate_in_thread(gate):
 
                 if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
                     logging.info(gate['name'] + ' : Vehicle detected')
-
                     # play selamat datang
                     try:
                         s.sendall(b'\xa6MT00007\xa9')
@@ -208,7 +207,7 @@ def gate_in_thread(gate):
                         # keluar dari loop cek kendaraan untuk sambung ulang controller
                         break
                 else:
-                    time.sleep(1)
+                    time.sleep(3)
                     continue
 
                 reset = False
