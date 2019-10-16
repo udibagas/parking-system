@@ -214,6 +214,10 @@
                 </tbody>
             </table>
         </el-dialog>
+
+        <el-dialog title="SNAPSHOT KAMERA" center :visible.sync="snapshotPreview">
+            <img :src="snapshot" alt="" style="width:100%">
+        </el-dialog>
     </div>
 </template>
 
@@ -233,7 +237,9 @@ export default {
             order: 'ascending',
             loading: false,
             showDetail: false,
-            selectedData: {}
+            selectedData: {},
+            snapshot: '',
+            snapshotPreview: false
         }
     },
     methods: {
@@ -244,6 +250,11 @@ export default {
                     type: 'success',
                     showClose: true
                 });
+
+                if (action == 'testCamera') {
+                    this.snapshot = 'data:image/jpeg;base64,' + r.data.snapshot
+                    this.snapshotPreview = true
+                }
             }).catch(e => {
                 this.$message({
                     message: e.response.data.message,

@@ -121,7 +121,7 @@ class ParkingGateController extends Controller
 
         return [
             'message' => 'BERHASIL MENGAMBIL SNAPSHOT',
-            'snapshot' => $response->getBody()
+            'snapshot' => base64_encode($response->getBody()->getContents())
         ];
     }
 
