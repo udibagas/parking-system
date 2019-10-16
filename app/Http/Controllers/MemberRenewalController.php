@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
+use App\LocationIdentity;
 use App\ParkingGate;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
@@ -79,9 +80,14 @@ class MemberRenewalController extends Controller
     public function printSlip(MemberRenewal $memberRenewal)
     {
         $parkingGate = ParkingGate::where('type', 'OUT')->where('active', 1)->first();
+        $location = LocationIdentity::where('active', 1)->first();
 
         if (!$parkingGate) {
             return response(['message' => 'TIDAK ADA PRINTER YANG DIPILIH'], 404);
+        }
+
+        if (!$location) {
+            return response(['message' => 'LOKASI BELUM DISET'], 404);
         }
 
         try {
@@ -101,6 +107,7 @@ class MemberRenewalController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("SLIP PEMBAYARAN KEANGGOTAAN\n");
+            $printer->text($location->name."\n");
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
