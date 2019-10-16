@@ -13,7 +13,7 @@ class MemberRenewalRequest extends FormRequest
      */
     public function authorize()
     {
-        return false;
+        return auth()->check();
     }
 
     /**
@@ -27,6 +27,15 @@ class MemberRenewalRequest extends FormRequest
             'parking_member_id' => 'required|exists:parking_members,id',
             'from_date' => 'required|date',
             'to_date' => 'required|date',
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'parking_member_id' => 'Member',
+            'from_date' => 'Dari Tanggal',
+            'to_date' => 'Sampai Tanggal',
         ];
     }
 }

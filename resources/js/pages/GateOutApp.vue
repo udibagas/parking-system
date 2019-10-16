@@ -296,13 +296,13 @@ export default {
                     showClose: true
                 })
             }).finally(() => {
-                setTimeout(this.openGate, 3000);
+                this.openGate()
             })
         },
         update(ticket) {
             axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
                 // print tiket hanya untuk non member
-                if (r.data.is_member == 0 || ticket) {
+                if (r.data.is_member == 0 && ticket) {
                     this.printTicket(r.data.id)
                 }
             }).catch(e => {
@@ -312,7 +312,7 @@ export default {
                     showClose: true
                 })
             }).finally(() => {
-                setTimeout(this.openGate, 3000);
+                this.openGate()
             })
         },
         takeSnapshot(id) {
@@ -364,7 +364,7 @@ export default {
                 this.formModel.plate_number = r.data.default_plate_number
             }).catch(e => {
                 this.$message({
-                    message: 'PLEASE SET LOCATION',
+                    message: 'MOHON SET LOKASI',
                     type: 'error',
                     showClose: true
                 })
@@ -376,7 +376,7 @@ export default {
 
                 if (r.data.filter(g => g.type == 'IN').length == 0) {
                     this.$message({
-                        message: 'PLEASE SET GATE IN',
+                        message: 'MOHON SET GATE IN',
                         type: 'error',
                         showClose: true
                     })
@@ -385,7 +385,7 @@ export default {
 
                 if (r.data.filter(g => g.type == 'OUT').length == 0) {
                     this.$message({
-                        message: 'PLEASE SET GATE OUT',
+                        message: 'MOHON SET GATE OUT',
                         type: 'error',
                         showClose: true
                     })
@@ -393,7 +393,7 @@ export default {
                 }
             }).catch(e => {
                 this.$message({
-                    message: 'PLEASE SET GATE',
+                    message: 'MOHON SET GATE',
                     type: 'error',
                     showClose: true
                 })
@@ -403,7 +403,7 @@ export default {
             axios.get('/vehicleType/getList').then(r => {
                 if (r.data.length == 0) {
                     this.$message({
-                        message: 'PLEASE SET VEHICLE TYPE',
+                        message: 'MOHON SET JENIS KENDARAAN',
                         type: 'error',
                         showClose: true
                     })
@@ -417,16 +417,10 @@ export default {
                     this.formModel.vehicle_type = default_vehicle.name
                     this.formModel.fare = default_vehicle.tarif_flat
                     this.$forceUpdate()
-                } else {
-                    this.$message({
-                        message: 'PLEASE SET DEFAULT VEHICLE TYPE',
-                        type: 'error',
-                        showClose: true
-                    })
                 }
             }).catch(e => {
                 this.$message({
-                    message: 'PLEASE SET VEHICLE TYPE',
+                    message: 'MOHON SET JENIS KENDARAAN',
                     type: 'error',
                     showClose: true
                 })

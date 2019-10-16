@@ -41,7 +41,9 @@ class ParkingTransactionController extends Controller
                 return $q->where('parking_transactions.barcode_number', 'LIKE', '%' . $request->keyword . '%')
                     ->orWhere('parking_transactions.plate_number', 'LIKE', '%' . $request->keyword . '%')
                     ->orWhere('parking_transactions.card_number', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('parking_transactions.operator', 'LIKE', '%' . $request->keyword . '%');
+                    ->orWhere('parking_transactions.operator', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('parking_gate_in.name', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('parking_gate_out.name', 'LIKE', '%' . $request->keyword . '%');
             })->when($request->is_member, function ($q) use ($request) {
                 return $q->whereIn('is_member', $request->is_member);
             })->orderBy($sort, $order)->paginate($request->pageSize);

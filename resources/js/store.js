@@ -15,6 +15,7 @@ export default new Vuex.Store({
         vehicleTypeList: [],
         parkingGateList: [],
         groupMemberList: [],
+        memberList: [],
         navigationList: [],
         setting: {}
     },
@@ -25,6 +26,10 @@ export default new Vuex.Store({
         },
         getGroupMemberList(state) {
             axios.get('/groupMember/getList').then(r => state.groupMemberList = r.data)
+                .catch(e => console.log(e))
+        },
+        getMemberList(state) {
+            axios.get('/parkingMember/getList').then(r => state.memberList = r.data)
                 .catch(e => console.log(e))
         },
         getParkingGateList(state) {

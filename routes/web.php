@@ -26,6 +26,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::resource('parkingGate', 'ParkingGateController')->except(['create', 'edit']);
     Route::get('vehicleType/getList', 'VehicleTypeController@getList');
     Route::resource('vehicleType', 'VehicleTypeController')->except(['create', 'edit']);
+    Route::get('parkingMember/getList', 'ParkingMemberController@getList');
     Route::get('parkingMember/search', 'ParkingMemberController@search');
     Route::resource('parkingMember', 'ParkingMemberController')->except(['create', 'edit']);
     Route::get('groupMember/getList', 'GroupMemberController@getList');
@@ -40,7 +41,8 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
     Route::resource('setting', 'SettingController')->only(['index', 'update', 'store']);
     Route::delete('memberVehicle/{memberVehicle}', 'MemberVehicleController@destroy');
-    // Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
+    Route::post('memberRenewal/printSlip/{memberRenewal}', 'MemberRenewalController@printSlip');
+    Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
 
     // Report
     Route::get('getIncome', 'ReportController@getIncome');

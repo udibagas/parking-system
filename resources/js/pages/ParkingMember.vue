@@ -1,7 +1,5 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="MEMBER"> </el-page-header>
-        <el-divider></el-divider>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item v-if="$store.state.user.role == 1">
                 <el-button @click="openForm({vehicles: [], register_date: now})" type="primary" icon="el-icon-plus">TAMBAH MEMBER</el-button>
@@ -16,7 +14,7 @@
         <el-table :data="tableData.data" stripe
         @row-dblclick="(row, column, event) => { selectedData = row; showDetail = true }"
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 345px)"
         @filter-change="(f) => { let c = Object.keys(f)[0]; filters[c] = Object.values(f[c]); page = 1; requestData(); }"
         v-loading="loading"
         @sort-change="sortChange">
@@ -79,11 +77,9 @@
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native.prevent="() => { selectedData = scope.row; showDetail = true; }"><i class="el-icon-zoom-in"></i> Lihat Detail</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-money"></i> Bayar Tagihan</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-printer"></i> Cetak Bukti Bayar Terakhir</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-edit-outline"></i> Edit</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Hapus</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-zoom-in" @click.native.prevent="() => { selectedData = scope.row; showDetail = true; }">Lihat Detail</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-edit-outline" @click.native.prevent="openForm(scope.row)">Edit</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-delete" @click.native.prevent="deleteData(scope.row.id)">Hapus</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>

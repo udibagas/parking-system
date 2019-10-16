@@ -19,6 +19,8 @@ class ParkingMember extends Model
 
     protected $with = ['vehicles'];
 
+    protected $casts = ['paid' => 'boolean'];
+
     public function vehicles()
     {
         return $this->hasMany(MemberVehicle::class);

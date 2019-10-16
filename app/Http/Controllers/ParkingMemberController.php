@@ -154,4 +154,10 @@ class ParkingMemberController extends Controller
         $parkingMember->delete();
         return ['message' => 'Member telah dihapus'];
     }
+
+    public function getList()
+    {
+        return ParkingMember::selectRaw('id, name, card_number, paid')
+            ->orderBy('name', 'ASC')->get();
+    }
 }
