@@ -120,7 +120,7 @@ def print_ticket_serial(gate, data, s):
 
     try:
         s.sendall(str.encode(''.join(command)))
-        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+        logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to print ticket ' + data['barcode_number'] + ' ' + str(e))
         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
@@ -186,29 +186,29 @@ def gate_in_thread(gate):
             while True:
                 try:
                     s.sendall(b'\xa6STAT\xa9')
-                    vehicle_detection = s.recv(1024)
+                    vehicle_detection = s.recv(64)
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to detect vehicle ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal deteksi kendaraan')
                     # keluar dari loop cek kendaraan untuk sambung ulang controller
                     break
 
-                logging.debug(gate['name'] + ' : ' + str(vehicle_detection))
+                logging.debug(gate['name'] + ' : Detecting vehicle ' + str(vehicle_detection))
 
                 if b'IN1ON' in vehicle_detection or b'STAT1' in vehicle_detection:
                     logging.info(gate['name'] + ' : Vehicle detected')
-                    # play selamat datang
                     try:
                         logging.debug(gate['name'] + ' : Playing welcome')
+                        time.sleep(.1)
                         s.sendall(b'\xa6MT00007\xa9')
-                        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+                        # logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play Selamat Datang ' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play Selamat Datang ')
                         # keluar dari loop cek kendaraan untuk sambung ulang controller
                         break
                 else:
-                    time.sleep(3)
+                    time.sleep(2)
                     continue
 
                 reset = False
@@ -217,15 +217,16 @@ def gate_in_thread(gate):
                 # detect push button or card
                 while True:
                     try:
+                        time.sleep(.1)
                         s.sendall(b'\xa6STAT\xa9')
-                        push_button_or_card = s.recv(1024)
+                        push_button_or_card = s.recv(64)
                     except Exception:
                         logging.error(gate['name'] + ' : Failed to sense button and card')
                         send_notification(gate, gate['name'] + ' : Gagal mendeteksi tombol tiket')
                         error = True
                         break
 
-                    logging.debug(gate['name'] + ' : ' + str(push_button_or_card))
+                    logging.debug(gate['name'] + ' : Detecting button or card ' + str(push_button_or_card))
 
                     if b'W' in push_button_or_card:
                         card_number = str(push_button_or_card).split('W')[1].split('\\xa9')[0]
@@ -233,6 +234,7 @@ def gate_in_thread(gate):
 
                         if not member:
                             try:
+                                time.sleep(.1)
                                 s.sendall(b'\xa6MT00003\xa9')
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon invalid card ' + str(e))
@@ -259,7 +261,9 @@ def gate_in_thread(gate):
                     elif b'IN4ON' in push_button_or_card:
                         reset = True
                         try:
+                            time.sleep(.1)
                             s.sendall(b'\xa6MT00005\xa9')
+                            time.sleep(10)
                         except Exception as e:
                             logging.error(gate['name'] + ' : Failed to respon help button ' + str(e))
                             send_notification(gate, gate['name'] + ' : Gagal merespon tombol bantuan')
@@ -307,7 +311,7 @@ def gate_in_thread(gate):
                     # play silakan ambil tiket
                     try:
                         s.sendall(b'\xa6MT00002\xa9')
-                        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+                        logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play silakan ambil tiket' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play silakan ambil tiket')
@@ -316,7 +320,7 @@ def gate_in_thread(gate):
                 # play terimakasih
                 try:
                     s.sendall(b'\xa6MT00006\xa9')
-                    logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+                    logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
                 except Exception:
                     logging.error(gate['name'] + ' : Failed to play terimakasih' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal play terimakasih')
@@ -327,7 +331,7 @@ def gate_in_thread(gate):
                 # open gate
                 try:
                     s.sendall(b'\xa6OPEN1\xa9')
-                    logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+                    logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal membuka gate')
@@ -348,7 +352,7 @@ def gate_in_thread(gate):
 
                     try:
                         s.sendall(b'\xa6STAT\xa9')
-                        vehicle_in = s.recv(1024)
+                        vehicle_in = s.recv(64)
                         logging.debug(gate['name'] + ' : ' + str(vehicle_in))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to sense loop 2 ' + str(e))
