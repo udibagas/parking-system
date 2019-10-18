@@ -105,9 +105,7 @@ class ParkingMemberController extends Controller
                 ->where('time_out', null)
                 ->first();
 
-            if ($unclosed) {
-                return response(['message' => 'Member has unclosed transaction'], 404);
-            }
+            $member->unclosed = $unclosed ? true : false;
         }
 
         return $member;

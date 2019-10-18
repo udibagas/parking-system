@@ -246,7 +246,7 @@ def gate_in_thread(gate):
 
                         if member['expired']:
                             try:
-                                s.sendall(b'\xa6MT00010\xa9')
+                                s.sendall(b'\xa6MT00013\xa9')
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon card expired ' + str(e))
                                 send_notification(gate, gate['name'] + ' : Gagal merespon kartu expired')
@@ -255,16 +255,27 @@ def gate_in_thread(gate):
 
                             continue
 
+                        if member['unclosed']:
+                            try:
+                                s.sendall(b'\xa6MT00014\xa9')
+                            except Exception as e:
+                                logging.error(gate['name'] + ' : Failed to respon card unclosed ' + str(e))
+                                send_notification(gate, gate['name'] + ' : Gagal merespon kartu belum selesai transaksi')
+                                error = True
+                                break
+
+                            continue
+
                         if not member['expired'] and member['expired_in'] == 5:
                             try:
-                                s.sendall(b'\xa6MT00008\xa9')
+                                s.sendall(b'\xa6MT00011\xa9')
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon card expired in 5 days ' + str(e))
                                 send_notification(gate, gate['name'] + ' : Gagal merespon kartu expired dalam 5 hari')
 
                         if not member['expired'] and member['expired_in'] == 1:
                             try:
-                                s.sendall(b'\xa6MT00009\xa9')
+                                s.sendall(b'\xa6MT00012\xa9')
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon card expired in 1 day ' + str(e))
                                 send_notification(gate, gate['name'] + ' : Gagal merespon kartu expired dalam 1 hari')
