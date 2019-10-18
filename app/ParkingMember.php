@@ -28,11 +28,11 @@ class ParkingMember extends Model
 
     public function getExpiredInAttribute()
     {
-        return (int) (new DateTime($this->expiry_date))->diff(new DateTime())->format('%a');
+        return (int) (new DateTime($this->expiry_date))->diff(new DateTime(date('Y-m-d')))->format('%a');
     }
 
     public function getExpiredAttribute()
     {
-        return strtotime(now()) > strtotime($this->expiry_date);
+        return strtotime(date('Y-m-d')) > strtotime($this->expiry_date);
     }
 }
