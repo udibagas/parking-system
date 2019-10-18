@@ -167,6 +167,27 @@ export default {
                 let params = { barcode_number: this.formModel.barcode_number }
                 axios.get('/parkingTransaction/search', { params: params }).then(r => {
                     if (r.data.is_member) {
+                        if (r.data.member.expired) {
+                            this.$alert('Kartu telah habis masa berlaku', 'Perhatian', {
+                                type: 'warning',
+                                center: true,
+                                roundButton: true,
+                                confirmButtonText: 'OK',
+                                confirmButtonClass: 'bg-red',
+                            })
+                            return
+                        }
+
+                        if (!r.data.member.expired && r.data.member.expired_in <= 5) {
+                            this.$alert('Kartu akan habis masa berlaku dalam ' + r.data.member.expired_in + ' hari', 'Perhatian', {
+                                type: 'warning',
+                                center: true,
+                                roundButton: true,
+                                confirmButtonText: 'OK',
+                                confirmButtonClass: 'bg-red',
+                            })
+                        }
+
                         let vehicle = r.data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
 
                         if (!vehicle) {
