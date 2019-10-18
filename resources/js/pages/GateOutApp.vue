@@ -30,7 +30,7 @@
                             <div class="label-big">[-] NO. PLAT</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" @keyup.f12="printLastTrx" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
+                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -39,7 +39,7 @@
                             <div class="label-big">[+] NO. TIKET/KARTU</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" @keyup.f12="printLastTrx" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -449,7 +449,7 @@ export default {
         this.getVehicleTypeList()
         document.getElementById('plate-number').focus()
 
-        document.getElementById('gate-out-app').onkeyup = (e) => {
+        document.getElementById('gate-out-app').onkeydown = (e) => {
             console.log(e.key)
             // ke field nomor plat
             if (e.key == '-') {
@@ -491,10 +491,11 @@ export default {
                 document.getElementById('time-in').focus()
             }
 
-            // if (e.key == '.' || e.key == 'F12') {
-            //     e.preventDefault()
-            //     this.printLastTrx()
-            // }
+            if (e.key == 'F12') {
+                e.preventDefault()
+                // alert('F12')
+                this.printLastTrx()
+            }
         }
     }
 
