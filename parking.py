@@ -269,6 +269,7 @@ def gate_in_thread(gate):
                         if not member['expired'] and member['expired_in'] == 5:
                             try:
                                 s.sendall(b'\xa6MT00011\xa9')
+                                time.sleep(6)
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon card expired in 5 days ' + str(e))
                                 send_notification(gate, gate['name'] + ' : Gagal merespon kartu expired dalam 5 hari')
@@ -276,6 +277,7 @@ def gate_in_thread(gate):
                         if not member['expired'] and member['expired_in'] == 1:
                             try:
                                 s.sendall(b'\xa6MT00012\xa9')
+                                time.sleep(6)
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon card expired in 1 day ' + str(e))
                                 send_notification(gate, gate['name'] + ' : Gagal merespon kartu expired dalam 1 hari')
