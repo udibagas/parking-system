@@ -16,7 +16,12 @@ while True:
 
         while True:
             try:
-                s.sendall(b'\xa6STAT\xa9')
+                s.send(b'\xa6MT00008\xa9')
+                time.sleep(5)
+                s.send(b'\xa6MT00009\xa9')
+                time.sleep(5)
+                s.send(b'\xa6MT000010\xa9')
+                time.sleep(5)
             except Exception as e:
                 print(str(e))
 

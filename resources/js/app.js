@@ -34,6 +34,7 @@ Vue.filter('formatNumber', function (v) {
 
 });
 
+Vue.config.keyCodes.f12 = 123
 
 Vue.component('App', require('./App').default)
 

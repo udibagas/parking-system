@@ -86,7 +86,8 @@ class ParkingMemberController extends Controller
         $member = ParkingMember::selectRaw('parking_members.*')
             ->join('member_vehicles', 'member_vehicles.parking_member_id', '=', 'parking_members.id')
             ->where('parking_members.is_active', 1)
-            ->where('parking_members.expiry_date', '>=', date('Y-m-d'))
+            // comment this line. prosesnya nanti di client
+            // ->where('parking_members.expiry_date', '>=', date('Y-m-d'))
             ->when($request->card_number, function($q) use ($request) {
                 return $q->where('parking_members.card_number', 'LIKE', '%'.$request->card_number);
             })->when($request->plate_number, function($q) use ($request) {

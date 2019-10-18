@@ -195,6 +195,17 @@ class ParkingTransactionController extends Controller
      */
     public function search(Request $request)
     {
+        // untuk print last trx
+        if ($request->gate_out_id) {
+            $data = ParkingTransaction::where('gate_out_id', $request->gate_out_id)->latest()->first();
+
+            if (!$data) {
+                return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
+            }
+
+            return $data;
+        }
+
         // ambil transaksi terakhir yg blm tap out
         $data = ParkingTransaction::with(['member'])->when($request->barcode_number, function($q) use ($request) {
                 return $q->where('barcode_number', $request->barcode_number)

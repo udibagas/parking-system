@@ -231,10 +231,10 @@ def gate_in_thread(gate):
                     if b'W' in push_button_or_card:
                         card_number = str(push_button_or_card).split('W')[1].split('\\xa9')[0]
                         member = check_card(gate, str(int(card_number, 16)))
+                        time.sleep(.1) # kasih jeda biar audio bisa play
 
                         if not member:
                             try:
-                                time.sleep(.1)
                                 s.sendall(b'\xa6MT00003\xa9')
                             except Exception as e:
                                 logging.error(gate['name'] + ' : Failed to respon invalid card ' + str(e))
@@ -243,6 +243,31 @@ def gate_in_thread(gate):
                                 break
 
                             continue
+
+                        if member['expired']:
+                            try:
+                                s.sendall(b'\xa6MT00010\xa9')
+                            except Exception as e:
+                                logging.error(gate['name'] + ' : Failed to respon card expired ' + str(e))
+                                send_notification(gate, gate['name'] + ' : Gagal merespon kartu expired')
+                                error = True
+                                break
+
+                            continue
+
+                        if not member['expired'] and member['expired_in'] == 5:
+                            try:
+                                s.sendall(b'\xa6MT00008\xa9')
+                            except Exception as e:
+                                logging.error(gate['name'] + ' : Failed to respon card expired in 5 days ' + str(e))
+                                send_notification(gate, gate['name'] + ' : Gagal merespon kartu expired dalam 5 hari')
+
+                        if not member['expired'] and member['expired_in'] == 1:
+                            try:
+                                s.sendall(b'\xa6MT00009\xa9')
+                            except Exception as e:
+                                logging.error(gate['name'] + ' : Failed to respon card expired in 1 day ' + str(e))
+                                send_notification(gate, gate['name'] + ' : Gagal merespon kartu expired dalam 1 hari')
 
                         data = {'is_member': 1, 'card_number': member['card_number'], 'parking_member_id': member['id']}
                         logging.info(gate['name'] + ' : Card detected :' + member['card_number'])

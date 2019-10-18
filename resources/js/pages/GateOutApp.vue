@@ -30,7 +30,7 @@
                             <div class="label-big">[-] NO. PLAT</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
+                            <input id="plate-number" autocomplete="off" @keyup.enter="checkPlate" @keyup.f12="printLastTrx" type="text" placeholder="NO. PLAT" v-model="formModel.plate_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -39,7 +39,7 @@
                             <div class="label-big">[+] NO. TIKET/KARTU</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" @keyup.f12="printLastTrx" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -399,6 +399,22 @@ export default {
                 })
             })
         },
+        printLastTrx() {
+            if (!this.formModel.gate_out_id) {
+                return
+            }
+
+            let params = { gate_out_id: this.formModel.gate_out_id }
+            axios.get('/parkingTransaction/search', { params: params }).then(r => {
+                this.printTicket(r.data.id)
+            }).catch(e => {
+                this.$message({
+                    message: 'BELUM ADA TRANSAKSI',
+                    type: 'error',
+                    showClose: true
+                })
+            })
+        },
         getVehicleTypeList() {
             axios.get('/vehicleType/getList').then(r => {
                 if (r.data.length == 0) {
@@ -433,7 +449,8 @@ export default {
         this.getVehicleTypeList()
         document.getElementById('plate-number').focus()
 
-        document.getElementById('gate-out-app').onkeypress = (e) => {
+        document.getElementById('gate-out-app').onkeyup = (e) => {
+            console.log(e.key)
             // ke field nomor plat
             if (e.key == '-') {
                 e.preventDefault()
@@ -473,6 +490,11 @@ export default {
                 this.formModel.time_in = ''
                 document.getElementById('time-in').focus()
             }
+
+            // if (e.key == '.' || e.key == 'F12') {
+            //     e.preventDefault()
+            //     this.printLastTrx()
+            // }
         }
     }
 

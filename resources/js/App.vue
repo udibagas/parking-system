@@ -124,7 +124,7 @@ export default {
                     }).then(() => {
                         this.notif = false
                         axios.put('/notification/' + n.id, { read: 1 }).then(rr => {
-                            console.log(rr.data)
+                            // console.log(rr.data)
                         }).catch(e => console.log(e))
                     })
                 }
