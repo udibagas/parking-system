@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { Message } from 'element-ui';
 
 Vue.use(Vuex)
 
@@ -42,7 +43,14 @@ export default new Vuex.Store({
         },
         getSetting(state) {
             axios.get('/setting').then(r => state.setting = r.data)
-                .catch(e => console.log(e))
+                .catch(e => {
+                    Message({
+                        message: 'BELUM ADA SETTING',
+                        type: 'error',
+                        showClose: true,
+                        duration: 10000
+                    })
+                })
         }
     }
 })

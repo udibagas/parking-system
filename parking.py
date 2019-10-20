@@ -14,24 +14,19 @@ import os
 import logging
 
 API_URL = 'http://localhost/api'
-LOCATION = False
+SETTING = False
 
-def get_location():
-    attempt = 0
-    while True:
-        attempt += 1
-        try:
-            r = requests.get(API_URL + '/locationIdentity/search', params={'active': 1}, timeout=3)
-        except Exception as e:
-            logging.error('Failed to get location ' + str(e))
-            time.sleep(3)
-            if attempt == 10:
-                return False
-
-        if r.status_code == 200:
-            return r.json()
-
+def get_setting():
+    try:
+        r = requests.get(API_URL + '/setting', timeout=3)
+    except Exception as e:
+        logging.error('Failed to get setting ' + str(e))
         return False
+
+    if r.status_code == 200:
+        return r.json()
+
+    return False
 
 def get_gates():
     try:
@@ -80,7 +75,7 @@ def print_ticket_network(gate, data):
         p.set(align='center')
         p.text("TIKET PARKIR\n")
         p.set(height=2, align='center')
-        p.text(LOCATION['name'] + "\n\n")
+        p.text(SETTING['location_name'] + "\n\n")
         p.set(align='left')
         p.text('GATE         : ' + gate['name'] + "/" + gate['vehicle_type'] + "\n")
         p.text('TANGGAL      : ' + datetime.datetime.strptime(data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + "\n")
@@ -88,7 +83,7 @@ def print_ticket_network(gate, data):
         p.set(align='center')
         p.barcode(data['barcode_number'], 'CODE39', function_type='A', height=100, width=4, pos='BELOW', align_ct=True)
         p.text("\n")
-        p.text(LOCATION['additional_info_ticket'])
+        p.text(SETTING['additional_info_ticket'])
         p.cut()
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to print ticket ' + data['barcode_number'] + ' ' + str(e))
@@ -101,7 +96,7 @@ def print_ticket_serial(gate, data, s):
     command = [
         '\xa6PR4', # start print command, baudrate 9600
         '\x1b\x61\x01TIKET PARKIR\n', # align center
-        '\x1b\x21\x10' + LOCATION['name'] +'\n\n', # double height
+        '\x1b\x21\x10' + SETTING['location_name'] +'\n\n', # double height
         '\x1b\x21\x00', # normal height
         '\x1b\x61\x00', # align left
         'GATE         : ' + gate['name'] + '/' +  gate['vehicle_type'] + '\n',
@@ -113,7 +108,7 @@ def print_ticket_serial(gate, data, s):
         '\x1dkE', # GS k 69
         chr(len(data['barcode_number'])), # barcode length
         data['barcode_number'], # barcode content
-        '\n' + LOCATION['additional_info_ticket'] + '\n',
+        '\n' + SETTING['additional_info_ticket'] + '\n',
         '\x1d\x56A', # full cut, add 3 lines: GS V 65
         '\xa9' # end command
     ]
@@ -137,7 +132,7 @@ def send_notification(gate, message):
         return False
 
     try:
-        data = { 'text': LOCATION['name'] + ' - ' + message, 'chat_id': 527538821 }
+        data = { 'text': SETTING['location_name'] + ' - ' + message, 'chat_id': 527538821 }
         requests.post('https://api.telegram.org/bot682525135:AAH5H-rqnDlyODgWzNpKiUZGszGz9Oys49g/sendMessage', data=data, timeout=3)
     except Exception:
         pass
@@ -410,14 +405,14 @@ def gate_in_thread(gate):
                     break
 
 def start_app():
-    global LOCATION
-    LOCATION = get_location()
+    global SETTING
+    SETTING = get_setting()
 
-    if LOCATION == False:
+    if SETTING == False:
         logging.info('Location not set. Exit application.')
         sys.exit()
 
-    logging.info('Location set: ' + LOCATION['name'])
+    logging.info('Location set: ' + SETTING['location_name'])
 
     gates = get_gates()
 

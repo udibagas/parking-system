@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\ParkingMember;
 use App\Http\Requests\ParkingMemberRequest;
 use App\ParkingTransaction;
+use App\Setting;
 use Illuminate\Support\Facades\DB;
 
 class ParkingMemberController extends Controller
@@ -99,13 +100,19 @@ class ParkingMemberController extends Controller
         }
 
         // kalau cari berdasarkan kartu berarti di gate in, cari apa dia ada transaksi yg blm closed
-        if ($request->card_number) {
-            // cari dia di group mana, boleh apa gak tap in kalau masih ada yg blm closed
+        if ($request->card_number)
+        {
             $unclosed = ParkingTransaction::where('card_number', 'LIKE', '%'.$request->card_number)
                 ->where('time_out', null)
                 ->first();
 
-            $member->unclosed = $unclosed ? true : false;
+            $setting = Setting::first();
+            $member->unclosed = $setting && $setting->must_checkout && $unclosed ? true : false;
+
+            // kalau gak harus check out otomatis close trx sebelumnya
+            if ($setting && !$setting->must_checkout && $unclosed) {
+                $unclosed->update(['time_out' => now()]);
+            }
         }
 
         return $member;

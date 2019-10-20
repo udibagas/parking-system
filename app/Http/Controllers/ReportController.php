@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\LocationIdentity;
+use App\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -82,7 +82,7 @@ class ReportController extends Controller
         ];
 
         if ($request->action == 'print') {
-            $data['location'] = LocationIdentity::where('active', 1)->first();
+            $data['setting'] = Setting::first();
             return view('print_report', $data);
         } else if ($request->action == 'export') {
             return $data;

@@ -5,8 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
-use App\LocationIdentity;
 use App\ParkingGate;
+use App\Setting;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
@@ -80,14 +80,18 @@ class MemberRenewalController extends Controller
     public function printSlip(MemberRenewal $memberRenewal)
     {
         $parkingGate = ParkingGate::where('type', 'OUT')->where('active', 1)->first();
-        $location = LocationIdentity::where('active', 1)->first();
+        $setting = Setting::first();
 
         if (!$parkingGate) {
             return response(['message' => 'TIDAK ADA PRINTER YANG DIPILIH'], 404);
         }
 
-        if (!$location) {
-            return response(['message' => 'LOKASI BELUM DISET'], 404);
+        if (!$setting) {
+            return response(['message' => 'BELUM ADA SETTING'], 500);
+        }
+
+        if (!$setting->location_name) {
+            return response(['message' => 'LOKASI BELUM DISET'], 500);
         }
 
         try {
@@ -106,18 +110,18 @@ class MemberRenewalController extends Controller
 
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("SLIP PEMBAYARAN KEANGGOTAAN\n");
-            $printer->text($location->name."\n");
+            $printer->text("SLIP PEMBAYARAN KEANGGOTAAN PARKIR\n");
+            $printer->text($setting->location_name."\n");
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text(str_pad('TANGGAL TRX', 15, ' ') . ' : ' . date('d-M-Y H:i:s', strtotime($memberRenewal->created_at)) . "\n");
-            $printer->text(str_pad('NAMA MEMBER', 15, ' ') . ' : ' . strtoupper($memberRenewal->parkingMember->name) . "\n");
-            $printer->text(str_pad('NOMOR KARTU', 15, ' ') . ' : ' . $memberRenewal->parkingMember->card_number . "\n");
-            $printer->text(str_pad('DARI TANGGAL', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->from_date)) . "\n");
-            $printer->text(str_pad('SAMPAI TANGGAL', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->to_date)) . "\n");
-            $printer->text(str_pad('JUMLAH', 15, ' ') . ' : ' .'Rp. ' . number_format($memberRenewal->amount, 0, ',', '.') . ",-\n");
-            $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper($memberRenewal->user->name) . "\n\n");
+            $printer->text(str_pad('Tanggal Trx', 15, ' ') . ' : ' . date('d-M-Y H:i:s', strtotime($memberRenewal->created_at)) . "\n");
+            $printer->text(str_pad('Nama Member', 15, ' ') . ' : ' . strtoupper($memberRenewal->parkingMember->name) . "\n");
+            $printer->text(str_pad('Nomor Kartu', 15, ' ') . ' : ' . $memberRenewal->parkingMember->card_number . "\n");
+            $printer->text(str_pad('Dari Tangal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->from_date)) . "\n");
+            $printer->text(str_pad('Sampai Tanggal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->to_date)) . "\n");
+            $printer->text(str_pad('Jumlah', 15, ' ') . ' : ' .'Rp. ' . number_format($memberRenewal->amount, 0, ',', '.') . ",-\n");
+            $printer->text(str_pad('Petugas', 15, ' ') . ' : ' . strtoupper($memberRenewal->user->name) . "\n\n");
             $printer->cut();
             $printer->close();
         } catch (\Exception $e) {

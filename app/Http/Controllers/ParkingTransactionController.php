@@ -8,9 +8,9 @@ use App\Http\Requests\ParkingTransactionRequest;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
-use App\LocationIdentity;
 use App\ParkingGate;
 use App\ParkingMember;
+use App\Setting;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 
@@ -104,10 +104,14 @@ class ParkingTransactionController extends Controller
 
     public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
     {
-        $location = LocationIdentity::where('active', 1)->first();
+        $setting = Setting::first();
 
-        if (!$location) {
-            return response(['message' => 'LOKASI TIDAK DISET'], 500);
+        if (!$setting) {
+            return response(['message' => 'BELUM ADA SETTING'], 500);
+        }
+
+        if (!$setting->location_name) {
+            return response(['message' => 'LOKASI BELUM DISET'], 404);
         }
 
         $gateId = $request->trx == 'OUT' ? $parkingTransaction->gate_out_id : $parkingTransaction->gate_in_id;
@@ -132,8 +136,8 @@ class ParkingTransactionController extends Controller
             try {
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text("STRUK PARKIR\n");
-                $printer->text($location->name . "\n");
-                $printer->text($location->address . "\n\n");
+                $printer->text($setting->location_name . "\n");
+                $printer->text($setting->location_address . "\n\n");
 
                 $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
                 $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gate->name);
@@ -160,8 +164,8 @@ class ParkingTransactionController extends Controller
             try {
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
                 $printer->text("TIKET PARKIR\n");
-                $printer->text($location->name . "\n");
-                $printer->text($location->address . "\n\n");
+                $printer->text($setting->location_name . "\n");
+                $printer->text($setting->location_address . "\n\n");
 
                 $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
                 $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type);
@@ -176,7 +180,7 @@ class ParkingTransactionController extends Controller
                 // $printer->setBarcodeWidth(4);
                 // $printer->barcode($parkingTransaction->barcode_number, 'CODE39');
                 // $printer->text("\n");
-                $printer->text($location->additional_info_ticket . "\n");
+                $printer->text($setting->additional_info_ticket . "\n");
                 $printer->cut();
                 $printer->close();
             } catch (\Exception $e) {

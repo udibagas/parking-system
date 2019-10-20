@@ -379,18 +379,6 @@ export default {
                 this.resetForm()
             })
         },
-        getLocationIdentity() {
-            axios.get('/locationIdentity/search', {params: {active: 1}}).then(r => {
-                this.location = r.data
-                this.formModel.plate_number = r.data.default_plate_number
-            }).catch(e => {
-                this.$message({
-                    message: 'MOHON SET LOKASI',
-                    type: 'error',
-                    showClose: true
-                })
-            })
-        },
         getParkingGateList() {
             axios.get('/parkingGate/getList').then(r => {
                 this.parkingGateList = r.data
@@ -465,7 +453,7 @@ export default {
         },
     },
     mounted() {
-        this.getLocationIdentity()
+        this.$store.commit('getSetting')
         this.getParkingGateList()
         this.getVehicleTypeList()
         document.getElementById('plate-number').focus()
