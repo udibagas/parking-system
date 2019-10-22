@@ -6,7 +6,7 @@
         <el-tabs type="card">
             <el-tab-pane lazy label="Global Setting" v-loading="loading">
                 <el-card>
-                    <el-form label-position="left" label-width="250px">
+                    <el-form label-position="left" label-width="210px">
                         <el-form-item label="Nama Lokasi" :class="formErrors.location_name ? 'is-error' : ''">
                             <el-input placeholder="Nama Lokasi" v-model="formModel.location_name"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.location_name">{{formErrors.location_name[0]}}</div>
@@ -31,11 +31,18 @@
                             <div class="el-form-item__error" v-if="formErrors.jml_kendaraan_per_kartu">{{formErrors.jml_kendaraan_per_kartu[0]}}</div>
                         </el-form-item>
 
-                        <el-form-item label="Kartu tap in harus check out" :class="formErrors.must_checkout ? 'is-error' : ''">
-                            <el-select placeholder="Kartu tap in harus check out" v-model="formModel.must_checkout" style="width:100%">
-                                <el-option v-for="(l, i) in ['Tidak', 'Ya']" :key="i" :value="i" :label="l"></el-option>
+                        <el-form-item label="Mode transaksi member" :class="formErrors.must_checkout ? 'is-error' : ''">
+                            <el-select placeholder="Mode transaksi member" v-model="formModel.must_checkout" style="width:100%">
+                                <el-option v-for="(l, i) in ['Tidak harus check out', 'Harus check out']" :key="i" :value="i" :label="l"></el-option>
                             </el-select>
                             <div class="el-form-item__error" v-if="formErrors.must_checkout">{{formErrors.must_checkout[0]}}</div>
+                        </el-form-item>
+
+                        <el-form-item label="Mode buka gate utuk member" :class="formErrors.member_auto_open ? 'is-error' : ''">
+                            <el-select placeholder="Mode buka gate utuk member" v-model="formModel.member_auto_open" style="width:100%">
+                                <el-option v-for="(l, i) in ['Ketik Plat Nomor (Buka oleh operator)', 'Tempel Kartu (Otomatis)']" :key="i" :value="i" :label="l"></el-option>
+                            </el-select>
+                            <div class="el-form-item__error" v-if="formErrors.member_auto_open">{{formErrors.member_auto_open[0]}}</div>
                         </el-form-item>
 
                         <!-- <el-form-item label="Masa Aktif Member" :class="formErrors.masa_aktif_member ? 'is-error' : ''">

@@ -74,7 +74,7 @@
                 style="margin-bottom:15px;">
             </el-alert>
 
-            <el-form label-width="130px" label-position="left">
+            <el-form label-width="180px" label-position="left">
                 <el-form-item label="Member" :class="formErrors.parking_member_id ? 'is-error' : ''">
                     <el-select filterable default-first-option clearable v-model="formModel.parking_member_id" placeholder="Member" style="width:100%">
                         <el-option v-for="(m, i) in $store.state.memberList.filter(m => m.paid)" :value="m.id" :label="m.card_number + ' - ' + m.name" :key="i"></el-option>
@@ -83,8 +83,9 @@
                 </el-form-item>
 
                 <el-form-item label="Siklus Pembayaran" :class="formErrors.billing_cycle ? 'is-error' : ''">
-                    <el-select v-model="formModel.billing_cycle" placeholder="Siklus Pembayaran" style="width:100%">
-                        <el-option v-for="b in [1, 2, 3, 4, 6, 12]" :value="b" :label="b + ' bulan'" :key="b"></el-option>
+                    <el-input type="number" v-model="formModel.billing_cycle" style="width: 30%"></el-input>
+                    <el-select v-model="formModel.billing_cycle_unit" style="width:66%;float:right;clear: right;">
+                        <el-option v-for="(s, i) in $store.state.siklus" :value="s.value" :label="s.label" :key="i"></el-option>
                     </el-select>
                     <div class="el-form-item__error" v-if="formErrors.billing_cycle">{{formErrors.billing_cycle[0]}}</div>
                 </el-form-item>
@@ -95,7 +96,7 @@
                 </el-form-item>
 
                 <el-form-item label="Sampai Tanggal" :class="formErrors.to_date ? 'is-error' : ''">
-                    <el-date-picker format="dd-MMM-yyyy" value-format="yyyy-MM-dd" placeholder="Sampai Tanggal" v-model="formModel.to_date" style="width:100%"></el-date-picker>
+                    <el-date-picker disabled format="dd-MMM-yyyy" value-format="yyyy-MM-dd" placeholder="Sampai Tanggal" v-model="to_date" style="width:100%"></el-date-picker>
                     <div class="el-form-item__error" v-if="formErrors.to_date">{{formErrors.to_date[0]}}</div>
                 </el-form-item>
 
@@ -126,7 +127,18 @@ export default {
             tableData: {},
             sort: 'created_at',
             order: 'descending',
-            loading: false
+            loading: false,
+        }
+    },
+    computed: {
+        to_date() {
+            try {
+                return moment(this.formModel.from_date, 'YYYY-MM-DD')
+                    .add(this.formModel.billing_cycle, this.formModel.billing_cycle_unit)
+                    .format('YYYY-MM-DD')
+            } catch (error) {
+                return ''
+            }
         }
     },
     methods: {
@@ -142,6 +154,7 @@ export default {
             this.showForm = true
         },
         save() {
+            this.formModel.to_date = this.to_date
             this.$confirm('Anda yakin?', 'Konfirmasi', { type: 'warning' }).then(() => {
                 if (!!this.formModel.id) {
                     this.update()

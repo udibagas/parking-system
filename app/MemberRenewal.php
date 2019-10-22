@@ -8,7 +8,8 @@ class MemberRenewal extends Model
 {
     protected $fillable = [
         'parking_member_id', 'user_id',
-        'from_date', 'to_date', 'amount'
+        'from_date', 'to_date', 'amount',
+        'billing_cycle_unit', 'billing_cycle'
     ];
 
     public function parkingMember() {

@@ -158,8 +158,9 @@
                     </el-col>
                     <el-col :span="8">
                         <el-form-item label="Siklus Pembayaran" :class="formErrors.billing_cycle ? 'is-error' : ''">
-                            <el-select v-model="formModel.billing_cycle" placeholder="Siklus Pembayaran" style="width:100%">
-                                <el-option v-for="b in [1, 2, 3, 4, 6, 12]" :value="b" :label="b + ' bulan'" :key="b"></el-option>
+                            <el-input type="number" v-model="formModel.billing_cycle" style="width: 30%"></el-input>
+                            <el-select v-model="formModel.billing_cycle_unit" style="width:66%;float:right;clear: right;">
+                                <el-option v-for="(s, i) in $store.state.siklus" :value="s.value" :label="s.label" :key="i"></el-option>
                             </el-select>
                             <div class="el-form-item__error" v-if="formErrors.billing_cycle">{{formErrors.billing_cycle[0]}}</div>
                         </el-form-item>
@@ -240,7 +241,7 @@ export default {
         expiry_date() {
             try {
                 return moment(this.formModel.register_date, 'YYYY-MM-DD')
-                    .add(this.formModel.billing_cycle, 'months')
+                    .add(this.formModel.billing_cycle, this.formModel.billing_cycle_unit)
                     .format('YYYY-MM-DD')
             } catch (error) {
                 return ''
@@ -289,6 +290,7 @@ export default {
                     showClose: true
                 });
                 this.requestData();
+                this.$store.commit('getMemberList')
             }).catch(e => {
                 if (e.response.status == 422) {
                     this.error = {}
@@ -314,6 +316,7 @@ export default {
                     showClose: true
                 });
                 this.requestData()
+                this.$store.commit('getMemberList')
             }).catch(e => {
                 if (e.response.status == 422) {
                     this.error = {}
@@ -332,6 +335,7 @@ export default {
             this.$confirm('Anda yakin akan menghapus data ini?', 'Warning', { type: 'warning' }).then(() => {
                 axios.delete('/parkingMember/' + id).then(r => {
                     this.requestData();
+                    this.$store.commit('getMemberList')
                     this.$message({
                         message: r.data.message,
                         type: 'success',

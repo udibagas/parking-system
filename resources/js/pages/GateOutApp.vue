@@ -212,6 +212,12 @@ export default {
                     this.formModel.time_out = now
                     this.$forceUpdate()
                     this.setDuration()
+
+                    // member auto open sesuai setingan
+                    if (r.data.is_member && !r.data.member.expired && this.$store.state.setting.member_auto_open) {
+                        this.update(false)
+                    }
+
                     document.getElementById('vehicle-type').focus()
                 }).then(() => {
                     this.takeSnapshot(this.formModel.id)

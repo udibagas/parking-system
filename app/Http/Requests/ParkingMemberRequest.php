@@ -33,7 +33,8 @@ class ParkingMemberRequest extends FormRequest
             'group_member_id' => 'required',
             'paid' => 'boolean',
             'register_date' => 'required|date',
-            'billing_cycle' => 'numeric',
+            'billing_cycle' => 'numeric|required',
+            'billing_cycle_unit' => 'required|in:days,weeks,months,years',
             'fare' => 'numeric'
         ];
     }
@@ -51,6 +52,7 @@ class ParkingMemberRequest extends FormRequest
             'paid' => 'Berbayar',
             'register_date' => 'Tanggal Daftar',
             'billing_cycle' => 'Siklus Pembayaran',
+            'billing_cycle_unit' => 'Siklus Pembayaran',
             'fare' => 'Tarif'
         ];
     }

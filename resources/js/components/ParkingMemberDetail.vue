@@ -30,12 +30,12 @@
                         <el-table-column prop="warna" label="Warna"></el-table-column>
                     </el-table>
                 </el-tab-pane>
-                <el-tab-pane label="Histori Transaksi">
+                <!-- <el-tab-pane label="Histori Transaksi">
 
                 </el-tab-pane>
                 <el-tab-pane label="Histori Pembayaran">
 
-                </el-tab-pane>
+                </el-tab-pane> -->
             </el-tabs>
         </el-col>
     </el-row>

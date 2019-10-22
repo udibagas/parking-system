@@ -18,7 +18,13 @@ export default new Vuex.Store({
         groupMemberList: [],
         memberList: [],
         navigationList: [],
-        setting: {}
+        setting: {},
+        siklus: [
+            {value: 'days', label: 'hari'},
+            {value: 'weeks', label: 'minggu'},
+            {value: 'months', label: 'bulan'},
+            {value: 'years', label: 'tahun'},
+        ]
     },
     mutations: {
         getVehicleTypeList(state) {

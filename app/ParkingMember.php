@@ -11,7 +11,7 @@ class ParkingMember extends Model
         'name', 'card_number',
         'is_active', 'expiry_date', 'balance',
         'last_transaction', 'email', 'phone',
-        'group_member_id', 'paid',
+        'group_member_id', 'paid', 'billing_cycle_unit',
         'register_date', 'billing_cycle', 'fare'
     ];
 

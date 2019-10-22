@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
 use App\ParkingGate;
+use App\ParkingMember;
 use App\Setting;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
@@ -49,7 +50,14 @@ class MemberRenewalController extends Controller
     {
         $input = $request->all();
         $input['user_id'] = auth()->user()->id;
-        return MemberRenewal::create($input);
+        $renewal = MemberRenewal::create($input);
+        ParkingMember::where('id', $request->parking_member_id)->update([
+            'register_date' => $request->from_date,
+            'expiry_date' => $request->to_date,
+            'billing_cycle' => $request->billing_cycle,
+            'billing_cycle_unit' => $request->billing_cycle_unit,
+        ]);
+        return $renewal;
     }
 
     /**
