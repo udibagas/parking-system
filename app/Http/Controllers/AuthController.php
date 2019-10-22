@@ -11,22 +11,24 @@ class AuthController extends Controller
 {
     public function login(Request $request)
     {
-        $input = $request->only('email', 'password');
-        $input['status'] = 1;
-        $jwt_token = null;
+        $user = User::where('status', 1)
+            ->where(function($q) use ($request) {
+                return $q->where('name', $request->email)
+                    ->orWhere('email', $request->email);
+            })->first();
 
-        if (!$jwt_token = JWTAuth::attempt($input)) {
+        if ($user && password_verify($request->password, $user->password)) {
             return response()->json([
-                'success' => false,
-                'message' => 'Invalid Email or Password',
-            ], 401);
+                'success' => true,
+                'token' => auth('api')->login($user),
+                'user' => auth()->user()
+            ]);
         }
 
         return response()->json([
-            'success' => true,
-            'token' => $jwt_token,
-            'user' => auth()->user()
-        ]);
+            'success' => false,
+            'message' => 'Username atau password salah',
+        ], 401);
     }
 
     public function logout(Request $request)
