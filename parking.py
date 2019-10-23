@@ -49,8 +49,8 @@ def take_snapshot(gate):
         r = requests.get(API_URL + '/parkingGate/takeSnapshot/' + str(gate['id']))
 
         if r.status_code != 200:
-            logging.error(gate['name'] + ' : Failed to take snapshot. Status code : ' + r.status_code)
-            send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + ". Status Code : " + r.status_code)
+            logging.error(gate['name'] + ' : Failed to take snapshot. Status code : ' + str(r.status_code))
+            send_notification(gate, "Gagal mengambil snapshot di gate " + gate['name'] + ". Status Code : " + str(r.status_code))
             return ''
 
         respons = r.json()
