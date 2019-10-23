@@ -80,7 +80,11 @@ class ParkingGateController extends Controller
     public function update(ParkingGateRequest $request, ParkingGate $parkingGate)
     {
         $parkingGate->update($request->all());
-        shell_exec('sudo systemctl restart parking');
+
+        if (!!$parkingGate->getChanges()) {
+            shell_exec('sudo systemctl restart parking');
+        }
+
         return $parkingGate;
     }
 
