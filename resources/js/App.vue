@@ -81,18 +81,21 @@ export default {
         },
         handleCommand(command) {
             if (command === 'logout') {
-                axios.get('/logout').then(r => {
-                    window.localStorage.removeItem('user')
-                    window.localStorage.removeItem('token')
-                    this.$store.state.user = {}
-                    this.$store.state.token = ''
-                    this.$store.state.is_logged_in = false
-                })
+                this.logout()
             }
 
             if(command === 'profile') {
                 this.showProfile = true
             }
+        },
+        logout() {
+            axios.get('/logout').then(r => {
+                window.localStorage.removeItem('user')
+                window.localStorage.removeItem('token')
+                this.$store.state.user = {}
+                this.$store.state.token = ''
+                this.$store.state.is_logged_in = false
+            })
         },
         getNotification() {
             if (!this.$store.state.is_logged_in) {
@@ -132,6 +135,11 @@ export default {
         }
     },
     mounted() {
+        window.onbeforeunload = (e) => {
+            window.localStorage.removeItem('user')
+            window.localStorage.removeItem('token')
+        }
+
         this.$store.commit('getNavigationList')
         setInterval(this.getNotification, 5000)
     }

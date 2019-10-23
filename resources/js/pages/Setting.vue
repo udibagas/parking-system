@@ -31,15 +31,15 @@
                             <div class="el-form-item__error" v-if="formErrors.jml_kendaraan_per_kartu">{{formErrors.jml_kendaraan_per_kartu[0]}}</div>
                         </el-form-item>
 
-                        <el-form-item label="Mode transaksi member" :class="formErrors.must_checkout ? 'is-error' : ''">
-                            <el-select placeholder="Mode transaksi member" v-model="formModel.must_checkout" style="width:100%">
+                        <el-form-item label="Mode Transaksi Member" :class="formErrors.must_checkout ? 'is-error' : ''">
+                            <el-select placeholder="Mode Transaksi Member" v-model="formModel.must_checkout" style="width:100%">
                                 <el-option v-for="(l, i) in ['Tidak harus check out', 'Harus check out']" :key="i" :value="i" :label="l"></el-option>
                             </el-select>
                             <div class="el-form-item__error" v-if="formErrors.must_checkout">{{formErrors.must_checkout[0]}}</div>
                         </el-form-item>
 
-                        <el-form-item label="Mode buka gate utuk member" :class="formErrors.member_auto_open ? 'is-error' : ''">
-                            <el-select placeholder="Mode buka gate utuk member" v-model="formModel.member_auto_open" style="width:100%">
+                        <el-form-item label="Mode Buka Gate Untuk Member" :class="formErrors.member_auto_open ? 'is-error' : ''">
+                            <el-select placeholder="Mode Buka Gate Untuk Member" v-model="formModel.member_auto_open" style="width:100%">
                                 <el-option v-for="(l, i) in ['Ketik Plat Nomor (Buka oleh operator)', 'Tempel Kartu (Otomatis)']" :key="i" :value="i" :label="l"></el-option>
                             </el-select>
                             <div class="el-form-item__error" v-if="formErrors.member_auto_open">{{formErrors.member_auto_open[0]}}</div>

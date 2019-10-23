@@ -81,14 +81,17 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="10">
+                    <button id="submit-btn" @keyup.right="nextBtn" @keyup.down="nextBtn" @keydown.enter="submit(false)" class="my-big-btn" @click="submit(false)">BUKA GATE</button>
+                    <button id="submit-btn1" @keyup.left="prevBtn" @keyup.up="prevBtn" @keydown.enter="printLastTrx" class="my-big-btn" @click="printLastTrx">[F2] PRINT STRUK TRANSAKSI TERAKHIR</button>
+
+                    <!-- <el-row :gutter="10">
                         <el-col :span="12">
                             <button id="submit-btn" @keyup.right="nextBtn" @keydown.enter="submit(false)" class="my-big-btn" @click="submit(false)">BUKA GATE TANPA PRINT TIKET</button>
                         </el-col>
                         <el-col :span="12">
                             <button id="submit-btn1" @keyup.left="prevBtn" @keydown.enter="submit(true)" class="my-big-btn" @click="submit(true)">PRINT TIKET & BUKA GATE</button>
                         </el-col>
-                    </el-row>
+                    </el-row> -->
                 </el-card>
             </el-col>
             <el-col :span="10">
@@ -125,9 +128,9 @@ export default {
             formErrors: {},
             snapshot_in: null,
             snapshot_out: null,
-            location: null,
             parkingGateList: [],
             vehicleTypeList: [],
+            setting: {}
         }
     },
     methods: {
@@ -258,7 +261,7 @@ export default {
         resetForm() {
             let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
             this.formModel.gate_in_id = null
-            this.formModel.plate_number = this.location.default_plate_number
+            this.formModel.plate_number = this.$store.setting.state.default_plate_number
             this.formModel.barcode_number = ''
             this.formModel.time_out = ''
             this.formModel.time_in = ''
@@ -457,9 +460,22 @@ export default {
                 })
             })
         },
+        getSetting(state) {
+            axios.get('/setting').then(r => {
+                this.setting = r.data
+                this.formModel.plate_number = r.data.default_plate_number
+            }).catch(e => {
+                this.$message({
+                    message: 'BELUM ADA SETTING',
+                    type: 'error',
+                    showClose: true,
+                    duration: 10000
+                })
+            })
+        }
     },
     mounted() {
-        this.$store.commit('getSetting')
+        this.getSetting()
         this.getParkingGateList()
         this.getVehicleTypeList()
         document.getElementById('plate-number').focus()
