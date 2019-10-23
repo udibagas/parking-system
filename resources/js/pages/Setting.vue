@@ -5,7 +5,7 @@
 
         <el-tabs type="card">
             <el-tab-pane lazy label="Global Setting" v-loading="loading">
-                <el-card>
+                <el-card style="height:calc(100vh - 235px);overflow:auto;">
                     <el-form label-position="left" label-width="250px">
                         <el-form-item label="Nama Lokasi" :class="formErrors.location_name ? 'is-error' : ''">
                             <el-input placeholder="Nama Lokasi" v-model="formModel.location_name"></el-input>
