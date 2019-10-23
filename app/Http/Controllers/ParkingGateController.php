@@ -45,7 +45,7 @@ class ParkingGateController extends Controller
     public function store(ParkingGateRequest $request)
     {
         $gate = ParkingGate::create($request->all());
-        shell_exec('systemctl restart parking');
+        shell_exec('/bin/systemctl restart parking');
         return $gate;
     }
 
@@ -80,7 +80,7 @@ class ParkingGateController extends Controller
     public function update(ParkingGateRequest $request, ParkingGate $parkingGate)
     {
         $parkingGate->update($request->all());
-        shell_exec('systemctl restart parking');
+        shell_exec('/bin/systemctl restart parking');
         return $parkingGate;
     }
 
@@ -93,7 +93,7 @@ class ParkingGateController extends Controller
     public function destroy(ParkingGate $parkingGate)
     {
         $parkingGate->delete();
-        shell_exec('systemctl restart parking');
+        shell_exec('/bin/systemctl restart parking');
         return ['message' => 'Parking gate telah dihapus'];
     }
 
