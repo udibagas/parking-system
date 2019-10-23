@@ -26,12 +26,15 @@ class SettingController extends Controller
 
     public function store(SettingRequest $request)
     {
-        return Setting::create($request->all());
+        $setting = Setting::create($request->all());
+        shell_exec('systemctl restart parking');
+        return $setting;
     }
 
     public function update(SettingRequest $request, Setting $setting)
     {
         $setting->update($request->all());
+        shell_exec('systemctl restart parking');
         return $setting;
     }
 }
