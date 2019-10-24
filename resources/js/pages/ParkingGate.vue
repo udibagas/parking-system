@@ -210,7 +210,7 @@
                     <tr><td class="td-label">Tipe Otentifikasi Kamera</td><td class="td-value">{{selectedData.camera_auth_type}}</td></tr>
                     <tr><td class="td-label">URL Snapshot Kamera</td><td class="td-value">{{selectedData.camera_image_snapshot_url}}</td></tr>
                     <tr><td class="td-label">Status Kamera</td><td class="td-value">{{selectedData.camera_status ? 'Active' : 'Inactive'}}</td></tr>
-                    <tr><td class="td-label">Status Gate</td><td class="td-value">{{selectedData.is_active ? 'Active' : 'Inactive'}}</td></tr>
+                    <tr><td class="td-label">Status Gate</td><td class="td-value">{{selectedData.active ? 'Active' : 'Inactive'}}</td></tr>
                 </tbody>
             </table>
         </el-dialog>

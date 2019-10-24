@@ -39,7 +39,7 @@
                             <div class="label-big">[+] NO. TIKET/KARTU</div>
                         </el-col>
                         <el-col :span="14">
-                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET" v-model="formModel.barcode_number" class="my-input">
+                            <input id="ticket-number" autocomplete="off" @keyup.enter="checkTicket" type="text" placeholder="NO. TIKET/KARTU" v-model="formModel.barcode_number" class="my-input">
                         </el-col>
                     </el-row>
 
