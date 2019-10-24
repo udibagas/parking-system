@@ -217,7 +217,7 @@ export default {
                     this.setDuration()
 
                     // member auto open sesuai setingan
-                    if (r.data.is_member && !r.data.member.expired && this.$store.state.setting.member_auto_open) {
+                    if (r.data.is_member && !r.data.member.expired && this.setting.member_auto_open) {
                         this.update(false)
                     }
 
@@ -261,7 +261,7 @@ export default {
         resetForm() {
             let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
             this.formModel.gate_in_id = null
-            this.formModel.plate_number = this.$store.state.setting.default_plate_number
+            this.formModel.plate_number = this.setting.default_plate_number
             this.formModel.barcode_number = ''
             this.formModel.time_out = ''
             this.formModel.time_in = ''
@@ -481,7 +481,7 @@ export default {
         document.getElementById('plate-number').focus()
 
         document.getElementById('gate-out-app').onkeydown = (e) => {
-            console.log(e.key)
+            // console.log(e.key)
             // ke field nomor plat
             if (e.key == '-') {
                 e.preventDefault()
@@ -541,8 +541,8 @@ export default {
 
 .my-input {
     border: 2px solid #160047;
-    height: 45px;
-    line-height: 45px;
+    height: 44px;
+    line-height: 44px;
     font-size: 30px;
     display: block;
     width: 100%;
@@ -556,8 +556,8 @@ export default {
 
 .my-input-time {
     border: 2px solid #160047;
-    height: 45px;
-    line-height: 45px;
+    height: 44px;
+    line-height: 44px;
     font-size: 20px;
     display: block;
     width: 100%;
@@ -571,8 +571,8 @@ export default {
     color: #fff;
     padding-left: 15px;
     font-size: 20px;
-    height: 45px;
-    line-height: 45px;
+    height: 44px;
+    line-height: 44px;
 }
 
 .tarif-input {
@@ -585,8 +585,8 @@ export default {
     width: 100%;
     border: none;
     font-size: 20px;
-    height: 45px;
-    line-height: 45px;
+    height: 44px;
+    line-height: 44px;
     background-color: #254ec1;
     color: #fff;
     border-radius: 4px;
