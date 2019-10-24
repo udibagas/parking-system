@@ -541,8 +541,8 @@ export default {
 
 .my-input {
     border: 2px solid #160047;
-    height: 44px;
-    line-height: 44px;
+    height: 43px;
+    line-height: 43px;
     font-size: 30px;
     display: block;
     width: 100%;
@@ -556,8 +556,8 @@ export default {
 
 .my-input-time {
     border: 2px solid #160047;
-    height: 44px;
-    line-height: 44px;
+    height: 43px;
+    line-height: 43px;
     font-size: 20px;
     display: block;
     width: 100%;
@@ -571,8 +571,8 @@ export default {
     color: #fff;
     padding-left: 15px;
     font-size: 20px;
-    height: 44px;
-    line-height: 44px;
+    height: 43px;
+    line-height: 43px;
 }
 
 .tarif-input {
@@ -585,8 +585,8 @@ export default {
     width: 100%;
     border: none;
     font-size: 20px;
-    height: 44px;
-    line-height: 44px;
+    height: 43px;
+    line-height: 43px;
     background-color: #254ec1;
     color: #fff;
     border-radius: 4px;
