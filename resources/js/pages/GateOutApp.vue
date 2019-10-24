@@ -261,7 +261,7 @@ export default {
         resetForm() {
             let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1)
             this.formModel.gate_in_id = null
-            this.formModel.plate_number = this.$store.setting.state.default_plate_number
+            this.formModel.plate_number = this.$store.state.setting.default_plate_number
             this.formModel.barcode_number = ''
             this.formModel.time_out = ''
             this.formModel.time_in = ''
