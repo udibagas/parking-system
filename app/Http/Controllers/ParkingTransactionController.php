@@ -11,6 +11,7 @@ use Mike42\Escpos\Printer;
 use App\ParkingGate;
 use App\ParkingMember;
 use App\Setting;
+use App\VehicleType;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 
@@ -28,9 +29,9 @@ class ParkingTransactionController extends Controller
 
         return ParkingTransaction::selectRaw('
                 parking_transactions.*,
-                parking_members.name as member,
-                parking_gate_in.name as gate_in,
-                parking_gate_out.name as gate_out
+                parking_members.name as `member`,
+                parking_gate_in.name as `gate_in`,
+                parking_gate_out.name as `gate_out`
             ')
             ->join('parking_members', 'parking_members.id', '=', 'parking_transactions.parking_member_id', 'LEFT')
             ->join('parking_gates AS parking_gate_in', 'parking_gate_in.id', '=', 'parking_transactions.gate_in_id', 'LEFT')
@@ -147,6 +148,15 @@ class ParkingTransactionController extends Controller
                 $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
                 $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
                 $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
+
+                // kalau tiket hilang
+                if ($parkingTransaction->barcode_number == 'xxxxx') {
+                    $vehicle = VehicleType::where('name', $parkingTransaction->vehicle_type)->first();
+                    if ($vehicle) {
+                        $printer->text(str_pad('DENDA', 15, ' ') . ' : Rp. ' . number_format($vehicle->denda_tiket_hilang, 0, ',', '.') . "\n");
+                    }
+                }
+
                 $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
 
                 $printer->setJustification(Printer::JUSTIFY_CENTER);
