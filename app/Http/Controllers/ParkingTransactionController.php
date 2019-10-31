@@ -219,8 +219,10 @@ class ParkingTransactionController extends Controller
 
         // ambil transaksi terakhir yg blm tap out
         $data = ParkingTransaction::with(['member'])->when($request->barcode_number, function($q) use ($request) {
-                return $q->where('barcode_number', $request->barcode_number)
+                return $q->where(function($qq) use ($request) {
+                    return $qq->where('barcode_number', $request->barcode_number)
                         ->orWhere('card_number', $request->barcode_number);
+                });
             })->where('time_out', null)
             ->orderBy('id', 'DESC')->first();
 

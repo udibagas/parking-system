@@ -46,7 +46,7 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="10" style="margin-bottom:10px;">
+                    <el-row v-show="formModel.barcode_number == 'xxxxx'" :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">[*] JAM MASUK</div>
                         </el-col>
@@ -159,7 +159,6 @@ export default {
     components: { GateInApp },
     computed: {
         totalBayar() {
-            // return 10000;
             return Number(this.formModel.fare) + Number(this.formModel.denda)
         }
     },
