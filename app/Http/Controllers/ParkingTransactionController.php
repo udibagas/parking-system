@@ -140,7 +140,7 @@ class ParkingTransactionController extends Controller
                 $printer->text($setting->location_name . "\n");
                 $printer->text($setting->location_address . "\n\n");
 
-                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
+                $printer->text('Rp. ' . number_format($parkingTransaction->fare + $parkingTransaction->denda, 0, ',', '.') . ",-\n");
                 $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gate->name);
                 $printer->text("\n\n");
 
@@ -150,11 +150,8 @@ class ParkingTransactionController extends Controller
                 $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
 
                 // kalau tiket hilang
-                if ($parkingTransaction->barcode_number == 'xxxxx') {
-                    $vehicle = VehicleType::where('name', $parkingTransaction->vehicle_type)->first();
-                    if ($vehicle) {
-                        $printer->text(str_pad('DENDA', 15, ' ') . ' : Rp. ' . number_format($vehicle->denda_tiket_hilang, 0, ',', '.') . "\n");
-                    }
+                if ($parkingTransaction->barcode_number == 'xxxxx' || $parkingTransaction->denda > 0) {
+                    $printer->text(str_pad('DENDA', 15, ' ') . ' : Rp. ' . number_format($parkingTransaction->denda, 0, ',', '.') . "\n");
                 }
 
                 $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
@@ -341,4 +338,89 @@ class ParkingTransactionController extends Controller
 
         return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
     }
+
+    // public function printReport(Request $request)
+    // {
+    //     if (!$request->gate_out_id) {
+    //         return response(['message' => 'Mohon pilih gate'], 400);
+    //     }
+
+    //     $setting = Setting::first();
+
+    //     if (!$setting) {
+    //         return response(['message' => 'BELUM ADA SETTING'], 500);
+    //     }
+
+    //     if (!$setting->location_name) {
+    //         return response(['message' => 'LOKASI BELUM DISET'], 404);
+    //     }
+
+    //     $gate = ParkingGate::find($request->gate_out_id);
+
+    //     if (!$gate) {
+    //         return response(['message' => 'GATE TIDAK DITEMUKAN'], 404);
+    //     }
+
+    //     // ambil data transaksi per tanggal, per operator, per gate
+    //     // reguler
+    //     $sql = "SELECT COUNT(id) AS jumlah,
+
+    //         WHERE time_out IS NOT NULL
+    //             AND is_member = 0
+    //             AND operator = :operator
+    //             AND DATE(updated_at) = :date
+    //             AND gate_out_id = :gate_out_id
+    //         GROUP BY vehicle_type
+    //     ";
+
+    //     $data = DB::select($sql, [
+    //         ':date' => $request->date,
+    //         ':operator' => $request->user()->name,
+    //         'gate_out_id' => $request->gate_out_id
+    //     ]);
+
+    //     try {
+    //         if ($gate->printer_type == "network") {
+    //             $connector = new NetworkPrintConnector($gate->printer_ip_address, 9100);
+    //         } else if ($gate->printer_type == "local") {
+    //             $connector = new FilePrintConnector($gate->printer_device);
+    //         } else {
+    //             return response(['message' => 'INVALID PRINTER'], 500);
+    //         }
+
+    //         $printer = new Printer($connector);
+    //     } catch (\Exception $e) {
+    //         return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+    //     }
+
+    //     try {
+    //         $printer->setJustification(Printer::JUSTIFY_CENTER);
+    //         $printer->text("LAPORAN PENDAPATAN\n");
+    //         $printer->text($setting->location_name . "\n");
+
+    //         $printer->text('Rp. ' . number_format($parkingTransaction->fare + $parkingTransaction->denda, 0, ',', '.') . ",-\n");
+    //         $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gate->name);
+    //         $printer->text("\n\n");
+
+    //         $printer->setJustification(Printer::JUSTIFY_LEFT);
+    //         $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
+    //         $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
+    //         $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
+
+    //         // kalau tiket hilang
+    //         if ($parkingTransaction->barcode_number == 'xxxxx' || $parkingTransaction->denda > 0) {
+    //             $printer->text(str_pad('DENDA', 15, ' ') . ' : Rp. ' . number_format($parkingTransaction->denda, 0, ',', '.') . "\n");
+    //         }
+
+    //         $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
+
+    //         $printer->setJustification(Printer::JUSTIFY_CENTER);
+    //         $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
+
+    //         $printer->cut();
+    //         $printer->close();
+    //     } catch (\Exeption $e) {
+    //         return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
+    //     }
+    // }
 }

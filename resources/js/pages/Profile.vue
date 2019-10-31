@@ -11,10 +11,10 @@
                 <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
             </el-form-item>
 
-            <el-form-item label="Alamat Email" :class="formErrors.email ? 'is-error' : ''">
+            <!-- <el-form-item label="Alamat Email" :class="formErrors.email ? 'is-error' : ''">
                 <el-input placeholder="Alamat Email" v-model="formModel.email"></el-input>
                 <div class="el-form-item__error" v-if="formErrors.email">{{formErrors.email[0]}}</div>
-            </el-form-item>
+            </el-form-item> -->
 
             <el-form-item label="Level">
                 <el-input disabled :value="formModel.role ? 'Admin' : 'Operator'"></el-input>

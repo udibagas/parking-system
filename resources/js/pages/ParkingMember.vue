@@ -123,21 +123,22 @@
                             <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
                         </el-form-item>
 
-                        <el-form-item label="Alamat Email" :class="formErrors.email ? 'is-error' : ''">
+                        <!-- <el-form-item label="Alamat Email" :class="formErrors.email ? 'is-error' : ''">
                             <el-input placeholder="Alamat Email" v-model="formModel.email"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.email">{{formErrors.email[0]}}</div>
-                        </el-form-item>
+                        </el-form-item> -->
 
                         <el-form-item label="Nomor HP" :class="formErrors.phone ? 'is-error' : ''">
                             <el-input placeholder="Nomor HP" v-model="formModel.phone"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.phone">{{formErrors.phone[0]}}</div>
                         </el-form-item>
-                    </el-col>
-                    <el-col :span="8">
+
                         <el-form-item label="Nomor Kartu" :class="formErrors.card_number ? 'is-error' : ''">
                             <el-input placeholder="Nomor Kartu" v-model="formModel.card_number"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.card_number">{{formErrors.card_number[0]}}</div>
                         </el-form-item>
+                    </el-col>
+                    <el-col :span="8">
 
                         <el-form-item label="Tanggal Daftar" :class="formErrors.register_date ? 'is-error' : ''">
                             <el-date-picker format="dd-MMM-yyyy" value-format="yyyy-MM-dd" placeholder="Tanggal Daftar" v-model="formModel.register_date" style="width:100%"></el-date-picker>
@@ -237,6 +238,13 @@ import ParkingMemberDetail from '../components/ParkingMemberDetail'
 
 export default {
     components: { ParkingMemberDetail },
+    watch: {
+        'formModel.paid'(v) {
+            if (!v) {
+                this.formModel.fare = 0
+            }
+        }
+    },
     computed: {
         expiry_date() {
             try {
@@ -246,7 +254,7 @@ export default {
             } catch (error) {
                 return ''
             }
-        }
+        },
     },
     data() {
         return {

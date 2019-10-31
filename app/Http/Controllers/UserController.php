@@ -47,6 +47,8 @@ class UserController extends Controller
             $input['password'] = bcrypt($request->password);
         }
 
+        $input['email'] = str_random().'@dummy.com';
+
         return User::create($input);
     }
 

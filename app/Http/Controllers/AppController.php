@@ -33,6 +33,7 @@ class AppController extends Controller
         $nav = [
             ['label' => 'Home', 'icon' => 'el-icon-s-home', 'path' => 'home' ],
             ['label' => 'Transaksi', 'icon' => 'el-icon-document-copy', 'path' => 'parking-transaction' ],
+            ['label' => 'Log Buka Manual', 'icon' => 'el-icon-unlock', 'path' => 'manual-open-log' ],
             ['label' => 'Member', 'icon' => 'el-icon-bank-card', 'path' => 'member' ],
         ];
 

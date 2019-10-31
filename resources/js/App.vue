@@ -12,7 +12,7 @@
                         <br>
                         <br> -->
                         <strong>{{$store.state.user.name}}</strong><br>
-                        <small>{{$store.state.user.email}}</small>
+                        <small>{{ $store.state.user.role ? 'Admin' : 'Operator' }}</small>
                     </div>
                 </div>
                 <el-menu
