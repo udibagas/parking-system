@@ -3,18 +3,7 @@
         <el-row :gutter="20">
             <el-col :span="14">
                 <el-card style="height:calc(100vh - 105px)">
-                    <el-row :gutter="10" style="margin-bottom:10px;">
-                        <el-col :span="10">
-                            <div class="label-big">GATE IN</div>
-                        </el-col>
-                        <el-col :span="14">
-                            <select :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
-                                <option v-for="g in parkingGateList" :value="g.id" :key="g.id">{{g.name}}</option>
-                            </select>
-                        </el-col>
-                    </el-row>
-
-                    <el-row :gutter="10" style="margin-bottom:10px;">
+                    <el-row v-if="parkingGateList.filter(g => g.type == 'OUT').length > 1" :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">GATE OUT</div>
                         </el-col>
@@ -59,6 +48,26 @@
 
                     <el-row :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
+                            <div class="label-big">[*] JAM MASUK</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <input @keyup.enter="toGateIn" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##:##'" v-model="formModel.time_in" class="my-input">
+                        </el-col>
+                    </el-row>
+
+                    <el-row v-show="formModel.barcode_number == 'xxxxx'" v-if="parkingGateList.filter(g => g.type == 'IN').length > 1" :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">GATE IN</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <select @change="toSubmit" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
+                                <option v-for="g in parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
+                            </select>
+                        </el-col>
+                    </el-row>
+
+                    <el-row :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
                             <div class="label-big">TARIF</div>
                         </el-col>
                         <el-col :span="14">
@@ -66,7 +75,16 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="10">
+                    <el-row v-if="formModel.barcode_number == 'xxxxx'" :gutter="10" style="margin-bottom:10px;">
+                        <el-col :span="10">
+                            <div class="label-big">TARIF + DENDA</div>
+                        </el-col>
+                        <el-col :span="14">
+                            <input disabled v-model="totalBayar" class="my-input tarif-input">
+                        </el-col>
+                    </el-row>
+
+                    <!-- <el-row :gutter="10">
                         <el-col :span="8">
                             <div class="label">[/] IN</div>
                             <input @keyup.enter="submit" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
@@ -79,10 +97,11 @@
                             <div class="label">DURASI</div>
                             <input disabled v-model="formModel.duration" class="my-input-time text-center">
                         </el-col>
-                    </el-row>
+                    </el-row> -->
 
                     <button id="submit-btn" @keyup.right="nextBtn" @keyup.down="nextBtn" @keydown.enter="submit(false)" class="my-big-btn" @click="submit(false)">BUKA GATE</button>
-                    <button id="submit-btn1" @keyup.left="prevBtn" @keyup.up="prevBtn" @keydown.enter="printLastTrx" class="my-big-btn" @click="printLastTrx">[F2] PRINT STRUK TRANSAKSI TERAKHIR</button>
+                    <button id="submit-btn1" @keyup.left="prevBtn" @keyup.up="prevBtn" @keydown.enter="printLastTrx" class="my-big-btn" @click="printLastTrx">[F12] PRINT STRUK TRANSAKSI TERAKHIR</button>
+                    <button @keydown.enter="() => { showManualOpenForm = true; formModelManualOpen = {} }" class="my-big-btn" @click="() => { showManualOpenForm = true; formModelManualOpen = {} }">[F11] BUKA GATE MANUAL</button>
 
                     <!-- <el-row :gutter="10">
                         <el-col :span="12">
@@ -113,6 +132,23 @@
                 </el-card>
             </el-col>
         </el-row>
+
+        <el-dialog title="FORM BUKA MANUAL" center :visible.sync="showManualOpenForm">
+            <el-form label-position="left" label-width="200px">
+                <el-form-item label="Alasan buka manual" :class="formErrors.alasan ? 'is-error' : ''">
+                    <el-input type="textarea" v-model="formModelManualOpen.alasan" rows="3" placeholder="Alasan buka manual"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.alasan">{{formErrors.alasan[0]}}</div>
+                </el-form-item>
+                <el-form-item label="Masukkan password Anda" :class="formErrors.password ? 'is-error' : ''">
+                    <el-input type="password" v-model="formModelManualOpen.password" placeholder="Password"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.password">{{formErrors.password[0]}}</div>
+                </el-form-item>
+            </el-form>
+            <div slot="footer">
+                <el-button icon="el-icon-success" type="primary" @click="manualOpen">SIMPAN</el-button>
+                <el-button icon="el-icon-error" type="info" @click="showManualOpenForm = false">BATAL</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
@@ -121,6 +157,12 @@ import GateInApp from './GateInApp'
 
 export default {
     components: { GateInApp },
+    computed: {
+        totalBayar() {
+            // return 10000;
+            return Number(this.formModel.fare) + Number(this.formModel.denda)
+        }
+    },
     data() {
         return {
             showTicketLostForm: false,
@@ -130,15 +172,43 @@ export default {
             snapshot_out: null,
             parkingGateList: [],
             vehicleTypeList: [],
-            setting: {}
+            setting: {},
+            showManualOpenForm: false,
+            formModelManualOpen: {}
         }
     },
     methods: {
+        toSubmit() {
+            document.getElementById('submit-btn').focus()
+        },
+        toGateIn() {
+            document.getElementById('gate-in').focus()
+        },
         nextBtn() {
             document.getElementById('submit-btn1').focus()
         },
         prevBtn() {
             document.getElementById('submit-btn').focus()
+        },
+        manualOpen() {
+            this.$confirm('Aksi ini akan dicatat oleh sistem. Anda yakin?', 'Peringatan', { type: 'warning'} ).then(() => {
+                this.formModelManualOpen.parking_gate_id = this.formModel.gate_out_id
+                axios.post('/manualOpenLog', this.formModelManualOpen).then(r => {
+                    this.openGate();
+                    this.showManualOpenForm = false
+                    this.formModelManualOpen = {}
+                }).catch(e => {
+                    if (e.response.status == 422) {
+                        this.formErrors = e.response.data.errors;
+                    } else {
+                        this.$message({
+                            message: e.response.data.message,
+                            type: 'error',
+                            showClose: true,
+                        })
+                    }
+                })
+            }).catch(() => console.log(e))
         },
         setDuration() {
             var date1 = moment(this.formModel.time_in)
@@ -164,6 +234,7 @@ export default {
             let now = moment().format('YYYY-MM-DD HH:mm:ss')
 
             if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
+                this.formModel.time_in = moment().format('YYYY-MM-DD');
                 this.formModel.time_out = now;
                 document.getElementById('vehicle-type').focus()
             } else {
@@ -243,7 +314,7 @@ export default {
                 {
                     this.formModel.fare = vehicle.tarif_flat
                     if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
-                        this.formModel.fare += vehicle.denda_tiket_hilang
+                        this.formModel.denda = vehicle.denda_tiket_hilang
                     }
                 } else {
                     this.formModel.fare = 0
@@ -401,6 +472,10 @@ export default {
                     return
                 }
 
+                if (r.data.filter(g => g.type == 'IN').length == 1) {
+                    this.formModel.gate_in_id = r.data.find(g => g.type == 'IN').id
+                }
+
                 if (r.data.filter(g => g.type == 'OUT').length == 0) {
                     this.$message({
                         message: 'MOHON SET GATE OUT',
@@ -408,6 +483,11 @@ export default {
                         showClose: true
                     })
                     return
+                }
+
+                // kalau cuma 1 gate outnya set default
+                if (r.data.filter(g => g.type == 'OUT').length == 1) {
+                    this.formModel.gate_out_id = r.data.find(g => g.type == 'OUT').id
                 }
             }).catch(e => {
                 this.$message({
@@ -526,6 +606,12 @@ export default {
                 e.preventDefault()
                 // alert('F12')
                 this.printLastTrx()
+            }
+
+            if (e.key == 'F11') {
+                e.preventDefault()
+                this.showManualOpenForm = true;
+                this.formModelManualOpen = {}
             }
         }
     }
