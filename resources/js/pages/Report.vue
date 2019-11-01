@@ -31,8 +31,8 @@
                                 <span>Kendaraan Masuk</span>
                             </div>
                             <el-row v-for="(t, id) in vehicleIn" :key="id" :gutter="10">
-                                <el-col :span="8" class="col-label">{{t.gate}}</el-col>
-                                <el-col :span="16" class="col-value">: {{t.total | formatNumber}}</el-col>
+                                <el-col :span="12" class="col-label">{{t.gate}}</el-col>
+                                <el-col :span="12" class="col-value">: {{t.total | formatNumber}}</el-col>
                             </el-row>
                         </el-card>
                     </el-col>
@@ -43,8 +43,8 @@
                                 <span>Transaksi</span>
                             </div>
                             <el-row v-for="(t, id) in transaction" :key="id" :gutter="10">
-                                <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
-                                <el-col :span="16" class="col-value">: {{t.total | formatNumber}}</el-col>
+                                <el-col :span="12" class="col-label">{{t.vehicle_type}}</el-col>
+                                <el-col :span="12" class="col-value">: {{t.total | formatNumber}}</el-col>
                             </el-row>
                         </el-card>
                     </el-col>
@@ -55,8 +55,8 @@
                                 <span>Pendapatan</span>
                             </div>
                             <el-row v-for="(t, id) in income" :key="id">
-                                <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
-                                <el-col :span="16" class="col-value">: Rp. {{t.total | formatNumber}}</el-col>
+                                <el-col :span="12" class="col-label">{{t.vehicle_type}}</el-col>
+                                <el-col :span="12" class="col-value">: Rp. {{t.total | formatNumber}}</el-col>
                             </el-row>
                         </el-card>
                     </el-col>
@@ -67,8 +67,8 @@
                                 <span>Kendaraan Masih Terparkir</span>
                             </div>
                             <el-row v-for="(t, id) in parkedVehicle" :key="id">
-                                <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
-                                <el-col :span="16" class="col-value">: {{t.total | formatNumber}}</el-col>
+                                <el-col :span="12" class="col-label">{{t.vehicle_type}}</el-col>
+                                <el-col :span="12" class="col-value">: {{t.total | formatNumber}}</el-col>
                             </el-row>
                         </el-card>
                     </el-col>
