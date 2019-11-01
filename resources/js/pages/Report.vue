@@ -21,57 +21,80 @@
             </el-col>
         </el-row>
         <el-divider></el-divider>
-        <el-row :gutter="20">
-            <el-col :span="8">
-                <!-- jumlah transaksi -->
-                <el-card class="summary-container bg-cyan">
-                    <div slot="header" class="text-center text-white">
-                        <span>Transaksi</span>
-                    </div>
-                    <el-row v-for="(t, id) in transaction" :key="id" :gutter="10">
-                        <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
-                        <el-col :span="16" class="col-value">: {{t.total | formatNumber}}</el-col>
-                    </el-row>
-                </el-card>
-            </el-col>
-            <el-col :span="8">
-                <!-- total tarif -->
-                <el-card class="summary-container bg-pink">
-                    <div slot="header" class="text-center text-white">
-                        <span>Pendapatan</span>
-                    </div>
-                    <el-row v-for="(t, id) in income" :key="id">
-                        <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
-                        <el-col :span="16" class="col-value">: Rp. {{t.total | formatNumber}}</el-col>
-                    </el-row>
-                </el-card>
-            </el-col>
-            <el-col :span="8">
-                <!-- Kendaraan masih di dalam -->
-                <el-card class="summary-container bg-teal">
-                    <div slot="header" class="text-center text-white">
-                        <span>Kendaraan Masih Terparkir</span>
-                    </div>
-                    <el-row v-for="(t, id) in parkedVehicle" :key="id">
-                        <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
-                        <el-col :span="16" class="col-value">: {{t.total | formatNumber}}</el-col>
-                    </el-row>
-                </el-card>
-            </el-col>
-        </el-row>
-
-        <el-divider></el-divider>
-        <div style="height:calc(100vh - 400px);overflow:auto;" v-html="report"></div>
+        <el-tabs type="card">
+            <el-tab-pane lazy label="RANGKUMAN">
+                <el-row :gutter="10">
+                    <el-col :span="6">
+                        <!-- kendaraan masuk -->
+                        <el-card class="summary-container">
+                            <div slot="header">
+                                <span>Kendaraan Masuk</span>
+                            </div>
+                            <el-row v-for="(t, id) in vehicleIn" :key="id" :gutter="10">
+                                <el-col :span="8" class="col-label">{{t.gate}}</el-col>
+                                <el-col :span="16" class="col-value">: {{t.total | formatNumber}}</el-col>
+                            </el-row>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="6">
+                        <!-- jumlah transaksi -->
+                        <el-card class="summary-container">
+                            <div slot="header">
+                                <span>Transaksi</span>
+                            </div>
+                            <el-row v-for="(t, id) in transaction" :key="id" :gutter="10">
+                                <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
+                                <el-col :span="16" class="col-value">: {{t.total | formatNumber}}</el-col>
+                            </el-row>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="6">
+                        <!-- total tarif -->
+                        <el-card class="summary-container">
+                            <div slot="header">
+                                <span>Pendapatan</span>
+                            </div>
+                            <el-row v-for="(t, id) in income" :key="id">
+                                <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
+                                <el-col :span="16" class="col-value">: Rp. {{t.total | formatNumber}}</el-col>
+                            </el-row>
+                        </el-card>
+                    </el-col>
+                    <el-col :span="6">
+                        <!-- Kendaraan masih di dalam -->
+                        <el-card class="summary-container">
+                            <div slot="header">
+                                <span>Kendaraan Masih Terparkir</span>
+                            </div>
+                            <el-row v-for="(t, id) in parkedVehicle" :key="id">
+                                <el-col :span="8" class="col-label">{{t.vehicle_type}}</el-col>
+                                <el-col :span="16" class="col-value">: {{t.total | formatNumber}}</el-col>
+                            </el-row>
+                        </el-card>
+                    </el-col>
+                </el-row>
+            </el-tab-pane>
+            <el-tab-pane lazy label="PENDAPATAN">
+                <div style="height:calc(100vh - 300px);overflow:auto;" v-html="report"></div>
+            </el-tab-pane>
+            <el-tab-pane lazy label="BUKA MANUAL">
+                <ManualOpenLog :range="dateRange" />
+            </el-tab-pane>
+        </el-tabs>
     </div>
 </template>
 
 <script>
+import ManualOpenLog from './ManualOpenLog'
+
 export default {
+    components: { ManualOpenLog },
     data() {
         return {
             transaction: [],
             income: [],
             parkedVehicle: [],
+            vehicleIn: [],
             dateRange: [moment().format('YYYY-MM-01'), moment().format('YYYY-MM-DD')],
             report: null
         }
@@ -104,6 +127,13 @@ export default {
                 this.parkedVehicle.push({ vehicle_type: 'TOTAL', total })
             })
         },
+        getVehicleIn() {
+            axios.get('getVehicleIn', { params: { dateRange: this.dateRange } }).then(r => {
+                this.vehicleIn = r.data
+                let total = r.data.map(d => d.total).reduce((sum, total) => sum + parseInt(total), 0)
+                this.vehicleIn.push({ gate: 'TOTAL', total })
+            })
+        },
         getReport() {
             axios.get('report', { params: { dateRange: this.dateRange } }).then(r => {
                 this.report = r.data
@@ -113,6 +143,7 @@ export default {
             this.getTransaction();
             this.getIncome();
             this.getParkedVehicle();
+            this.getVehicleIn();
             this.getReport();
         }
     },
@@ -131,13 +162,8 @@ export default {
     font-size: 30px;
 }
 
-.td-value {
-    background-color: #eee;
-    padding: 5px 10px;
-}
-
 .col-value, .col-label {
     font-size: 16px;
-    color: #fff;
+    // color: #fff;
 }
 </style>

@@ -49,6 +49,18 @@ class ReportController extends Controller
         ]);
     }
 
+    public function getVehicleIn(Request $request) {
+        return DB::select('
+            SELECT parking_gates.name AS `gate`, COUNT(parking_transactions.id) AS `total`
+            FROM parking_transactions
+            JOIN parking_gates ON parking_gates.id = parking_transactions.gate_in_id
+            WHERE DATE(parking_transactions.updated_at) BETWEEN :start AND :stop
+            GROUP BY `gate`', [
+            ':start' => $request->dateRange[0],
+            ':stop' => $request->dateRange[1]
+        ]);
+    }
+
     public function pendapatan(Request $request)
     {
         $perKendaraan = DB::select('

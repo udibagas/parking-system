@@ -48,6 +48,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::get('getIncome', 'ReportController@getIncome');
     Route::get('getTransaction', 'ReportController@getTransaction');
     Route::get('getParkedVehicle', 'ReportController@getParkedVehicle');
+    Route::get('getVehicleIn', 'ReportController@getVehicleIn');
     Route::get('report', 'ReportController@pendapatan');
 });
 

@@ -1,10 +1,7 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="LOG BUKA MANUAL"> </el-page-header>
-        <el-divider></el-divider>
-
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
-            <el-form-item>
+            <!-- <el-form-item>
                 <el-date-picker
                 @change="requestData"
                 v-model="dateRange"
@@ -15,7 +12,7 @@
                 start-placeholder="Start date"
                 end-placeholder="End date">
                 </el-date-picker>
-            </el-form-item>
+            </el-form-item> -->
             <el-form-item style="margin-right:0;">
                 <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                     <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
@@ -26,7 +23,7 @@
         <el-table :data="tableData.data" stripe
         @row-dblclick="(row, column, event) => { snapshot = row.snapshot; showSnapshot = true }"
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 360px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="created_at" label="Tanggal" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
@@ -58,7 +55,7 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog center top="60px" width="500px" :visible.sync="showSnapshot" title="SNAPSHOT">
+        <el-dialog center top="60px" width="600px" :visible.sync="showSnapshot" title="SNAPSHOT">
             <el-image :src="snapshot" style="width: 100%; height: 100%" fit="cover">
                 <div slot="error" class="el-image__error">
                     <i class="el-icon-picture-outline"></i>
@@ -70,6 +67,12 @@
 
 <script>
 export default {
+    props: ['range'],
+    watch: {
+        range(v) {
+            this.requestData()
+        }
+    },
     data() {
         return {
             keyword: '',
@@ -80,7 +83,7 @@ export default {
             order: 'descending',
             loading: false,
             showSnapshot: false,
-            dateRange: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
+            // dateRange: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
             snapshot: ''
         }
     },
@@ -97,7 +100,7 @@ export default {
                 pageSize: this.pageSize,
                 sort: this.sort,
                 order: this.order,
-                dateRange: this.dateRange
+                dateRange: this.range
             }
 
             this.loading = true;

@@ -81,7 +81,8 @@ class ParkingGateController extends Controller
     {
         $parkingGate->update($request->all());
 
-        if (!!$parkingGate->getChanges()) {
+        // restart service hanya kalau ada yg berubah & gate in aja
+        if (!!$parkingGate->getChanges() && $request->type == 'IN') {
             shell_exec('sudo systemctl restart parking');
         }
 
