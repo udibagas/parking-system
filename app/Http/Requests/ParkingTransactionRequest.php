@@ -30,8 +30,6 @@ class ParkingTransactionRequest extends FormRequest
             'gate_out_id' => 'exists:parking_gates,id',
             'user_id' => 'exists:users,id',
             'member_id' => 'exists:parking_members,id',
-            'time_in' => 'sometimes|required|date',
-            'time_out' => 'sometimes|required|date',
             'card_number' => 'exists:parking_members,card_number'
         ];
     }

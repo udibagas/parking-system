@@ -51,7 +51,7 @@
                             <div class="label-big">[*] JAM MASUK</div>
                         </el-col>
                         <el-col :span="14">
-                            <input @keyup.enter="toGateIn" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##:##'" v-model="formModel.time_in" class="my-input">
+                            <input @keyup.enter="toGateIn" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##'" v-model="formModel.time_in" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -376,6 +376,19 @@ export default {
                 return
             }
 
+            if (this.formModel.time_in.length < 16) {
+                this.$message({
+                    message: 'FORMAT TIME IN SALAH',
+                    type: 'error',
+                    showClose: true
+                })
+                return
+            }
+
+            if (this.formModel.time_in.length == 16) {
+                this.formModel.time_in += ':00'
+            }
+
             if (!!this.formModel.id) {
                 this.update(ticket)
             } else {
@@ -388,6 +401,7 @@ export default {
                 if (ticket) {
                     this.printTicket(r.data.id)
                 }
+                this.openGate()
             }).catch(e => {
                 // kecil kemungkinan
                 this.$message({
@@ -395,8 +409,6 @@ export default {
                     type: 'error',
                     showClose: true
                 })
-            }).finally(() => {
-                this.openGate()
             })
         },
         update(ticket) {
