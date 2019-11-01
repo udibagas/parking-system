@@ -136,7 +136,7 @@
         <el-dialog title="FORM BUKA MANUAL" center :visible.sync="showManualOpenForm">
             <el-form label-position="left" label-width="200px">
                 <el-form-item label="Alasan buka manual" :class="formErrors.alasan ? 'is-error' : ''">
-                    <el-input type="textarea" v-model="formModelManualOpen.alasan" rows="3" placeholder="Alasan buka manual"></el-input>
+                    <el-input autofocus type="textarea" v-model="formModelManualOpen.alasan" rows="3" placeholder="Alasan buka manual"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.alasan">{{formErrors.alasan[0]}}</div>
                 </el-form-item>
                 <el-form-item label="Masukkan password Anda" :class="formErrors.password ? 'is-error' : ''">
