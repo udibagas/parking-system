@@ -61,7 +61,7 @@
                         </el-col>
                         <el-col :span="14">
                             <select @change="toSubmit" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
-                                <option v-for="g in parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.name}}</option>
+                                <option v-for="g in parkingGateList.filter(g => g.type == 'IN')" :value="g.id" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
                             </select>
                         </el-col>
                     </el-row>

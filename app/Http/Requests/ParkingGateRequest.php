@@ -38,7 +38,8 @@ class ParkingGateRequest extends FormRequest
             'camera_image_snapshot_url' => 'required|url',
             // 'camera_video_snapshot_url' => 'required|url',
             'camera_auth_type' => 'required|in:basic,digest',
-            'active' => 'boolean'
+            'active' => 'boolean',
+            'shortcut_key' => 'required|numeric'
         ];
     }
 
@@ -58,7 +59,8 @@ class ParkingGateRequest extends FormRequest
             'camera_password' => 'Password Kamera',
             'camera_image_snapshot_url' => 'URL Snapshot Kamera',
             'camera_auth_type' => 'Tipe Otentifikasi Kamera',
-            'active' => 'Aktif'
+            'active' => 'Aktif',
+            'shortcut_key' => 'Tombol Shortcut'
         ];
     }
 }

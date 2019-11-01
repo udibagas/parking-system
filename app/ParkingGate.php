@@ -15,6 +15,7 @@ class ParkingGate extends Model
         'camera_password', 'camera_auth_type',
         'camera_image_snapshot_url',
         'camera_video_snapshot_url',
-        'active', 'camera_status'
+        'active', 'camera_status',
+        'shortcut_key'
     ];
 }

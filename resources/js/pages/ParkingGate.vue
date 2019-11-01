@@ -2,10 +2,10 @@
     <div>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="openForm({printer_type: 'local'})" type="primary"><i class="el-icon-plus"></i> TAMBAH GATE</el-button>
+                <el-button icon="el-icon-plus" @click="openForm({printer_type: 'local'})" type="primary">TAMBAH GATE</el-button>
             </el-form-item>
             <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
+                <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                     <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
                 </el-input>
             </el-form-item>
@@ -18,6 +18,7 @@
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column fixed="left" prop="name" label="Nama" min-width="100px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="shortcut_key" label="Shortcut" min-width="100px" align="center" header-align="center"></el-table-column>
             <el-table-column prop="type" label="Jenis" min-width="80px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="vehicle_type" label="Jenis Kendaraan" min-width="160px" show-overflow-tooltip></el-table-column>
             <el-table-column prop="controller_ip_address" label="Controller Address" min-width="180px" show-overflow-tooltip>
@@ -94,6 +95,11 @@
                         <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
                             <el-input placeholder="Nama" v-model="formModel.name"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.name">{{formErrors.name[0]}}</div>
+                        </el-form-item>
+
+                        <el-form-item label="Tombol Shortcut" :class="formErrors.shortcut_key ? 'is-error' : ''">
+                            <el-input type="number" placeholder="Tombol Shortcut" v-model="formModel.shortcut_key"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.shortcut_key">{{formErrors.shortcut_key[0]}}</div>
                         </el-form-item>
 
                         <el-form-item label="Jenis" :class="formErrors.type ? 'is-error' : ''">
@@ -197,6 +203,7 @@
             <table v-if="!!selectedData.id" style="width:100%">
                 <tbody>
                     <tr><td class="td-label">Nama</td><td class="td-value">{{selectedData.name}}</td></tr>
+                    <tr><td class="td-label">Tombol Shortcut</td><td class="td-value">{{selectedData.shortcut_key}}</td></tr>
                     <tr><td class="td-label">Jenis</td><td class="td-value">{{selectedData.type}}</td></tr>
                     <tr><td class="td-label">Jenis Kendaraan</td><td class="td-value">{{selectedData.vehicle_type}}</td></tr>
                     <tr><td class="td-label">Alamat IP Kontroller</td><td class="td-value">{{selectedData.controller_ip_address}}</td></tr>
