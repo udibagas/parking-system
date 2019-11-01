@@ -341,88 +341,182 @@ class ParkingTransactionController extends Controller
         return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
     }
 
-    // public function printReport(Request $request)
-    // {
-    //     if (!$request->gate_out_id) {
-    //         return response(['message' => 'Mohon pilih gate'], 400);
-    //     }
+    public function printReport(Request $request)
+    {
+        if (!$request->gate_out_id) {
+            return response(['message' => 'Mohon pilih gate'], 400);
+        }
 
-    //     $setting = Setting::first();
+        $setting = Setting::first();
 
-    //     if (!$setting) {
-    //         return response(['message' => 'BELUM ADA SETTING'], 500);
-    //     }
+        if (!$setting) {
+            return response(['message' => 'BELUM ADA SETTING'], 500);
+        }
 
-    //     if (!$setting->location_name) {
-    //         return response(['message' => 'LOKASI BELUM DISET'], 404);
-    //     }
+        if (!$setting->location_name) {
+            return response(['message' => 'LOKASI BELUM DISET'], 404);
+        }
 
-    //     $gate = ParkingGate::find($request->gate_out_id);
+        $gate = ParkingGate::find($request->gate_out_id);
 
-    //     if (!$gate) {
-    //         return response(['message' => 'GATE TIDAK DITEMUKAN'], 404);
-    //     }
+        if (!$gate) {
+            return response(['message' => 'GATE TIDAK DITEMUKAN'], 404);
+        }
 
-    //     // ambil data transaksi per tanggal, per operator, per gate
-    //     // reguler
-    //     $sql = "SELECT COUNT(id) AS jumlah,
+        // ambil data transaksi per tanggal, per operator, per gate
+        // reguler
+        $sqlReguler = "SELECT vehicle_type, COUNT(id) AS jumlah,
+                SUM(fare) AS pendapatan
+            FROM parking_transactions
+            WHERE time_out IS NOT NULL
+                AND is_member = 0
+                AND operator = :operator
+                AND DATE(updated_at) = :date
+                AND gate_out_id = :gate_out_id
+            GROUP BY vehicle_type
+        ";
 
-    //         WHERE time_out IS NOT NULL
-    //             AND is_member = 0
-    //             AND operator = :operator
-    //             AND DATE(updated_at) = :date
-    //             AND gate_out_id = :gate_out_id
-    //         GROUP BY vehicle_type
-    //     ";
+        // ambil data transaksi per tanggal, per operator, per gate
+        // denda
+        $sqlDenda = "SELECT vehicle_type, COUNT(id) AS jumlah,
+                SUM(denda) AS pendapatan
+            FROM parking_transactions
+            WHERE time_out IS NOT NULL
+                AND is_member = 0
+                AND operator = :operator
+                AND DATE(updated_at) = :date
+                AND gate_out_id = :gate_out_id
+                AND denda > 0
+            GROUP BY vehicle_type
+        ";
 
-    //     $data = DB::select($sql, [
-    //         ':date' => $request->date,
-    //         ':operator' => $request->user()->name,
-    //         'gate_out_id' => $request->gate_out_id
-    //     ]);
+        // ambil data transaksi per tanggal, per operator, per gate
+        // member
+        $sqlMember = "SELECT vehicle_type, COUNT(id) AS jumlah
+            FROM parking_transactions
+            WHERE time_out IS NOT NULL
+                AND is_member = 1
+                AND operator = :operator
+                AND DATE(updated_at) = :date
+                AND gate_out_id = :gate_out_id
+            GROUP BY vehicle_type
+        ";
 
-    //     try {
-    //         if ($gate->printer_type == "network") {
-    //             $connector = new NetworkPrintConnector($gate->printer_ip_address, 9100);
-    //         } else if ($gate->printer_type == "local") {
-    //             $connector = new FilePrintConnector($gate->printer_device);
-    //         } else {
-    //             return response(['message' => 'INVALID PRINTER'], 500);
-    //         }
+        // ambil data transaksi per tanggal, per operator, per gate
+        // member
+        $sqlBukaManual = "SELECT COUNT(id) AS jumlah
+            FROM manual_open_logs
+            WHERE user_id = :user_id
+                AND DATE(updated_at) = :date
+                AND parking_gate_id = :gate_out_id
+        ";
 
-    //         $printer = new Printer($connector);
-    //     } catch (\Exception $e) {
-    //         return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
-    //     }
+        $pendapatanReguler = DB::select($sqlReguler, [
+            ':date' => $request->date,
+            ':operator' => $request->user()->name,
+            ':gate_out_id' => $request->gate_out_id
+        ]);
 
-    //     try {
-    //         $printer->setJustification(Printer::JUSTIFY_CENTER);
-    //         $printer->text("LAPORAN PENDAPATAN\n");
-    //         $printer->text($setting->location_name . "\n");
+        $pendapatanDenda = DB::select($sqlDenda, [
+            ':date' => $request->date,
+            ':operator' => $request->user()->name,
+            ':gate_out_id' => $request->gate_out_id
+        ]);
 
-    //         $printer->text('Rp. ' . number_format($parkingTransaction->fare + $parkingTransaction->denda, 0, ',', '.') . ",-\n");
-    //         $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gate->name);
-    //         $printer->text("\n\n");
+        $trxMember = DB::select($sqlMember, [
+            ':date' => $request->date,
+            ':operator' => $request->user()->name,
+            ':gate_out_id' => $request->gate_out_id
+        ]);
 
-    //         $printer->setJustification(Printer::JUSTIFY_LEFT);
-    //         $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-    //         $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
-    //         $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
+        $bukaManual = DB::select($sqlBukaManual, [
+            ':date' => $request->date,
+            ':user_id' => $request->user()->id,
+            ':gate_out_id' => $request->gate_out_id
+        ]);
 
-    //         // kalau tiket hilang
-    //         if ($parkingTransaction->barcode_number == 'xxxxx' || $parkingTransaction->denda > 0) {
-    //             $printer->text(str_pad('DENDA', 15, ' ') . ' : Rp. ' . number_format($parkingTransaction->denda, 0, ',', '.') . "\n");
-    //         }
+        try {
+            if ($gate->printer_type == "network") {
+                $connector = new NetworkPrintConnector($gate->printer_ip_address, 9100);
+            } else if ($gate->printer_type == "local") {
+                $connector = new FilePrintConnector($gate->printer_device);
+            } else {
+                return response(['message' => 'INVALID PRINTER'], 500);
+            }
 
-    //         $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
+            $printer = new Printer($connector);
+        } catch (\Exception $e) {
+            return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+        }
 
-    //         $printer->setJustification(Printer::JUSTIFY_CENTER);
-    //         $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
+        try {
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("LAPORAN PENDAPATAN PARKIR\n");
+            $printer->text($setting->location_name . "\n");
 
-    //         $printer->cut();
-    //         $printer->close();
-    //     } catch (\Exeption $e) {
-    //         return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
-    //     }
-    // }
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+            $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . $request->date . "\n");
+            $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper($request->user()->name) . "\n\n");
+
+            // REGULER SECTION
+            $printer->text("REGULER\n");
+            $subTotalReguler = ['jumlah' => 0, 'pendapatan' => 0];
+
+            foreach ($pendapatanReguler as $d)
+            {
+                $subTotalReguler['jumlah'] += $d->jumlah;
+                $subTotalReguler['pendapatan'] += $d->pendapatan;
+
+                $printer->text(str_pad('- '.$d->vehicle_type, 15, ' ') . ' : '
+                    . str_pad($d->jumlah, 5, ' ')
+                    . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
+            }
+
+            $printer->text(str_pad('SUB TOTAL', 15, ' ') . ' : '
+                . str_pad($subTotalReguler['jumlah'], 5, ' ')
+                . str_pad(number_format($subTotalReguler['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT));
+
+
+            // DENDA SECTION
+            $printer->text("DENDA\n");
+            $subTotalDenda = ['jumlah' => 0, 'pendapatan' => 0];
+
+            foreach ($pendapatanDenda as $d)
+            {
+                $subTotalDenda['jumlah'] += $d->jumlah;
+                $subTotalDenda['pendapatan'] += $d->pendapatan;
+
+                $printer->text(str_pad('- '.$d->vehicle_type, 15, ' ') . ' : '
+                    . str_pad($d->jumlah, 5, ' ')
+                    . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n");
+            }
+
+            $printer->text(str_pad('SUB TOTAL', 15, ' ') . ' : '
+                . str_pad($subTotalDenda['jumlah'], 5, ' ')
+                . str_pad(number_format($subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT));
+
+            // MEMBER SECTION
+            $printer->text("MEMBER\n");
+            $subTotalMember = ['jumlah' => 0];
+
+            foreach ($trxMember as $d)
+            {
+                $subTotalMember['jumlah'] += $d->jumlah;
+                $printer->text(str_pad('- '.$d->vehicle_type, 15, ' ') . ' : ' . str_pad($d->jumlah, 5, ' '));
+            }
+
+            $printer->text(str_pad('SUB TOTAL', 15, ' ') . ' : ' . str_pad($subTotalMember['jumlah'], 5, ' '));
+
+            $printer->text(str_pad('GRAND TOTAL', 15, ' ') . ' : '
+                . str_pad(' ', 5, ' ')
+                . str_pad(number_format($subTotalReguler['pendapatan'] + $subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT));
+
+            $printer->text(str_pad('BUKA MANUAL', 15, ' ') . ' : ' . $bukaManual[0]->jumlah . "\n\n");
+
+            $printer->cut();
+            $printer->close();
+        } catch (\Exeption $e) {
+            return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
+        }
+    }
 }
