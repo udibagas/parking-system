@@ -101,7 +101,16 @@
 
                     <button id="submit-btn" @keyup.right="nextBtn" @keyup.down="nextBtn" @keydown.enter="submit(false)" class="my-big-btn" @click="submit(false)">BUKA GATE</button>
                     <button id="submit-btn1" @keyup.left="prevBtn" @keyup.up="prevBtn" @keydown.enter="printLastTrx" class="my-big-btn" @click="printLastTrx">[F12] PRINT STRUK TRANSAKSI TERAKHIR</button>
-                    <button @keydown.enter="() => { showManualOpenForm = true; formModelManualOpen = {} }" class="my-big-btn" @click="() => { showManualOpenForm = true; formModelManualOpen = {} }">[F11] BUKA GATE MANUAL</button>
+
+                    <el-row :gutter="10">
+                        <el-col :span="12">
+                            <button @keydown.enter="printReport" class="my-big-btn" @click="printReport">[F10] PRINT LAPORAN</button>
+                        </el-col>
+                        <el-col :span="12">
+                            <button @keydown.enter="() => { showManualOpenForm = true; formModelManualOpen = {} }" class="my-big-btn" @click="() => { showManualOpenForm = true; formModelManualOpen = {} }">[F11] BUKA GATE MANUAL</button>
+                        </el-col>
+                    </el-row>
+
 
                     <!-- <el-row :gutter="10">
                         <el-col :span="12">
@@ -524,6 +533,26 @@ export default {
                 })
             })
         },
+        printReport() {
+            let payload = {
+                gate_out_id: this.formModel.gate_out_id,
+                date: moment().format('YYYY-MM-DD')
+            }
+
+            axios.post('/parkingTransaction/printReport', payload).then(r => {
+                this.$message({
+                    message: 'SILAKAN AMBIL STRUK',
+                    type: 'success',
+                    showClose: true
+                })
+            }).catch(e => {
+                this.$message({
+                    message: e.response.data.message,
+                    type: 'error',
+                    showClose: true
+                })
+            })
+        },
         getVehicleTypeList() {
             axios.get('/vehicleType/getList').then(r => {
                 if (r.data.length == 0) {
@@ -613,16 +642,20 @@ export default {
                 document.getElementById('time-in').focus()
             }
 
-            if (e.key == 'F12') {
+            if (e.key == 'F10') {
                 e.preventDefault()
-                // alert('F12')
-                this.printLastTrx()
+                this.printReport()
             }
 
             if (e.key == 'F11') {
                 e.preventDefault()
                 this.showManualOpenForm = true;
                 this.formModelManualOpen = {}
+            }
+
+            if (e.key == 'F12') {
+                e.preventDefault()
+                this.printLastTrx()
             }
         }
     }

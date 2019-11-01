@@ -343,6 +343,11 @@ class ParkingTransactionController extends Controller
 
     public function printReport(Request $request)
     {
+        $request->validate([
+            'gate_out_id' => 'required',
+            'date' => 'required|date'
+        ]);
+
         if (!$request->gate_out_id) {
             return response(['message' => 'Mohon pilih gate'], 400);
         }
