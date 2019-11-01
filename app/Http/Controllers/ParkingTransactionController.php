@@ -457,7 +457,7 @@ class ParkingTransactionController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("LAPORAN PENDAPATAN PARKIR\n");
-            $printer->text($setting->location_name . "\n");
+            $printer->text($setting->location_name . "\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . $request->date . "\n");
@@ -477,7 +477,7 @@ class ParkingTransactionController extends Controller
                     . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
             }
 
-            $printer->text(str_pad('SUB TOTAL', 15, ' ') . ' : '
+            $printer->text(str_pad('SUB TOTAL', 15, ' ')
                 . str_pad($subTotalReguler['jumlah'], 5, ' ', STR_PAD_LEFT)
                 . str_pad(number_format($subTotalReguler['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
 
@@ -516,7 +516,7 @@ class ParkingTransactionController extends Controller
                 . str_pad(' ', 5, ' ', STR_PAD_LEFT)
                 . str_pad(number_format($subTotalReguler['pendapatan'] + $subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
 
-            $printer->text(str_pad('BUKA MANUAL', 15, ' ') . $bukaManual[0]->jumlah . "\n\n");
+            $printer->text(str_pad('BUKA MANUAL', 15, ' ') . str_pad($bukaManual[0]->jumlah, 5, ' ', STR_PAD_LEFT) . "\n\n");
 
             $printer->cut();
             $printer->close();
