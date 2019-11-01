@@ -472,14 +472,14 @@ class ParkingTransactionController extends Controller
                 $subTotalReguler['jumlah'] += $d->jumlah;
                 $subTotalReguler['pendapatan'] += $d->pendapatan;
 
-                $printer->text(str_pad('- '.$d->vehicle_type, 15, ' ') . ' : '
-                    . str_pad($d->jumlah, 5, ' ')
+                $printer->text(str_pad('-- '.$d->vehicle_type, 15, ' ')
+                    . str_pad($d->jumlah, 5, ' ', STR_PAD_LEFT)
                     . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
             }
 
             $printer->text(str_pad('SUB TOTAL', 15, ' ') . ' : '
-                . str_pad($subTotalReguler['jumlah'], 5, ' ')
-                . str_pad(number_format($subTotalReguler['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT));
+                . str_pad($subTotalReguler['jumlah'], 5, ' ', STR_PAD_LEFT)
+                . str_pad(number_format($subTotalReguler['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
 
 
             // DENDA SECTION
@@ -491,14 +491,14 @@ class ParkingTransactionController extends Controller
                 $subTotalDenda['jumlah'] += $d->jumlah;
                 $subTotalDenda['pendapatan'] += $d->pendapatan;
 
-                $printer->text(str_pad('- '.$d->vehicle_type, 15, ' ') . ' : '
-                    . str_pad($d->jumlah, 5, ' ')
+                $printer->text(str_pad('-- '.$d->vehicle_type, 15, ' ')
+                    . str_pad($d->jumlah, 5, ' ', STR_PAD_LEFT)
                     . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n");
             }
 
-            $printer->text(str_pad('SUB TOTAL', 15, ' ') . ' : '
-                . str_pad($subTotalDenda['jumlah'], 5, ' ')
-                . str_pad(number_format($subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT));
+            $printer->text(str_pad('SUB TOTAL', 15, ' ')
+                . str_pad($subTotalDenda['jumlah'], 5, ' ', STR_PAD_LEFT)
+                . str_pad(number_format($subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
 
             // MEMBER SECTION
             $printer->text("MEMBER\n");
@@ -507,16 +507,16 @@ class ParkingTransactionController extends Controller
             foreach ($trxMember as $d)
             {
                 $subTotalMember['jumlah'] += $d->jumlah;
-                $printer->text(str_pad('- '.$d->vehicle_type, 15, ' ') . ' : ' . str_pad($d->jumlah, 5, ' '));
+                $printer->text(str_pad('-- '.$d->vehicle_type, 15, ' ', STR_PAD_LEFT) . str_pad($d->jumlah, 5, ' ') ."\n");
             }
 
-            $printer->text(str_pad('SUB TOTAL', 15, ' ') . ' : ' . str_pad($subTotalMember['jumlah'], 5, ' '));
+            $printer->text(str_pad('SUB TOTAL', 15, ' ') . str_pad($subTotalMember['jumlah'], 5, ' ', STR_PAD_LEFT) ."\n");
 
-            $printer->text(str_pad('GRAND TOTAL', 15, ' ') . ' : '
-                . str_pad(' ', 5, ' ')
-                . str_pad(number_format($subTotalReguler['pendapatan'] + $subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT));
+            $printer->text(str_pad('GRAND TOTAL', 15, ' ')
+                . str_pad(' ', 5, ' ', STR_PAD_LEFT)
+                . str_pad(number_format($subTotalReguler['pendapatan'] + $subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
 
-            $printer->text(str_pad('BUKA MANUAL', 15, ' ') . ' : ' . $bukaManual[0]->jumlah . "\n\n");
+            $printer->text(str_pad('BUKA MANUAL', 15, ' ') . $bukaManual[0]->jumlah . "\n\n");
 
             $printer->cut();
             $printer->close();
