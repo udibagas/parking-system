@@ -80,15 +80,19 @@
             <el-tab-pane lazy label="BUKA MANUAL">
                 <ManualOpenLog :range="dateRange" />
             </el-tab-pane>
+            <el-tab-pane lazy label="LOG USER">
+                <UserLog :range="dateRange" />
+            </el-tab-pane>
         </el-tabs>
     </div>
 </template>
 
 <script>
 import ManualOpenLog from './ManualOpenLog'
+import UserLog from './UserLog'
 
 export default {
-    components: { ManualOpenLog },
+    components: { ManualOpenLog, UserLog },
     data() {
         return {
             transaction: [],

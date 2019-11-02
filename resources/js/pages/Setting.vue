@@ -63,6 +63,9 @@
             <el-tab-pane lazy label="Jenis Kendaraan">
                 <VehicleType />
             </el-tab-pane>
+            <el-tab-pane lazy label="Backup &amp; Restore DB">
+                <Backup />
+            </el-tab-pane>
             <!-- <el-tab-pane lazy label="Group Member">
                 <GroupMember />
             </el-tab-pane> -->
@@ -74,9 +77,10 @@
 import ParkingGate from './ParkingGate'
 import VehicleType from './VehicleType'
 import GroupMember from './GroupMember'
+import Backup from './Backup'
 
 export default {
-    components: { ParkingGate, VehicleType, GroupMember },
+    components: { ParkingGate, VehicleType, GroupMember, Backup },
     data() {
         return {
             formModel: {},

@@ -89,7 +89,7 @@ export default {
             }
         },
         logout() {
-            axios.get('/logout').then(r => {
+            axios.post('/logout', { token: this.$store.state.token }).then(r => {
                 window.localStorage.removeItem('user')
                 window.localStorage.removeItem('token')
                 this.$store.state.user = {}
@@ -135,10 +135,10 @@ export default {
         }
     },
     mounted() {
-        window.onbeforeunload = (e) => {
-            window.localStorage.removeItem('user')
-            window.localStorage.removeItem('token')
-        }
+        // window.onbeforeunload = (e) => {
+        //     window.localStorage.removeItem('user')
+        //     window.localStorage.removeItem('token')
+        // }
 
         this.$store.commit('getNavigationList')
         setInterval(this.getNotification, 5000)

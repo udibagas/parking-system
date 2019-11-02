@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\User;
+use App\UserLog;
 use Illuminate\Http\Request;
 use JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
@@ -18,10 +19,16 @@ class AuthController extends Controller
             })->first();
 
         if ($user && password_verify($request->password, $user->password)) {
+            // simpan log
+            UserLog::create([
+                'user_id' => $user->id,
+                'action' => 'LOGIN'
+            ]);
+
             return response()->json([
                 'success' => true,
                 'token' => auth('api')->login($user),
-                'user' => auth('api')->user()
+                'user' => $user
             ]);
         }
 
@@ -39,6 +46,11 @@ class AuthController extends Controller
 
         try {
             JWTAuth::invalidate($request->token);
+
+            UserLog::create([
+                'user_id' => $request->user()->id,
+                'action' => 'LOGOUT'
+            ]);
 
             return response()->json([
                 'success' => true,

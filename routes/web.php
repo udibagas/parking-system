@@ -18,32 +18,53 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::post('logout', 'AuthController@logout');
     Route::resource('user', 'UserController')->except(['create', 'edit']);
     // Route::resource('locationIdentity', 'LocationIdentityController')->except(['create', 'edit', 'show']);
+
+    // untuk dropdown
+    Route::get('parkingGate/getList', 'ParkingGateController@getList');
+    Route::get('vehicleType/getList', 'VehicleTypeController@getList');
+    Route::get('parkingMember/getList', 'ParkingMemberController@getList');
+    Route::get('groupMember/getList', 'GroupMemberController@getList');
+
     Route::post('parkingGate/openGate/{parkingGate}', 'ParkingGateController@openGate');
     Route::post('parkingGate/testPrinter/{parkingGate}', 'ParkingGateController@testPrinter');
     Route::post('parkingGate/testCamera/{parkingGate}', 'ParkingGateController@testCamera');
-    Route::get('parkingGate/getList', 'ParkingGateController@getList');
     Route::resource('parkingGate', 'ParkingGateController')->except(['create', 'edit']);
-    Route::get('vehicleType/getList', 'VehicleTypeController@getList');
+
     Route::resource('vehicleType', 'VehicleTypeController')->except(['create', 'edit']);
-    Route::get('parkingMember/getList', 'ParkingMemberController@getList');
+
     Route::get('parkingMember/search', 'ParkingMemberController@search');
     Route::resource('parkingMember', 'ParkingMemberController')->except(['create', 'edit']);
-    Route::get('groupMember/getList', 'GroupMemberController@getList');
     Route::resource('groupMember', 'GroupMemberController')->except(['create', 'edit', 'show']);
+
     Route::post('parkingTransaction/printReport', 'ParkingTransactionController@printReport');
     Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');
     Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
     Route::put('parkingTransaction/setSudahKeluarSemua', 'ParkingTransactionController@setSudahKeluarSemua');
     Route::put('parkingTransaction/setSudahKeluar/{parkingTransaction}', 'ParkingTransactionController@setSudahKeluar');
     Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
+    Route::get('parkingTransaction/getSnapshot', 'ParkingTransactionController@getSnapshot');
+    Route::delete('parkingTransaction/deleteSnapshot', 'ParkingTransactionController@deleteSnapshot');
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
+
     Route::resource('manualOpenLog', 'ManualOpenLogController')->except(['create', 'edit']);
+
     Route::delete('notification/clearNotification', 'NotificationController@clearNotification');
     Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
+
     Route::resource('setting', 'SettingController')->only(['index', 'update', 'store']);
     Route::delete('memberVehicle/{memberVehicle}', 'MemberVehicleController@destroy');
+
     Route::post('memberRenewal/printSlip/{memberRenewal}', 'MemberRenewalController@printSlip');
     Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
+
+    Route::get('userLog', 'UserLogController@index');
+    Route::delete('userLog', 'UserLogController@clear');
+
+    Route::post('backup', 'BackupController@store');
+    Route::get('backup', 'BackupController@index');
+    Route::delete('backup', 'BackupController@destroy');
+    Route::post('restoreDatabase', 'BackupController@restoreDatabase');
+    Route::post('restoreSnapshot', 'BackupController@restoreSnapshot');
 
     // Report
     Route::get('getIncome', 'ReportController@getIncome');
