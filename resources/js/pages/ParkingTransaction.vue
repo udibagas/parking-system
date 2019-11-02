@@ -45,7 +45,7 @@
             show-overflow-tooltip
             :filters="vehicleTypes.map(v => { return { value: v.name, text: v.name } })"
             column-key="vehicle_type"
-            min-width="160px">
+            min-width="180px">
             </el-table-column>
 
             <el-table-column prop="plate_number" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
@@ -62,7 +62,7 @@
             label="Gate Masuk"
             sortable="custom"
             show-overflow-tooltip
-            min-width="130px"
+            min-width="150px"
             column-key="gate_in_id"
             :filters="gates.filter(g => g.type == 'IN').map(g => { return { value: g.id, text: g.name } })">
             </el-table-column>
@@ -72,7 +72,7 @@
             label="Gate Keluar"
             sortable="custom"
             show-overflow-tooltip
-            min-width="130px"
+            min-width="150px"
             column-key="gate_out_id"
             :filters="gates.filter(g => g.type == 'OUT').map(g => { return { value: g.id, text: g.name } })">
             </el-table-column>
@@ -112,7 +112,7 @@
             column-key="edit"
             :filters="[{value: 'Y', text: 'YA'}, {value: 'T', text: 'TIDAK'}]"
             :filter-multiple="false"
-            min-width="80px">
+            min-width="100px">
                 <template slot-scope="scope">
                     {{scope.row.edit ? 'YA' : 'TIDAK'}}
                 </template>
@@ -126,7 +126,7 @@
             column-key="manual"
             :filters="[{value: 'Y', text: 'YA'}, {value: 'T', text: 'TIDAK'}]"
             :filter-multiple="false"
-            min-width="100px">
+            min-width="120px">
                 <template slot-scope="scope">
                     {{scope.row.manual ? 'YA' : 'TIDAK'}}
                 </template>
@@ -210,7 +210,7 @@
         </el-dialog>
 
         <el-dialog :close-on-click-modal="false" :title="!formModel.id ? 'TRANSAKSI MANUAL' : 'EDIT TRANSAKSI ' + formModel.barcode_number" :visible.sync="showForm" top="60px" width="800px">
-            <el-form label-position="left" label-width="120px">
+            <el-form label-position="left" label-width="150px">
                 <!-- <el-form-item label="Nomor Barcode">
                     <el-input disabled placeholder="Nomor Barcode" v-model="formModel.barcode_number"></el-input>
                 </el-form-item> -->
