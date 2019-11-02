@@ -14,7 +14,7 @@
                         </el-col>
                     </el-row>
 
-                    <el-row :gutter="10" style="margin-bottom:10px;">
+                    <el-row v-if="!setting.disable_plat_nomor" :gutter="10" style="margin-bottom:10px;">
                         <el-col :span="10">
                             <div class="label-big">[-] NO. PLAT</div>
                         </el-col>
@@ -356,7 +356,11 @@ export default {
                 this.formModel.fare = ''
             }
 
-            document.getElementById('plate-number').focus()
+            if (this.setting.disable_plat_nomor) {
+                document.getElementById('ticket-number').focus()
+            } else {
+                document.getElementById('plate-number').focus()
+            }
         },
         submit(ticket) {
             // kalau tiket hilang harus isi time in dulu
@@ -378,7 +382,6 @@ export default {
 
             if (!this.formModel.barcode_number
             || !this.formModel.gate_out_id
-            || !this.formModel.plate_number
             || !this.formModel.vehicle_type
             || !this.formModel.time_out
             || !this.formModel.time_in) {
@@ -584,6 +587,12 @@ export default {
             axios.get('/setting').then(r => {
                 this.setting = r.data
                 this.formModel.plate_number = r.data.default_plate_number
+
+                if (this.setting.disable_plat_nomor) {
+                    document.getElementById('ticket-number').focus()
+                } else {
+                    document.getElementById('plate-number').focus()
+                }
             }).catch(e => {
                 this.$message({
                     message: 'BELUM ADA SETTING',
@@ -598,7 +607,6 @@ export default {
         this.getSetting()
         this.getParkingGateList()
         this.getVehicleTypeList()
-        document.getElementById('plate-number').focus()
 
         document.getElementById('gate-out-app').onkeydown = (e) => {
             // console.log(e.key)

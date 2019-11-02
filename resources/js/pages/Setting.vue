@@ -45,6 +45,13 @@
                             <div class="el-form-item__error" v-if="formErrors.member_auto_open">{{formErrors.member_auto_open[0]}}</div>
                         </el-form-item>
 
+                        <el-form-item label="Disable Plat Nomor di POS Out" :class="formErrors.disable_plat_nomor ? 'is-error' : ''">
+                            <el-select placeholder="Disable Plat Nomor di POS Out" v-model="formModel.disable_plat_nomor" style="width:100%">
+                                <el-option v-for="(l, i) in ['Tidak', 'Ya']" :key="i" :value="i" :label="l"></el-option>
+                            </el-select>
+                            <div class="el-form-item__error" v-if="formErrors.disable_plat_nomor">{{formErrors.disable_plat_nomor[0]}}</div>
+                        </el-form-item>
+
                         <!-- <el-form-item label="Masa Aktif Member" :class="formErrors.masa_aktif_member ? 'is-error' : ''">
                             <el-select placeholder="Masa Aktif Member" v-model="formModel.masa_aktif_member" style="width:100%">
                                 <el-option v-for="(l, i) in ['24 JAM', 'LEWAT TENGAH MALAM']" :key="i" :value="i" :label="l"></el-option>
