@@ -175,7 +175,7 @@
                     <table style="width:100%">
                         <tbody>
                             <tr><td class="td-label">Nomor Barcode</td><td class="td-value">{{trx.barcode_number}}</td></tr>
-                            <tr><td class="td-label">Jenis Kendarran</td><td class="td-value">{{trx.vehicle_type}}</td></tr>
+                            <tr><td class="td-label">Jenis Kendaraan</td><td class="td-value">{{trx.vehicle_type}}</td></tr>
                             <tr><td class="td-label">Plat Nomor</td><td class="td-value">{{trx.plate_number}}</td></tr>
                             <tr><td class="td-label">Member</td><td class="td-value">{{trx.is_member ? 'Ya' : 'Tidak'}}</td></tr>
                             <tr><td class="td-label">Nomor Kartu</td><td class="td-value">{{trx.card_number}}</td></tr>

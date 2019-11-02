@@ -41,11 +41,11 @@ class ManualOpenLogController extends Controller
     {
         $request->validate([
             'alasan' => 'required',
-            'password' => ['required', function($attribute, $value, $fail) {
-                if (!password_verify($value, auth()->user()->password)) {
-                    $fail('Password yang Anda masukkan salah.');
-                }
-            }]
+            // 'password' => ['required', function($attribute, $value, $fail) {
+            //     if (!password_verify($value, auth()->user()->password)) {
+            //         $fail('Password yang Anda masukkan salah.');
+            //     }
+            // }]
         ]);
 
         $input = $request->all();

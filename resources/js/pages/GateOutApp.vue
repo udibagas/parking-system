@@ -148,10 +148,10 @@
                     <el-input autofocus type="textarea" v-model="formModelManualOpen.alasan" rows="3" placeholder="Alasan buka manual"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.alasan">{{formErrors.alasan[0]}}</div>
                 </el-form-item>
-                <el-form-item label="Masukkan password Anda" :class="formErrors.password ? 'is-error' : ''">
+                <!-- <el-form-item label="Masukkan password Anda" :class="formErrors.password ? 'is-error' : ''">
                     <el-input type="password" v-model="formModelManualOpen.password" placeholder="Password"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.password">{{formErrors.password[0]}}</div>
-                </el-form-item>
+                </el-form-item> -->
             </el-form>
             <div slot="footer">
                 <el-button icon="el-icon-success" type="primary" @click="manualOpen">SIMPAN</el-button>
