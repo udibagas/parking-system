@@ -556,7 +556,7 @@ class ParkingTransactionController extends Controller
 
         // ambil data periode jam
         $start = DB::select('SELECT time_out
-            FROM parking_trasactions
+            FROM parking_transactions
             WHERE operator = :operator
                 AND gate_out_id = :gate_out_id
                 AND DATE(time_out) = :date
@@ -573,7 +573,7 @@ class ParkingTransactionController extends Controller
 
         // kalau ada start pasti ada end. worst case-nya start = end
         $end = DB::select('SELECT time_out
-            FROM parking_trasactions
+            FROM parking_transactions
             WHERE operator = :operator
                 AND gate_out_id = :gate_out_id
                 AND DATE(time_out) = :date
