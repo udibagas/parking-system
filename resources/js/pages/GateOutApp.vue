@@ -168,7 +168,7 @@ export default {
     components: { GateInApp },
     computed: {
         totalBayar() {
-            return Number(this.formModel.fare) + Number(this.formModel.denda)
+            return this.formModel.fare + this.formModel.denda
         }
     },
     data() {
