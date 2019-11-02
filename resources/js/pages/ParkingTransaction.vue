@@ -388,6 +388,21 @@ export default {
                 })
             })
         },
+        openGate(gate_id) {
+            axios.post('/parkingGate/openGate/' + gate_id).then(r => {
+                this.$message({
+                    message: r.data.message,
+                    type: 'success',
+                    showClose: true
+                })
+            }).catch(e => {
+                this.$message({
+                    message: e.response.data.message,
+                    type: 'error',
+                    showClose: true
+                })
+            })
+        },
         store() {
             this.loading = true
             this.formModel.manual = 1
@@ -398,6 +413,7 @@ export default {
                     showClose: true
                 })
                 this.showForm = false
+                this.openGate(this.formModel.gate_out_id)
                 this.formModel = {}
                 this.dateRange = [moment().format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD HH:mm:ss')],
                 this.requestData()

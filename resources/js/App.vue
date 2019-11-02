@@ -135,10 +135,10 @@ export default {
         }
     },
     mounted() {
-        // window.onbeforeunload = (e) => {
-        //     window.localStorage.removeItem('user')
-        //     window.localStorage.removeItem('token')
-        // }
+        window.onbeforeunload = (e) => {
+            window.localStorage.removeItem('user')
+            window.localStorage.removeItem('token')
+        }
 
         this.$store.commit('getNavigationList')
         setInterval(this.getNotification, 5000)
