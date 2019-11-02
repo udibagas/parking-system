@@ -554,6 +554,36 @@ class ParkingTransactionController extends Controller
             ':gate_out_id' => $request->gate_out_id
         ]);
 
+        // ambil data periode jam
+        $start = DB::select('SELECT time_out
+            FROM parking_trasactions
+            WHERE operator = :operator
+                AND gate_out_id = :gate_out_id
+                AND DATE(time_out) = :date
+            ORDER BY time_out ASC
+            ', [
+                ':date' => $request->date,
+                ':operator' => $request->user()->name,
+                ':gate_out_id' => $request->gate_out_id
+        ]);
+
+        if (!$start) {
+            return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
+        }
+
+        // kalau ada start pasti ada end. worst case-nya start = end
+        $end = DB::select('SELECT time_out
+            FROM parking_trasactions
+            WHERE operator = :operator
+                AND gate_out_id = :gate_out_id
+                AND DATE(time_out) = :date
+            ORDER BY time_out DESC
+            ', [
+                ':date' => $request->date,
+                ':operator' => $request->user()->name,
+                ':gate_out_id' => $request->gate_out_id
+        ]);
+
         try {
             if ($gate->printer_type == "network") {
                 $connector = new NetworkPrintConnector($gate->printer_ip_address, 9100);
@@ -575,6 +605,7 @@ class ParkingTransactionController extends Controller
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . $request->date . "\n");
+            $printer->text(str_pad('JAM', 15, ' ') . ' : ' . $start[0]->time_out . ' - ' . $end[0]->time_out . "\n");
             $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper($request->user()->name) . "\n\n");
 
             // REGULER SECTION
