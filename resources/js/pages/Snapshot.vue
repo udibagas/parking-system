@@ -8,8 +8,8 @@
                 <el-date-picker
                 @change="requestData"
                 v-model="dateRange"
-                format="dd/MMM/yyyy"
-                value-format="yyyy-MM-dd"
+                format="dd-MMM-yyyy HH:mm:ss"
+                value-format="yyyy-MM-dd HH:mm:ss"
                 type="datetimerange"
                 range-separator="-"
                 start-placeholder="Dari Tanggal"
@@ -35,7 +35,7 @@
         </el-form>
 
         <div style="height:calc(100vh - 400px);overflow:auto;" v-loading="loading">
-            <span v-for="(data, index) in snapshots" :key="index">
+            <span v-for="(data, index) in paginatedData" :key="index">
                 <el-image
                 :style="'width: ' + imgSize.active +'px; height: ' + imgSize.active + 'px;' + 'margin:5px'"
                 :src="data.name"
@@ -59,20 +59,25 @@
 
         <el-divider></el-divider>
 
-        <!-- <el-pagination background
-        @current-change="(p) => { page = p; requestData(); }"
-        @size-change="(s) => { pageSize = s; requestData(); }"
+        <el-pagination background
+        @current-change="(p) => { page = p; }"
+        @size-change="(s) => { pageSize = s; }"
         layout="prev, pager, next, sizes, total"
         :page-size="pageSize"
         :page-sizes="[10, 25, 50, 100]"
-        :total="snapshots.total">
-        </el-pagination> -->
+        :total="snapshots.length">
+        </el-pagination>
 
     </div>
 </template>
 
 <script>
 export default {
+    computed: {
+        paginatedData() {
+            return this.snapshots.slice((this.page - 1) * this.pageSize, this.pageSize);
+        }
+    },
     data() {
         return {
             page: 1,
@@ -87,7 +92,7 @@ export default {
     },
     methods: {
         resizeImg(step) {
-            console.log(step)
+            // console.log(step)
 
             if (step > 0) {
                 if (this.imgSize.max == this.imgSize.active) {
@@ -116,7 +121,7 @@ export default {
 
             this.loading = true;
             axios.get('/parkingTransaction/getSnapshot', { params: params }).then(r => {
-                    this.snapshots = r.data
+                this.snapshots = Object.values(r.data)
             }).catch(e => {
                 if (e.response.status == 500) {
                     this.$message({
@@ -130,20 +135,26 @@ export default {
             })
         },
         deleteSnapshot() {
-            axios.delete('parkingTransaction/deleteSnapshot', payload).then(r => {
-                this.$message({
-                    message: r.data.message,
-                    type: 'success',
-                    showClose: true
-                });
-                this.requestData();
-            }).catch(e => {
-                this.$message({
-                    message: e.response.data.message,
-                    type: 'error',
-                    showClose: true
-                });
-            })
+            this.$confirm('Anda yakin?', 'Peringatan', { type: 'warning' }).then(() => {
+                let payload = { dateRange: this.dateRange }
+                this.loading = true
+                axios.delete('parkingTransaction/deleteSnapshot', { params: payload }).then(r => {
+                    this.$message({
+                        message: r.data.message,
+                        type: 'success',
+                        showClose: true
+                    });
+                    this.requestData();
+                }).catch(e => {
+                    this.$message({
+                        message: e.response.data.message,
+                        type: 'error',
+                        showClose: true
+                    });
+                }).finally(() => {
+                    this.loading = false
+                })
+            }).catch(e => console.log(e))
         }
     },
     mounted() {

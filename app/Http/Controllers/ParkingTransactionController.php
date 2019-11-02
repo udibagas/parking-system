@@ -643,8 +643,11 @@ class ParkingTransactionController extends Controller
     {
         $files = scandir('snapshot');
 
-        $files = array_filter($files, function($f) {
-            return $f != '.' && $f != '..';
+        $files = array_filter($files, function($f) use ($request) {
+            return $f != '.'
+                && $f != '..'
+                && filemtime('snapshot/' . $f) >= strtotime($request->dateRange[0])
+                && filemtime('snapshot/' . $f) <= strtotime($request->dateRange[1]);
         });
 
         return array_map(function($f) {
@@ -657,6 +660,17 @@ class ParkingTransactionController extends Controller
 
     public function deleteSnapshot(Request $request)
     {
+        $files = scandir('snapshot');
 
+        foreach ($files as $f) {
+            if (file_exists('snapshot/' . $f)
+            && is_file('snapshot/' . $f)
+            && filemtime('snapshot/' . $f) >= strtotime($request->dateRange[0])
+            && filemtime('snapshot/' . $f) <= strtotime($request->dateRange[1])) {
+                unlink('snapshot/' . $f);
+            }
+        }
+
+        return ['message' => 'Snapshot berhasil dihapus'];
     }
 }
