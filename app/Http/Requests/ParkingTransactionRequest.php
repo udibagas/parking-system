@@ -28,9 +28,16 @@ class ParkingTransactionRequest extends FormRequest
             'vehicle_type' => 'required',
             'gate_in_id' => 'sometimes|exists:parking_gates,id',
             'gate_out_id' => 'exists:parking_gates,id',
-            'user_id' => 'exists:users,id',
             'member_id' => 'exists:parking_members,id',
-            'card_number' => 'exists:parking_members,card_number'
+        ];
+    }
+
+    public function attributes()
+    {
+        return [
+            'vehicle_type' => 'Jenis Kendaraan',
+            'gate_in_id' => 'Gate Masuk',
+            'gate_out_id' => 'Gate Keluar'
         ];
     }
 }

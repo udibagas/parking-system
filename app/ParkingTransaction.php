@@ -11,7 +11,7 @@ class ParkingTransaction extends Model
         'time_in', 'time_out', 'barcode_number', 'card_number',
         'note', 'user_id', 'parking_member_id', 'plate_number',
         'fare', 'snapshot_in', 'snapshot_out', 'operator',
-        'denda'
+        'denda', 'edit', 'edit_by', 'manual'
     ];
 
     protected $appends = ['durasi'];

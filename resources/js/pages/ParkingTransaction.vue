@@ -5,22 +5,25 @@
 
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
+                <el-button type="primary" icon="el-icon-plus" @click="() => { formModel = {}; formErrors = {}; showForm = true; }">TRANSAKSI MANUAL</el-button>
+            </el-form-item>
+            <el-form-item>
                 <el-date-picker
                 @change="requestData"
                 v-model="dateRange"
-                format="dd/MMM/yyyy"
-                value-format="yyyy-MM-dd"
-                type="daterange"
-                range-separator="To"
+                format="dd-MMM-yyyy HH:mm:ss"
+                value-format="yyyy-MM-dd HH:mm:ss"
+                type="datetimerange"
+                range-separator="-"
                 start-placeholder="Start date"
                 end-placeholder="End date">
                 </el-date-picker>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-finished" @click="setSudahKeluarSemua">SET KENDARAAN SUDAH KELUAR SEMUA</el-button>
+                <el-button type="primary" icon="el-icon-finished" @click="setSudahKeluarSemua">SET SUDAH KELUAR SEMUA</el-button>
             </el-form-item>
             <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
+                <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                     <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
                 </el-input>
             </el-form-item>
@@ -28,12 +31,23 @@
 
         <el-table :data="tableData.data" stripe
         @row-dblclick="(row, column, event) => { trx = row; showTrxDetail = true }"
+        @filter-change="(f) => { let c = Object.keys(f)[0]; filters[c] = Object.values(f[c]); page = 1; requestData(); }"
         :default-sort = "{prop: sort, order: order}"
         height="calc(100vh - 290px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="barcode_number" label="No. Tiket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" sortable="custom" show-overflow-tooltip min-width="160px"></el-table-column>
+
+            <el-table-column
+            prop="vehicle_type"
+            label="Jenis Kendaraan"
+            sortable="custom"
+            show-overflow-tooltip
+            :filters="vehicleTypes.map(v => { return { value: v.name, text: v.name } })"
+            column-key="vehicle_type"
+            min-width="160px">
+            </el-table-column>
+
             <el-table-column prop="plate_number" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <!-- <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
                 <template slot-scope="scope">
@@ -42,8 +56,27 @@
             </el-table-column> -->
             <el-table-column prop="member" label="Nama Member" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="gate_in" label="Gate Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="gate_out" label="Gate Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+
+            <el-table-column
+            prop="gate_in"
+            label="Gate Masuk"
+            sortable="custom"
+            show-overflow-tooltip
+            min-width="130px"
+            column-key="gate_in_id"
+            :filters="gates.filter(g => g.type == 'IN').map(g => { return { value: g.id, text: g.name } })">
+            </el-table-column>
+
+            <el-table-column
+            prop="gate_out"
+            label="Gate Keluar"
+            sortable="custom"
+            show-overflow-tooltip
+            min-width="130px"
+            column-key="gate_out_id"
+            :filters="gates.filter(g => g.type == 'OUT').map(g => { return { value: g.id, text: g.name } })">
+            </el-table-column>
+
             <el-table-column prop="time_in" label="Waktu Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="time_out" label="Waktu Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="durasi" label="Durasi" show-overflow-tooltip min-width="100px"></el-table-column>
@@ -52,13 +85,54 @@
                     Rp. {{scope.row.fare | formatNumber }}
                 </template>
             </el-table-column>
-            <el-table-column v-if="$store.state.user.role == 1" prop="denda" label="Denda" sortable="custom" align="right" header-align="right" min-width="100px">
+
+            <el-table-column
+            v-if="$store.state.user.role == 1"
+            prop="denda" label="Denda"
+            sortable="custom"
+            align="right"
+            column-key="denda"
+            :filters="[{value: 'Y', text: 'YA'}, {value: 'T', text: 'TIDAK'}]"
+            :filter-multiple="false"
+            header-align="right"
+            min-width="100px">
                 <template slot-scope="scope">
                     Rp. {{scope.row.denda | formatNumber }}
                 </template>
             </el-table-column>
+
             <el-table-column prop="operator" label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <!-- <el-table-column prop="updated_at" label="Waktu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
+
+            <el-table-column
+            label="Edit"
+            sortable="custom"
+            align="center"
+            header-align="center"
+            column-key="edit"
+            :filters="[{value: 'Y', text: 'YA'}, {value: 'T', text: 'TIDAK'}]"
+            :filter-multiple="false"
+            min-width="80px">
+                <template slot-scope="scope">
+                    {{scope.row.edit ? 'YA' : 'TIDAK'}}
+                </template>
+            </el-table-column>
+
+            <el-table-column
+            label="Manual"
+            sortable="custom"
+            align="center"
+            header-align="center"
+            column-key="manual"
+            :filters="[{value: 'Y', text: 'YA'}, {value: 'T', text: 'TIDAK'}]"
+            :filter-multiple="false"
+            min-width="100px">
+                <template slot-scope="scope">
+                    {{scope.row.manual ? 'YA' : 'TIDAK'}}
+                </template>
+            </el-table-column>
+
+            <el-table-column prop="edit_by" label="Diedit Oleh" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
 
             <el-table-column fixed="right" width="40px">
                 <template slot-scope="scope">
@@ -67,9 +141,17 @@
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native.prevent="() => { trx = scope.row; showTrxDetail = true }"><i class="el-icon-zoom-in"></i> Lihat Detail</el-dropdown-item>
-                            <el-dropdown-item v-if="!scope.row.time_out" @click.native.prevent="setSudahKeluar(scope.row.id)"><i class="el-icon-check"></i> Set Sudah Keluar</el-dropdown-item>
-                            <!-- <el-dropdown-item @click.native.prevent="printTicket(scope.row)"><i class="el-icon-print"></i> Print Ticket Keluar</el-dropdown-item> -->
+                            <el-dropdown-item icon="el-icon-zoom-in" @click.native.prevent="() => { trx = scope.row; showTrxDetail = true }">Lihat Detail</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-check" v-if="!scope.row.time_out" @click.native.prevent="setSudahKeluar(scope.row.id)">Set Sudah Keluar</el-dropdown-item>
+
+                            <el-dropdown-item
+                            icon="el-icon-edit"
+                            v-if="!scope.row.is_member && !scope.row.edit && !scope.row.manual"
+                            @click.native.prevent="() => { formModel = scope.row; formErrors = {}; showForm = true; }">
+                                Edit
+                            </el-dropdown-item>
+
+                            <el-dropdown-item icon="el-icon-printer" v-if="!scope.row.is_member && !!scope.row.time_out" @click.native.prevent="printTicket(scope.row.id)">Print Ticket Keluar</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
@@ -126,11 +208,107 @@
                 </el-col>
             </el-row>
         </el-dialog>
+
+        <el-dialog :close-on-click-modal="false" :title="!formModel.id ? 'TRANSAKSI MANUAL' : 'EDIT TRANSAKSI ' + formModel.barcode_number" :visible.sync="showForm" top="60px" width="800px">
+            <el-form label-position="left" label-width="120px">
+                <!-- <el-form-item label="Nomor Barcode">
+                    <el-input disabled placeholder="Nomor Barcode" v-model="formModel.barcode_number"></el-input>
+                </el-form-item> -->
+                <!-- <el-form-item label="Durasi" >
+                    <el-input disabled placeholder="Durasi" v-model="durasi"></el-input>
+                </el-form-item> -->
+                <el-row :gutter="30">
+                    <el-col :span="12">
+                        <el-form-item label="Plat Nomor" :class="formErrors.plate_number ? 'is-error' : ''">
+                            <el-input placeholder="Plat Nomor" v-model="formModel.plate_number"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.plate_number">{{formErrors.plate_number[0]}}</div>
+                        </el-form-item>
+                        <el-form-item label="Gate Masuk" :class="formErrors.gate_in_id ? 'is-error' : ''">
+                            <el-select v-model="formModel.gate_in_id" placeholder="Gate Masuk" style="width:100%">
+                                <el-option v-for="(g, i) in gates.filter(g => g.type == 'IN')" :value="g.id" :label="g.name" :key="i"></el-option>
+                            </el-select>
+                            <div class="el-form-item__error" v-if="formErrors.gate_in_id">{{formErrors.gate_in_id[0]}}</div>
+                        </el-form-item>
+                        <el-form-item label="Waktu Masuk" :class="formErrors.time_in ? 'is-error' : ''">
+                            <el-date-picker
+                            type="datetime"
+                            style="width:100%"
+                            format="dd-MMM-yyyy HH:mm"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            placeholder="Waktu Masuk"
+                            v-model="formModel.time_in"></el-date-picker>
+                            <div class="el-form-item__error" v-if="formErrors.time_in">{{formErrors.time_in[0]}}</div>
+                        </el-form-item>
+                        <el-form-item label="Tarif (Rp)" :class="formErrors.fare ? 'is-error' : ''">
+                            <el-input type="number" placeholder="Tarif" v-model="formModel.fare"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.fare">{{formErrors.fare[0]}}</div>
+                        </el-form-item>
+                        <el-form-item label="User Admin" :class="formErrors.username ? 'is-error' : ''">
+                            <el-input placeholder="User Admin" v-model="formModel.username"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.username">{{formErrors.username[0]}}</div>
+                        </el-form-item>
+                    </el-col>
+
+                    <el-col :span="12">
+                        <el-form-item label="Jenis Kendaraan" :class="formErrors.vehicle_type ? 'is-error' : ''">
+                            <el-select v-model="formModel.vehicle_type" placeholder="Jenis Kendaraan" style="width:100%">
+                                <el-option v-for="(v, i) in vehicleTypes" :value="v.name" :label="v.name" :key="i"></el-option>
+                            </el-select>
+                            <div class="el-form-item__error" v-if="formErrors.vehicle_type">{{formErrors.vehicle_type[0]}}</div>
+                        </el-form-item>
+                        <el-form-item label="Gate Keluar" :class="formErrors.gate_out_id ? 'is-error' : ''">
+                            <el-select v-model="formModel.gate_out_id" placeholder="Gate Keluar" style="width:100%">
+                                <el-option v-for="(g, i) in gates.filter(g => g.type == 'OUT')" :value="g.id" :label="g.name" :key="i"></el-option>
+                            </el-select>
+                            <div class="el-form-item__error" v-if="formErrors.gate_out_id">{{formErrors.gate_out_id[0]}}</div>
+                        </el-form-item>
+                        <el-form-item label="Waktu Keluar" :class="formErrors.time_out ? 'is-error' : ''">
+                            <el-date-picker
+                            type="datetime"
+                            :autocomplete="false"
+                            style="width:100%"
+                            format="dd-MMM-yyyy HH:mm"
+                            value-format="yyyy-MM-dd HH:mm:ss"
+                            placeholder="Waktu Keluar"
+                            v-model="formModel.time_out"></el-date-picker>
+                            <div class="el-form-item__error" v-if="formErrors.time_out">{{formErrors.time_out[0]}}</div>
+                        </el-form-item>
+                        <el-form-item label="Denda (Rp)" :class="formErrors.denda ? 'is-error' : ''">
+                            <el-input type="number" placeholder="Denda" v-model="formModel.denda"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.denda">{{formErrors.denda[0]}}</div>
+                        </el-form-item>
+                        <el-form-item label="Password Admin" :class="formErrors.password ? 'is-error' : ''">
+                            <el-input type="password" placeholder="Password Admin" v-model="formModel.password"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.password">{{formErrors.password[0]}}</div>
+                        </el-form-item>
+                    </el-col>
+                </el-row>
+            </el-form>
+
+            <div slot="footer">
+                <el-button type="primary" icon="el-icon-success" @click="() => !!formModel.id ? update() : store()">SIMPAN</el-button>
+                <el-button type="info" icon="el-icon-error" @click="showForm = false">BATAL</el-button>
+            </div>
+        </el-dialog>
     </div>
 </template>
 
 <script>
 export default {
+    computed: {
+        durasi() {
+            var date1 = moment(this.formModel.time_in)
+            var date2 = moment(this.formModel.time_out);
+            var duration = moment.duration(date2.diff(date1));
+            return moment.utc(duration.asMilliseconds()).format('HH:mm:ss')
+        },
+        gates() {
+            return this.$store.state.parkingGateList
+        },
+        vehicleTypes() {
+            return this.$store.state.vehicleTypeList
+        }
+    },
     data() {
         return {
             keyword: '',
@@ -146,7 +324,11 @@ export default {
             income: [],
             parkedVehicle: [],
             date: moment().format('YYYY-MM-DD'),
-            dateRange: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')]
+            dateRange: [moment().format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD HH:mm:ss')],
+            formModel: {},
+            formErrors: {},
+            showForm: false,
+            filters: {}
         }
     },
     methods: {
@@ -191,8 +373,74 @@ export default {
                 })
             }).catch(() => console.log(e))
         },
-        printTicket(data) {
-
+        printTicket(id) {
+            axios.post('/parkingTransaction/printTicket/' + id, { trx: 'OUT' }).then(r => {
+                this.$message({
+                    message: r.data.message,
+                    type: 'success',
+                    showClose: true
+                })
+            }).catch(e => {
+                this.$message({
+                    message: e.response.data.message,
+                    type: 'error',
+                    showClose: true
+                })
+            })
+        },
+        store() {
+            this.loading = true
+            this.formModel.manual = 1
+            axios.post('/parkingTransaction', this.formModel).then(r => {
+                this.$message({
+                    message: 'Data berhasil disimpan',
+                    type: 'success',
+                    showClose: true
+                })
+                this.showForm = false
+                this.formModel = {}
+                this.dateRange = [moment().format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD HH:mm:ss')],
+                this.requestData()
+            }).catch(e => {
+                if (e.response.status == 422) {
+                    this.formErrors = e.response.data.errors;
+                } else {
+                    this.$message({
+                        message: e.response.data.message,
+                        type: 'error',
+                        showClose: true
+                    })
+                }
+            }).finally(() => {
+                this.loading = false
+            })
+        },
+        update() {
+            this.loading = true
+            this.formModel.edit = 1
+            axios.put('/parkingTransaction/' + this.formModel.id, this.formModel).then(r => {
+                this.$message({
+                    message: 'Data berhasil disimpan',
+                    type: 'success',
+                    showClose: true
+                })
+                this.showForm = false
+                this.formModel = {}
+                this.dateRange = [moment().format('YYYY-MM-DD 00:00:00'), moment().format('YYYY-MM-DD HH:mm:ss')],
+                this.requestData()
+            }).catch(e => {
+                if (e.response.status == 422) {
+                    this.formErrors = e.response.data.errors;
+                } else {
+                    this.$message({
+                        message: e.response.data.message,
+                        type: 'error',
+                        showClose: true
+                    })
+                }
+            }).finally(() => {
+                this.loading = false
+            })
         },
         requestData() {
             let params = {
@@ -205,7 +453,7 @@ export default {
             }
 
             this.loading = true;
-            axios.get('/parkingTransaction', {params: params}).then(r => {
+            axios.get('/parkingTransaction', { params: Object.assign(params, this.filters) }).then(r => {
                     this.tableData = r.data
             }).catch(e => {
                 if (e.response.status == 500) {
@@ -222,6 +470,8 @@ export default {
     },
     mounted() {
         this.requestData();
+        this.$store.commit('getParkingGateList')
+        this.$store.commit('getVehicleTypeList')
     }
 }
 </script>

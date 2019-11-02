@@ -11,7 +11,7 @@ use Mike42\Escpos\Printer;
 use App\ParkingGate;
 use App\ParkingMember;
 use App\Setting;
-use App\VehicleType;
+use App\User;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 
@@ -37,16 +37,46 @@ class ParkingTransactionController extends Controller
             ->join('parking_gates AS parking_gate_in', 'parking_gate_in.id', '=', 'parking_transactions.gate_in_id', 'LEFT')
             ->join('parking_gates AS parking_gate_out', 'parking_gate_out.id', '=', 'parking_transactions.gate_out_id', 'LEFT')
             ->when($request->dateRange, function($q) use ($request) {
-                return $q->whereRaw('DATE(parking_transactions.updated_at) BETWEEN "'.$request->dateRange[0].'" AND "'.$request->dateRange[1].'"');
+                return $q->whereBetween('parking_transactions.updated_at', $request->dateRange);
             })->when($request->keyword, function ($q) use ($request) {
-                return $q->where('parking_transactions.barcode_number', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('parking_transactions.plate_number', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('parking_transactions.card_number', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('parking_transactions.operator', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('parking_gate_in.name', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('parking_gate_out.name', 'LIKE', '%' . $request->keyword . '%');
+                return $q->where(function($qq) use ($request) {
+                    return $qq->where('parking_transactions.barcode_number', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('parking_transactions.plate_number', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('parking_transactions.card_number', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('parking_transactions.operator', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('parking_transactions.edit_by', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('parking_gate_in.name', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('parking_gate_out.name', 'LIKE', '%' . $request->keyword . '%');
+                });
             })->when($request->is_member, function ($q) use ($request) {
-                return $q->whereIn('is_member', $request->is_member);
+                return $q->whereIn('parking_transactions.is_member', $request->is_member);
+            })->when($request->vehicle_type, function ($q) use ($request) {
+                return $q->whereIn('parking_transactions.vehicle_type', $request->vehicle_type);
+            })->when($request->gate_in_id, function ($q) use ($request) {
+                return $q->whereIn('parking_transactions.gate_in_id', $request->gate_in_id);
+            })->when($request->gate_out_id, function ($q) use ($request) {
+                return $q->whereIn('parking_transactions.gate_out_id', $request->gate_out_id);
+            })->when($request->denda, function($q) use ($request) {
+                if ($request->denda[0] == 'Y') {
+                    return $q->where('denda', '>', 0);
+                }
+                if ($request->denda[0] == 'T') {
+                    return $q->where('denda', 0);
+                }
+            })->when($request->edit, function($q)  use ($request)  {
+                if ($request->edit[0] == 'Y') {
+                    return $q->where('edit', 1);
+                }
+                if ($request->edit[0] == 'T') {
+                    return $q->where('edit', 0);
+                }
+            })->when($request->manual, function($q)  use ($request)  {
+                if ($request->manual[0] == 'Y') {
+                    return $q->where('manual', 1);
+                }
+                if ($request->manual[0] == 'T') {
+                    return $q->where('manual', 0);
+                }
             })->orderBy($sort, $order)->paginate($request->pageSize);
     }
 
@@ -59,6 +89,48 @@ class ParkingTransactionController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
+
+        if ($request->manual)
+        {
+            $input['barcode_number'] = strtoupper(str_random(5));
+            $input['is_member'] = 0;
+            $input['manual'] = 1;
+
+            $request->validate([
+                'plate_number' => 'required',
+                'vehicle_type' => 'required',
+                'gate_in_id' => 'required',
+                'gate_out_id' => 'required',
+                'time_in' => 'required',
+                'time_out' => 'required',
+                'username' => ['required', function($attribute, $value, $fail) {
+                    $user = User::where('role', 1)->where('status', 1)->where('name', 'LIKE', $value)->first();
+                    if (!$user) {
+                        $fail('User admin tidak terdaftar');
+                    }
+                }],
+                'password' => ['required', function($attribute, $value, $fail) use ($request) {
+                    $user = User::where('role', 1)->where('status', 1)
+                        ->where('name', 'LIKE', $request->username)
+                        ->first();
+
+                    if (!$user) {
+                        $fail('User admin tidak terdaftar');
+                    } else if (!password_verify($value, $user->password)) {
+                        $fail('User/password admin tidak sesuai');
+                    }
+                }],
+            ], [], [
+                'plate_number' => 'Plat Nomor',
+                'vehicle_type' => 'Jenis Kendaraan',
+                'gate_in_id' => 'Gate Masuk',
+                'gate_out_id' => 'Gate Keluar',
+                'time_in' => 'Waktu Masuk',
+                'time_out' => 'Waktu Keluar',
+                'username' => 'User Admin',
+                'password' => 'Password Admin'
+            ]);
+        }
 
         if (auth()->check()) {
             $input['operator'] = auth()->user()->name;
@@ -284,7 +356,49 @@ class ParkingTransactionController extends Controller
     {
         $input = $request->all();
 
-        if (auth()->check()) {
+        if ($request->edit)
+        {
+            $request->validate([
+                'plate_number' => 'required',
+                'vehicle_type' => 'required',
+                'gate_in_id' => 'required',
+                'gate_out_id' => 'required',
+                'time_in' => 'required',
+                'time_out' => 'required',
+                'username' => ['required', function($attribute, $value, $fail) {
+                    $user = User::where('role', 1)->where('status', 1)->where('name', 'LIKE', $value)->first();
+                    if (!$user) {
+                        $fail('User admin tidak terdaftar');
+                    }
+                }],
+                'password' => ['required', function($attribute, $value, $fail) use ($request) {
+                    $user = User::where('role', 1)->where('status', 1)
+                        ->where('name', 'LIKE', $request->username)
+                        ->first();
+
+                    if (!$user) {
+                        $fail('User admin tidak terdaftar');
+                    }
+
+                    if (!password_verify($value, $user->password)) {
+                        $fail('User/password admin tidak sesuai');
+                    }
+                }],
+            ], [], [
+                'plate_number' => 'Plat Nomor',
+                'vehicle_type' => 'Jenis Kendaraan',
+                'gate_in_id' => 'Gate Masuk',
+                'gate_out_id' => 'Gate Keluar',
+                'time_in' => 'Waktu Masuk',
+                'time_out' => 'Waktu Keluar',
+                'username' => 'User Admin',
+                'password' => 'Password Admin'
+            ]);
+
+            $input['edit_by'] = auth()->user()->name;
+        }
+
+        if (auth()->check() && !$request->edit) {
             $input['user_id'] = auth()->user()->id;
             $input['operator'] = auth()->user()->name;
         }
