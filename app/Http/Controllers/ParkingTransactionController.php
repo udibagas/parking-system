@@ -638,4 +638,25 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
         }
     }
+
+    public function getSnapshot(Request $request)
+    {
+        $files = scandir('snapshot');
+
+        $files = array_filter($files, function($f) {
+            return $f != '.' && $f != '..';
+        });
+
+        return array_map(function($f) {
+            return [
+                'name' => 'snapshot/' . $f,
+                'modified_at' => filemtime('snapshot/' . $f)
+            ];
+        }, $files);
+    }
+
+    public function deleteSnapshot(Request $request)
+    {
+
+    }
 }

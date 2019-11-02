@@ -10,46 +10,36 @@
                 v-model="dateRange"
                 format="dd/MMM/yyyy"
                 value-format="yyyy-MM-dd"
-                type="daterange"
-                range-separator="To"
-                start-placeholder="Start date"
-                end-placeholder="End date">
+                type="datetimerange"
+                range-separator="-"
+                start-placeholder="Dari Tanggal"
+                end-placeholder="Sampai Tanggal">
                 </el-date-picker>
             </el-form-item>
 
-            <el-form-item>
+            <!-- <el-form-item>
                 <el-select v-model="gate" placeholder="Gate" clearable multiple @change="requestData">
                     <el-option v-for="(t, i) in $store.state.parkingGateList" :value="t.id" :label="t.name" :key="i"></el-option>
                 </el-select>
             </el-form-item>
 
             <el-form-item>
-                <el-select v-model="vehicle_type" placeholder="Vehicle Type" clearable multiple @change="requestData">
-                <el-option v-for="(t, i) in $store.state.vehicleTypeList" :value="t.id" :label="t.name" :key="i"></el-option>
-            </el-select>
-            </el-form-item>
-
-            <!-- <el-form-item>
-                <el-button plain disabled type="danger" icon="el-icon-delete">HAPUS SNAPSHOT</el-button>
+                <el-select v-model="vehicle_type" placeholder="Jenis Kendaraan" clearable multiple @change="requestData">
+                    <el-option v-for="(t, i) in $store.state.vehicleTypeList" :value="t.id" :label="t.name" :key="i"></el-option>
+                </el-select>
             </el-form-item> -->
+
+            <el-form-item>
+                <el-button type="danger" icon="el-icon-delete" @click="deleteSnapshot">HAPUS SNAPSHOT</el-button>
+            </el-form-item>
         </el-form>
 
         <div style="height:calc(100vh - 400px);overflow:auto;" v-loading="loading">
-            <span v-for="(data, index) in tableData.data" :key="index">
+            <span v-for="(data, index) in snapshots" :key="index">
                 <el-image
                 :style="'width: ' + imgSize.active +'px; height: ' + imgSize.active + 'px;' + 'margin:5px'"
-                :src="data.snapshot_in"
-                :preview-src-list="[data.snapshot_in]"
-                lazy
-                fit="cover">
-                    <div slot="error" class="el-image__error">
-                        <i class="el-icon-picture-outline"></i>
-                    </div>
-                </el-image>
-                <el-image
-                :style="'width: ' + imgSize.active +'px; height: ' + imgSize.active + 'px;' + 'margin:5px'"
-                :src="data.snapshot_out"
-                :preview-src-list="[data.snapshot_out]"
+                :src="data.name"
+                :preview-src-list="[data.name]"
                 lazy
                 fit="cover">
                     <div slot="error" class="el-image__error">
@@ -69,14 +59,14 @@
 
         <el-divider></el-divider>
 
-        <el-pagination background
+        <!-- <el-pagination background
         @current-change="(p) => { page = p; requestData(); }"
         @size-change="(s) => { pageSize = s; requestData(); }"
         layout="prev, pager, next, sizes, total"
         :page-size="pageSize"
         :page-sizes="[10, 25, 50, 100]"
-        :total="tableData.total">
-        </el-pagination>
+        :total="snapshots.total">
+        </el-pagination> -->
 
     </div>
 </template>
@@ -88,19 +78,8 @@ export default {
             page: 1,
             pageSize: 10,
             imgSize: { min: 150, active: 150, max: 300, step: 10 },
-            tableData: {
-                // total: 1000,
-                // data: [
-                //     { snapshot_in: 'images/logo.jpg', snapshot_out: 'images/logo.jpg' },
-                //     { snapshot_in: 'images/logo.jpg', snapshot_out: 'images/logo.jpg' },
-                //     { snapshot_in: 'images/logo.jpg', snapshot_out: 'images/logo.jpg' },
-                //     { snapshot_in: 'images/logo.jpg', snapshot_out: 'images/logo.jpg' },
-                //     { snapshot_in: 'images/logo.jpg', snapshot_out: 'images/logo.jpg' },
-                //     { snapshot_in: 'images/logo.jpg', snapshot_out: 'images/logo.jpg' },
-                //     { snapshot_in: 'images/logo.jpg', snapshot_out: 'images/logo.jpg' },
-                // ]
-            },
-            dateRange: [moment().format('YYYY-MM-01'), moment().format('YYYY-MM-DD')],
+            snapshots: [],
+            dateRange: [moment().format('YYYY-MM-01 00:00:00'), moment().format('YYYY-MM-DD HH:mm:ss')],
             gate: [],
             vehicle_type: [],
             loading: false
@@ -126,22 +105,22 @@ export default {
         },
         requestData() {
             let params = {
-                page: this.page,
-                pageSize: this.pageSize,
-                sort: 'created_at',
-                order: 'ascending',
+                // page: this.page,
+                // pageSize: this.pageSize,
+                // sort: 'created_at',
+                // order: 'ascending',
                 dateRange: this.dateRange,
-                vehicle_type: this.vehicle_type,
-                gate: this.gate,
+                // vehicle_type: this.vehicle_type,
+                // gate: this.gate,
             }
 
             this.loading = true;
-            axios.get('/parkingTransaction', {params: params}).then(r => {
-                    this.tableData = r.data
+            axios.get('/parkingTransaction/getSnapshot', { params: params }).then(r => {
+                    this.snapshots = r.data
             }).catch(e => {
                 if (e.response.status == 500) {
                     this.$message({
-                        message: e.response.data.message + '\n' + e.response.data.file + ':' + e.response.data.line,
+                        message: e.response.data.message,
                         type: 'error',
                         showClose: true
                     });
@@ -149,12 +128,28 @@ export default {
             }).finally(() => {
                 this.loading = false;
             })
+        },
+        deleteSnapshot() {
+            axios.delete('parkingTransaction/deleteSnapshot', payload).then(r => {
+                this.$message({
+                    message: r.data.message,
+                    type: 'success',
+                    showClose: true
+                });
+                this.requestData();
+            }).catch(e => {
+                this.$message({
+                    message: e.response.data.message,
+                    type: 'error',
+                    showClose: true
+                });
+            })
         }
     },
     mounted() {
         this.requestData()
-        this.$store.commit('getParkingGateList')
-        this.$store.commit('getVehicleTypeList')
+        // this.$store.commit('getParkingGateList')
+        // this.$store.commit('getVehicleTypeList')
     }
 
 }

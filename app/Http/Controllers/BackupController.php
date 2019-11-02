@@ -80,6 +80,21 @@ class BackupController extends Controller
 
     public function restoreSnapshot(Request $request)
     {
+        // delete files first
+        array_map( 'unlink', array_filter((array) glob("snapshot/*") ) );
+        // extract files
+        $zip = new \ZipArchive;
+        if ($zip->open(env('BACKUP_DIR') . $request->file) === true) {
+            $zip->extractTo('./');
 
+            for($i=0; $i<$zip->numFiles; $i++){
+                touch($zip->statIndex($i)['name'], $zip->statIndex($i)['mtime']);
+            }
+
+            $zip->close();
+            return ['message' => 'Snapshot berhasil di restore'];
+        } else {
+            return response(['message' => 'Gagal extract snapshot'], 500);
+        }
     }
 }

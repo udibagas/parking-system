@@ -126,7 +126,22 @@ export default {
         },
         restoreSnapshot(file) {
             this.$confirm('Anda yakin akan merestore file snapshot ini?', 'Peringatan', { type: 'warning'}).then(() => {
-
+                this.loading = true
+                axios.post('restoreSnapshot', { file: file.name }).then(r => {
+                    this.$message({
+                        message: r.data.message,
+                        type: 'success',
+                        showClose: true
+                    })
+                }).catch(e => {
+                    this.$message({
+                        message: e.response.data.message,
+                        type: 'error',
+                        showClose: true
+                    })
+                }).finally(() => {
+                    this.loading = false
+                })
             }).catch(e => console.log(e))
         },
         restoreDatabase(file) {

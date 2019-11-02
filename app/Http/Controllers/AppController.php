@@ -39,6 +39,7 @@ class AppController extends Controller
         $adminNav = [
             ['label' => 'Laporan', 'icon' => 'el-icon-data-analysis', 'path' => 'report' ],
             ['label' => 'User', 'icon' => 'el-icon-user', 'path' => 'user' ],
+            ['label' => 'Snapshot', 'icon' => 'el-icon-camera', 'path' => 'snapshot' ],
             ['label' => 'Notifikasi', 'icon' => 'el-icon-bell', 'path' => 'notification' ],
             ['label' => 'Setting', 'icon' => 'el-icon-setting', 'path' => 'setting' ],
         ];
