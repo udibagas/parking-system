@@ -20,7 +20,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="name" label="Backup File Database" show-overflow-tooltip></el-table-column>
-                    <el-table-column label="Ukuran" width="100px" header-align="right" align="right">
+                    <el-table-column label="Ukuran" width="120px" header-align="right" align="right">
                         <template slot-scope="scope">
                             {{scope.row.size | formatNumber }} KB
                         </template>
@@ -43,7 +43,7 @@
                         </template>
                     </el-table-column>
                     <el-table-column prop="name" label="Backup File Snapshot" show-overflow-tooltip></el-table-column>
-                    <el-table-column label="Ukuran" width="100px" header-align="right" align="right">
+                    <el-table-column label="Ukuran" width="120px" header-align="right" align="right">
                         <template slot-scope="scope">
                             {{scope.row.size | formatNumber }} KB
                         </template>

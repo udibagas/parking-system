@@ -11,46 +11,58 @@
             </el-form-item>
         </el-form>
 
-        <el-table :data="tableData.data" stripe
+        <el-table :data="tableData.data"
+        :row-class-name="tableRowClassName"
         @row-dblclick="(row, column, event) => { selectedData = row; showDetail = true }"
         :default-sort = "{prop: sort, order: order}"
         height="calc(100vh - 345px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column fixed="left" prop="name" label="Nama" min-width="100px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="shortcut_key" label="Shortcut" min-width="100px" align="center" header-align="center"></el-table-column>
-            <el-table-column prop="type" label="Jenis" min-width="80px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" min-width="160px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="controller_ip_address" label="Controller Address" min-width="180px" show-overflow-tooltip>
+            <el-table-column prop="shortcut_key" label="#" min-width="30px" align="center" header-align="center"></el-table-column>
+            <el-table-column prop="name" label="Nama" min-width="100px">
                 <template slot-scope="scope">
+                    <i :class="scope.row.active ? 'el-icon-circle-check text-green' : 'el-icon-circle-close text-red'"></i>
+                    {{scope.row.name}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="type" label="Jenis" min-width="80px" header-align="center" align="center"></el-table-column>
+            <el-table-column prop="vehicle_type" label="Jenis Kendaraan" min-width="130px" show-overflow-tooltip></el-table-column>
+            <el-table-column prop="controller_ip_address" label="Controller" min-width="150px" show-overflow-tooltip>
+                <template slot-scope="scope">
+                    <span v-if="!!scope.row.controller_ip_address">
                     {{scope.row.controller_ip_address}}:{{scope.row.controller_port}}
-                </template>
-            </el-table-column>
-            <el-table-column prop="controller_device" label="Controller Device" min-width="180px" show-overflow-tooltip>
-                <template slot-scope="scope">
+                    </span>
+                    <br v-if="!!scope.row.controller_ip_address">
+                    <span v-if="!!scope.row.controller_device">
                     {{scope.row.controller_device}}:{{scope.row.controller_baudrate}}
+                    </span>
                 </template>
             </el-table-column>
-            <el-table-column prop="printer_type" label="Jenis Printer" min-width="150px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="printer_device" label="Device Printer" min-width="150px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="printer_ip_address" label="Alamat IP Printer" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_ip_address" label="Alamat IP Kamera" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_username" label="Username Kamera" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_password" label="Password Kamera" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_auth_type" label="Otentifikasi Kamera" min-width="180px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_image_snapshot_url" label="URL Snapshot Kamera" min-width="250px" show-overflow-tooltip></el-table-column>
-            <el-table-column prop="camera_status" label="Status Kamera" min-width="150px">
+            <el-table-column label="Printer" min-width="110px" show-overflow-tooltip>
                 <template slot-scope="scope">
-                    <el-tag size="mini" :type="scope.row.camera_status ? 'success' : 'info'">{{scope.row.camera_status ? 'Active' : 'Inactive'}}</el-tag>
+                    {{scope.row.printer_type == 'local' ? scope.row.printer_device : scope.row.printer_ip_address}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="camera_image_snapshot_url" label="URL Kamera" min-width="180px" show-overflow-tooltip>
+                <template slot-scope="scope">
+                    <i :class="scope.row.camera_status ? 'el-icon-circle-check text-green' : 'el-icon-circle-close text-red'"></i>
+                    {{scope.row.camera_image_snapshot_url}}
+                </template>
+            </el-table-column>
+            <el-table-column label="User/Pass/Auth Kamera" min-width="250px">
+                <template slot-scope="scope">
+                    <!-- <i :class="scope.row.camera_status ? 'el-icon-circle-check text-green' : 'el-icon-circle-close text-red'"></i> -->
+                    {{scope.row.camera_username}}/{{scope.row.camera_password}}/{{scope.row.camera_auth_type}}
+                    <!-- <el-tag size="mini" :type="scope.row.camera_status ? 'success' : 'info'">{{scope.row.camera_status ? 'Aktif' : 'Nonaktif'}}</el-tag> -->
                 </template>
             </el-table-column>
             <!-- <el-table-column prop="camera_video_snapshot_url" label="Camera Video Snapshot URL" min-width="250px" show-overflow-tooltip></el-table-column> -->
 
-            <el-table-column fixed="right" prop="status" label="Status" min-width="100px">
+            <!-- <el-table-column fixed="right" prop="status" label="Status" min-width="100px">
                 <template slot-scope="scope">
-                    <el-tag size="mini" :type="scope.row.active ? 'success' : 'info'">{{scope.row.active ? 'Active' : 'Inactive'}}</el-tag>
+                    <el-tag size="mini" :type="scope.row.active ? 'success' : 'info'">{{scope.row.active ? 'Aktif' : 'Nonaktif'}}</el-tag>
                 </template>
-            </el-table-column>
+            </el-table-column> -->
 
             <el-table-column fixed="right" width="40px">
                 <template slot-scope="scope">
@@ -62,8 +74,8 @@
                             <el-dropdown-item icon="el-icon-zoom-in" @click.native.prevent="() => { selectedData = scope.row; showDetail = true; }">Lihat Detail</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-camera" @click.native.prevent="testDevice('testCamera', scope.row.id)">Test Kamera</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-printer" @click.native.prevent="testDevice('testPrinter', scope.row.id)">Test Printer</el-dropdown-item>
-                            <el-dropdown-item icon="el-icon-minus" @click.native.prevent="testDevice('openGate', scope.row.id)">Test Gate</el-dropdown-item>
-                            <el-dropdown-item icon="el-icon-edit-outline" @click.native.prevent="openForm(scope.row)">Edit</el-dropdown-item>
+                            <el-dropdown-item v-if="scope.row.type == 'OUT'" icon="el-icon-minus" @click.native.prevent="testDevice('openGate', scope.row.id)">Test Gate</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-edit-outline" divided @click.native.prevent="openForm(scope.row)">Edit</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-delete" @click.native.prevent="deleteData(scope.row.id)">Hapus</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
@@ -139,6 +151,9 @@
                             <el-input type="number" placeholder="Baudrate" v-model="formModel.controller_baudrate" style="width:38%;float:right;clear:right;"></el-input>
                         </el-form-item>
 
+                    </el-col>
+
+                    <el-col :span="12">
                         <el-form-item label="Jenis Printer" :class="formErrors.printer_type || formErrors.printer_device || formErrors.printer_ip_address ? 'is-error' : ''">
                             <el-select v-model="formModel.printer_type" placeholder="Jenis Printer" style="width:40%">
                                 <el-option v-for="(t, i) in ['local', 'network']" :value="t" :label="t" :key="i"></el-option>
@@ -149,12 +164,15 @@
                             <div class="el-form-item__error" v-if="formErrors.printer_device">{{formErrors.printer_device[0]}}</div>
                             <div class="el-form-item__error" v-if="formErrors.printer_ip_address">{{formErrors.printer_ip_address[0]}}</div>
                         </el-form-item>
-                    </el-col>
 
-                    <el-col :span="12">
-                        <el-form-item label="Alamat IP Kamera" :class="formErrors.camera_ip_address ? 'is-error' : ''">
+                        <!-- <el-form-item label="Alamat IP Kamera" :class="formErrors.camera_ip_address ? 'is-error' : ''">
                             <el-input placeholder="Alamat IP Kamera" v-model="formModel.camera_ip_address"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.camera_ip_address">{{formErrors.camera_ip_address[0]}}</div>
+                        </el-form-item> -->
+
+                        <el-form-item label="URL Snapshot Kamera" :class="formErrors.camera_image_snapshot_url ? 'is-error' : ''">
+                            <el-input placeholder="URL Snapshot Kamera" v-model="formModel.camera_image_snapshot_url"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.camera_image_snapshot_url">{{formErrors.camera_image_snapshot_url[0]}}</div>
                         </el-form-item>
 
                         <el-form-item label="Username Kamera" :class="formErrors.camera_username ? 'is-error' : ''">
@@ -172,11 +190,6 @@
                                 <el-option v-for="(t, i) in ['basic', 'digest']" :value="t" :label="t" :key="i"></el-option>
                             </el-select>
                             <div class="el-form-item__error" v-if="formErrors.camera_auth_type">{{formErrors.camera_auth_type[0]}}</div>
-                        </el-form-item>
-
-                        <el-form-item label="URL Snapshot Kamera" :class="formErrors.camera_image_snapshot_url ? 'is-error' : ''">
-                            <el-input placeholder="URL Snapshot Kamera" v-model="formModel.camera_image_snapshot_url"></el-input>
-                            <div class="el-form-item__error" v-if="formErrors.camera_image_snapshot_url">{{formErrors.camera_image_snapshot_url[0]}}</div>
                         </el-form-item>
 
                         <el-form-item label="Status Kamera" :class="formErrors.camera_status ? 'is-error' : ''">
@@ -208,16 +221,18 @@
                     <tr><td class="td-label">Jenis Kendaraan</td><td class="td-value">{{selectedData.vehicle_type}}</td></tr>
                     <tr><td class="td-label">Alamat IP Kontroller</td><td class="td-value">{{selectedData.controller_ip_address}}</td></tr>
                     <tr><td class="td-label">Port Kontroller</td><td class="td-value">{{selectedData.controller_port}}</td></tr>
+                    <tr><td class="td-label">Device Kontroller</td><td class="td-value">{{selectedData.controller_device}}</td></tr>
+                    <tr><td class="td-label">Baudrate Kontroller</td><td class="td-value">{{selectedData.controller_baudrate}}</td></tr>
                     <tr><td class="td-label">Jenis Printer</td><td class="td-value">{{selectedData.printer_type}}</td></tr>
                     <tr><td class="td-label">Device Printer</td><td class="td-value">{{selectedData.printer_device}}</td></tr>
                     <tr><td class="td-label">Alamat IP Printer</td><td class="td-value">{{selectedData.printer_ip_address}}</td></tr>
-                    <tr><td class="td-label">Alamat IP Kamera</td><td class="td-value">{{selectedData.camera_ip_address}}</td></tr>
+                    <!-- <tr><td class="td-label">Alamat IP Kamera</td><td class="td-value">{{selectedData.camera_ip_address}}</td></tr> -->
                     <tr><td class="td-label">Username Kamera</td><td class="td-value">{{selectedData.camera_username}}</td></tr>
                     <tr><td class="td-label">Password Kamera</td><td class="td-value">{{selectedData.camera_password}}</td></tr>
                     <tr><td class="td-label">Tipe Otentifikasi Kamera</td><td class="td-value">{{selectedData.camera_auth_type}}</td></tr>
                     <tr><td class="td-label">URL Snapshot Kamera</td><td class="td-value">{{selectedData.camera_image_snapshot_url}}</td></tr>
-                    <tr><td class="td-label">Status Kamera</td><td class="td-value">{{selectedData.camera_status ? 'Active' : 'Inactive'}}</td></tr>
-                    <tr><td class="td-label">Status Gate</td><td class="td-value">{{selectedData.active ? 'Active' : 'Inactive'}}</td></tr>
+                    <tr><td class="td-label">Status Kamera</td><td class="td-value">{{selectedData.camera_status ? 'Aktif' : 'Nonaktif'}}</td></tr>
+                    <tr><td class="td-label">Status Gate</td><td class="td-value">{{selectedData.active ? 'Aktif' : 'Nonaktif'}}</td></tr>
                 </tbody>
             </table>
         </el-dialog>
@@ -250,6 +265,12 @@ export default {
         }
     },
     methods: {
+        tableRowClassName({row, rowIndex}) {
+            if (!row.active) {
+                return 'inactive-row'
+            }
+            return ''
+        },
         testDevice(action, id) {
             axios.post('/parkingGate/' + action + '/' + id).then(r => {
                 this.$message({
