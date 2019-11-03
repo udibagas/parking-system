@@ -11,15 +11,14 @@ sudo apt install -y \
     php-xml \
     php-zip \
     apache2 \
-    libapache2-mohp \
     mysql-server \
     python3-pip \
     git \
     composer \
     sed
 
-sudo pip3 install python-escpos
 git clone https://github.com/udibagas/parking-system.git
+sudo pip3 install python-escpos requests
 cd parking-system
 composer install
 cp .env-prod .env
@@ -28,7 +27,7 @@ php artisan jwt:secret
 
 # prepare database server
 sudo mysql -uroot -e 'create database parking_system'
-sudo mysql -uroot -e 'grant all on parking_system.* to parking_system@localhost identified by "Bismillah1@#$%"'
+sudo mysql -uroot -e 'grant all on parking_system.* to parking_system@localhost identified by Bismillah1@#$%"'
 sudo mysql -uroot -e 'flush privileges'
 
 # migrate then populate db

@@ -34,7 +34,7 @@
             </el-form-item>
         </el-form>
 
-        <div style="height:calc(100vh - 400px);overflow:auto;" v-loading="loading">
+        <div style="height:calc(100vh - 320px);overflow:auto;" v-loading="loading">
             <span v-for="(data, index) in paginatedData" :key="index">
                 <el-image
                 :style="'width: ' + imgSize.active +'px; height: ' + imgSize.active + 'px;' + 'margin:5px'"
@@ -49,20 +49,20 @@
             </span>
         </div>
 
-        <el-slider style="width:300px;margin:15px auto 0;" v-model="imgSize.active" :min="imgSize.min" :max="imgSize.max"></el-slider>
+        <!-- <el-slider style="width:300px;margin:15px auto 0;" v-model="imgSize.active" :min="imgSize.min" :max="imgSize.max"></el-slider>
         <div style="text-align:center;margin-bottom:0px">
             <el-button-group>
                 <el-button size="mini" plain type="primary" :disabled="imgSize.active == imgSize.min" @click="resizeImg(-imgSize.step)" icon="el-icon-zoom-out"></el-button>
                 <el-button size="mini" plain type="primary" :disabled="imgSize.active == imgSize.max" @click="resizeImg(imgSize.step)" icon="el-icon-zoom-in"></el-button>
             </el-button-group>
-        </div>
+        </div> -->
 
         <el-divider></el-divider>
 
         <el-pagination background
         @current-change="(p) => { page = p; }"
         @size-change="(s) => { pageSize = s; }"
-        layout="prev, pager, next, sizes, total"
+        layout="prev, next, sizes, total"
         :page-size="pageSize"
         :page-sizes="[10, 25, 50, 100]"
         :total="snapshots.length">
@@ -75,7 +75,7 @@
 export default {
     computed: {
         paginatedData() {
-            return this.snapshots.slice((this.page - 1) * this.pageSize, this.pageSize);
+            return this.snapshots.slice((this.page - 1) * this.pageSize, this.page * this.pageSize);
         }
     },
     data() {
