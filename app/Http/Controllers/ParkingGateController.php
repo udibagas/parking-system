@@ -239,7 +239,7 @@ class ParkingGateController extends Controller
         }
 
         $client = new Client(['timeout' => 3]);
-        $fileName = 'snapshot/'.date('YmdHis').'.jpg';
+        $fileName = 'snapshot/'.$parkingGate->name.'-'.date('YmdHis').'.jpg';
 
         try {
             $response = $client->request('GET', $parkingGate->camera_image_snapshot_url, [
