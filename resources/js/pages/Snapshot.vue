@@ -3,169 +3,168 @@
         <el-page-header @back="$emit('back')" content="SNAPSHOT"> </el-page-header>
         <el-divider></el-divider>
 
-        <el-form inline>
-            <el-form-item>
-                <el-date-picker
-                @change="requestData"
-                v-model="dateRange"
-                format="dd-MMM-yyyy HH:mm:ss"
-                value-format="yyyy-MM-dd HH:mm:ss"
-                type="datetimerange"
-                range-separator="-"
-                start-placeholder="Dari Tanggal"
-                end-placeholder="Sampai Tanggal">
-                </el-date-picker>
-            </el-form-item>
-
-            <!-- <el-form-item>
-                <el-select v-model="gate" placeholder="Gate" clearable multiple @change="requestData">
-                    <el-option v-for="(t, i) in $store.state.parkingGateList" :value="t.id" :label="t.name" :key="i"></el-option>
-                </el-select>
-            </el-form-item>
-
-            <el-form-item>
-                <el-select v-model="vehicle_type" placeholder="Jenis Kendaraan" clearable multiple @change="requestData">
-                    <el-option v-for="(t, i) in $store.state.vehicleTypeList" :value="t.id" :label="t.name" :key="i"></el-option>
-                </el-select>
-            </el-form-item> -->
-
-            <el-form-item>
-                <el-button type="danger" icon="el-icon-delete" @click="deleteSnapshot">HAPUS SNAPSHOT</el-button>
-            </el-form-item>
-        </el-form>
-
-        <div style="height:calc(100vh - 320px);overflow:auto;" v-loading="loading">
-            <span v-for="(data, index) in paginatedData" :key="index">
-                <el-image
-                :style="'width: ' + imgSize.active +'px; height: ' + imgSize.active + 'px;' + 'margin:5px'"
-                :src="data.name"
-                :preview-src-list="[data.name]"
-                lazy
-                fit="cover">
+        <el-row :gutter="20">
+            <el-col :span="12">
+                <el-card style="height:calc(100vh - 180px);overflow:auto;">
+                    <el-tree v-if="show" lazy :load="loadData" node-key="id"
+                    :expand-on-click-node="false"
+                    @node-click="showPreview"
+                    :props="{children: 'children', label: 'label', isLeaf: 'leaf'}">
+                        <span class="custom-tree-node" slot-scope="{ node, data }">
+                        <span>{{ node.label }}</span>
+                        <span>
+                        <el-button type="text" size="mini" icon="el-icon-delete" @click="() => deleteSnapshot(node, data)"> </el-button>
+                        </span>
+                        </span>
+                    </el-tree>
+                </el-card>
+            </el-col>
+            <el-col :span="12">
+                <el-image style="width:100%;height:100%;" :src="preview" fit="cover">
                     <div slot="error" class="el-image__error">
                         <i class="el-icon-picture-outline"></i>
                     </div>
                 </el-image>
-            </span>
-        </div>
-
-        <!-- <el-slider style="width:300px;margin:15px auto 0;" v-model="imgSize.active" :min="imgSize.min" :max="imgSize.max"></el-slider>
-        <div style="text-align:center;margin-bottom:0px">
-            <el-button-group>
-                <el-button size="mini" plain type="primary" :disabled="imgSize.active == imgSize.min" @click="resizeImg(-imgSize.step)" icon="el-icon-zoom-out"></el-button>
-                <el-button size="mini" plain type="primary" :disabled="imgSize.active == imgSize.max" @click="resizeImg(imgSize.step)" icon="el-icon-zoom-in"></el-button>
-            </el-button-group>
-        </div> -->
-
-        <el-divider></el-divider>
-
-        <el-pagination background
-        @current-change="(p) => { page = p; }"
-        @size-change="(s) => { pageSize = s; }"
-        layout="prev, next, sizes, total"
-        :page-size="pageSize"
-        :page-sizes="[10, 25, 50, 100]"
-        :total="snapshots.length">
-        </el-pagination>
-
+            </el-col>
+        </el-row>
     </div>
 </template>
 
 <script>
 export default {
-    computed: {
-        paginatedData() {
-            return this.snapshots.slice((this.page - 1) * this.pageSize, this.page * this.pageSize);
-        }
-    },
     data() {
         return {
-            page: 1,
-            pageSize: 10,
-            imgSize: { min: 150, active: 150, max: 300, step: 10 },
-            snapshots: [],
-            dateRange: [moment().format('YYYY-MM-01 00:00:00'), moment().format('YYYY-MM-DD HH:mm:ss')],
-            gate: [],
-            vehicle_type: [],
-            loading: false
+            data: [],
+            preview: null,
+            months: moment.months(),
+            show: true,
         }
     },
     methods: {
-        resizeImg(step) {
-            // console.log(step)
-
-            if (step > 0) {
-                if (this.imgSize.max == this.imgSize.active) {
-                    return
-                }
-            }
-
-            if (step < 0) {
-                if (this.imgSize.min == this.imgSize.active) {
-                    return
-                }
-            }
-
-            this.imgSize.active += step
-        },
-        requestData() {
-            let params = {
-                // page: this.page,
-                // pageSize: this.pageSize,
-                // sort: 'created_at',
-                // order: 'ascending',
-                dateRange: this.dateRange,
-                // vehicle_type: this.vehicle_type,
-                // gate: this.gate,
-            }
-
-            this.loading = true;
-            axios.get('/parkingTransaction/getSnapshot', { params: params }).then(r => {
-                this.snapshots = Object.values(r.data)
-            }).catch(e => {
-                if (e.response.status == 500) {
-                    this.$message({
-                        message: e.response.data.message,
-                        type: 'error',
-                        showClose: true
-                    });
-                }
-            }).finally(() => {
-                this.loading = false;
+        reload() {
+            this.show = false;
+            this.$nextTick(() => {
+                this.show = true
             })
         },
-        deleteSnapshot() {
+        showPreview(node) {
+            if (node.leaf == true) {
+                this.preview = node.path
+            }
+        },
+        loadData(node, resolve) {
+            let params = {level: node.level}
+            let path = ''
+
+            if (node.level == 1) {
+                params.year = node.data.id
+                path = params.year
+            }
+
+            if (node.level == 2) {
+                params.year = node.parent.data.id,
+                params.month = node.data.id
+                path = params.year + '/' + params.month
+            }
+
+            if (node.level == 3) {
+                params.year = node.parent.parent.data.id,
+                params.month = node.parent.data.id
+                params.day = node.data.id
+                path = params.year + '/' + params.month + '/' + params.day
+            }
+
+            if (node.level == 4) {
+                params.year = node.parent.parent.parent.data.id,
+                params.month = node.parent.parent.data.id
+                params.day = node.parent.data.id
+                params.hour = node.data.id
+                path = params.year + '/' + params.month + '/' + params.day + '/' + params.hour
+            }
+
+            axios.get('snapshots', { params: params }).then(r => {
+                resolve(r.data.filter(d => d != '.' && d != '..').map(d => {
+                    return {
+                        id: d,
+                        label: node.level == 1 ? this.months[parseInt(d) - 1] : d,
+                        leaf: d.includes('.jpg') || d.includes('.png'),
+                        path: 'snapshot/' + path + '/' + d
+                    }
+                }))
+            })
+        },
+        deleteSnapshot(node) {
+            let params = null
+
+            // tahun
+            if (node.level == 1) {
+                params = { level: 1, target: node.data.id }
+            }
+
+            // bulan
+            if (node.level == 2) {
+                params = {
+                    level: 2,
+                    target: node.parent.data.id + '/' +  node.data.id
+                }
+            }
+
+            // tanggal
+            if (node.level == 3) {
+                params = {
+                    level: 3,
+                    target: node.parent.parent.data.id + '/' + node.parent.data.id + '/' + node.data.id
+                }
+            }
+
+            // jam
+            if (node.level == 4) {
+                params = {
+                    level: 4,
+                    target: node.parent.parent.parent.data.id + '/' + node.parent.parent.data.id + '/' + node.parent.data.id + '/' + node.data.id
+                }
+            }
+
+            // file
+            if (node.level == 5) {
+                params = {
+                    level: 5,
+                    target: node.parent.parent.parent.parent.data.id + '/' + node.parent.parent.parent.data.id + '/' + node.parent.parent.data.id + '/' + node.parent.data.id + '/' + node.data.id
+                }
+            }
+
             this.$confirm('Anda yakin?', 'Peringatan', { type: 'warning' }).then(() => {
-                let payload = { dateRange: this.dateRange }
-                this.loading = true
-                axios.delete('parkingTransaction/deleteSnapshot', { params: payload }).then(r => {
+                axios.delete('snapshots', { params: params }).then(r => {
                     this.$message({
                         message: r.data.message,
                         type: 'success',
                         showClose: true
                     });
-                    this.requestData();
                 }).catch(e => {
-                    this.$message({
-                        message: e.response.data.message,
-                        type: 'error',
-                        showClose: true
-                    });
+                    console.log(e)
+                    // this.$message({
+                    //     message: e.response.data.message,
+                    //     type: 'error',
+                    //     showClose: true
+                    // });
                 }).finally(() => {
-                    this.loading = false
+                    this.preview = null
+                    this.reload()
                 })
             }).catch(e => console.log(e))
         }
-    },
-    mounted() {
-        this.requestData()
-        // this.$store.commit('getParkingGateList')
-        // this.$store.commit('getVehicleTypeList')
     }
 
 }
 </script>
 
 <style lang="scss" scoped>
-
+.custom-tree-node {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 14px;
+    padding-right: 8px;
+}
 </style>

@@ -42,8 +42,6 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::put('parkingTransaction/setSudahKeluarSemua', 'ParkingTransactionController@setSudahKeluarSemua');
     Route::put('parkingTransaction/setSudahKeluar/{parkingTransaction}', 'ParkingTransactionController@setSudahKeluar');
     Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
-    Route::get('parkingTransaction/getSnapshot', 'ParkingTransactionController@getSnapshot');
-    Route::delete('parkingTransaction/deleteSnapshot', 'ParkingTransactionController@deleteSnapshot');
     Route::resource('parkingTransaction', 'ParkingTransactionController')->except(['create', 'edit']);
 
     Route::resource('manualOpenLog', 'ManualOpenLogController')->except(['create', 'edit']);
@@ -59,6 +57,9 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 
     Route::get('userLog', 'UserLogController@index');
     Route::delete('userLog', 'UserLogController@clear');
+
+    Route::get('snapshots', 'SnapshotsController@index');
+    Route::delete('snapshots', 'SnapshotsController@delete');
 
     Route::post('backup', 'BackupController@store');
     Route::get('backup', 'BackupController@index');
