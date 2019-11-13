@@ -25,7 +25,7 @@ class SettingRequest extends FormRequest
     {
         return [
             'jml_kendaraan_per_kartu' => 'required|numeric',
-            'masa_aktif_member' => 'required|boolean',
+            // 'masa_aktif_member' => 'required|boolean',
             'location_name' => 'required',
             'must_checkout' => 'required|boolean'
         ];
