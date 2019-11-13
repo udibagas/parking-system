@@ -74,7 +74,7 @@
                             <el-dropdown-item icon="el-icon-zoom-in" @click.native.prevent="() => { selectedData = scope.row; showDetail = true; }">Lihat Detail</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-camera" @click.native.prevent="testDevice('testCamera', scope.row.id)">Test Kamera</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-printer" @click.native.prevent="testDevice('testPrinter', scope.row.id)">Test Printer</el-dropdown-item>
-                            <el-dropdown-item v-if="scope.row.type == 'OUT'" icon="el-icon-minus" @click.native.prevent="testDevice('openGate', scope.row.id)">Test Gate</el-dropdown-item>
+                            <el-dropdown-item v-if="scope.row.type == 'OUT'" icon="el-icon-minus" @click.native.prevent="testGate(scope.row)">Test Gate</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-edit-outline" divided @click.native.prevent="openForm(scope.row)">Edit</el-dropdown-item>
                             <el-dropdown-item icon="el-icon-delete" @click.native.prevent="deleteData(scope.row.id)">Hapus</el-dropdown-item>
                         </el-dropdown-menu>
@@ -270,6 +270,32 @@ export default {
                 return 'inactive-row'
             }
             return ''
+        },
+        testGate(gate) {
+            ws = new WebSocket("ws://"+gate.controller_ip_address+":"+gate.controller_port+"/");
+
+            ws.onerror = (event) => {
+                this.$message({
+                    message: 'KONEKSI KE CONTROLLER GATE KELUAR GAGAL',
+                    type: 'error',
+                    showClose: true,
+                    duration: 10000
+                })
+            }
+
+            ws.onopen = (event) => {
+                ws.send('open');
+            }
+
+            ws.onmessage = (event) => {
+                let data = JSON.parse(event.data)
+                this.$message({
+                    message: data.message,
+                    type: data.status ? 'success' : 'error',
+                    showClose: true
+                })
+                ws.close(1000, 'Leaving app')
+            }
         },
         testDevice(action, id) {
             axios.post('/parkingGate/' + action + '/' + id).then(r => {
