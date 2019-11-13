@@ -484,7 +484,15 @@ export default {
             })
         },
         openGate() {
-            this.ws.send('open');
+            // get gate out
+            const gate = this.parkingGateList.find(g => g.id == this.formModel.gate_out_id);
+            this.ws.send([
+                'open',
+                gate.controller_device,
+                gate.controller_baudrate,
+                gate.cmd_open,
+                gate.cmd_close
+            ].join(';'));
         },
         getParkingGateList() {
             axios.get('/parkingGate/getList').then(r => {

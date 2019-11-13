@@ -146,9 +146,19 @@
                             <div class="el-form-item__error" v-if="formErrors.controller_port">{{formErrors.controller_port[0]}}</div>
                         </el-form-item>
 
-                        <el-form-item label="Controller Device">
+                        <el-form-item v-show="formModel.type == 'OUT'" label="Controller Device">
                             <el-input placeholder="Device" v-model="formModel.controller_device" style="width:60%"></el-input>
                             <el-input type="number" placeholder="Baudrate" v-model="formModel.controller_baudrate" style="width:38%;float:right;clear:right;"></el-input>
+                        </el-form-item>
+
+                        <el-form-item v-show="formModel.type == 'OUT'" label="Perintah Buka" :class="formErrors.cmd_open ? 'is-error' : ''">
+                            <el-input placeholder="Perintah Buka" v-model="formModel.cmd_open"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.cmd_open">{{formErrors.cmd_open[0]}}</div>
+                        </el-form-item>
+
+                        <el-form-item v-show="formModel.type == 'OUT'" label="Perintah Tutup" :class="formErrors.cmd_close ? 'is-error' : ''">
+                            <el-input placeholder="Perintah Tutup" v-model="formModel.cmd_close"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.cmd_close">{{formErrors.cmd_close[0]}}</div>
                         </el-form-item>
 
                     </el-col>
@@ -223,6 +233,8 @@
                     <tr><td class="td-label">Port Kontroller</td><td class="td-value">{{selectedData.controller_port}}</td></tr>
                     <tr><td class="td-label">Device Kontroller</td><td class="td-value">{{selectedData.controller_device}}</td></tr>
                     <tr><td class="td-label">Baudrate Kontroller</td><td class="td-value">{{selectedData.controller_baudrate}}</td></tr>
+                    <tr v-if="selectedData.type == 'OUT'"><td class="td-label">Perintah Buka</td><td class="td-value">{{selectedData.cmd_open}}</td></tr>
+                    <tr v-if="selectedData.type == 'OUT'"><td class="td-label">Perintah Tutup</td><td class="td-value">{{selectedData.cmd_close}}</td></tr>
                     <tr><td class="td-label">Jenis Printer</td><td class="td-value">{{selectedData.printer_type}}</td></tr>
                     <tr><td class="td-label">Device Printer</td><td class="td-value">{{selectedData.printer_device}}</td></tr>
                     <tr><td class="td-label">Alamat IP Printer</td><td class="td-value">{{selectedData.printer_ip_address}}</td></tr>
@@ -272,7 +284,7 @@ export default {
             return ''
         },
         testGate(gate) {
-            ws = new WebSocket("ws://"+gate.controller_ip_address+":"+gate.controller_port+"/");
+            const ws = new WebSocket("ws://"+gate.controller_ip_address+":"+gate.controller_port+"/");
 
             ws.onerror = (event) => {
                 this.$message({
@@ -284,7 +296,13 @@ export default {
             }
 
             ws.onopen = (event) => {
-                ws.send('open');
+                ws.send([
+                    'open',
+                    gate.controller_device,
+                    gate.controller_baudrate,
+                    gate.cmd_open,
+                    gate.cmd_close,
+                ].join(';'));
             }
 
             ws.onmessage = (event) => {
