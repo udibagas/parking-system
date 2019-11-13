@@ -9,9 +9,6 @@ import sys
 import configparser
 import json
 
-CFG = configparser.ConfigParser()
-CFG.read_file(open(os.path.join(os.path.dirname(__file__), 'controller.cfg')))
-
 async def open_gate(websocket, path):
     while True:
         try:
@@ -19,19 +16,20 @@ async def open_gate(websocket, path):
         except Exception as e:
             continue
 
-        if (cmd == 'open'):
+        if (cmd[:4] == 'open'):
+            cfg = cmd.split(';')
             try:
-                ser = Serial(CFG['controller']['device'], int(CFG['controller']['baudrate']), timeout=1)
+                ser = Serial(cfg[1], int(cfg[2]), timeout=1)
             except Exception as e:
-                await websocket.send(json.dumps({"status" : False, "message": "Gagal membuka serial " + str(e)}))
+                await websocket.send(json.dumps({"status" : False, "message": "Gagal membuka gate " + str(e)}))
                 continue
 
             try:
-                ser.write(CFG['cmd']['open'].encode())
+                ser.write(cfg[3].encode())
 
-                if CFG['cmd']['close'] is not None:
+                if cfg[4] != '':
                     time.sleep(1)
-                    ser.write(CFG['cmd']['close'].encode())
+                    ser.write(cfg[4].encode())
 
                 ser.close()
                 await websocket.send(json.dumps({"status" : True, "message": "Gate berhasil dibuka"}))
@@ -40,7 +38,7 @@ async def open_gate(websocket, path):
         else:
             await websocket.send(json.dumps({"status" : False, "message": "Perintah tidak dikenal"}))
 
-start_server = websockets.serve(open_gate, '127.0.0.1', 5678)
+start_server = websockets.serve(open_gate, None, 5678)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
