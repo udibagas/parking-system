@@ -182,7 +182,8 @@ export default {
             vehicleTypeList: [],
             setting: {},
             showManualOpenForm: false,
-            formModelManualOpen: {}
+            formModelManualOpen: {},
+            ws: null
         }
     },
     methods: {
@@ -465,7 +466,7 @@ export default {
                 })
             })
         },
-        openGate() {
+        openGate1() {
             axios.post('/parkingGate/openGate/' + this.formModel.gate_out_id).then(r => {
                 this.$message({
                     message: r.data.message,
@@ -481,6 +482,9 @@ export default {
             }).finally(() => {
                 this.resetForm()
             })
+        },
+        openGate() {
+            this.ws.send('open');
         },
         getParkingGateList() {
             axios.get('/parkingGate/getList').then(r => {
@@ -601,9 +605,31 @@ export default {
                     duration: 10000
                 })
             })
+        },
+        connectToGateOut() {
+            this.ws = new WebSocket("ws://127.0.0.1:5678/");
+            this.ws.onerror = (event) => {
+                this.$message({
+                    message: 'KONEKSI KE CONTROLLER GATE KELUAR GAGAL',
+                    type: 'error',
+                    showClose: true,
+                    duration: 10000
+                })
+            }
+            this.ws.onmessage = (event) => {
+                let data = JSON.parse(event.data)
+                this.$message({
+                    message: data.message,
+                    type: data.status ? 'success' : 'error',
+                    showClose: true
+                })
+
+                this.resetForm()
+            }
         }
     },
     mounted() {
+        this.connectToGateOut()
         this.getSetting()
         this.getParkingGateList()
         this.getVehicleTypeList()
@@ -666,6 +692,9 @@ export default {
                 this.printLastTrx()
             }
         }
+    },
+    destroyed() {
+        this.ws.close(1000, 'Leaving app')
     }
 
 }

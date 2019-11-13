@@ -131,11 +131,11 @@ def send_notification(gate, message):
         logging.info(gate['name'] + ' : Failed to send notification ' + str(e))
         return False
 
-    try:
-        data = { 'text': SETTING['location_name'] + ' - ' + message, 'chat_id': 527538821 }
-        requests.post('https://api.telegram.org/bot682525135:AAH5H-rqnDlyODgWzNpKiUZGszGz9Oys49g/sendMessage', data=data, timeout=3)
-    except Exception:
-        pass
+    # try:
+    #     data = { 'text': SETTING['location_name'] + ' - ' + message, 'chat_id': 527538821 }
+    #     requests.post('https://api.telegram.org/bot682525135:AAH5H-rqnDlyODgWzNpKiUZGszGz9Oys49g/sendMessage', data=data, timeout=3)
+    # except Exception:
+    #     pass
 
     return True
 
@@ -363,7 +363,7 @@ def gate_in_thread(gate):
 
                 # open gate
                 try:
-                    s.sendall(b'\xa6OPEN1\xa9')
+                    s.sendall(b'\xa6TRIG1\xa9')
                     logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))

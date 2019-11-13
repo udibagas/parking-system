@@ -159,7 +159,7 @@ export default {
 
 <style lang="scss" scoped>
 .summary-container {
-    height: 150px;
+    height: 200px;
 }
 
 .summary-info {
