@@ -4,8 +4,6 @@ import time
 import asyncio
 import websockets
 from serial import Serial
-import os
-import sys
 import configparser
 import json
 
