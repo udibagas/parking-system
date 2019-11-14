@@ -175,6 +175,10 @@ class ParkingGateController extends Controller
 
     public function openGate(ParkingGate $parkingGate)
     {
+        if ($parkingGate->type == 'IN') {
+            return response(['message' => 'Gate IN tidak bisa ditest dari browser'], 500);
+        }
+
         // kalau controller_ip_address kosong berarti interface langsung nancep
         if (!$parkingGate->controller_ip_address)
         {
@@ -187,49 +191,57 @@ class ParkingGateController extends Controller
                 $serial->confStopBits(1);
                 $serial->confFlowControl("none");
                 $serial->deviceOpen();
-                // ada 2 jenis: A, B, C, D (tergantung relay nomor berapa) atau AZ123
-                $serial->sendMessage(env("GATE_CMD_OPEN", "AZ123"));
-                sleep(1);
-                // W,X,Y,Z (tergantung relay nomor berapa)
-                $serial->sendMessage(env("GATE_CMD_CLOSE", "W"));
+                // ada 2 jenis: A, B, C, D (tergantung relay nomor berapa) atau AZ123, atau *TRIG1#, *OPEN1#
+                $serial->sendMessage($parkingGate->cmd_open);
+
+                if ($parkingGate->cmd_close) {
+                    sleep(1);
+                    // W,X,Y,Z (tergantung relay nomor berapa)
+                    $serial->sendMessage($parkingGate->cmd_close);
+                }
+
                 $serial->deviceClose();
             } catch (\Exception $e) {
                 return response(['message' => 'GAGAL MEMBUKA GATE. '. $e->getMessage()], 500);
             }
+
+            return ['message' => 'GATE BERHASIL DIBUKA'];
+
+        } else {
+            return response(['message' => 'Controller tidak terkoneksi langsung dengan server'], 500);
         }
 
-        else
-        {
-            $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
-            if (!is_resource($socket)) {
-                return response(['message' => 'GAGAL MEMBUKA GATE. Failed to create socket.'], 500);
-            }
+        // else
+        // {
+        //     $socket = socket_create(AF_INET, SOCK_STREAM, SOL_TCP);
 
-            if (!socket_connect($socket, $parkingGate->controller_ip_address, $parkingGate->controller_port)) {
-                return response(['message' => 'GAGAL MEMBUKA GATE. Socket connection failed.'], 500);
-            }
+        //     if (!is_resource($socket)) {
+        //         return response(['message' => 'GAGAL MEMBUKA GATE. Failed to create socket.'], 500);
+        //     }
 
-            $command = "OPEN";
-            $length = strlen($command);
+        //     if (!socket_connect($socket, $parkingGate->controller_ip_address, $parkingGate->controller_port)) {
+        //         return response(['message' => 'GAGAL MEMBUKA GATE. Socket connection failed.'], 500);
+        //     }
 
-            if (!socket_write($socket, $command, $length)) {
-                return response(['message' => 'GAGAL MEMBUKA GATE. Failed to send command.'], 500);
-            }
+        //     $command = "OPEN";
+        //     $length = strlen($command);
 
-            $response = socket_read($socket, 1024);
+        //     if (!socket_write($socket, $command, $length)) {
+        //         return response(['message' => 'GAGAL MEMBUKA GATE. Failed to send command.'], 500);
+        //     }
 
-            if (!$response) {
-                return response(['message' => 'GAGAL MEMBUKA GATE. Empty respons.'], 500);
-            } elseif ($response != 'OK') {
-                return response(['message' => $response], 500);
-            }
+        //     $response = socket_read($socket, 1024);
 
-            socket_shutdown($socket);
-            socket_close($socket);
-        }
+        //     if (!$response) {
+        //         return response(['message' => 'GAGAL MEMBUKA GATE. Empty respons.'], 500);
+        //     } elseif ($response != 'OK') {
+        //         return response(['message' => $response], 500);
+        //     }
 
-        return ['message' => 'GATE BERHASIL DIBUKA'];
+        //     socket_shutdown($socket);
+        //     socket_close($socket);
+        // }
     }
 
     public function takeSnapshot(ParkingGate $parkingGate)
