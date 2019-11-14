@@ -284,35 +284,52 @@ export default {
             return ''
         },
         testGate(gate) {
-            const ws = new WebSocket("ws://"+gate.controller_ip_address+":"+gate.controller_port+"/");
-
-            ws.onerror = (event) => {
-                this.$message({
-                    message: 'KONEKSI KE CONTROLLER GATE KELUAR GAGAL',
-                    type: 'error',
-                    showClose: true,
-                    duration: 10000
+            // interface langsung nancep ke server
+            if (!gate.controller_ip_address) {
+                axios.post('/parkingGate/openGate/' + gate.id).then(r => {
+                    this.$message({
+                        message: r.data.message,
+                        type: 'success',
+                        showClose: true
+                    })
+                }).catch(e => {
+                    this.$message({
+                        message: e.response.data.message,
+                        type: 'error',
+                        showClose: true
+                    })
                 })
-            }
+            } else {
+                const ws = new WebSocket("ws://"+gate.controller_ip_address+":"+gate.controller_port+"/");
 
-            ws.onopen = (event) => {
-                ws.send([
-                    'open',
-                    gate.controller_device,
-                    gate.controller_baudrate,
-                    gate.cmd_open,
-                    gate.cmd_close,
-                ].join(';'));
-            }
+                ws.onerror = (event) => {
+                    this.$message({
+                        message: 'KONEKSI KE CONTROLLER GATE KELUAR GAGAL',
+                        type: 'error',
+                        showClose: true,
+                        duration: 10000
+                    })
+                }
 
-            ws.onmessage = (event) => {
-                let data = JSON.parse(event.data)
-                this.$message({
-                    message: data.message,
-                    type: data.status ? 'success' : 'error',
-                    showClose: true
-                })
-                ws.close(1000, 'Leaving app')
+                ws.onopen = (event) => {
+                    ws.send([
+                        'open',
+                        gate.controller_device,
+                        gate.controller_baudrate,
+                        gate.cmd_open,
+                        gate.cmd_close,
+                    ].join(';'));
+                }
+
+                ws.onmessage = (event) => {
+                    let data = JSON.parse(event.data)
+                    this.$message({
+                        message: data.message,
+                        type: data.status ? 'success' : 'error',
+                        showClose: true
+                    })
+                    ws.close(1000, 'Leaving app')
+                }
             }
         },
         testDevice(action, id) {

@@ -534,7 +534,12 @@ export default {
 
                 // kalau cuma 1 gate outnya set default
                 if (r.data.filter(g => g.type == 'OUT').length == 1) {
-                    this.formModel.gate_out_id = r.data.find(g => g.type == 'OUT').id
+                    let gate = r.data.find(g => g.type == 'OUT')
+                    this.formModel.gate_out_id = gate.id
+
+                    if (!!gate.controller_ip_address) {
+                        this.connectToGateOut(gate)
+                    }
                 }
             }).catch(e => {
                 this.$message({
@@ -626,9 +631,10 @@ export default {
                 })
             })
         },
-        connectToGateOut() {
-            this.ws = new WebSocket("ws://127.0.0.1:5678/");
+        connectToGateOut(gate) {
+            this.ws = new WebSocket("ws://"+gate.controller_ip_address+":"+gate.controller_port+"/");
             this.ws.onerror = (event) => {
+                console.log(event)
                 this.$message({
                     message: 'KONEKSI KE CONTROLLER GATE KELUAR GAGAL',
                     type: 'error',
@@ -649,7 +655,6 @@ export default {
         }
     },
     mounted() {
-        this.connectToGateOut()
         this.getSetting()
         this.getParkingGateList()
         this.getVehicleTypeList()
