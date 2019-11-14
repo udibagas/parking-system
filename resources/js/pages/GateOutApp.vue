@@ -466,33 +466,45 @@ export default {
                 })
             })
         },
-        openGate1() {
-            axios.post('/parkingGate/openGate/' + this.formModel.gate_out_id).then(r => {
-                this.$message({
-                    message: r.data.message,
-                    type: 'success',
-                    showClose: true
-                })
-            }).catch(e => {
-                this.$message({
-                    message: e.response.data.message,
-                    type: 'error',
-                    showClose: true
-                })
-            }).finally(() => {
-                this.resetForm()
-            })
-        },
         openGate() {
             // get gate out
             const gate = this.parkingGateList.find(g => g.id == this.formModel.gate_out_id);
-            this.ws.send([
-                'open',
-                gate.controller_device,
-                gate.controller_baudrate,
-                gate.cmd_open,
-                gate.cmd_close
-            ].join(';'));
+
+            if (!gate) {
+                this.$message({
+                    message: 'MOHON PILIH GATE OUT',
+                    type: 'error',
+                    showClose: true
+                })
+                return
+            }
+
+            // kalau ga ada ip berarti langsung nancep
+            if (!gate.controller_ip_address) {
+                axios.post('/parkingGate/openGate/' + this.formModel.gate_out_id).then(r => {
+                    this.$message({
+                        message: r.data.message,
+                        type: 'success',
+                        showClose: true
+                    })
+                }).catch(e => {
+                    this.$message({
+                        message: e.response.data.message,
+                        type: 'error',
+                        showClose: true
+                    })
+                }).finally(() => {
+                    this.resetForm()
+                })
+            } else {
+                this.ws.send([
+                    'open',
+                    gate.controller_device,
+                    gate.controller_baudrate,
+                    gate.cmd_open,
+                    gate.cmd_close
+                ].join(';'));
+            }
         },
         getParkingGateList() {
             axios.get('/parkingGate/getList').then(r => {
