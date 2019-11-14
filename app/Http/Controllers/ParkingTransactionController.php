@@ -155,7 +155,11 @@ class ParkingTransactionController extends Controller
         }
 
         $client = new Client(['timeout' => 3]);
-        $fileName = 'snapshot/'.date('YmdHis').'.jpg';
+        $fileName = 'snapshot/'.date('Y/m/d/H/').$gate->name.'-'.date('YmdHis').'.jpg';
+
+        if (!is_dir('snapshot/'.date('Y/m/d/H'))) {
+            mkdir('snapshot/'.date('Y/m/d/H'), 0777, true);
+        }
 
         try {
             $response = $client->request('GET', $gate->camera_image_snapshot_url, [
