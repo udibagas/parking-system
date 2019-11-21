@@ -53,6 +53,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::delete('memberVehicle/{memberVehicle}', 'MemberVehicleController@destroy');
 
     Route::post('memberRenewal/printSlip/{memberRenewal}', 'MemberRenewalController@printSlip');
+    Route::get('memberRenewal/report', 'MemberRenewalController@report');
     Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
 
     Route::get('userLog', 'UserLogController@index');

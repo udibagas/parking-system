@@ -95,7 +95,7 @@
             :filters="[{value: 'Y', text: 'YA'}, {value: 'T', text: 'TIDAK'}]"
             :filter-multiple="false"
             header-align="right"
-            min-width="100px">
+            min-width="120px">
                 <template slot-scope="scope">
                     Rp. {{scope.row.denda | formatNumber }}
                 </template>

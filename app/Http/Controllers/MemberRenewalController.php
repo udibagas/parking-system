@@ -8,6 +8,7 @@ use App\Http\Requests\MemberRenewalRequest;
 use App\ParkingGate;
 use App\ParkingMember;
 use App\Setting;
+use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
@@ -32,7 +33,9 @@ class MemberRenewalController extends Controller
             ')
             ->join('parking_members', 'parking_members.id', '=', 'member_renewals.parking_member_id')
             ->join('users', 'users.id', '=', 'member_renewals.user_id')
-            ->when($request->keyword, function($q) use ($request) {
+            ->when($request->dateRange, function($q) use ($request) {
+                return $q->whereRaw("DATE(member_renewals.updated_at) BETWEEN '{$request->dateRange[0]}' AND '{$request->dateRange[1]}' ");
+            })->when($request->keyword, function($q) use ($request) {
                 return $q->where('parking_members.name', 'LIKE', '%'.$request->keyword.'%')
                     ->orWhere('parking_members.card_number', 'LIKE', '%'.$request->keyword.'%')
                     ->orWhere('users.name', 'LIKE', '%'.$request->keyword.'%');
@@ -87,12 +90,12 @@ class MemberRenewalController extends Controller
 
     public function printSlip(MemberRenewal $memberRenewal)
     {
-        $parkingGate = ParkingGate::where('type', 'OUT')->where('active', 1)->first();
+        // $parkingGate = ParkingGate::where('type', 'OUT')->where('active', 1)->first();
         $setting = Setting::first();
 
-        if (!$parkingGate) {
-            return response(['message' => 'TIDAK ADA PRINTER YANG DIPILIH'], 404);
-        }
+        // if (!$parkingGate) {
+        //     return response(['message' => 'TIDAK ADA PRINTER YANG DIPILIH'], 404);
+        // }
 
         if (!$setting) {
             return response(['message' => 'BELUM ADA SETTING'], 500);
@@ -102,15 +105,22 @@ class MemberRenewalController extends Controller
             return response(['message' => 'LOKASI BELUM DISET'], 500);
         }
 
-        try {
-            if ($parkingGate->printer_type == "network") {
-                $connector = new NetworkPrintConnector($parkingGate->printer_ip_address, 9100);
-            } else if ($parkingGate->printer_type == "local") {
-                $connector = new FilePrintConnector($parkingGate->printer_device);
-            } else {
-                return response(['message' => 'INVALID PRINTER'], 500);
-            }
+        // try {
+        //     if ($parkingGate->printer_type == "network") {
+        //         $connector = new NetworkPrintConnector($parkingGate->printer_ip_address, 9100);
+        //     } else if ($parkingGate->printer_type == "local") {
+        //         $connector = new FilePrintConnector($parkingGate->printer_device);
+        //     } else {
+        //         return response(['message' => 'INVALID PRINTER'], 500);
+        //     }
 
+        //     $printer = new Printer($connector);
+        // } catch (\Exception $e) {
+        //     return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+        // }
+
+        try {
+            $connector = new NetworkPrintConnector(env('PRINTER_ADDRESS'), 9100);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
@@ -130,6 +140,71 @@ class MemberRenewalController extends Controller
             $printer->text(str_pad('Sampai Tanggal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->to_date)) . "\n");
             $printer->text(str_pad('Jumlah', 15, ' ') . ' : ' .'Rp. ' . number_format($memberRenewal->amount, 0, ',', '.') . ",-\n");
             $printer->text(str_pad('Petugas', 15, ' ') . ' : ' . strtoupper($memberRenewal->user->name) . "\n\n");
+            $printer->cut();
+            $printer->close();
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENCETAK SLIP.' . $e->getMessage()], 500);
+        }
+
+        return ['message' => 'SILAKAN AMBIL SLIP'];
+    }
+
+    public function report(Request $request)
+    {
+        $sql = "SELECT DATE(created_at) AS tanggal,
+            COUNT(id) AS jumlah,
+            SUM(amount) AS pendapatan
+        FROM member_renewals
+        WHERE DATE(created_at) BETWEEN :start AND :end
+        GROUP BY DATE(created_at)";
+
+        $data = DB::select($sql, [
+            ':start' => $request->dateRange[0],
+            ':end' => $request->dateRange[1]
+        ]);
+
+        if ($request->action == 'print') {
+            $this->printReport($data);
+        }
+
+        return $data;
+    }
+
+    protected function printReport($data)
+    {
+        $setting = Setting::first();
+
+        if (!$setting) {
+            return response(['message' => 'BELUM ADA SETTING'], 500);
+        }
+
+        if (!$setting->location_name) {
+            return response(['message' => 'LOKASI BELUM DISET'], 500);
+        }
+
+        try {
+            $connector = new NetworkPrintConnector(env('PRINTER_ADDRESS'), 9100);
+            $printer = new Printer($connector);
+        } catch (\Exception $e) {
+            return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+        }
+
+        try {
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("LAPORAN PENDAPATAN ANGGOTA\n");
+            $printer->text($setting->location_name."\n");
+            $printer->text("\n\n");
+
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+
+            $printer->text(str_pad('TANGGAL', 15, ' ') . str_pad('JUMLAH', 15, ' ') . str_pad('PENDAPATAN', 15, ' ')  . "\n");
+
+            foreach ($data as $d) {
+                $printer->text(str_pad(date('d/M/Y', strtotime($d->tanggal)), 15, ' ')
+                    . str_pad(number_format($d->jumlah, 0, ',', '.'), 15, ' ')
+                    . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ')  . "\n");
+            }
+
             $printer->cut();
             $printer->close();
         } catch (\Exception $e) {

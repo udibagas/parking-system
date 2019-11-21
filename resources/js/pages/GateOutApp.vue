@@ -249,6 +249,16 @@ export default {
             } else {
                 let params = { barcode_number: this.formModel.barcode_number }
                 axios.get('/parkingTransaction/search', { params: params }).then(r => {
+                    this.snapshot_in = r.data.snapshot_in
+                    this.formModel.id = r.data.id
+                    this.formModel.gate_in_id = r.data.gate_in_id
+                    this.formModel.time_in = r.data.time_in
+                    this.formModel.is_member = r.data.is_member
+                    this.formModel.time_out = now
+
+                    this.$forceUpdate()
+                    this.setDuration()
+
                     if (r.data.is_member) {
                         if (r.data.member.expired) {
                             this.$alert('Kartu telah habis masa berlaku', 'Perhatian', {
@@ -258,6 +268,7 @@ export default {
                                 confirmButtonText: 'OK',
                                 confirmButtonClass: 'bg-red',
                             })
+                            this.formModel.is_member = 0;
                             return
                         }
 
@@ -271,30 +282,40 @@ export default {
                             })
                         }
 
-                        let vehicle = r.data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
+                        if (this.setting.disable_plat_nomor) {
+                            this.$confirm('Plat nomor yang terdaftar atas kartu ini adalah '
+                                + r.data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
+                                    type: 'warning',
+                                    center: true,
+                                    roundButton: true,
+                                    confirmButtonText: 'SESUAI',
+                                    cancelButtonText: 'TIDAK SESUAI',
+                                }).then(() => {
+                                    if (r.data.member.vehicles.length == 1) {
+                                        this.formModel.vehicle_type = r.data.member.vehicles[0].vehicle_type
+                                    }
+                                    this.update(false)
+                                }).catch(() => {
+                                    this.formModel.is_member = 0;
+                                    return
+                                })
+                        } else {
+                            let vehicle = r.data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
 
-                        if (!vehicle) {
-                            this.$alert('Nomor plat tidak cocok dengan kartu. Nomor plat yang terdaftar adalah '
-                            + r.data.member.vehicles.map(v => v.plate_number).join(', '), 'Notifikasi', {
-                                type: 'warning',
-                                center: true,
-                                roundButton: true,
-                                confirmButtonText: 'SAYA TELAH MEMBACA NOTIFIKASI INI',
-                                confirmButtonClass: 'bg-red'
-                            })
+                            if (!vehicle) {
+                                this.$alert('Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah '
+                                + r.data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
+                                    type: 'warning',
+                                    center: true,
+                                    roundButton: true,
+                                    confirmButtonText: 'OK',
+                                    confirmButtonClass: 'bg-red'
+                                })
+                            }
                         }
 
                         this.formModel.fare = 0
                     }
-
-                    this.snapshot_in = r.data.snapshot_in
-                    this.formModel.id = r.data.id
-                    this.formModel.gate_in_id = r.data.gate_in_id
-                    this.formModel.time_in = r.data.time_in
-                    this.formModel.is_member = r.data.is_member
-                    this.formModel.time_out = now
-                    this.$forceUpdate()
-                    this.setDuration()
 
                     // member auto open sesuai setingan
                     if (r.data.is_member && !r.data.member.expired && this.setting.member_auto_open) {

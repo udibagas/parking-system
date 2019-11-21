@@ -4,6 +4,18 @@
             <el-form-item>
                 <el-button @click="openForm({})" type="primary"><i class="el-icon-plus"></i> INPUT PEMBAYARAN KEANGGOTAAN</el-button>
             </el-form-item>
+            <el-form-item>
+                <el-date-picker
+                @change="requestData"
+                v-model="dateRange"
+                format="dd/MMM/yyyy"
+                value-format="yyyy-MM-dd"
+                type="daterange"
+                range-separator="-"
+                start-placeholder="Dari tanggal"
+                end-placeholder="Sampai tanggal">
+                </el-date-picker>
+            </el-form-item>
             <el-form-item style="margin-right:0;">
                 <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                     <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
@@ -84,7 +96,7 @@
 
                 <el-form-item label="Siklus Pembayaran" :class="formErrors.billing_cycle ? 'is-error' : ''">
                     <el-input type="number" v-model="formModel.billing_cycle" style="width: 30%"></el-input>
-                    <el-select v-model="formModel.billing_cycle_unit" style="width:66%;float:right;clear: right;">
+                    <el-select placeholder="Pilih" v-model="formModel.billing_cycle_unit" style="width:66%;float:right;clear: right;">
                         <el-option v-for="(s, i) in $store.state.siklus" :value="s.value" :label="s.label" :key="i"></el-option>
                     </el-select>
                     <div class="el-form-item__error" v-if="formErrors.billing_cycle">{{formErrors.billing_cycle[0]}}</div>
@@ -128,6 +140,7 @@ export default {
             sort: 'created_at',
             order: 'descending',
             loading: false,
+            dateRange: ''
         }
     },
     computed: {
@@ -236,6 +249,7 @@ export default {
                 pageSize: this.pageSize,
                 sort: this.sort,
                 order: this.order,
+                dateRange: this.dateRange
             }
 
             this.loading = true;

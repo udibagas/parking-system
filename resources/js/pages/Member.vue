@@ -7,6 +7,7 @@
             <el-tab-pane lazy label="Member"><ParkingMember /></el-tab-pane>
             <el-tab-pane lazy label="Group Member"><GroupMember /></el-tab-pane>
             <el-tab-pane lazy label="Pembayaran"><MemberRenewal /></el-tab-pane>
+            <el-tab-pane lazy label="Laporan Pendapatan"><MembershipReport /></el-tab-pane>
         </el-tabs>
     </div>
 </template>
@@ -15,9 +16,10 @@
 import ParkingMember from './ParkingMember'
 import MemberRenewal from './MemberRenewal'
 import GroupMember from './GroupMember'
+import MembershipReport from './MembershipReport'
 
 export default {
-    components: { ParkingMember, MemberRenewal, GroupMember }
+    components: { ParkingMember, MemberRenewal, GroupMember, MembershipReport }
 }
 </script>
 

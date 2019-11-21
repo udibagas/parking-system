@@ -90,6 +90,18 @@ export default {
         },
         logout() {
             axios.post('/logout', { token: this.$store.state.token }).then(r => {
+                this.$message({
+                    message: 'Anda telah keluar',
+                    type: 'success',
+                    showClose: true
+                })
+            }).catch(e => {
+                this.$message({
+                    message: 'Token tidak sesuai',
+                    type: 'error',
+                    showClose: true
+                })
+            }).finally(() => {
                 window.localStorage.removeItem('user')
                 window.localStorage.removeItem('token')
                 this.$store.state.user = {}
