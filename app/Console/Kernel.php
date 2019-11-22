@@ -2,6 +2,7 @@
 
 namespace App\Console;
 
+use App\Setting;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 
@@ -24,8 +25,8 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')
-        //          ->hourly();
+        $age = Setting::first()->hapus_snapshot_dalam_hari;
+        $schedule->command('snapshot:delete '.$age)->dailyAt('12:00');
     }
 
     /**
