@@ -38,7 +38,7 @@ class DeleteSnapshotCommand extends Command
      */
     public function handle()
     {
-        $data = ParkingTransaction::whereRaw('DATEDIFF(DATE(created_at), NOW()) >= :age', [
+        $data = ParkingTransaction::whereRaw('DATEDIFF(NOW(), created_at) >= :age', [
             ':age' => $this->argument('age')
         ])->get();
 
