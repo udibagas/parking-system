@@ -37,15 +37,15 @@ class BackupController extends Controller
         ]);
 
         // backup file
-        $zip = new \ZipArchive;
-        $zip->open(env('BACKUP_DIR'). $request->fileName .'.zip', \ZipArchive::CREATE);
-        foreach (scandir('snapshot') as $img) {
-            if (!is_dir('snapshot/' . $img)) {
-                $zip->addFile('snapshot/' . $img);
-            }
-        }
+        // $zip = new \ZipArchive;
+        // $zip->open(env('BACKUP_DIR'). $request->fileName .'.zip', \ZipArchive::CREATE);
+        // foreach (scandir('snapshot') as $img) {
+        //     if (!is_dir('snapshot/' . $img)) {
+        //         $zip->addFile('snapshot/' . $img);
+        //     }
+        // }
 
-        $zip->close();
+        // $zip->close();
 
         try {
             $dump = new IMysqldump\Mysqldump(
@@ -78,23 +78,49 @@ class BackupController extends Controller
         return ['message' => 'Database telah di restore'];
     }
 
-    public function restoreSnapshot(Request $request)
-    {
-        // delete files first
-        array_map( 'unlink', array_filter((array) glob("snapshot/*") ) );
-        // extract files
-        $zip = new \ZipArchive;
-        if ($zip->open(env('BACKUP_DIR') . $request->file) === true) {
-            $zip->extractTo('./');
+    // public function restoreSnapshot(Request $request)
+    // {
+    //     // delete files first
+    //     array_map( 'unlink', array_filter((array) glob("snapshot/*") ) );
+    //     // extract files
+    //     $zip = new \ZipArchive;
+    //     if ($zip->open(env('BACKUP_DIR') . $request->file) === true) {
+    //         $zip->extractTo('./');
 
-            for($i=0; $i<$zip->numFiles; $i++){
-                touch($zip->statIndex($i)['name'], $zip->statIndex($i)['mtime']);
-            }
+    //         for($i=0; $i<$zip->numFiles; $i++){
+    //             touch($zip->statIndex($i)['name'], $zip->statIndex($i)['mtime']);
+    //         }
 
-            $zip->close();
-            return ['message' => 'Snapshot berhasil di restore'];
-        } else {
-            return response(['message' => 'Gagal extract snapshot'], 500);
-        }
-    }
+    //         $zip->close();
+    //         return ['message' => 'Snapshot berhasil di restore'];
+    //     } else {
+    //         return response(['message' => 'Gagal extract snapshot'], 500);
+    //     }
+    // }
+
+    // protected function zipData($source, $destination)
+    // {
+    //     if (file_exists($source) === true) {
+    //         $zip = new \ZipArchive();
+    //         if ($zip->open($destination, \ZipArchive::CREATE) === true) {
+    //             $source = realpath($source);
+    //             if (is_dir($source) === true) {
+    //                 $files = new RecursiveIteratorIterator(new RecursiveDirectoryIterator($source), RecursiveIteratorIterator::SELF_FIRST);
+    //                 foreach ($files as $file) {
+    //                     $file = realpath($file);
+    //                     if (is_dir($file) === true) {
+    //                         $zip->addEmptyDir(str_replace($source . '/', '', $file . '/'));
+    //                     } else if (is_file($file) === true) {
+    //                         $zip->addFromString(str_replace($source . '/', '', $file), file_get_contents($file));
+    //                     }
+    //                 }
+    //             } else if (is_file($source) === true) {
+    //                 $zip->addFromString(basename($source), file_get_contents($source));
+    //             }
+    //         }
+    //         return $zip->close();
+    //     }
+
+    //     return false;
+    // }
 }
