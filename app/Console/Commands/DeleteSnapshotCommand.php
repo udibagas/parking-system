@@ -44,53 +44,53 @@ class DeleteSnapshotCommand extends Command
 
         foreach ($data as $d)
         {
-            if ($d->snapshot_in && file_exists('public/'.$d->snapshot_in)) {
+            if ($d->snapshot_in && file_exists('./public/'.$d->snapshot_in)) {
                 $this->info('Delete file '. $d->snapshot_in);
-                unlink('public/'.$d->snapshot_in);
+                unlink('./public/'.$d->snapshot_in);
                 $this->info('File '. $d->snapshot_in. ' telah dihapus');
             }
 
-            if ($d->snapshot_out && file_exists('public/'.$d->snapshot_out)) {
+            if ($d->snapshot_out && file_exists('./public/'.$d->snapshot_out)) {
                 $this->info('Delete file '. $d->snapshot_out);
-                unlink('public/'.$d->snapshot_out);
+                unlink('./public/'.$d->snapshot_out);
                 $this->info('File '. $d->snapshot_in. ' telah dihapus');
             }
         }
 
-        $years = scandir('public/snapshot');
+        $years = scandir('./public/snapshot');
 
         foreach ($years as $year)
         {
-            if ($year == '.' || $year == '..' || !is_dir('public/snapshot/'.$year)) {
+            if ($year == '.' || $year == '..' || !is_dir('./public/snapshot/'.$year)) {
                 continue;
             }
 
-            $months = scandir('public/snapshot/'.$year);
+            $months = scandir('./public/snapshot/'.$year);
 
             foreach($months as $month)
             {
-                if ($month == '.' || $month == '..' || !is_dir('public/snapshot/'.$year.'/'.$month)) {
+                if ($month == '.' || $month == '..' || !is_dir('./public/snapshot/'.$year.'/'.$month)) {
                     continue;
                 }
 
-                $days = scandir('public/snapshot/'.$year.'/'.$month);
+                $days = scandir('./public/snapshot/'.$year.'/'.$month);
 
                 foreach ($days as $day)
                 {
-                    if ($day == '.' || $day == '..' || !is_dir('public/snapshot/'.$year.'/'.$month.'/'.$day)) {
+                    if ($day == '.' || $day == '..' || !is_dir('./public/snapshot/'.$year.'/'.$month.'/'.$day)) {
                         continue;
                     }
 
-                    $hours = scandir('public/snapshot/'.$year.'/'.$month.'/'.$day);
+                    $hours = scandir('./public/snapshot/'.$year.'/'.$month.'/'.$day);
 
                     foreach ($hours as $hour)
                     {
-                        if ($hour == '.' || $hour == '..' || !is_dir('public/snapshot/'.$year.'/'.$month.'/'.$day.'/'.$hour)) {
+                        if ($hour == '.' || $hour == '..' || !is_dir('./public/snapshot/'.$year.'/'.$month.'/'.$day.'/'.$hour)) {
                             continue;
                         }
 
                         try {
-                            rmdir('public/snapshot/'.$year.'/'.$month.'/'.$day.'/'.$hour);
+                            rmdir('./public/snapshot/'.$year.'/'.$month.'/'.$day.'/'.$hour);
                             $this->info('Delete directory public/snapshot/'.$year.'/'.$month.'/'.$day.'/'.$hour);
                         } catch (\Exception $e) {
                             continue;
@@ -98,7 +98,7 @@ class DeleteSnapshotCommand extends Command
                     }
 
                     try {
-                        rmdir('public/snapshot/'.$year.'/'.$month.'/'.$day);
+                        rmdir('./public/snapshot/'.$year.'/'.$month.'/'.$day);
                         $this->info('Delete directory public/snapshot/'.$year.'/'.$month.'/'.$day);
                         } catch (\Exception $e) {
                         continue;
@@ -106,7 +106,7 @@ class DeleteSnapshotCommand extends Command
                 }
 
                 try {
-                    rmdir('public/snapshot/'.$year.'/'.$month);
+                    rmdir('./public/snapshot/'.$year.'/'.$month);
                     $this->info('Delete directory public/snapshot/'.$year.'/'.$month);
                 } catch (\Exception $e) {
                     continue;
@@ -114,7 +114,7 @@ class DeleteSnapshotCommand extends Command
             }
 
             try {
-                rmdir('public/snapshot/'.$year);
+                rmdir('./public/snapshot/'.$year);
                 $this->info('Delete directory public/snapshot/'.$year);
             } catch (\Exception $e) {
                 continue;
