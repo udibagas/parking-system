@@ -170,6 +170,20 @@ class MemberRenewalController extends Controller
         return $data;
     }
 
+    public function reportDaily(Request $request)
+    {
+        $data = MemberRenewal::with('parkingMember')
+            ->whereRaw('DATE(member_renewals.created_at) = ?', [$request->date])
+            ->orderBy('member_renewals.created_at', 'ASC')
+            ->get();
+
+        if ($request->action == 'print') {
+            $this->printReportDaily($request->date, $data);
+        }
+
+        return $data;
+    }
+
     protected function printReport($data)
     {
         $setting = Setting::first();
@@ -199,11 +213,74 @@ class MemberRenewalController extends Controller
 
             $printer->text(str_pad('TANGGAL', 15, ' ') . str_pad('JUMLAH', 15, ' ') . str_pad('PENDAPATAN', 15, ' ')  . "\n");
 
-            foreach ($data as $d) {
+            $totalJumlah = 0;
+            $totalPendapatan = 0;
+
+            foreach ($data as $d)
+            {
+                $totalJumlah += $d->jumlah;
+                $totalPendapatan += $d->pendapatan;
+
                 $printer->text(str_pad(date('d/M/Y', strtotime($d->tanggal)), 15, ' ')
                     . str_pad(number_format($d->jumlah, 0, ',', '.'), 15, ' ')
                     . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ')  . "\n");
             }
+
+            $printer->text("\n\n");
+            $printer->text(str_pad('TOTAL', 15, ' ')
+                    . str_pad(number_format($totalJumlah, 0, ',', '.'), 15, ' ')
+                    . str_pad(number_format($totalPendapatan, 0, ',', '.'), 15, ' ')  . "\n");
+
+            $printer->cut();
+            $printer->close();
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENCETAK SLIP.' . $e->getMessage()], 500);
+        }
+
+        return ['message' => 'SILAKAN AMBIL SLIP'];
+    }
+
+    protected function printReportDaily($date, $data)
+    {
+        $setting = Setting::first();
+
+        if (!$setting) {
+            return response(['message' => 'BELUM ADA SETTING'], 500);
+        }
+
+        if (!$setting->location_name) {
+            return response(['message' => 'LOKASI BELUM DISET'], 500);
+        }
+
+        try {
+            $connector = new NetworkPrintConnector(env('PRINTER_ADDRESS'), 9100);
+            $printer = new Printer($connector);
+        } catch (\Exception $e) {
+            return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+        }
+
+        try {
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("LAPORAN PENDAPATAN ANGGOTA\n");
+            $printer->text($setting->location_name."\n");
+            $printer->text("TANGGAL ".date('d/M/Y', strtotime($date)));
+            $printer->text("\n\n");
+
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+
+            $printer->text(str_pad('NAMA', 15, ' ') . str_pad('JUMLAH', 15, ' ')  . "\n");
+
+            $total = 0;
+
+            foreach ($data as $d) {
+                $total += $d->amount;
+                $printer->text(str_pad($d->parkingMember->name, 15, ' ')
+                    . str_pad(number_format($d->amount, 0, ',', '.'), 15, ' ')  . "\n");
+            }
+
+            $printer->text("\n\n");
+            $printer->text(str_pad('TOTAL:', 15, ' ')
+                . str_pad(number_format($total, 0, ',', '.'), 15, ' ')  . "\n");
 
             $printer->cut();
             $printer->close();

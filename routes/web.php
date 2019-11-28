@@ -54,6 +54,7 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 
     Route::post('memberRenewal/printSlip/{memberRenewal}', 'MemberRenewalController@printSlip');
     Route::get('memberRenewal/report', 'MemberRenewalController@report');
+    Route::get('memberRenewal/reportDaily', 'MemberRenewalController@reportDaily');
     Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
 
     Route::get('userLog', 'UserLogController@index');
