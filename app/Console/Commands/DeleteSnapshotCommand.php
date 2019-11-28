@@ -38,22 +38,35 @@ class DeleteSnapshotCommand extends Command
      */
     public function handle()
     {
-        $data = ParkingTransaction::whereRaw('DATEDIFF(NOW(), created_at) >= :age', [
+        $data = ParkingTransaction::whereRaw('DATEDIFF(NOW(), created_at) >= :age AND (snapshot_in != "" OR snapshot_out != "")', [
             ':age' => $this->argument('age')
         ])->get();
 
         foreach ($data as $d)
         {
-            if ($d->snapshot_in && file_exists('./public/'.$d->snapshot_in)) {
+            if ($d->snapshot_in && file_exists('./public/'.$d->snapshot_in))
+            {
                 $this->info('Delete file '. $d->snapshot_in);
-                unlink('./public/'.$d->snapshot_in);
-                $this->info('File '. $d->snapshot_in. ' telah dihapus');
+
+                try {
+                    unlink('./public/'.$d->snapshot_in);
+                    $this->info('File '. $d->snapshot_in. ' telah dihapus');
+                    ParkingTransaction::where('snapshot_in', $d->snapshot_in)->update(['snapshot_in' => '']);
+                } catch (\Exception $e) {
+                    $this->error('Gagal menghapus file ' . $d->snapshot_in . '. '. $e->getMessage());
+                }
             }
 
             if ($d->snapshot_out && file_exists('./public/'.$d->snapshot_out)) {
                 $this->info('Delete file '. $d->snapshot_out);
-                unlink('./public/'.$d->snapshot_out);
-                $this->info('File '. $d->snapshot_in. ' telah dihapus');
+
+                try {
+                    unlink('./public/'.$d->snapshot_out);
+                    $this->info('File '. $d->snapshot_out. ' telah dihapus');
+                    ParkingTransaction::where('snapshot_out', $d->snapshot_out)->update(['snapshot_out' => '']);
+                } catch (\Exception $e) {
+                    $this->error('Gagal menghapus file ' . $d->snapshot_out . '. '. $e->getMessage());
+                }
             }
         }
 
