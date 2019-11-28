@@ -122,6 +122,9 @@ export default {
 
             return sums;
         }
+    },
+    mounted() {
+        this.requestData()
     }
 }
 </script>
