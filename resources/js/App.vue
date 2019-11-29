@@ -45,7 +45,7 @@
                         </el-col>
                     </el-row>
                 </el-header>
-                <el-main style="padding:20px">
+                <el-main style="padding:20px;height:calc(100vh - 60px);overflow:auto;">
                     <el-collapse-transition>
                         <router-view @back="goBack"></router-view>
                     </el-collapse-transition>
