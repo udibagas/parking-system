@@ -153,7 +153,7 @@
                         </el-form-item>
 
                         <el-form-item label="Tarif (Rp)" :class="formErrors.fare ? 'is-error' : ''">
-                            <el-input type="number" placeholder="Tarif (Rp)" v-model="formModel.fare"></el-input>
+                            <el-input :disabled="!formModel.paid" type="number" placeholder="Tarif (Rp)" v-model="formModel.fare"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.fare">{{formErrors.fare[0]}}</div>
                         </el-form-item>
                     </el-col>
