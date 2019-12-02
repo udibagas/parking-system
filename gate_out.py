@@ -4,7 +4,6 @@ import time
 import asyncio
 import websockets
 from serial import Serial
-import configparser
 import json
 
 async def open_gate(websocket, path):

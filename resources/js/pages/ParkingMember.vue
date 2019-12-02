@@ -2,7 +2,7 @@
     <div>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item v-if="$store.state.user.role == 1">
-                <el-button @click="openForm({vehicles: [], register_date: now})" type="primary" icon="el-icon-plus">TAMBAH MEMBER</el-button>
+                <el-button @click="openForm({vehicles: [], register_date: now, fare: 0})" type="primary" icon="el-icon-plus">TAMBAH MEMBER</el-button>
             </el-form-item>
             <el-form-item style="margin-right:0;">
                 <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
@@ -63,7 +63,7 @@
             prop="is_active"
             label="Status"
             sortable="custom"
-            min-width="100px"
+            min-width="120px"
             header-align="center"
             align="center">
                 <template slot-scope="scope">
@@ -153,7 +153,7 @@
                         </el-form-item>
 
                         <el-form-item label="Tarif (Rp)" :class="formErrors.fare ? 'is-error' : ''">
-                            <el-input :disabled="!formModel.paid" type="number" placeholder="Tarif (Rp)" v-model="formModel.fare"></el-input>
+                            <el-input type="number" placeholder="Tarif (Rp)" v-model="formModel.fare"></el-input>
                             <div class="el-form-item__error" v-if="formErrors.fare">{{formErrors.fare[0]}}</div>
                         </el-form-item>
                     </el-col>

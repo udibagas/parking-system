@@ -33,14 +33,14 @@
                     {{scope.row.created_at | readableDateTime}}
                 </template>
             </el-table-column>
-            <el-table-column prop="member_name" label="Nama" sortable="custom"></el-table-column>
+            <el-table-column prop="member_name" label="Nama" sortable="custom" show-overflow-tooltip el-table-column>
             <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom"></el-table-column>
-            <el-table-column prop="from_date" label="Dari Tanggal" sortable="custom" align="center" header-align="center">
+            <el-table-column prop="from_date" label="Dari Tanggal" width="120px" sortable="custom" align="center" header-align="center">
                 <template slot-scope="scope">
                     {{scope.row.from_date | readableDate}}
                 </template>
             </el-table-column>
-            <el-table-column prop="to_date" label="Sampai Tanggal" sortable="custom" align="center" header-align="center">
+            <el-table-column prop="to_date" label="Sampai Tanggal" width="120px" sortable="custom" align="center" header-align="center">
                 <template slot-scope="scope">
                     {{scope.row.to_date | readableDate}}
                 </template>
