@@ -40,7 +40,7 @@
                     {{scope.row.from_date | readableDate}}
                 </template>
             </el-table-column>
-            <el-table-column prop="to_date" label="Sampai Tanggal" width="150px" sortable="custom" align="center" header-align="center">
+            <el-table-column prop="to_date" label="Sampai Tanggal" width="160px" sortable="custom" align="center" header-align="center">
                 <template slot-scope="scope">
                     {{scope.row.to_date | readableDate}}
                 </template>
