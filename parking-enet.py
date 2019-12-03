@@ -280,12 +280,12 @@ def gate_in_thread(gate):
                         data = {'is_member': 0}
                         break
 
-                    elif b'IN3' in push_button_or_card:
+                    elif b'IN3ON' in push_button_or_card or b'IN31' in push_button_or_card:
                         logging.info(gate['name'] + ' : Reset')
                         reset = True
                         break
 
-                    elif b'IN41' in push_button_or_card:
+                    elif b'IN41' in push_button_or_card or b'IN4ON' in push_button_or_card:
                         reset = True
                         try:
                             time.sleep(.1)
@@ -301,7 +301,7 @@ def gate_in_thread(gate):
                         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' membutuhkan bantuan Anda')
                         break
 
-                    elif b'IN10' in push_button_or_card:
+                    elif b'IN10' in push_button_or_card or b'IN1OFF' in push_button_or_card:
                         logging.info(gate['name'] + ' : Vehicle turn back')
                         reset = True
                         break
