@@ -143,6 +143,7 @@ export default {
                     showClose: true
                 });
                 this.requestData();
+                this.$store.commit('getGroupMemberList')
             }).catch(e => {
                 if (e.response.status == 422) {
                     this.error = {}
@@ -167,6 +168,7 @@ export default {
                     showClose: true
                 });
                 this.requestData()
+                this.$store.commit('getGroupMemberList')
             }).catch(e => {
                 if (e.response.status == 422) {
                     this.error = {}
@@ -185,6 +187,7 @@ export default {
             this.$confirm('Anda yakin akan menghapus data ini?', 'Warning', { type: 'warning' }).then(() => {
                 axios.delete('/groupMember/' + id).then(r => {
                     this.requestData();
+                    this.$store.commit('getGroupMemberList')
                     this.$message({
                         message: r.data.message,
                         type: 'success',
