@@ -392,7 +392,7 @@ def gate_in_thread(gate):
                         logging.info(gate['name'] + ' : Vehicle in')
                         break
 
-                    time.sleep(3)
+                    time.sleep(1)
 
                 if error:
                     # break loop cek kendaraan, sambung ulang controller
