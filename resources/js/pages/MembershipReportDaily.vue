@@ -18,6 +18,11 @@
             </el-table-column>
             <el-table-column prop="parking_member.name" label="Nama"></el-table-column>
             <el-table-column prop="parking_member.card_number" label="Nomor Kartu" header-align="center" align="center"></el-table-column>
+            <el-table-column label="Plat Nomor" header-align="center" align="center">
+                <template slot-scope="scope">
+                    {{ scope.row.parking_member.vehicles.map(v => v.plate_number).join(', ') }}
+                </template>
+            </el-table-column>
             <el-table-column label="Jumlah" header-align="right" align="right">
                 <template slot-scope="scope">
                     Rp. {{ scope.row.amount | formatNumber }}
@@ -99,12 +104,12 @@ export default {
                     return;
                 }
 
-                if (index === 1 || index === 2) {
+                if (index === 1 || index === 2 || index === 3) {
                     sums[index] = '';
                     return;
                 }
 
-                if (index === 3) {
+                if (index === 4) {
                     let amount = this.report.reduce((prev, curr) => { return prev + Number(curr.amount) }, 0)
                     sums[index] = 'Rp ' + this.formatNumber(amount)
                 }
