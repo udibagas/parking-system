@@ -1,4 +1,16 @@
- install ini sebelum install kivy : libgl1-mesa-dev
+Method takeSnapshot 1 aja
+
+Belum beres:
+    - backup
+        - zip belum recursive
+    - report
+        - denda belum
+
+Member:
+    - Edit disable field tgl registrasi
+    - Konfirmasi dulu waktu simpan
+- Gate Out
+    - Notif expiry member
 
 
 Protocol PCLess Interface
@@ -123,3 +135,19 @@ jika input 4 berubah status dari ON menjadi OFF, interface akan mengirimkan data
 jika interface menerima data valid dari card reader Wiegand-26/34 (auto detect), maka interface akan mengirimkan data Waaaaaaaa
 aaaaaaaa = 8/10 digit desimal data nomor UID kartu RFID
 (8 digit untuk Wiegand 26, 10 digit untuk Wiegand 34)
+
+Install the following package by entering:
+sudo apt-get install libgconf-2-4
+
+Add yourself to the "dialout" group:
+sudo usermod -a -G dialout $USER
+
+Create a rule file to automatically enable permissions when Palette™/P+™ is connected:
+sudo nano /etc/udev/rules.d/50-local.rules
+
+Paste this line in the file you just created:
+ACTION=="add", ATTRS{idProduct}=="0042", ATTRS{idVendor}=="2341", DRIVERS=="usb", RUN+="chmod a+rw /dev/ttyACM0"
+/etc/init.d/udev restart
+
+Press Control-O and then Control-X to save the file and exit.
+

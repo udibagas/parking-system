@@ -293,6 +293,7 @@ export default {
                                 }).then(() => {
                                     if (r.data.member.vehicles.length == 1) {
                                         this.formModel.vehicle_type = r.data.member.vehicles[0].vehicle_type
+                                        this.$forceUpdate()
                                     }
                                 }).catch(() => {
                                     this.formModel.is_member = 0;
