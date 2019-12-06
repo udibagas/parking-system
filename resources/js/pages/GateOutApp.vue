@@ -438,6 +438,7 @@ export default {
                 this.openGate()
             }).catch(e => {
                 // kecil kemungkinan
+                console.log(e)
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
                     type: 'error',
@@ -452,6 +453,7 @@ export default {
                     this.printTicket(r.data.id)
                 }
             }).catch(e => {
+                console.log(e)
                 this.$message({
                     message: 'DATA GAGAL DISIMPAN',
                     type: 'error',
