@@ -314,7 +314,6 @@ export default {
                         }
 
                         this.formModel.fare = 0
-
                         // member auto open sesuai setingan
                         if (this.setting.member_auto_open) {
                             this.update(false)
