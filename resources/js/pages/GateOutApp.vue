@@ -294,7 +294,6 @@ export default {
                                     if (r.data.member.vehicles.length == 1) {
                                         this.formModel.vehicle_type = r.data.member.vehicles[0].vehicle_type
                                     }
-                                    this.update(false)
                                 }).catch(() => {
                                     this.formModel.is_member = 0;
                                     return
@@ -315,11 +314,11 @@ export default {
                         }
 
                         this.formModel.fare = 0
-                    }
 
-                    // member auto open sesuai setingan
-                    if (r.data.is_member && !r.data.member.expired && this.setting.member_auto_open) {
-                        this.update(false)
+                        // member auto open sesuai setingan
+                        if (this.setting.member_auto_open) {
+                            this.update(false)
+                        }
                     }
 
                     document.getElementById('vehicle-type').focus()
