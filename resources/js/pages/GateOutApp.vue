@@ -378,6 +378,8 @@ export default {
                 this.formModel.fare = ''
             }
 
+            this.$forceUpdate()
+
             if (this.setting.disable_plat_nomor) {
                 document.getElementById('ticket-number').focus()
             } else {
