@@ -440,7 +440,7 @@ export default {
                 // kecil kemungkinan
                 console.log(e)
                 this.$message({
-                    message: 'DATA GAGAL DISIMPAN : ' + JSON.stringify(e),
+                    message: 'DATA GAGAL DISIMPAN',
                     type: 'error',
                     showClose: true
                 })
@@ -455,7 +455,7 @@ export default {
             }).catch(e => {
                 console.log(e)
                 this.$message({
-                    message: 'DATA GAGAL DISIMPAN : ' + JSON.stringify(e),
+                    message: 'DATA GAGAL DISIMPAN',
                     type: 'error',
                     showClose: true
                 })
