@@ -260,70 +260,71 @@ export default {
                     this.takeSnapshot(this.formModel.id)
                     this.setDuration()
 
-                    if (data.is_member) {
-                        if (data.member.expired) {
-                            this.$alert('Kartu telah habis masa berlaku', 'Perhatian', {
-                                type: 'warning',
-                                center: true,
-                                roundButton: true,
-                                confirmButtonText: 'OK',
-                                confirmButtonClass: 'bg-red',
-                            })
-                            this.formModel.is_member = 0;
-                            return
-                        }
-
-                        if (!data.member.expired && data.member.expired_in <= 5) {
-                            this.$alert('Kartu akan habis masa berlaku dalam ' + data.member.expired_in + ' hari', 'Perhatian', {
-                                type: 'warning',
-                                center: true,
-                                roundButton: true,
-                                confirmButtonText: 'OK',
-                                confirmButtonClass: 'bg-red',
-                            })
-                        }
-
-                        if (this.setting.disable_plat_nomor) {
-                            this.$confirm('Plat nomor yang terdaftar atas kartu ini adalah '
-                                + data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
-                                    type: 'warning',
-                                    center: true,
-                                    roundButton: true,
-                                    confirmButtonText: 'SESUAI',
-                                    cancelButtonText: 'TIDAK SESUAI',
-                                }).then(() => {
-                                    if (r.data.member.vehicles.length == 1) {
-                                        this.formModel.plate_number = data.member.vehicles[0].plate_number
-                                    }
-                                }).catch(() => {
-                                    this.formModel.is_member = 0;
-                                    return
-                                })
-                        } else {
-                            let vehicle = data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
-
-                            if (!vehicle) {
-                                this.$alert('Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah '
-                                + data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
-                                    type: 'warning',
-                                    center: true,
-                                    roundButton: true,
-                                    confirmButtonText: 'OK',
-                                    confirmButtonClass: 'bg-red'
-                                })
-                            }
-
-                            return false
-                        }
-
-                        this.formModel.fare = 0
-                        // member auto open sesuai setingan
-                        if (this.setting.member_auto_open) {
-                            this.update(false)
-                        }
-                    } else {
+                    if (!data.is_member) {
                         console.log('this should be call only for ticket')
                         document.getElementById('vehicle-type').focus()
+                        return
+                    }
+
+                    if (!!data.member.expired) {
+                        this.$alert('Kartu telah habis masa berlaku', 'Perhatian', {
+                            type: 'warning',
+                            center: true,
+                            roundButton: true,
+                            confirmButtonText: 'OK',
+                            confirmButtonClass: 'bg-red',
+                        })
+                        this.formModel.is_member = 0;
+                        return
+                    }
+
+                    if (!data.member.expired && data.member.expired_in <= 5) {
+                        this.$alert('Kartu akan habis masa berlaku dalam ' + data.member.expired_in + ' hari', 'Perhatian', {
+                            type: 'warning',
+                            center: true,
+                            roundButton: true,
+                            confirmButtonText: 'OK',
+                            confirmButtonClass: 'bg-red',
+                        })
+                    }
+
+                    if (!!this.setting.disable_plat_nomor) {
+                        this.$confirm('Plat nomor yang terdaftar atas kartu ini adalah '
+                            + data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
+                                type: 'warning',
+                                center: true,
+                                roundButton: true,
+                                confirmButtonText: 'SESUAI',
+                                cancelButtonText: 'TIDAK SESUAI',
+                            }).then(() => {
+                                if (r.data.member.vehicles.length == 1) {
+                                    this.formModel.plate_number = data.member.vehicles[0].plate_number
+                                }
+                            }).catch(() => {
+                                this.formModel.is_member = 0;
+                                return
+                            })
+                    } else {
+                        let vehicle = data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
+
+                        if (!vehicle) {
+                            this.$alert('Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah '
+                            + data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
+                                type: 'warning',
+                                center: true,
+                                roundButton: true,
+                                confirmButtonText: 'OK',
+                                confirmButtonClass: 'bg-red'
+                            })
+                        }
+
+                        return false
+                    }
+
+                    this.formModel.fare = 0
+                    // member auto open sesuai setingan
+                    if (!!this.setting.member_auto_open) {
+                        this.update(false)
                     }
                 }).catch(e => {
                     console.log(e)
