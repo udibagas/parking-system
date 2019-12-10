@@ -337,7 +337,7 @@ class ParkingTransactionController extends Controller
                 'vehicle_type' => $member->vehicles[0]->vehicle_type,
                 'is_member' => 1,
                 'parking_member_id' => $member->id,
-                'time_in' => date('Y-m-d H:i:s'),
+                'time_in' => now(),
                 'gate_in_id' => ParkingGate::where('type', 'IN')->where('active', 1)->first()->id,
                 'card_number' => $member->card_number
             ];

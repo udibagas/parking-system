@@ -293,6 +293,7 @@ export default {
                                 }).then(() => {
                                     if (r.data.member.vehicles.length == 1) {
                                         this.formModel.vehicle_type = r.data.member.vehicles[0].vehicle_type
+                                        this.formModel.plate_number = r.data.member.vehicles[0].plate_number
                                         this.$forceUpdate()
                                     }
                                 }).catch(() => {
@@ -439,7 +440,7 @@ export default {
                 // kecil kemungkinan
                 console.log(e)
                 this.$message({
-                    message: 'DATA GAGAL DISIMPAN',
+                    message: 'DATA GAGAL DISIMPAN : ' + JSON.stringify(e),
                     type: 'error',
                     showClose: true
                 })
@@ -454,7 +455,7 @@ export default {
             }).catch(e => {
                 console.log(e)
                 this.$message({
-                    message: 'DATA GAGAL DISIMPAN',
+                    message: 'DATA GAGAL DISIMPAN : ' + JSON.stringify(e),
                     type: 'error',
                     showClose: true
                 })
