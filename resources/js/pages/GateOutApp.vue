@@ -249,18 +249,20 @@ export default {
             } else {
                 let params = { barcode_number: this.formModel.barcode_number }
                 axios.get('/parkingTransaction/search', { params: params }).then(r => {
-                    this.snapshot_in = r.data.snapshot_in
-                    this.formModel.id = r.data.id
-                    this.formModel.gate_in_id = r.data.gate_in_id
-                    this.formModel.time_in = r.data.time_in
-                    this.formModel.is_member = r.data.is_member
+                    const data = r.data
+                    this.snapshot_in = data.snapshot_in
+                    this.formModel.id = data.id
+                    this.formModel.gate_in_id = data.gate_in_id
+                    this.formModel.time_in = data.time_in
+                    this.formModel.is_member = data.is_member
+                    this.formModel.vehicle_type = data.vehicle_type
                     this.formModel.time_out = now
 
                     this.$forceUpdate()
                     this.setDuration()
 
-                    if (r.data.is_member) {
-                        if (r.data.member.expired) {
+                    if (data.is_member) {
+                        if (data.member.expired) {
                             this.$alert('Kartu telah habis masa berlaku', 'Perhatian', {
                                 type: 'warning',
                                 center: true,
@@ -272,8 +274,8 @@ export default {
                             return
                         }
 
-                        if (!r.data.member.expired && r.data.member.expired_in <= 5) {
-                            this.$alert('Kartu akan habis masa berlaku dalam ' + r.data.member.expired_in + ' hari', 'Perhatian', {
+                        if (!data.member.expired && data.member.expired_in <= 5) {
+                            this.$alert('Kartu akan habis masa berlaku dalam ' + data.member.expired_in + ' hari', 'Perhatian', {
                                 type: 'warning',
                                 center: true,
                                 roundButton: true,
@@ -284,7 +286,7 @@ export default {
 
                         if (this.setting.disable_plat_nomor) {
                             this.$confirm('Plat nomor yang terdaftar atas kartu ini adalah '
-                                + r.data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
+                                + data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
                                     type: 'warning',
                                     center: true,
                                     roundButton: true,
@@ -292,20 +294,18 @@ export default {
                                     cancelButtonText: 'TIDAK SESUAI',
                                 }).then(() => {
                                     if (r.data.member.vehicles.length == 1) {
-                                        this.formModel.vehicle_type = r.data.member.vehicles[0].vehicle_type
-                                        this.formModel.plate_number = r.data.member.vehicles[0].plate_number
-                                        this.$forceUpdate()
+                                        this.formModel.plate_number = data.member.vehicles[0].plate_number
                                     }
                                 }).catch(() => {
                                     this.formModel.is_member = 0;
                                     return
                                 })
                         } else {
-                            let vehicle = r.data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
+                            let vehicle = data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
 
                             if (!vehicle) {
                                 this.$alert('Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah '
-                                + r.data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
+                                + data.member.vehicles.map(v => v.plate_number).join(', '), 'Perhatian', {
                                     type: 'warning',
                                     center: true,
                                     roundButton: true,
@@ -320,9 +320,9 @@ export default {
                         if (this.setting.member_auto_open) {
                             this.update(false)
                         }
+                    } else {
+                        document.getElementById('vehicle-type').focus()
                     }
-
-                    document.getElementById('vehicle-type').focus()
                 }).then(() => {
                     this.takeSnapshot(this.formModel.id)
                 }).catch(e => {

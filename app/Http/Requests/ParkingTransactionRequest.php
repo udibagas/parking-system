@@ -25,7 +25,7 @@ class ParkingTransactionRequest extends FormRequest
     {
         return [
             'is_member' => 'boolean',
-            // 'vehicle_type' => 'required',
+            'vehicle_type' => 'required',
             'gate_in_id' => 'sometimes|exists:parking_gates,id',
             'gate_out_id' => 'exists:parking_gates,id',
             'member_id' => 'exists:parking_members,id',
