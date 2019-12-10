@@ -257,11 +257,11 @@ export default {
                     this.formModel.is_member = data.is_member
                     this.formModel.vehicle_type = data.vehicle_type
                     this.formModel.time_out = now
+                    this.formModel.fare = 0
                     this.takeSnapshot(this.formModel.id)
                     this.setDuration()
 
                     if (!data.is_member) {
-                        console.log('this should be call only for ticket')
                         document.getElementById('vehicle-type').focus()
                         return
                     }
@@ -297,8 +297,13 @@ export default {
                                 confirmButtonText: 'SESUAI',
                                 cancelButtonText: 'TIDAK SESUAI',
                             }).then(() => {
-                                if (r.data.member.vehicles.length == 1) {
+                                if (data.member.vehicles.length == 1) {
                                     this.formModel.plate_number = data.member.vehicles[0].plate_number
+                                }
+
+                                // member auto open sesuai setingan
+                                if (!!this.setting.member_auto_open) {
+                                    this.update(false)
                                 }
                             }).catch(() => {
                                 this.formModel.is_member = 0;
@@ -318,13 +323,7 @@ export default {
                             })
                         }
 
-                        return false
-                    }
-
-                    this.formModel.fare = 0
-                    // member auto open sesuai setingan
-                    if (!!this.setting.member_auto_open) {
-                        this.update(false)
+                        return
                     }
                 }).catch(e => {
                     console.log(e)
