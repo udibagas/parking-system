@@ -257,7 +257,7 @@ export default {
                     this.formModel.is_member = data.is_member
                     this.formModel.vehicle_type = data.vehicle_type
                     this.formModel.time_out = now
-
+                    this.takeSnapshot(this.formModel.id)
                     this.$forceUpdate()
                     this.setDuration()
 
@@ -271,7 +271,7 @@ export default {
                                 confirmButtonClass: 'bg-red',
                             })
                             this.formModel.is_member = 0;
-                            return
+                            return false
                         }
 
                         if (!data.member.expired && data.member.expired_in <= 5) {
@@ -298,7 +298,7 @@ export default {
                                     }
                                 }).catch(() => {
                                     this.formModel.is_member = 0;
-                                    return
+                                    return false
                                 })
                         } else {
                             let vehicle = data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
@@ -313,6 +313,8 @@ export default {
                                     confirmButtonClass: 'bg-red'
                                 })
                             }
+
+                            return false
                         }
 
                         this.formModel.fare = 0
@@ -323,8 +325,6 @@ export default {
                     } else {
                         document.getElementById('vehicle-type').focus()
                     }
-                }).then(() => {
-                    this.takeSnapshot(this.formModel.id)
                 }).catch(e => {
                     console.log(e)
                     this.$message({
@@ -377,8 +377,6 @@ export default {
                 this.formModel.vehicle_type = ''
                 this.formModel.fare = ''
             }
-
-            this.$forceUpdate()
 
             if (this.setting.disable_plat_nomor) {
                 document.getElementById('ticket-number').focus()
