@@ -248,7 +248,7 @@ export default {
                 document.getElementById('vehicle-type').focus()
             } else {
                 let params = { barcode_number: this.formModel.barcode_number }
-                axios.get('/parkingTransaction/search', { params: params }).then(r => {
+                axios.get('/parkingTransaction/search', { params }).then(r => {
                     const data = r.data
                     this.snapshot_in = data.snapshot_in
                     this.formModel.id = data.id
@@ -258,7 +258,6 @@ export default {
                     this.formModel.vehicle_type = data.vehicle_type
                     this.formModel.time_out = now
                     this.takeSnapshot(this.formModel.id)
-                    this.$forceUpdate()
                     this.setDuration()
 
                     if (data.is_member) {
@@ -271,7 +270,7 @@ export default {
                                 confirmButtonClass: 'bg-red',
                             })
                             this.formModel.is_member = 0;
-                            return false
+                            return
                         }
 
                         if (!data.member.expired && data.member.expired_in <= 5) {
@@ -298,7 +297,7 @@ export default {
                                     }
                                 }).catch(() => {
                                     this.formModel.is_member = 0;
-                                    return false
+                                    return
                                 })
                         } else {
                             let vehicle = data.member.vehicles.find(v => v.plate_number == this.formModel.plate_number)
@@ -323,6 +322,7 @@ export default {
                             this.update(false)
                         }
                     } else {
+                        console.log('this should be call only for ticket')
                         document.getElementById('vehicle-type').focus()
                     }
                 }).catch(e => {
