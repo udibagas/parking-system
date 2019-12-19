@@ -1,8 +1,7 @@
 <template>
     <div>
         <el-page-header @back="$emit('back')" content="SETTING"> </el-page-header>
-        <el-divider></el-divider>
-
+        <br>
         <el-tabs type="card">
             <el-tab-pane lazy label="Global Setting" v-loading="loading">
                 <el-card>

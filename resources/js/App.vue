@@ -8,9 +8,6 @@
                     <img src="/images/logo.jpeg" style="height:60px;width:60px;margin:25px 0 10px 0;border-radius:5px;" alt="">
 
                     <div>
-                        <!-- <el-avatar shape="square" :size="70" icon="el-icon-user" src="/images/logo.jpeg" fit="contain"></el-avatar>
-                        <br>
-                        <br> -->
                         <strong>{{$store.state.user.name}}</strong><br>
                         <small>{{ $store.state.user.role ? 'Admin' : 'Operator' }}</small>
                     </div>
@@ -35,6 +32,17 @@
                             <span class="brand"> {{appName}} </span>
                         </el-col>
                         <el-col :span="12" class="text-right">
+                            <el-popover v-if="notifications.length > 0" style="margin-right:20px" placement="top-start" width="300" trigger="click">
+                                <el-button slot="reference" type="danger" size="mini" round icon="el-icon-bell" style="color:#fff;">{{notifications.length}}</el-button>
+                                <div style="height:calc(100vh - 300px);overflow:auto;padding-right:10px;">
+                                    <el-button type="danger" style="width:100%" round size="mini" @click="readAllNotification">Tandai Sudah Dibaca Semua</el-button>
+                                    <div v-for="n in notifications" :key="n.id">
+                                        <p style="margin-bottom:0"><strong>{{n.created_at | readableDateTime}}</strong> {{n.message}}</p>
+                                        <el-button type="text" size="small" @click="readNotification(n.id)">Tandai sudah dibaca</el-button><br>
+                                    </div>
+                                </div>
+                            </el-popover>
+
                             <el-dropdown @command="handleCommand">
                                 <span class="el-dropdown-link" style="cursor:pointer">Selamat Datang, {{$store.state.user.name}}!</span>
                                 <el-dropdown-menu slot="dropdown">
@@ -72,7 +80,9 @@ export default {
             appName: APP_NAME,
             showProfile: false,
             loginForm: !this.$store.state.is_logged_in,
-            notif: false
+            notifications: [
+                // {created_at: '2019-10-10 10:10:10', message: 'ok jos'}
+            ]
         }
     },
     methods: {
@@ -114,36 +124,27 @@ export default {
                 return
             }
 
-            let params = { read: 0, pageSize: 1 }
-            axios.get('/notification', { params: params }).then(r => {
-                if (r.data.data.length == 0) {
-                    return
-                }
-
-                // jika tidak ada notifikasi yg tampil
-                if (!this.notif)
-                {
-                    let n = r.data.data[0]
-                    this.notif = true
-                    let h = this.$createElement
-                    this.$alert('[' + moment(n.created_at).format('DD/MMM/YYYY HH:mm:ss') + '] ' + n.message, 'Notifikasi', {
-                        type: 'warning',
-                        center: true,
-                        roundButton: true,
-                        confirmButtonText: 'SAYA TELAH MEMBACA NOTIFIKASI INI',
-                        confirmButtonClass: 'bg-red',
-                        beforeClose: (action, instance, done) => {
-                            this.notif = false
-                            done()
-                        }
-                    }).then(() => {
-                        this.notif = false
-                        axios.put('/notification/' + n.id, { read: 1 }).then(rr => {
-                            // console.log(rr.data)
-                        }).catch(e => console.log(e))
+            axios.get('/notification/unreadNotification').then(r => {
+                // kalau jumlah lebih dari sebelumnya tampilkan record terakhir
+                if (r.data.length > this.notifications.length) {
+                    this.$notify.warning({
+                        title: 'Notifikasi',
+                        message: '[' + r.data[0].created_at + '] ' + r.data[0].message
                     })
                 }
+                this.notifications = r.data;
             }).catch(e => console.log(e))
+        },
+        readNotification(id) {
+            const params = { read: 1}
+            axios.put('/notification/' + id, { read: 1 })
+                .then(r => console.log(r))
+                .catch(e => console.log(e))
+        },
+        readAllNotification() {
+            axios.put('/notification/markAllAsRead')
+                .then(r => this.notifications = [])
+                .catch(e => console.log(e))
         }
     },
     mounted() {

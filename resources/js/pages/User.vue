@@ -1,15 +1,24 @@
 <template>
     <div>
         <el-page-header @back="$emit('back')" content="USER"> </el-page-header>
-        <el-divider></el-divider>
-        <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
+        <br>
+        <el-form inline class="text-right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="openForm({role: 0, password: ''})" type="primary" icon="el-icon-plus">TAMBAH USER</el-button>
+                <el-button size="small" @click="openForm({role: 0, password: ''})" type="primary" icon="el-icon-plus">TAMBAH USER</el-button>
             </el-form-item>
-            <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
-                    <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
+            <el-form-item>
+                <el-input size="small" v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                 </el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-pagination background
+                @current-change="(p) => { page = p; requestData(); }"
+                @size-change="(s) => { pageSize = s; requestData(); }"
+                layout="total, sizes, prev, next"
+                :page-size="pageSize"
+                :page-sizes="[10, 25, 50, 100]"
+                :total="tableData.total">
+                </el-pagination>
             </el-form-item>
         </el-form>
 
@@ -32,31 +41,28 @@
                 </template>
             </el-table-column>
 
-            <el-table-column width="40px">
+            <el-table-column width="40px" align="center" header-align="center">
+                <template slot="header">
+                    <el-button
+                    type="text"
+                    class="text-white"
+                    @click="() => { page = 1; keyword = ''; requestData(); }"
+                    icon="el-icon-refresh">
+                    </el-button>
+                </template>
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native.prevent="openForm(scope.row)"><i class="el-icon-edit-outline"></i> Edit</el-dropdown-item>
-                            <el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"><i class="el-icon-delete"></i> Hapus</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-edit-outline" @click.native.prevent="openForm(scope.row)">Edit</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-delete" @click.native.prevent="deleteData(scope.row.id)">Hapus</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
             </el-table-column>
         </el-table>
-
-        <br>
-
-        <el-pagination background
-        @current-change="(p) => { page = p; requestData(); }"
-        @size-change="(s) => { pageSize = s; requestData(); }"
-        layout="prev, pager, next, sizes, total"
-        :page-size="pageSize"
-        :page-sizes="[10, 25, 50, 100]"
-        :total="tableData.total">
-        </el-pagination>
 
         <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT USER' : 'TAMBAH USER'" width="500px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"

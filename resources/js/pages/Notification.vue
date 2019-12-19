@@ -1,13 +1,14 @@
 <template>
     <div>
-        <el-page-header @back="$emit('back')" content="USER"> </el-page-header>
-        <el-divider></el-divider>
+        <el-page-header @back="$emit('back')" content="NOTIFIKASI"> </el-page-header>
+        <br>
         <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="clearNotification" type="danger" plain icon="el-icon-delete">HAPUS NOTIFIKASI</el-button>
+                <el-button size="small" @click="clearNotification" type="danger" icon="el-icon-delete">HAPUS NOTIFIKASI</el-button>
             </el-form-item>
             <el-form-item>
                 <el-date-picker
+                size="small"
                 @change="requestData"
                 v-model="dateRange"
                 format="dd/MMM/yyyy"
@@ -19,15 +20,14 @@
                 </el-date-picker>
             </el-form-item>
             <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
-                    <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
+                <el-input size="small" v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                 </el-input>
             </el-form-item>
         </el-form>
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 250px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="created_at" label="Time" sortable="custom" width="150px">
@@ -36,7 +36,15 @@
                 </template>
             </el-table-column>
             <el-table-column prop="message" label="Message" min-width="150px"></el-table-column>
-            <el-table-column width="70px" align="center">
+            <el-table-column width="70px" align="center" header-align="center">
+                <template slot="header">
+                    <el-button
+                    type="text"
+                    class="text-white"
+                    @click="() => { page = 1; keyword = ''; requestData(); }"
+                    icon="el-icon-refresh">
+                    </el-button>
+                </template>
                 <template slot-scope="scope">
                     <el-button size="small" type="danger" plain icon="el-icon-delete" @click="deleteData(scope.row.id)"></el-button>
                 </template>

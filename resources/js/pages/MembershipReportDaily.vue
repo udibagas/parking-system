@@ -2,11 +2,11 @@
     <div v-loading="loading">
         <el-form inline style="text-align:right">
             <el-form-item>
-                <el-date-picker @change="requestData" v-model="date" format="dd/MMM/yyyy" value-format="yyyy-MM-dd" type="date">
+                <el-date-picker size="small" @change="requestData" v-model="date" format="dd/MMM/yyyy" value-format="yyyy-MM-dd" type="date">
                 </el-date-picker>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-printer" @click="printReport">PRINT LAPORAN</el-button>
+                <el-button size="small" type="primary" icon="el-icon-printer" @click="printReport">PRINT LAPORAN</el-button>
             </el-form-item>
         </el-form>
 

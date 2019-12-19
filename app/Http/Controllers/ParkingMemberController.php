@@ -32,14 +32,22 @@ class ParkingMemberController extends Controller
             ')
             ->join('group_members', 'group_members.id', '=', 'parking_members.group_member_id', 'LEFT')
             ->when($request->keyword, function ($q) use ($request) {
-                return $q->where('parking_members.name', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('parking_members.card_number', 'LIKE', '%' . $request->keyword . '%');
+                return $q->where(function($qq) use ($request) {
+                    return $qq->where('parking_members.name', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('parking_members.card_number', 'LIKE', '%' . $request->keyword . '%');
+                });
             })->when($request->is_active, function ($q) use ($request) {
                 return $q->whereIn('parking_members.is_active', $request->is_active);
+            })->when($request->group_member_id, function ($q) use ($request) {
+                return $q->whereIn('parking_members.group_member_id', $request->group_member_id);
             })->when($request->expired == ['y'], function ($q) {
                 return $q->whereRaw('parking_members.expiry_date < DATE(NOW())');
-            })->when($request->expired == ['n'], function ($q) {
-                return $q->whereRaw('parking_members.expiry_date >= DATE(NOW())');
+            })->when($request->expired == ['y'], function ($q) {
+                return $q->whereRaw('parking_members.expiry_date < DATE(NOW())');
+            })->when($request->paid == ['y'], function ($q) {
+                return $q->where('paid', 1);
+            })->when($request->paid == ['n'], function ($q) {
+                return $q->where('paid', 0);
             })->orderBy($sort, $order)->paginate($request->pageSize);
     }
 

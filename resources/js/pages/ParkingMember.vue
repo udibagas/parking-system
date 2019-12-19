@@ -1,45 +1,73 @@
 <template>
     <div>
-        <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
+        <el-form inline class="text-right" @submit.native.prevent="() => { return }">
             <el-form-item v-if="$store.state.user.role == 1">
-                <el-button @click="openForm({vehicles: [], register_date: now, fare: 0})" type="primary" icon="el-icon-plus">TAMBAH MEMBER</el-button>
+                <el-button size="small" @click="openForm({vehicles: [], register_date: now, fare: 0})" type="primary" icon="el-icon-plus">TAMBAH MEMBER</el-button>
             </el-form-item>
-            <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
-                    <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
+            <el-form-item>
+                <el-input size="small" v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                 </el-input>
+            </el-form-item>
+            <el-form-item>
+                <el-pagination background
+                @current-change="(p) => { page = p; requestData(); }"
+                @size-change="(s) => { pageSize = s; requestData(); }"
+                layout="total, sizes, prev, next"
+                :page-size="pageSize"
+                :page-sizes="[10, 25, 50, 100]"
+                :total="tableData.total">
+                </el-pagination>
             </el-form-item>
         </el-form>
 
         <el-table :data="tableData.data" stripe
         @row-dblclick="(row, column, event) => { selectedData = row; showDetail = true }"
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 345px)"
+        height="calc(100vh - 255px)"
         @filter-change="(f) => { let c = Object.keys(f)[0]; filters[c] = Object.values(f[c]); page = 1; requestData(); }"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="group" label="Group" sortable="custom" show-overflow-tooltip min-width="100px"></el-table-column>
             <el-table-column prop="name" label="Nama" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="email" label="Alamat Email" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="phone" label="Nomor HP" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+
+            <el-table-column
+            :filters="[{value: 'y', text: 'BERBAYAR'}, {value: 'n', text: 'GRATIS'}]"
+            :filter-multiple="false"
+            column-key="paid"
+            prop="paid"
+            label="Jenis"
+            sortable="custom"
+            min-width="100px"
+            align="center"
+            header-align="center">
+                <template slot-scope="scope">
+                    {{scope.row.paid ? 'BERBAYAR' : 'GRATIS'}}
+                </template>
+            </el-table-column>
+
+            <el-table-column
+            :filters="this.$store.state.groupMemberList.map(g => { return {value: g.id, text: g.name } })"
+            column-key="group_member_id"
+            prop="group"
+            label="Group"
+            sortable="custom"
+            show-overflow-tooltip min-width="100px">
+            </el-table-column>
+
             <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="register_date" label="Tgl Daftar" sortable="custom" show-overflow-tooltip min-width="120px"></el-table-column>
+            <el-table-column prop="fare" label="Tarif" sortable="custom" min-width="100px" header-align="right" align="right">
+                <template slot-scope="scope">
+                    Rp. {{scope.row.fare | formatNumber}}
+                </template>
+            </el-table-column>
             <el-table-column prop="billing_cycle" label="Siklus Bayar" sortable="custom" min-width="150px">
                 <template slot-scope="scope">
                     {{scope.row.billing_cycle}} bulan
                 </template>
             </el-table-column>
             <el-table-column prop="expiry_date" label="Tgl Kedaluarsa" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="paid" label="Jenis" sortable="custom" min-width="100px">
-                <template slot-scope="scope">
-                    {{scope.row.paid ? 'Berbayar' : 'Gratis'}}
-                </template>
-            </el-table-column>
-            <el-table-column prop="fare" label="Tarif" sortable="custom" min-width="100px" header-align="right" align="right">
-                <template slot-scope="scope">
-                    Rp. {{scope.row.fare | formatNumber}}
-                </template>
-            </el-table-column>
+            <el-table-column prop="phone" label="Nomor HP" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="email" label="Alamat Email" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="last_transaction" label="Trx Terkakhir" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column
             :filters="[{value: 'y', text: 'Ya'}, {value: 'n', text: 'Tidak'}]"
@@ -53,7 +81,7 @@
             header-align="center"
             align="center">
                 <template slot-scope="scope">
-                    <el-tag size="mini" :type="scope.row.expired ? 'danger' : 'success'">{{scope.row.expired ? 'Ya' : 'Tidak'}}</el-tag>
+                    <el-tag size="small" effect="dark" style="width:100%" :type="scope.row.expired ? 'danger' : 'success'">{{scope.row.expired ? 'Ya' : 'Tidak'}}</el-tag>
                 </template>
             </el-table-column>
             <el-table-column
@@ -67,10 +95,18 @@
             header-align="center"
             align="center">
                 <template slot-scope="scope">
-                    <el-tag size="mini" :type="scope.row.is_active ? 'success' : 'info'">{{scope.row.is_active ? 'Aktif' : 'Nonaktif'}}</el-tag>
+                    <el-tag size="small" effect="dark" style="width:100%" :type="scope.row.is_active ? 'success' : 'info'">{{scope.row.is_active ? 'Aktif' : 'Nonaktif'}}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column fixed="right" width="40px" v-if="$store.state.user.role == 1">
+            <el-table-column fixed="right" width="40px" align="center" header-align="center" v-if="$store.state.user.role == 1">
+                <template slot="header">
+                    <el-button
+                    type="text"
+                    class="text-white"
+                    @click="() => { page = 1; keyword = ''; requestData(); }"
+                    icon="el-icon-refresh">
+                    </el-button>
+                </template>
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">
@@ -85,17 +121,6 @@
                 </template>
             </el-table-column>
         </el-table>
-
-        <br>
-
-        <el-pagination background
-        @current-change="(p) => { page = p; requestData(); }"
-        @size-change="(s) => { pageSize = s; requestData(); }"
-        layout="prev, pager, next, sizes, total"
-        :page-size="pageSize"
-        :page-sizes="[10, 25, 50, 100]"
-        :total="tableData.total">
-        </el-pagination>
 
         <el-dialog v-if="!!selectedData" center fullscreen title="INFORMASI MEMBER" :visible.sync="showDetail">
             <ParkingMemberDetail :member="selectedData" />

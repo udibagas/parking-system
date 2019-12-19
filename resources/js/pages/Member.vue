@@ -1,7 +1,8 @@
 <template>
     <div>
         <el-page-header @back="$emit('back')" content="MEMBER"> </el-page-header>
-        <el-divider></el-divider>
+
+        <br>
 
         <el-tabs type="card">
             <el-tab-pane lazy label="Member"><ParkingMember /></el-tab-pane>

@@ -3,6 +3,7 @@
         <el-form inline style="text-align:right">
             <el-form-item>
                 <el-date-picker
+                size="small"
                 @change="requestData"
                 v-model="dateRange"
                 format="dd/MMM/yyyy"
@@ -14,7 +15,7 @@
                 </el-date-picker>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-printer" @click="printReport">PRINT LAPORAN</el-button>
+                <el-button size="small" type="primary" icon="el-icon-printer" @click="printReport">PRINT LAPORAN</el-button>
             </el-form-item>
         </el-form>
 

@@ -2,11 +2,11 @@
     <div v-loading="loading">
         <el-form :inline="true">
             <el-form-item>
-                <el-input v-model="fileName" placeholder="Nama file backup" style="width:300px;display:block;"></el-input>
+                <el-input size="small" v-model="fileName" placeholder="Nama file backup" style="width:300px;display:block;"></el-input>
                 <span v-if="error" class="text-danger">{{error}}</span>
             </el-form-item>
             <el-form-item>
-                <el-button :disabled="isGenerating || !fileName" @click="createBackup" type="primary">{{buttonLabel}}</el-button>
+                <el-button size="small" :disabled="isGenerating || !fileName" @click="createBackup" type="primary">{{buttonLabel}}</el-button>
             </el-form-item>
         </el-form>
         <!-- <el-divider style="margin-top:0"></el-divider> -->

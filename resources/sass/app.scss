@@ -95,9 +95,18 @@ body {
     background-color: $cyan !important;
 }
 
-.el-table th {
+.el-table th, .el-table thead.is-group th {
     background-color: #060446;
     color: #fff;
+    padding: 4px 0;
+}
+
+.el-pagination {
+    margin-top: 4px;
+}
+
+.el-form--inline .el-form-item {
+    margin-bottom: 5px;
 }
 
 .text-red {

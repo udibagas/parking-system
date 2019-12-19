@@ -1,11 +1,13 @@
 <template>
     <div>
-        <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
+        <el-form inline class="text-right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button @click="openForm({})" type="primary"><i class="el-icon-plus"></i> INPUT PEMBAYARAN KEANGGOTAAN</el-button>
+                <el-button size="small" @click="openForm({})" type="primary"><i class="el-icon-plus"></i> INPUT PEMBAYARAN KEANGGOTAAN</el-button>
             </el-form-item>
+
             <el-form-item>
                 <el-date-picker
+                size="small"
                 @change="requestData"
                 v-model="dateRange"
                 format="dd/MMM/yyyy"
@@ -16,16 +18,21 @@
                 end-placeholder="Sampai tanggal">
                 </el-date-picker>
             </el-form-item>
-            <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
-                    <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
+
+            <el-form-item>
+                <el-input size="small"
+                v-model="keyword"
+                placeholder="Search"
+                prefix-icon="el-icon-search"
+                clearable
+                @change="(v) => { keyword = v; requestData(); }">
                 </el-input>
             </el-form-item>
         </el-form>
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 345px)"
+        height="calc(100vh - 300px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="created_at" label="Tanggal Trx" sortable="custom">
@@ -52,7 +59,15 @@
             </el-table-column>
             <el-table-column prop="operator" label="Operator" sortable="custom"></el-table-column>
 
-            <el-table-column fixed="right" width="40px">
+            <el-table-column fixed="right" width="40px" align="center" header-align="center">
+                <template slot="header">
+                    <el-button
+                    type="text"
+                    class="text-white"
+                    @click="() => { page = 1; keyword = ''; requestData(); }"
+                    icon="el-icon-refresh">
+                    </el-button>
+                </template>
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">
@@ -73,7 +88,7 @@
         <el-pagination background
         @current-change="(p) => { page = p; requestData(); }"
         @size-change="(s) => { pageSize = s; requestData(); }"
-        layout="prev, pager, next, sizes, total"
+        layout="total, sizes, prev, next"
         :page-size="pageSize"
         :page-sizes="[10, 25, 50, 100]"
         :total="tableData.total">

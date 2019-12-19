@@ -1,19 +1,30 @@
 <template>
     <div>
-        <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
+        <el-form inline class="text-right" @submit.native.prevent="() => { return }">
             <el-form-item v-if="$store.state.user.role == 1">
-                <el-button @click="openForm({})" type="primary" icon="el-icon-plus">TAMBAH GROUP</el-button>
+                <el-button size="small" @click="openForm({})" type="primary" icon="el-icon-plus">TAMBAH GROUP</el-button>
             </el-form-item>
-            <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
-                    <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
+
+            <el-form-item>
+                <el-input size="small" v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                 </el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-pagination background
+                @current-change="(p) => { page = p; requestData(); }"
+                @size-change="(s) => { pageSize = s; requestData(); }"
+                layout="total, sizes, prev, next"
+                :page-size="pageSize"
+                :page-sizes="[10, 25, 50, 100]"
+                :total="tableData.total">
+                </el-pagination>
             </el-form-item>
         </el-form>
 
         <el-table :data="tableData.data" stripe
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 345px)"
+        height="calc(100vh - 255px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="name" label="Nama" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
@@ -21,7 +32,15 @@
             <el-table-column prop="contact_person_name" label="Nama Contact Person" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="contact_person_phone" label="No. HP Contact Person" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="contact_person_email" label="Alamat Email Contact Person" sortable="custom" show-overflow-tooltip min-width="220px"></el-table-column>
-            <el-table-column fixed="right" width="40px" v-if="$store.state.user.role == 1">
+            <el-table-column fixed="right" width="40px" header-align="center" align="center" v-if="$store.state.user.role == 1">
+                <template slot="header">
+                    <el-button
+                    class="text-white"
+                    type="text"
+                    @click="() => { page = 1; keyword = ''; requestData(); }"
+                    icon="el-icon-refresh">
+                    </el-button>
+                </template>
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">
@@ -35,17 +54,6 @@
                 </template>
             </el-table-column>
         </el-table>
-
-        <br>
-
-        <el-pagination background
-        @current-change="(p) => { page = p; requestData(); }"
-        @size-change="(s) => { pageSize = s; requestData(); }"
-        layout="prev, pager, next, sizes, total"
-        :page-size="pageSize"
-        :page-sizes="[10, 25, 50, 100]"
-        :total="tableData.total">
-        </el-pagination>
 
         <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT GROUP MEMBER' : 'TAMBAH GROUP MEMBER'" width="500px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"

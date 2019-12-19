@@ -9,7 +9,11 @@ class NotificationController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:1')->except(['index', 'update', 'store']);
+        $this->middleware('role:1')->except([
+            'index', 'update', 'store',
+            'unreadNotification',
+            'markAllAsRead'
+        ]);
     }
 
     /**
@@ -41,17 +45,6 @@ class NotificationController extends Controller
             'message' => 'required',
             'parking_gate_id' => 'required|exists:parking_gates,id'
         ]);
-
-        // notifikasi di gate yg belum terbaca
-        $exists = Notification::where('parking_gate_id', $request->parking_gate_id)
-            ->whereRaw('(TIME_TO_SEC(created_at) - TIME_TO_SEC(created_at)) < 60')
-            ->where('message', $request->message)
-            ->where('read', 0)
-            ->first();
-
-        if ($exists) {
-            return $exists;
-        }
 
         return Notification::create($request->all());
     }
@@ -85,5 +78,16 @@ class NotificationController extends Controller
     {
         Notification::truncate();
         return ['message' => 'Data telah dihapus.'];
+    }
+
+    public function unreadNotification()
+    {
+        return Notification::where('read', 0)->get();
+    }
+
+    public function markAllAsRead()
+    {
+        Notification::where('read', 0)->update(['read', 1]);
+        return ['message' => 'Data telah disimpan'];
     }
 }

@@ -1,7 +1,7 @@
 <template>
     <div>
         <el-page-header @back="$emit('back')" content="SNAPSHOT"> </el-page-header>
-        <el-divider></el-divider>
+        <br>
 
         <el-row :gutter="20">
             <el-col :span="12">

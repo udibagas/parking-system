@@ -1,14 +1,16 @@
 <template>
     <div>
         <el-page-header @back="$emit('back')" content="TRANSAKSI"> </el-page-header>
-        <el-divider></el-divider>
 
-        <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
+        <br>
+
+        <el-form inline class="text-right" @submit.native.prevent="() => { return }">
             <el-form-item>
-                <el-button type="primary" icon="el-icon-plus" @click="() => { formModel = {}; formErrors = {}; showForm = true; }">TRANSAKSI MANUAL</el-button>
+                <el-button size="small" type="primary" icon="el-icon-plus" @click="() => { formModel = {}; formErrors = {}; showForm = true; }">TRANSAKSI MANUAL</el-button>
             </el-form-item>
             <el-form-item>
                 <el-date-picker
+                size="small"
                 @change="requestData"
                 v-model="dateRange"
                 format="dd-MMM-yyyy HH:mm:ss"
@@ -20,11 +22,10 @@
                 </el-date-picker>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" icon="el-icon-finished" @click="setSudahKeluarSemua">SET SUDAH KELUAR SEMUA</el-button>
+                <el-button size="small" type="primary" icon="el-icon-finished" @click="setSudahKeluarSemua">SET SUDAH KELUAR SEMUA</el-button>
             </el-form-item>
             <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
-                    <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
+                <el-input size="small" v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
                 </el-input>
             </el-form-item>
         </el-form>
@@ -33,7 +34,7 @@
         @row-dblclick="(row, column, event) => { trx = row; showTrxDetail = true }"
         @filter-change="(f) => { let c = Object.keys(f)[0]; filters[c] = Object.values(f[c]); page = 1; requestData(); }"
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 290px)"
+        height="calc(100vh - 250px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="barcode_number" label="No. Tiket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
@@ -134,7 +135,15 @@
 
             <el-table-column prop="edit_by" label="Diedit Oleh" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
 
-            <el-table-column fixed="right" width="40px">
+            <el-table-column fixed="right" width="40px" align="center" header-align="center">
+                <template slot="header">
+                    <el-button
+                    class="text-white"
+                    type="text"
+                    @click="() => { page = 1; keyword = ''; requestData(); }"
+                    icon="el-icon-refresh">
+                    </el-button>
+                </template>
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">

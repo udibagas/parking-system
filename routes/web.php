@@ -46,6 +46,8 @@ Route::group(['middleware' => 'auth.jwt'], function () {
 
     Route::resource('manualOpenLog', 'ManualOpenLogController')->except(['create', 'edit']);
 
+    Route::get('notification/unreadNotification', 'NotificationController@unreadNotification');
+    Route::put('notification/markAllAsRead', 'NotificationController@markAllAsRead');
     Route::delete('notification/clearNotification', 'NotificationController@clearNotification');
     Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
 
