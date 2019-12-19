@@ -87,7 +87,7 @@ class NotificationController extends Controller
 
     public function markAllAsRead()
     {
-        Notification::where('read', 0)->update(['read', 1]);
+        Notification::where('read', 0)->update(['read' => 1]);
         return ['message' => 'Data telah disimpan'];
     }
 }
