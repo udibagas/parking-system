@@ -50,7 +50,7 @@
             prop="group"
             label="Group"
             sortable="custom"
-            show-overflow-tooltip min-width="100px">
+            show-overflow-tooltip min-width="120px">
             </el-table-column>
 
             <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
