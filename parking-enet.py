@@ -115,7 +115,7 @@ def print_ticket_serial(gate, data, s):
 
     try:
         s.sendall(str.encode(''.join(command)))
-        logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
+        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
     except Exception as e:
         logging.error(gate['name'] + ' : Failed to print ticket ' + data['barcode_number'] + ' ' + str(e))
         send_notification(gate, 'Pengunjung di ' + gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
@@ -175,7 +175,7 @@ def gate_in_thread(gate):
             while True:
                 try:
                     s.sendall(b':INFO;')
-                    vehicle_detection = s.recv(64)
+                    vehicle_detection = s.recv(1024)
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to detect vehicle ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal deteksi kendaraan')
@@ -190,7 +190,7 @@ def gate_in_thread(gate):
                         logging.debug(gate['name'] + ' : Playing welcome')
                         time.sleep(.1)
                         s.sendall(b':PLAYTRACK7;')
-                        # logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
+                        # logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play Selamat Datang ' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play Selamat Datang ')
@@ -208,7 +208,7 @@ def gate_in_thread(gate):
                     try:
                         time.sleep(.1)
                         s.sendall(b':INFO;')
-                        push_button_or_card = s.recv(64)
+                        push_button_or_card = s.recv(1024)
                     except Exception:
                         logging.error(gate['name'] + ' : Failed to sense button and card')
                         send_notification(gate, gate['name'] + ' : Gagal mendeteksi tombol tiket')
@@ -338,7 +338,7 @@ def gate_in_thread(gate):
                     # play silakan ambil tiket
                     try:
                         s.sendall(b':PLAYTRACK2;')
-                        logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
+                        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to play silakan ambil tiket' + str(e))
                         send_notification(gate, gate['name'] + ' : Gagal play silakan ambil tiket')
@@ -347,7 +347,7 @@ def gate_in_thread(gate):
                 # play terimakasih
                 try:
                     s.sendall(b':PLAYTRACK6;')
-                    logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
+                    logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                 except Exception:
                     logging.error(gate['name'] + ' : Failed to play terimakasih' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal play terimakasih')
@@ -358,7 +358,7 @@ def gate_in_thread(gate):
                 # open gate
                 try:
                     s.sendall(b':OPEN1;')
-                    logging.debug(gate['name'] + ' : ' + str(s.recv(64)))
+                    logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
                 except Exception as e:
                     logging.error(gate['name'] + ' : Failed to open gate ' + str(e))
                     send_notification(gate, gate['name'] + ' : Gagal membuka gate')
@@ -379,7 +379,7 @@ def gate_in_thread(gate):
 
                     try:
                         s.sendall(b':INFO;')
-                        vehicle_in = s.recv(64)
+                        vehicle_in = s.recv(1024)
                         logging.debug(gate['name'] + ' : ' + str(vehicle_in))
                     except Exception as e:
                         logging.error(gate['name'] + ' : Failed to sense loop 2 ' + str(e))
