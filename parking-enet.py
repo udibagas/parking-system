@@ -219,7 +219,7 @@ def gate_in_thread(gate):
 
                     if b'W1' in push_button_or_card:
                         card_number = str(push_button_or_card).split('W1')[1].split(';')[0]
-                        member = check_card(gate, str(int(card_number, 16)))
+                        member = check_card(gate, card_number)
                         time.sleep(.1) # kasih jeda biar audio bisa play
 
                         if not member:
