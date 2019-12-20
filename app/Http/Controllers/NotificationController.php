@@ -82,7 +82,7 @@ class NotificationController extends Controller
 
     public function unreadNotification()
     {
-        return Notification::where('read', 0)->get();
+        return Notification::where('read', 0)->orderBy('created_at', 'desc')->get();
     }
 
     public function markAllAsRead()
