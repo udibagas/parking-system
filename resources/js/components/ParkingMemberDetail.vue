@@ -11,7 +11,7 @@
                     <tr><td class="td-label">Jenis</td><td class="td-value">{{member.paid ? 'Berbayar' : 'Gratis'}}</td></tr>
                     <tr><td class="td-label">Tanggal Daftar</td><td class="td-value">{{member.register_date}}</td></tr>
                     <tr><td class="td-label">Tanggal Kedaluarsa</td><td class="td-value">{{member.expiry_date}}</td></tr>
-                    <tr><td class="td-label">Siklus Pembayaran</td><td class="td-value">{{member.billing_cycle}} bulan</td></tr>
+                    <tr><td class="td-label">Siklus Pembayaran</td><td class="td-value">{{member.billing_cycle}} {{$store.state.siklus.find(s => s.value == member.billing_cycle_unit).label}}</td></tr>
                     <tr><td class="td-label">Tarif</td><td class="td-value">Rp {{member.fare | formatNumber}}</td></tr>
                     <tr><td class="td-label">Transaksi Terkahir</td><td class="td-value">{{member.last_transaction}}</td></tr>
                     <tr><td class="td-label">Status</td><td class="td-value">{{member.is_active ? 'Aktif' : 'Nonaktif'}}</td></tr>
@@ -43,7 +43,19 @@
 
 <script>
 export default {
-    props: ['member']
+    props: ['member'],
+    filters: {
+        getSiklus(v) {
+            const siklus = [
+                {'days': 'hari'},
+                {'weeks': 'minggu'},
+                {'months': 'bulan'},
+                {'years': 'tahun'},
+            ];
+
+            return siklus[v]
+        }
+    },
 }
 </script>
 

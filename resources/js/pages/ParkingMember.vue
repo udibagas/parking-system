@@ -62,7 +62,7 @@
             </el-table-column>
             <el-table-column prop="billing_cycle" label="Siklus Bayar" sortable="custom" min-width="150px">
                 <template slot-scope="scope">
-                    {{scope.row.billing_cycle}} bulan
+                    {{scope.row.billing_cycle}} {{$store.state.siklus.find(s => s.value == scope.row.billing_cycle_unit).label}}
                 </template>
             </el-table-column>
             <el-table-column prop="expiry_date" label="Tgl Kedaluarsa" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
