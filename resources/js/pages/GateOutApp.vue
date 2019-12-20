@@ -321,9 +321,10 @@ export default {
                                 confirmButtonText: 'OK',
                                 confirmButtonClass: 'bg-red'
                             })
+                            document.getElementById('plate-number').focus()
+                        } else {
+                            document.getElementById('vehicle-type').focus()
                         }
-
-                        return
                     }
                 }).catch(e => {
                     console.log(e)
