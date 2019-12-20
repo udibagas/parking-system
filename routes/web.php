@@ -76,9 +76,13 @@ Route::group(['middleware' => 'auth.jwt'], function () {
     Route::get('getParkedVehicle', 'ReportController@getParkedVehicle');
     Route::get('getVehicleIn', 'ReportController@getVehicleIn');
     Route::get('report', 'ReportController@pendapatan');
+
+    Route::get('controller-log', function() {
+        $output = shell_exec('tail -n 250 /var/log/parking.log');
+        return nl2br($output);
+    });
 });
 
 Route::get('serverInformation', 'ServerInformationController@index');
-
 
 Route::get('/{any}', 'AppController@index')->where('any', '.*');

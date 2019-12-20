@@ -2,70 +2,80 @@
     <div>
         <el-page-header @back="$emit('back')" content="NOTIFIKASI"> </el-page-header>
         <br>
-        <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
-            <el-form-item>
-                <el-button size="small" @click="clearNotification" type="danger" icon="el-icon-delete">HAPUS NOTIFIKASI</el-button>
-            </el-form-item>
-            <el-form-item>
-                <el-date-picker
-                size="small"
-                @change="requestData"
-                v-model="dateRange"
-                format="dd/MMM/yyyy"
-                value-format="yyyy-MM-dd"
-                type="daterange"
-                range-separator="To"
-                start-placeholder="Start date"
-                end-placeholder="End date">
-                </el-date-picker>
-            </el-form-item>
-            <el-form-item style="margin-right:0;">
-                <el-input size="small" v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
-                </el-input>
-            </el-form-item>
-        </el-form>
+        <el-tabs type="card">
+            <el-tab-pane label="Notifikasi">
+                <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
+                    <el-form-item>
+                        <el-button size="small" @click="clearNotification" type="danger" icon="el-icon-delete">HAPUS NOTIFIKASI</el-button>
+                    </el-form-item>
+                    <el-form-item>
+                        <el-date-picker
+                        size="small"
+                        @change="requestData"
+                        v-model="dateRange"
+                        format="dd/MMM/yyyy"
+                        value-format="yyyy-MM-dd"
+                        type="daterange"
+                        range-separator="To"
+                        start-placeholder="Start date"
+                        end-placeholder="End date">
+                        </el-date-picker>
+                    </el-form-item>
+                    <el-form-item style="margin-right:0;">
+                        <el-input size="small" v-model="keyword" placeholder="Search" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
+                        </el-input>
+                    </el-form-item>
+                </el-form>
 
-        <el-table :data="tableData.data" stripe
-        :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 250px)"
-        v-loading="loading"
-        @sort-change="sortChange">
-            <el-table-column prop="created_at" label="Time" sortable="custom" width="150px">
-                <template slot-scope="scope">
-                    {{ scope.row.created_at | readableDateTime }}
-                </template>
-            </el-table-column>
-            <el-table-column prop="message" label="Message" min-width="150px"></el-table-column>
-            <el-table-column width="70px" align="center" header-align="center">
-                <template slot="header">
-                    <el-button
-                    type="text"
-                    class="text-white"
-                    @click="() => { page = 1; keyword = ''; requestData(); }"
-                    icon="el-icon-refresh">
-                    </el-button>
-                </template>
-                <template slot-scope="scope">
-                    <el-button size="small" type="danger" plain icon="el-icon-delete" @click="deleteData(scope.row.id)"></el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+                <el-table :data="tableData.data" stripe
+                :default-sort = "{prop: sort, order: order}"
+                height="calc(100vh - 300px)"
+                v-loading="loading"
+                @sort-change="sortChange">
+                    <el-table-column prop="created_at" label="Time" sortable="custom" width="150px">
+                        <template slot-scope="scope">
+                            {{ scope.row.created_at | readableDateTime }}
+                        </template>
+                    </el-table-column>
+                    <el-table-column prop="message" label="Message" min-width="150px"></el-table-column>
+                    <el-table-column width="70px" align="center" header-align="center">
+                        <template slot="header">
+                            <el-button
+                            type="text"
+                            class="text-white"
+                            @click="() => { page = 1; keyword = ''; requestData(); }"
+                            icon="el-icon-refresh">
+                            </el-button>
+                        </template>
+                        <template slot-scope="scope">
+                            <el-button size="small" type="danger" plain icon="el-icon-delete" @click="deleteData(scope.row.id)"></el-button>
+                        </template>
+                    </el-table-column>
+                </el-table>
 
-        <br>
+                <br>
 
-        <el-pagination background
-        @current-change="(p) => { page = p; requestData(); }"
-        @size-change="(s) => { pageSize = s; requestData(); }"
-        layout="prev, pager, next, sizes, total"
-        :page-size="pageSize"
-        :page-sizes="[10, 25, 50, 100]"
-        :total="tableData.total">
-        </el-pagination>
+                <el-pagination background
+                @current-change="(p) => { page = p; requestData(); }"
+                @size-change="(s) => { pageSize = s; requestData(); }"
+                layout="prev, pager, next, sizes, total"
+                :page-size="pageSize"
+                :page-sizes="[10, 25, 50, 100]"
+                :total="tableData.total">
+                </el-pagination>
+            </el-tab-pane>
+            <el-tab-pane lazy label="Controller Log">
+                <ControllerLog />
+            </el-tab-pane>
+        </el-tabs>
     </div>
 </template>
 
 <script>
+import ControllerLog from './ControllerLog'
+
 export default {
+    components: { ControllerLog },
     data() {
         return {
             keyword: '',
