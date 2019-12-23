@@ -38,7 +38,7 @@ class Kernel extends ConsoleKernel
                 $schedule->command('trx:delete '.$age)->dailyAt('12:00');
             }
         } catch (\Exception $e) {
-            $this->error($e->getMessage());
+            // nothing todo
         }
     }
 
