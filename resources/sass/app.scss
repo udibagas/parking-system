@@ -130,3 +130,7 @@ body {
 .el-table .inactive-row {
     background: #ffeff0;
 }
+
+.el-table .cell, .el-dialog__body {
+    word-break: normal;
+}

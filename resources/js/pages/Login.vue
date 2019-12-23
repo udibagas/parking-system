@@ -1,7 +1,7 @@
 <template>
     <el-container>
         <el-main style="text-align:center">
-            <img src="images/logo.jpeg" alt="" style="width:70px;margin-top:80px">
+            <img :src="'/images/' + appLogo" alt="" style="width:70px;margin-top:80px;border-radius:5px;">
             <h2>{{appName}}</h2>
             <el-form id="login-form" style="width:300px;margin: 20px auto 0;text-align:center;">
                 <el-divider><h3>LOGIN</h3></el-divider>
@@ -16,8 +16,8 @@
                     <el-button type="primary" @click="login" style="width:100%">LOGIN</el-button>
                 </el-form-item>
 
-                <a href="http://www.mitrateknik.co.id">www.MitraTeknik.co.id</a><br>
-                &copy; {{year}}
+                <!-- <a href="http://www.mitrateknik.co.id">www.MitraTeknik.co.id</a><br> -->
+                <el-divider>&copy; {{year}}</el-divider>
             </el-form>
         </el-main>
     </el-container>
@@ -30,6 +30,7 @@ export default {
     data() {
         return {
             appName: APP_NAME,
+            appLogo: APP_LOGO,
             email: '',
             password: '',
             year: moment().format('YYYY')

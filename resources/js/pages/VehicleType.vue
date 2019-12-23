@@ -25,11 +25,29 @@
         height="calc(100vh - 260px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="name" label="Nama" sortable="custom" min-width="150px"></el-table-column>
-            <el-table-column prop="shortcut_key" label="Shortcut Key" sortable="custom" align="center" header-align="center" min-width="150px"></el-table-column>
-            <el-table-column prop="tarif_flat" label="Tarif Flat" sortable="custom" align="center" header-align="center" min-width="150px">
+            <el-table-column prop="name" label="Nama" sortable="custom" min-width="100px"></el-table-column>
+            <el-table-column prop="shortcut_key" label="Shortcut" sortable="custom" align="center" header-align="center" min-width="100px"></el-table-column>
+            <el-table-column label="Mode Tarif" sortable="custom" align="center" header-align="center" min-width="120px">
+                <template slot-scope="scope">
+                    {{scope.row.mode_tarif ? 'PROGRESIF' : 'FLAT'}}
+                </template>
+            </el-table-column>
+            <el-table-column label="Mode Inap" sortable="custom" align="center" header-align="center" min-width="120px">
+                <template slot-scope="scope">
+                    {{scope.row.mode_menginap ? 'LEWAT TENGAH MALAM' : '24 JAM DARI CHECK IN'}}
+                </template>
+            </el-table-column>
+            <el-table-column prop="tarif_flat" label="Tarif Flat" sortable="custom" align="center" header-align="center" min-width="120px">
                 <template slot-scope="scope">
                     Rp {{scope.row.tarif_flat | formatNumber}}
+                </template>
+            </el-table-column>
+            <el-table-column label="Tarif Non Flat" min-width="250px">
+                <template slot-scope="scope">
+                    Tarif {{scope.row.menit_pertama}} menit pertama = Rp {{scope.row.tarif_menit_pertama | formatNumber}} <br />
+                    Tarif {{scope.row.menit_selanjutnya}} menit selanjutnya = Rp {{scope.row.tarif_menit_selanjutnya | formatNumber}} <br />
+                    Tarif maksimal per hari = Rp {{scope.row.tarif_maksimum | formatNumber}} <br />
+                    Tarif menginap per hari = Rp {{scope.row.tarif_menginap | formatNumber}} <br />
                 </template>
             </el-table-column>
             <el-table-column prop="denda_tiket_hilang" label="Denda Tiket Hilang" sortable="custom" align="center" header-align="center" min-width="150px">
@@ -65,7 +83,7 @@
             </el-table-column>
         </el-table>
 
-        <el-dialog :visible.sync="showForm" :title="!!formModel.id ? 'EDIT JENIS KENDARAAN' : 'TAMBAH JENIS KENDARAAN'" width="550px" v-loading="loading" :close-on-click-modal="false">
+        <el-dialog top="60px" :visible.sync="showForm" :title="!!formModel.id ? 'EDIT JENIS KENDARAAN' : 'TAMBAH JENIS KENDARAAN'" width="600px" v-loading="loading" :close-on-click-modal="false">
             <el-alert type="error" title="ERROR"
                 :description="error.message + '\n' + error.file + ':' + error.line"
                 v-show="error.message"
@@ -83,55 +101,83 @@
                     <div class="el-form-item__error" v-if="formErrors.shortcut_key">{{formErrors.shortcut_key[0]}}</div>
                 </el-form-item>
 
+                <el-form-item label="Mode Tarif" :class="formErrors.mode_tarif ? 'is-error' : ''">
+                    <el-select placeholder="FLAT/PROGRESIF" v-model="formModel.mode_tarif" style="width:100%">
+                        <el-option :value="0" label="FLAT"></el-option>
+                        <el-option :value="1" label="PROGRESIF"></el-option>
+                    </el-select>
+                    <div class="el-form-item__error" v-if="formErrors.mode_tarif">{{formErrors.mode_tarif[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Mode Inap" :class="formErrors.mode_menginap ? 'is-error' : ''">
+                    <el-select placeholder="Mode Inap" v-model="formModel.mode_menginap" style="width:100%">
+                        <el-option :value="0" label="24 JAM DARI CHECK IN"></el-option>
+                        <el-option :value="1" label="LEWAT TENGAH MALAM"></el-option>
+                    </el-select>
+                    <div class="el-form-item__error" v-if="formErrors.mode_menginap">{{formErrors.mode_menginap[0]}}</div>
+                </el-form-item>
+
                 <el-form-item label="Tarif Flat (Rp)" :class="formErrors.tarif_flat ? 'is-error' : ''">
                     <el-input type="number" :step="500" placeholder="Tarif Flat (Rp)" v-model="formModel.tarif_flat"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.tarif_flat">{{formErrors.tarif_flat[0]}}</div>
                 </el-form-item>
 
-                <!-- <el-form-item label="Menit Pertama Gratis (menit)" :class="formErrors.first_minute_free ? 'is-error' : ''">
-                    <el-input type="number" placeholder="Menit Pertama Gratis (menit)" v-model="formModel.first_minute_free"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.first_minute_free">{{formErrors.first_minute_free[0]}}</div>
+                <el-form-item label="Tarif Progresif">
+                    <div>
+                        Tarif
+                        <el-input size="small" style="width:80px;margin: 0 5px;" type="number" v-model="formModel.menit_pertama"></el-input>
+                        menit pertama = Rp.
+                        <el-input size="small" style="width:111px;margin-left:23px;" type="number" v-model="formModel.tarif_menit_pertama"></el-input>
+                    </div>
+                    <div>
+                        Tarif
+                        <el-input size="small" style="width:80px;margin: 0 5px;" type="number" v-model="formModel.menit_selanjutnya"></el-input>
+                        menit selanjutnya = Rp.
+                        <el-input size="small" style="width:111px;margin-left:6px;" type="number" v-model="formModel.tarif_menit_selanjutnya"></el-input>
+                    </div>
+                    <div>
+                        Tarif maksimal per hari = Rp
+                        <el-input size="small" style="width:205px;margin-left: 10px;" type="number" v-model="formModel.tarif_maksimum"></el-input>
+                    </div>
+                    <div>
+                        Tarif menginap per hari = Rp
+                        <el-input size="small" style="width:205px;margin-left: 5px;" type="number" v-model="formModel.tarif_menginap"></el-input>
+                    </div>
                 </el-form-item>
-
-                <el-form-item label="Tarif 1 Jam Pertama (Rp)" :class="formErrors.first_hour_rate ? 'is-error' : ''">
-                    <el-input type="number" placeholder="Tarif 1 Jam Pertama (Rp)" v-model="formModel.first_hour_rate"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.first_hour_rate">{{formErrors.first_hour_rate[0]}}</div>
-                </el-form-item>
-
-                <el-form-item label="Tarif Per Jam Berikutnya (Rp)" :class="formErrors.per_hour_rate ? 'is-error' : ''">
-                    <el-input type="number" placeholder="Tarif Per Jam Berikutnya (Rp)" v-model="formModel.per_hour_rate"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.per_hour_rate">{{formErrors.per_hour_rate[0]}}</div>
-                </el-form-item>
-
-                <el-form-item label="Tarif Maksimal Per Hari (Rp)" :class="formErrors.max_rate ? 'is-error' : ''">
-                    <el-input type="number" placeholder="Tarif Maksimal Per Hari (Rp)" v-model="formModel.max_rate"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.max_rate">{{formErrors.max_rate[0]}}</div>
-                </el-form-item>
-
-                <el-form-item label="Tarif Menginap Per Hari (Rp)" :class="formErrors.overnight_rate ? 'is-error' : ''">
-                    <el-input type="number" placeholder="Tarif Menginap Per Hari" v-model="formModel.overnight_rate"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.overnight_rate">{{formErrors.overnight_rate[0]}}</div>
-                </el-form-item> -->
 
                 <el-form-item label="Denda Tiket Hilang (Rp)" :class="formErrors.denda_tiket_hilang ? 'is-error' : ''">
                     <el-input type="number" :step="500" placeholder="Denda Tiket Hilang (Rp)" v-model="formModel.denda_tiket_hilang"></el-input>
                     <div class="el-form-item__error" v-if="formErrors.denda_tiket_hilang">{{formErrors.denda_tiket_hilang[0]}}</div>
                 </el-form-item>
 
-                <!-- <el-form-item label="Mode Tarif" :class="formErrors.rate_mode ? 'is-error' : ''">
-                    <el-select placeholder="FLAT/NON FLAT" v-model="formModel.rate_mode" style="width:100%">
-                        <el-option value="FLAT"></el-option>
-                        <el-option value="NON FLAT"></el-option>
-                    </el-select>
-                    <div class="el-form-item__error" v-if="formErrors.rate_mode">{{formErrors.rate_mode[0]}}</div>
+                <!-- <el-form-item label="Menit Pertama (menit)" :class="formErrors.menit_pertama ? 'is-error' : ''">
+                    <el-input type="number" placeholder="Menit Pertama (menit)" v-model="formModel.menit_pertama"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.menit_pertama">{{formErrors.menit_pertama[0]}}</div>
                 </el-form-item>
 
-                <el-form-item label="Mode Inap" :class="formErrors.overnight_mode ? 'is-error' : ''">
-                    <el-select placeholder="Mode Inap" v-model="formModel.overnight_mode" style="width:100%">
-                        <el-option value="24 JAM DARI CHECK IN"></el-option>
-                        <el-option value="LEWAT TENGAH MALAM"></el-option>
-                    </el-select>
-                    <div class="el-form-item__error" v-if="formErrors.overnight_mode">{{formErrors.overnight_mode[0]}}</div>
+                <el-form-item label="Tarif Menit Pertama (Rp)" :class="formErrors.tarif_menit_pertama ? 'is-error' : ''">
+                    <el-input type="number" placeholder="Tarif Menit Pertama (Rp)" v-model="formModel.tarif_menit_pertama"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.tarif_menit_pertama">{{formErrors.tarif_menit_pertama[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Menit Berikutnya (menit)" :class="formErrors.menit_selanjutnya ? 'is-error' : ''">
+                    <el-input type="number" placeholder="Menit Berikutnya (menit)" v-model="formModel.menit_selanjutnya"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.menit_selanjutnya">{{formErrors.menit_selanjutnya[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Tarif Menit Berikutnya (Rp)" :class="formErrors.tarif_menit_selanjutnya ? 'is-error' : ''">
+                    <el-input type="number" placeholder="Tarif Menit Berikutnya (Rp)" v-model="formModel.tarif_menit_selanjutnya"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.tarif_menit_selanjutnya">{{formErrors.tarif_menit_selanjutnya[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Tarif Maksimal Per Hari (Rp)" :class="formErrors.tarif_maksimum ? 'is-error' : ''">
+                    <el-input type="number" placeholder="Tarif Maksimal Per Hari (Rp)" v-model="formModel.tarif_maksimum"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.tarif_maksimum">{{formErrors.tarif_maksimum[0]}}</div>
+                </el-form-item>
+
+                <el-form-item label="Tarif Menginap Per Hari (Rp)" :class="formErrors.tarif_menginap ? 'is-error' : ''">
+                    <el-input type="number" placeholder="Tarif Menginap Per Hari" v-model="formModel.tarif_menginap"></el-input>
+                    <div class="el-form-item__error" v-if="formErrors.tarif_menginap">{{formErrors.tarif_menginap[0]}}</div>
                 </el-form-item> -->
 
                 <!-- <el-form-item label="Default" :class="formErrors.is_default ? 'is-error' : ''">
@@ -146,8 +192,8 @@
                 </el-form-item> -->
             </el-form>
             <span slot="footer" class="dialog-footer">
-                <el-button type="primary" @click="() => !!formModel.id ? update() : store()"><i class="el-icon-success"></i> SIMPAN</el-button>
-                <el-button type="info" @click="showForm = false"><i class="el-icon-error"></i> BATAL</el-button>
+                <el-button icon="el-icon-success" type="primary" @click="() => !!formModel.id ? update() : store()">SIMPAN</el-button>
+                <el-button icon="el-icon-error" type="info" @click="showForm = false">BATAL</el-button>
             </span>
         </el-dialog>
     </div>

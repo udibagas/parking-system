@@ -37,7 +37,7 @@
                             <div class="label-big">[*] JENIS KENDARAAN</div>
                         </el-col>
                         <el-col :span="14">
-                            <select @change="setFare" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
+                            <select @change="hitungTarif" v-model="formModel.vehicle_type" id="vehicle-type" class="my-input">
                                 <option v-for="g in vehicleTypeList" :value="g.name" :key="g.id">{{g.shortcut_key}} - {{g.name}}</option>
                             </select>
                             <!-- <div style="padding:3px 10px;font-weight:bold;" class="bg-yellow">
@@ -51,7 +51,7 @@
                             <div class="label-big">[*] JAM MASUK</div>
                         </el-col>
                         <el-col :span="14">
-                            <input @keyup.enter="toGateIn" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##'" v-model="formModel.time_in" class="my-input">
+                            <input @keyup.enter="toGateIn" @change="hitungTarif" id="time-in" v-mask="'####-##-## ##:##'" v-model="formModel.time_in" class="my-input">
                         </el-col>
                     </el-row>
 
@@ -87,7 +87,7 @@
                     <!-- <el-row :gutter="10">
                         <el-col :span="8">
                             <div class="label">[/] IN</div>
-                            <input @keyup.enter="submit" @change="setDuration" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
+                            <input @keyup.enter="submit" @change="hitungTarif" id="time-in" v-mask="'####-##-## ##:##:##'" :disabled="formModel.barcode_number.toLowerCase() != 'xxxxx'" v-model="formModel.time_in" class="my-input-time text-center">
                         </el-col>
                         <el-col :span="8">
                             <div class="label">OUT</div>
@@ -166,11 +166,11 @@ import GateInApp from './GateInApp'
 
 export default {
     components: { GateInApp },
-    computed: {
-        totalBayar() {
-            return this.formModel.fare + this.formModel.denda
-        }
-    },
+    // computed: {
+    //     totalBayar() {
+    //         return this.formModel.fare + this.formModel.denda
+    //     }
+    // },
     data() {
         return {
             showTicketLostForm: false,
@@ -183,7 +183,8 @@ export default {
             setting: {},
             showManualOpenForm: false,
             formModelManualOpen: {},
-            ws: null
+            ws: null,
+            totalBayar: 0
         }
     },
     methods: {
@@ -192,12 +193,115 @@ export default {
         },
         toGateIn() {
             document.getElementById('gate-in').focus()
+
         },
         nextBtn() {
             document.getElementById('submit-btn1').focus()
         },
         prevBtn() {
             document.getElementById('submit-btn').focus()
+        },
+        hitungTarif() {
+            if (this.formModel.is_member) {
+                this.formModel.fare = 0;
+                document.getElementById('submit-btn').focus()
+                return
+            }
+
+            const tarif = this.vehicleTypeList.find(v => v.name == this.formModel.vehicle_type)
+
+            if (!tarif) {
+                this.$message({
+                    message: 'Tarif tidak ditemukan untuk jenis kendaraan ' + this.formModel.vehicle_type,
+                    type: 'error',
+                    showClose: true
+                });
+                this.formModel.fare = 0
+                return
+            }
+
+            if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
+                document.getElementById('time-in').focus()
+                this.formModel.denda = tarif.denda_tiket_hilang
+            } else {
+                document.getElementById('submit-btn').focus()
+            }
+
+            if (tarif.mode_tarif == 0) {
+                this.formModel.fare = tarif.tarif_flat;
+            }
+
+            const timeIn = moment(this.formModel.time_in)
+            const timeOut = moment(this.formModel.time_out);
+            const durasi = timeOut.diff(timeIn, 'minutes')
+            const duration = moment.duration(timeOut.diff(timeIn));
+            this.formModel.duration = moment.utc(duration.asMilliseconds()).format('DD HH:mm:ss')
+
+            // buat hitung hari lewat tengah malem
+            const dateIn = moment(this.formModel.time_in.slice(0,10))
+            const dateOut = moment(this.formModel.time_out.slice(0,10))
+
+            // hitung dia menginap berapa hari (jumlah hari * tarif)
+            const hari_menginap = tarif.mode_menginap == 0
+                ? timeOut.diff(timeIn, 'days') // mode 24 jam
+                : dateOut.diff(dateIn, 'days') // mode lewat tengah malam
+
+            const tarif_menginap = hari_menginap * tarif.tarif_menginap
+
+            // mode 24 jam
+            if (tarif.mode_menginap == 0) {
+                const tarif_maksimum = hari_menginap * tarif.tarif_maksimum
+                // sisa menit
+                const sisa_menit = durasi % (60 * 24)
+                let tarif_sisa_menit = tarif.tarif_menit_pertama;
+
+                // kalau menitnya lebih dari atau sama dengan menit pertama
+                if (sisa_menit > tarif.menit_pertama) {
+                    const menit_selanjutnya = sisa_menit - tarif.menit_pertama
+                    const tarif_menit_selanjutnya = Math.ceil(menit_selanjutnya/tarif.menit_selanjutnya) * tarif.tarif_menit_selanjutnya
+                    tarif_sisa_menit += tarif_menit_selanjutnya
+
+                    if (tarif_sisa_menit > tarif.tarif_maksimum) {
+                        tarif_sisa_menit = tarif.tarif_maksimum
+                    }
+                }
+
+                this.formModel.fare = tarif_menginap + tarif_maksimum + tarif_sisa_menit
+            }
+
+            // mode lewat tengah malam
+            else {
+                const tarif_maksimum = (hari_menginap - 1) * tarif.tarif_maksimum
+                const menit_hari_pertama = moment(this.formModel.time_in.slice(0,10) + ' 24:00:00').diff(timeIn, 'minutes')
+                const menit_hari_terakhir = timeOut.diff(dateOut, 'minutes')
+                // hitung menit selanjutnya
+                const menit_selanjutnya_hari_pertama = menit_hari_pertama - tarif.menit_pertama
+                const menit_selanjutnya_hari_terakhir = menit_hari_terakhir - tarif.menit_pertama
+
+                // tarif menit pertama hari pertama & terakhir by default = tarif menit pertama
+                let tarif_hari_pertama = tarif.tarif_menit_pertama
+                let tarif_hari_terakhir = tarif.tarif_menit_pertama
+
+                if (menit_selanjutnya_hari_pertama > 0) {
+                    tarif_hari_pertama += Math.ceil(menit_selanjutnya_hari_pertama / tarif.menit_selanjutnya) * tarif.tarif_menit_selanjutnya
+                }
+
+                if (menit_selanjutnya_hari_terakhir > 0) {
+                    tarif_hari_terakhir += Math.ceil(menit_selanjutnya_hari_terakhir / tarif.menit_selanjutnya) * tarif.tarif_menit_selanjutnya
+                }
+
+                if (tarif_hari_pertama > tarif.tarif_maksimum) {
+                    tarif_hari_pertama = tarif.tarif_maksimum;
+                }
+
+                if (tarif_hari_terakhir > tarif.tarif_maksimum) {
+                    tarif_hari_terakhir = tarif.tarif_maksimum;
+                }
+
+                this.formModel.fare = tarif_menginap + tarif_maksimum + tarif_hari_pertama + tarif_hari_terakhir
+            }
+
+            this.totalBayar = this.formModel.denda + this.formModel.fare
         },
         manualOpen() {
             this.$confirm('Aksi ini akan dicatat oleh sistem. Anda yakin?', 'Peringatan', { type: 'warning'} ).then(() => {
@@ -218,14 +322,6 @@ export default {
                     }
                 })
             }).catch(() => console.log(e))
-        },
-        setDuration() {
-            var date1 = moment(this.formModel.time_in)
-            var date2 = moment(this.formModel.time_out);
-            var duration = moment.duration(date2.diff(date1));
-            this.formModel.duration = moment.utc(duration.asMilliseconds()).format('HH:mm:ss')
-            // console.log(this.formModel.duration)
-            this.$forceUpdate()
         },
         checkPlate() {
             let params = { plate_number: this.formModel.plate_number }
@@ -259,7 +355,7 @@ export default {
                     this.formModel.time_out = now
                     this.formModel.fare = 0
                     this.takeSnapshot(this.formModel.id)
-                    this.setDuration()
+                    this.hitungTarif()
 
                     if (!data.is_member) {
                         document.getElementById('vehicle-type').focus()
@@ -334,30 +430,6 @@ export default {
                         showClose: true,
                     })
                 })
-            }
-        },
-        setFare() {
-            let vehicle = this.vehicleTypeList.find(vt => vt.name == this.formModel.vehicle_type)
-            if (vehicle) {
-                document.getElementById('vehicle-type').blur()
-
-                if (!this.formModel.is_member)
-                {
-                    this.formModel.fare = vehicle.tarif_flat
-                    if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
-                        this.formModel.denda = vehicle.denda_tiket_hilang
-                    }
-                } else {
-                    this.formModel.fare = 0
-                }
-
-                this.$forceUpdate()
-
-                if (this.formModel.barcode_number.toLowerCase() == 'xxxxx') {
-                    document.getElementById('time-in').focus()
-                } else {
-                    document.getElementById('submit-btn').focus()
-                }
             }
         },
         resetForm() {

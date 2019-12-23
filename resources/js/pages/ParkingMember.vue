@@ -54,21 +54,33 @@
             </el-table-column>
 
             <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="register_date" label="Tgl Daftar" sortable="custom" show-overflow-tooltip min-width="120px"></el-table-column>
+            <el-table-column label="Tgl Daftar" sortable="custom" min-width="120px">
+                <template slot-scope="scope">
+                    {{scope.row.register_date | readableDate}}
+                </template>
+            </el-table-column>
+            <el-table-column label="Tgl Kedaluarsa" sortable="custom" min-width="150px" align="center" header-align="center">
+                <template slot-scope="scope">
+                    {{scope.row.expiry_date | readableDate}}
+                </template>
+            </el-table-column>
             <el-table-column prop="fare" label="Tarif" sortable="custom" min-width="100px" header-align="right" align="right">
                 <template slot-scope="scope">
                     Rp. {{scope.row.fare | formatNumber}}
                 </template>
             </el-table-column>
-            <el-table-column prop="billing_cycle" label="Siklus Bayar" sortable="custom" min-width="150px">
+            <el-table-column prop="billing_cycle" label="Siklus Bayar" sortable="custom" min-width="120px">
                 <template slot-scope="scope">
                     {{scope.row.billing_cycle}} {{$store.state.siklus.find(s => s.value == scope.row.billing_cycle_unit).label}}
                 </template>
             </el-table-column>
-            <el-table-column prop="expiry_date" label="Tgl Kedaluarsa" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="phone" label="Nomor HP" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="phone" label="Nomor HP" sortable="custom" show-overflow-tooltip min-width="130px"></el-table-column>
             <el-table-column prop="email" label="Alamat Email" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="last_transaction" label="Trx Terkakhir" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="last_transaction" label="Trx Terkakhir" sortable="custom" min-width="150px">
+                <template slot-scope="scope">
+                    {{scope.row.last_transaction | readableDate}}
+                </template>
+            </el-table-column>
             <el-table-column
             :filters="[{value: 'y', text: 'Ya'}, {value: 'n', text: 'Tidak'}]"
             :filter-multiple="false"

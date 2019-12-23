@@ -11,6 +11,7 @@
     <div id="app"></div>
     <script type="text/javascript">
         const BASE_URL = '{{url("")}}';
+        const APP_LOGO = '{{env('APP_LOGO', 'logo.jpeg')}}'
         const APP_NAME = '{{config('app.name')}}'
     </script>
     <script src="{{ asset('js/app.js') }}"></script>

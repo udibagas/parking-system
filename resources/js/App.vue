@@ -5,7 +5,7 @@
             <Profile v-if="$store.state.is_logged_in" :show="showProfile" @close="showProfile = false" />
             <el-aside width="auto">
                 <div v-show="!collapse" class="brand-box">
-                    <img src="/images/logo.jpeg" style="height:60px;width:60px;margin:25px 0 10px 0;border-radius:5px;" alt="">
+                    <img :src="'/images/' + appLogo" style="height:60px;width:60px;margin:25px 0 10px 0;border-radius:5px;" alt="">
 
                     <div>
                         <strong>{{$store.state.user.name}}</strong><br>
@@ -78,6 +78,7 @@ export default {
         return {
             collapse: false,
             appName: APP_NAME,
+            appLogo: APP_LOGO,
             showProfile: false,
             loginForm: !this.$store.state.is_logged_in,
             notifications: [
@@ -148,10 +149,10 @@ export default {
         }
     },
     mounted() {
-        window.onbeforeunload = (e) => {
-            window.localStorage.removeItem('user')
-            window.localStorage.removeItem('token')
-        }
+        // window.onbeforeunload = (e) => {
+        //     window.localStorage.removeItem('user')
+        //     window.localStorage.removeItem('token')
+        // }
 
         this.$store.commit('getNavigationList')
         setInterval(this.getNotification, 5000)
