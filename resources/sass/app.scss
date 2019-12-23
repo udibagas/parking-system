@@ -56,6 +56,10 @@ body {
     text-align: right;
 }
 
+.text-center {
+    text-align: center;
+}
+
 .text-white, .text-white:hover, .text-white:active, .text-white:focus {
     color: #fff !important;
 }
@@ -109,12 +113,17 @@ body {
     margin-bottom: 5px;
 }
 
-.text-red {
+.text-red, .text-danger {
     color: $red;
 }
 
-.text-green {
+.text-green, .text-success {
     color: $green;
+}
+
+table {
+    border-spacing: 0px;
+    border-collapse: separate;
 }
 
 .table {

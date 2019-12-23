@@ -1,59 +1,59 @@
 <template>
     <div>
-        <el-form :inline="true" style="text-align:right" @submit.native.prevent="() => { return }">
-            <!-- <el-form-item>
-                <el-date-picker
-                @change="requestData"
-                v-model="dateRange"
-                format="dd/MMM/yyyy"
-                value-format="yyyy-MM-dd"
-                type="daterange"
-                range-separator="To"
-                start-placeholder="Start date"
-                end-placeholder="End date">
-                </el-date-picker>
-            </el-form-item> -->
-            <el-form-item style="margin-right:0;">
-                <el-input v-model="keyword" placeholder="Cari" prefix-icon="el-icon-search" :clearable="true" @change="(v) => { keyword = v; requestData(); }">
-                    <el-button @click="() => { page = 1; keyword = ''; requestData(); }" slot="append" icon="el-icon-refresh"></el-button>
+        <el-form inline class="text-right" @submit.native.prevent="() => { return }">
+            <el-form-item>
+                <el-input size="small"
+                v-model="keyword"
+                placeholder="Cari"
+                prefix-icon="el-icon-search"
+                clearable
+                @change="(v) => { keyword = v; requestData(); }">
                 </el-input>
+            </el-form-item>
+
+            <el-form-item>
+                <el-pagination background
+                @current-change="(p) => { page = p; requestData(); }"
+                @size-change="(s) => { pageSize = s; requestData(); }"
+                layout="total, sizes, prev, next"
+                :page-size="pageSize"
+                :page-sizes="[10, 25, 50, 100]"
+                :total="tableData.total">
+                </el-pagination>
             </el-form-item>
         </el-form>
 
         <el-table :data="tableData.data" stripe
         @row-dblclick="(row, column, event) => { snapshot = row.snapshot; showSnapshot = true }"
         :default-sort = "{prop: sort, order: order}"
-        height="calc(100vh - 360px)"
+        height="calc(100vh - 280px)"
         v-loading="loading"
         @sort-change="sortChange">
             <el-table-column prop="created_at" label="Tanggal" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="user.name" label="Operator" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="alasan" label="Alasan" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
 
-            <el-table-column fixed="right" width="40px">
+            <el-table-column fixed="right" width="40px" align="center" header-align="center">
+                <template slot="header">
+                    <el-button
+                    type="text"
+                    class="text-white"
+                    @click="() => { page = 1; keyword = ''; requestData(); }"
+                    icon="el-icon-refresh">
+                    </el-button>
+                </template>
                 <template slot-scope="scope">
                     <el-dropdown>
                         <span class="el-dropdown-link">
                             <i class="el-icon-more"></i>
                         </span>
                         <el-dropdown-menu slot="dropdown">
-                            <el-dropdown-item @click.native.prevent="() => { snapshot = scope.row.snapshot; showSnapshot = true }"><i class="el-icon-camera"></i> Lihat Snapshot</el-dropdown-item>
+                            <el-dropdown-item icon="el-icon-camera" @click.native.prevent="() => { snapshot = scope.row.snapshot; showSnapshot = true }">Lihat Snapshot</el-dropdown-item>
                         </el-dropdown-menu>
                     </el-dropdown>
                 </template>
             </el-table-column>
         </el-table>
-
-        <br>
-
-        <el-pagination background
-        @current-change="(p) => { page = p; requestData(); }"
-        @size-change="(s) => { pageSize = s; requestData(); }"
-        layout="prev, pager, next, sizes, total"
-        :page-size="pageSize"
-        :page-sizes="[10, 25, 50, 100]"
-        :total="tableData.total">
-        </el-pagination>
 
         <el-dialog center top="60px" width="600px" :visible.sync="showSnapshot" title="SNAPSHOT">
             <el-image :src="snapshot" style="width: 100%; height: 100%" fit="cover">
@@ -83,7 +83,6 @@ export default {
             order: 'descending',
             loading: false,
             showSnapshot: false,
-            // dateRange: [moment().format('YYYY-MM-DD'), moment().format('YYYY-MM-DD')],
             snapshot: ''
         }
     },

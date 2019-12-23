@@ -26,7 +26,7 @@ class ParkingMemberController extends Controller
         $sort = $request->sort ? $request->sort : 'name';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
-        return ParkingMember::selectRaw('
+        $data = ParkingMember::selectRaw('
                 parking_members.*,
                 group_members.name AS `group`
             ')
@@ -40,15 +40,24 @@ class ParkingMemberController extends Controller
                 return $q->whereIn('parking_members.is_active', $request->is_active);
             })->when($request->group_member_id, function ($q) use ($request) {
                 return $q->whereIn('parking_members.group_member_id', $request->group_member_id);
-            })->when($request->expired == ['y'], function ($q) {
+            })->when($request->expired == ['y'] || $request->expired == 'y', function ($q) {
                 return $q->whereRaw('parking_members.expiry_date < DATE(NOW())');
-            })->when($request->expired == ['y'], function ($q) {
-                return $q->whereRaw('parking_members.expiry_date < DATE(NOW())');
-            })->when($request->paid == ['y'], function ($q) {
+            })->when($request->expired == ['n'] || $request->expired == 'n', function ($q) {
+                return $q->whereRaw('parking_members.expiry_date >= DATE(NOW())');
+            })->when($request->paid == ['y'] || $request->paid == 'y', function ($q) {
                 return $q->where('paid', 1);
-            })->when($request->paid == ['n'], function ($q) {
+            })->when($request->paid == ['n'] || $request->paid == 'n', function ($q) {
                 return $q->where('paid', 0);
             })->orderBy($sort, $order)->paginate($request->pageSize);
+
+        if ($request->action == 'print') {
+            return view('parking_member.print', [
+                'data' => $data,
+                'setting' => Setting::first()
+            ]);
+        }
+
+        return $data;
     }
 
     /**

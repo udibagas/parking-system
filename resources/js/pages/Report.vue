@@ -7,6 +7,7 @@
             <el-col :span="16" style="text-align:right">
                 Pilih Tanggal :
                 <el-date-picker
+                size="small"
                 @change="requestData"
                 v-model="dateRange"
                 format="dd/MMM/yyyy"
@@ -17,10 +18,12 @@
                 end-placeholder="End date">
                 </el-date-picker>
 
-                <el-button type="primary" icon="el-icon-printer" @click="printReport">PRINT LAPORAN</el-button>
+                <el-button size="small" type="primary" icon="el-icon-printer" @click="printReport">PRINT LAPORAN</el-button>
             </el-col>
         </el-row>
-        <el-divider></el-divider>
+
+        <br>
+
         <el-tabs type="card">
             <el-tab-pane lazy label="RANGKUMAN">
                 <el-row :gutter="10">

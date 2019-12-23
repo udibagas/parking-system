@@ -1,5 +1,3 @@
-Method takeSnapshot 1 aja
-
 Belum beres:
     - backup
         - zip belum recursive
@@ -9,9 +7,6 @@ Belum beres:
 Member:
     - Edit disable field tgl registrasi
     - Konfirmasi dulu waktu simpan
-- Gate Out
-    - Notif expiry member
-
 
 Protocol PCLess Interface
 header = char 0xA6 / char 166

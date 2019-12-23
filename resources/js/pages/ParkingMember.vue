@@ -9,6 +9,12 @@
                 </el-input>
             </el-form-item>
             <el-form-item>
+                <el-button-group>
+                    <el-button icon="el-icon-download" size="small" type="primary" @click="download"></el-button>
+                    <el-button icon="el-icon-printer" size="small" type="primary" @click="print"></el-button>
+                </el-button-group>
+            </el-form-item>
+            <el-form-item>
                 <el-pagination background
                 @current-change="(p) => { page = p; requestData(); }"
                 @size-change="(s) => { pageSize = s; requestData(); }"
@@ -54,6 +60,11 @@
             </el-table-column>
 
             <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column label="Plat Nomor" show-overflow-tooltip min-width="150px">
+                <template slot-scope="scope">
+                    {{scope.row.vehicles.map(v => v.plate_number).join(', ')}}
+                </template>
+            </el-table-column>
             <el-table-column label="Tgl Daftar" sortable="custom" min-width="120px">
                 <template slot-scope="scope">
                     {{scope.row.register_date | readableDate}}
@@ -75,7 +86,7 @@
                 </template>
             </el-table-column>
             <el-table-column prop="phone" label="Nomor HP" sortable="custom" show-overflow-tooltip min-width="130px"></el-table-column>
-            <el-table-column prop="email" label="Alamat Email" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <!-- <el-table-column prop="email" label="Alamat Email" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
             <el-table-column prop="last_transaction" label="Trx Terkakhir" sortable="custom" min-width="150px">
                 <template slot-scope="scope">
                     {{scope.row.last_transaction | readableDate}}
@@ -271,6 +282,7 @@
 </template>
 
 <script>
+import exportFromJSON from 'export-from-json'
 import ParkingMemberDetail from '../components/ParkingMemberDetail'
 
 export default {
@@ -313,6 +325,48 @@ export default {
         }
     },
     methods: {
+        print() {
+            const params = Object.assign({
+                pageSize: 1000000,
+                sort: this.sort,
+                order: this.order,
+                action: 'print',
+                token: this.$store.state.token
+            }, this.filters)
+
+            const querystring = Object.keys(params).map(key => key + '=' + params[key]).join('&');
+            window.open(BASE_URL + '/parkingMember?' + querystring, '_blank')
+        },
+        download() {
+            const params = {
+                pageSize: 1000000,
+                sort: this.sort,
+                order: this.order,
+            }
+
+            axios.get('parkingMember', { params: Object.assign(params, this.filters) }).then(r => {
+                const data = r.data.data.map(d => {
+                    return {
+                        "Nama" : d.name,
+                        "Jenis" : d.paid ? 'BERBAYAR' : 'GRATIS',
+                        "Group" : d.group,
+                        "Nomor Kartu" : d.card_number,
+                        "Plat Nomor": d.vehicles.map(v => v.plate_number).join(', '),
+                        "Tanggal Daftar": d.register_date,
+                        "Tanggal Kedaluarsa": d.expiry_date,
+                        "Tarif": d.fare,
+                        "Siklus Bayar": d.billing_cycle + ' ' + this.$store.state.siklus.find(s => s.value == d.billing_cycle_unit).label,
+                        "Nomor HP": d.phone_number,
+                        // "Alamat Email": d.email,
+                        "Transaksi Terakhir": d.last_transaction || '',
+                        "Status Kartu": d.expired ? 'KEDALUARSA' : 'BERLAKU',
+                        "Status Anggota": d.is_active ? 'AKTIF' : 'NONAKTIF'
+                    }
+                })
+
+                exportFromJSON({ data, fileName: 'member-parkir', exportType: 'xls' })
+            }).catch(e => console.log(e)).finally(() => this.loading = false)
+        },
         sortChange(c) {
             if (c.prop != this.sort || c.order != this.order) {
                 this.sort = c.prop; this.order = c.order; this.requestData()
