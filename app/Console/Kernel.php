@@ -25,16 +25,20 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
-        $age = Setting::first()->hapus_snapshot_dalam_hari;
+        try {
+            $age = Setting::first()->hapus_snapshot_dalam_hari;
 
-        if ($age > 0) {
-            $schedule->command('snapshot:delete '.$age)->dailyAt('12:00');
-        }
+            if ($age > 0) {
+                $schedule->command('snapshot:delete '.$age)->dailyAt('12:00');
+            }
 
-        $age = Setting::first()->hapus_transaksi_dalam_hari;
+            $age = Setting::first()->hapus_transaksi_dalam_hari;
 
-        if ($age > 0) {
-            $schedule->command('trx:delete '.$age)->dailyAt('12:00');
+            if ($age > 0) {
+                $schedule->command('trx:delete '.$age)->dailyAt('12:00');
+            }
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
         }
     }
 
