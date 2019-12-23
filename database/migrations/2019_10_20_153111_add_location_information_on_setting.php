@@ -16,12 +16,12 @@ class AddLocationInformationOnSetting extends Migration
     public function up()
     {
 
-        Schema::table('settings', function (Blueprint $table) {
-            $table->string('location_name')->nullable();
-            $table->string('location_address')->nullable();
-            $table->text('additional_info_ticket')->nullable();
-            $table->string('default_plate_number')->nullable();
-        });
+        // Schema::table('settings', function (Blueprint $table) {
+        //     $table->string('location_name')->nullable();
+        //     $table->string('location_address')->nullable();
+        //     $table->text('additional_info_ticket')->nullable();
+        //     $table->string('default_plate_number')->nullable();
+        // });
 
         // $location = LocationIdentity::where('active', 1)->first();
         // $setting = Setting::first();
