@@ -23,24 +23,24 @@ class AddLocationInformationOnSetting extends Migration
             $table->string('default_plate_number')->nullable();
         });
 
-        $location = LocationIdentity::where('active', 1)->first();
-        $setting = Setting::first();
+        // $location = LocationIdentity::where('active', 1)->first();
+        // $setting = Setting::first();
 
-        if ($location)
-        {
-            $data = [
-                'location_name' => $location->name,
-                'location_address' => $location->address,
-                'additional_info_ticket' => $location->additional_info_ticket,
-                'default_plate_number' => $location->default_plate_number,
-            ];
+        // if ($location)
+        // {
+        //     $data = [
+        //         'location_name' => $location->name,
+        //         'location_address' => $location->address,
+        //         'additional_info_ticket' => $location->additional_info_ticket,
+        //         'default_plate_number' => $location->default_plate_number,
+        //     ];
 
-            if ($setting) {
-                $setting->update($data);
-            } else {
-                Setting::create($data);
-            }
-        }
+        //     if ($setting) {
+        //         $setting->update($data);
+        //     } else {
+        //         Setting::create($data);
+        //     }
+        // }
     }
 
     /**
