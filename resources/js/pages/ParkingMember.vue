@@ -65,12 +65,12 @@
                     {{scope.row.vehicles.map(v => v.plate_number).join(', ')}}
                 </template>
             </el-table-column>
-            <el-table-column label="Tgl Daftar" sortable="custom" min-width="120px">
+            <el-table-column prop="register_date" label="Tgl Daftar" sortable="custom" min-width="120px" align="center" header-align="center">
                 <template slot-scope="scope">
                     {{scope.row.register_date | readableDate}}
                 </template>
             </el-table-column>
-            <el-table-column label="Tgl Kedaluarsa" sortable="custom" min-width="150px" align="center" header-align="center">
+            <el-table-column prop="expiry_date" label="Tgl Kedaluarsa" sortable="custom" min-width="150px" align="center" header-align="center">
                 <template slot-scope="scope">
                     {{scope.row.expiry_date | readableDate}}
                 </template>
