@@ -8,7 +8,7 @@
             <tr>
                 <th>#</th>
                 <th>Nama</th>
-                <th>Nomor Katu</th>
+                <th>Nomor Kartu</th>
                 <th>Plat Nomor</th>
                 <th class="text-center">Berlaku Sampai</th>
                 <th class="text-center">Status</th>
