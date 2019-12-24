@@ -80,7 +80,7 @@
                     Rp. {{scope.row.fare | formatNumber}}
                 </template>
             </el-table-column>
-            <el-table-column prop="billing_cycle" label="Siklus Bayar" sortable="custom" min-width="120px">
+            <el-table-column prop="billing_cycle" label="Siklus Bayar" sortable="custom" min-width="130px">
                 <template slot-scope="scope">
                     {{scope.row.billing_cycle}} {{$store.state.siklus.find(s => s.value == scope.row.billing_cycle_unit).label}}
                 </template>
