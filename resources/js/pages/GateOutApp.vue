@@ -204,6 +204,7 @@ export default {
         hitungTarif() {
             if (this.formModel.is_member) {
                 this.formModel.fare = 0;
+                this.$forceUpdate();
                 document.getElementById('submit-btn').focus()
                 return
             }
@@ -217,6 +218,7 @@ export default {
                     showClose: true
                 });
                 this.formModel.fare = 0
+                this.$forceUpdate();
                 return
             }
 
@@ -230,6 +232,7 @@ export default {
             if (tarif.mode_tarif == 0) {
                 this.formModel.fare = tarif.tarif_flat;
                 this.totalBayar = this.formModel.denda + this.formModel.fare
+                this.$forceUpdate();
                 return
             }
 
@@ -304,6 +307,7 @@ export default {
             }
 
             this.totalBayar = this.formModel.denda + this.formModel.fare
+            this.$forceUpdate();
         },
         manualOpen() {
             this.$confirm('Aksi ini akan dicatat oleh sistem. Anda yakin?', 'Peringatan', { type: 'warning'} ).then(() => {
