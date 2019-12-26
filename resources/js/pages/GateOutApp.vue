@@ -229,6 +229,8 @@ export default {
 
             if (tarif.mode_tarif == 0) {
                 this.formModel.fare = tarif.tarif_flat;
+                this.totalBayar = this.formModel.denda + this.formModel.fare
+                return
             }
 
             const timeIn = moment(this.formModel.time_in)
