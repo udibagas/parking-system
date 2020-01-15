@@ -194,6 +194,8 @@ export default {
         toGateIn() {
             if (!this.formModel.gate_in_id) {
                 document.getElementById('gate-in').focus()
+            } else {
+                document.getElementById('submit-btn').focus()
             }
         },
         nextBtn() {
