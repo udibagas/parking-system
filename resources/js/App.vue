@@ -1,8 +1,8 @@
 <template>
     <div>
-        <Login v-if="!$store.state.is_logged_in" />
+        <Login v-if="!$store.state.token" />
         <el-container v-else>
-            <Profile v-if="$store.state.is_logged_in" :show="showProfile" @close="showProfile = false" />
+            <Profile v-if="$store.state.token" :show="showProfile" @close="showProfile = false" />
             <el-aside width="auto">
                 <div v-show="!collapse" class="brand-box">
                     <img :src="'/images/' + appLogo" style="height:60px;width:60px;margin:25px 0 10px 0;border-radius:5px;" alt="">
@@ -80,10 +80,8 @@ export default {
             appName: APP_NAME,
             appLogo: APP_LOGO,
             showProfile: false,
-            loginForm: !this.$store.state.is_logged_in,
-            notifications: [
-                // {created_at: '2019-10-10 10:10:10', message: 'ok jos'}
-            ]
+            loginForm: !this.$store.state.token,
+            notifications: []
         }
     },
     methods: {
@@ -113,15 +111,12 @@ export default {
                     showClose: true
                 })
             }).finally(() => {
-                window.localStorage.removeItem('user')
-                window.localStorage.removeItem('token')
                 this.$store.state.user = {}
-                this.$store.state.token = ''
-                this.$store.state.is_logged_in = false
+                this.$store.state.token = null
             })
         },
         getNotification() {
-            if (!this.$store.state.is_logged_in) {
+            if (!this.$store.state.token) {
                 return
             }
 
@@ -149,11 +144,6 @@ export default {
         }
     },
     mounted() {
-        window.onbeforeunload = (e) => {
-            window.localStorage.removeItem('user')
-            window.localStorage.removeItem('token')
-        }
-
         this.$store.commit('getNavigationList')
         setInterval(this.getNotification, 5000)
     }

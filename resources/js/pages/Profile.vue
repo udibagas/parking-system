@@ -41,7 +41,7 @@ export default {
     props: ['show'],
     data() {
         return {
-            formModel: JSON.parse(window.localStorage.getItem('user')),
+            formModel: this.$store.state.user,
             loading: false,
             formErrors: {},
             error: {},
@@ -56,7 +56,6 @@ export default {
                     type: 'success',
                     showClose: true
                 })
-                window.localStorage.setItem('user', r.data)
                 this.$store.state.user = r.data
             }).catch(e => {
                 if (e.response.status == 422) {

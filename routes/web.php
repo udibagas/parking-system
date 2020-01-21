@@ -12,7 +12,7 @@
 */
 Route::post('login', 'AuthController@login');
 
-Route::group(['middleware' => 'auth.jwt'], function () {
+Route::group(['middleware' => 'auth'], function () {
     Route::get('checkAuth', 'AppController@checkAuth');
     Route::get('getNavigation', 'AppController@getNavigation');
     Route::post('logout', 'AuthController@logout');

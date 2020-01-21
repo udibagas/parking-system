@@ -48,12 +48,9 @@ export default {
             }
 
             axios.post('login', data).then(r => {
-                window.localStorage.setItem('user', JSON.stringify(r.data.user))
-                window.localStorage.setItem('token', r.data.token)
                 window.axios.defaults.headers.common['Authorization'] = 'bearer ' + r.data.token;
                 this.$store.state.user = r.data.user
                 this.$store.state.token = r.data.token
-                this.$store.state.is_logged_in = true
                 this.$router.push('home')
             }).catch(e => {
                 this.$message({

@@ -284,7 +284,9 @@ class ParkingTransactionController extends Controller
     {
         // untuk print last trx
         if ($request->gate_out_id) {
-            $data = ParkingTransaction::where('gate_out_id', $request->gate_out_id)->latest()->first();
+            $data = ParkingTransaction::where('gate_out_id', $request->gate_out_id)
+                ->orderBy('time_out', 'desc')
+                ->first();
 
             if (!$data) {
                 return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
