@@ -12,6 +12,7 @@ use App\ParkingGate;
 use App\ParkingMember;
 use App\Setting;
 use App\User;
+use App\UserLog;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 
@@ -577,18 +578,7 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
         }
 
-        // kalau ada start pasti ada end. worst case-nya start = end
-        $end = DB::select('SELECT time_out
-            FROM parking_transactions
-            WHERE operator = :operator
-                AND gate_out_id = :gate_out_id
-                AND DATE(time_out) = :date
-            ORDER BY time_out DESC
-            ', [
-                ':date' => $request->date,
-                ':operator' => $request->user()->name,
-                ':gate_out_id' => $request->gate_out_id
-        ]);
+        $userLog = UserLog::where('action', 'LOGIN')->where('user_id', $request->user()->id)->first();
 
         try {
             if ($gate->printer_type == "network") {
@@ -611,7 +601,7 @@ class ParkingTransactionController extends Controller
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . $request->date . "\n");
-            $printer->text(str_pad('JAM', 15, ' ') . ' : ' . $start[0]->time_out . ' - ' . $end[0]->time_out . "\n");
+            $printer->text(str_pad('JAM', 15, ' ') . ' : ' . date('d-M-Y H:i', strtotime($userLog->created_at)) . ' - ' . date('d-M-Y H:i') . "\n");
             $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper($request->user()->name) . "\n\n");
 
             // REGULER SECTION
