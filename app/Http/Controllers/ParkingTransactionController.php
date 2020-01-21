@@ -578,7 +578,11 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
         }
 
-        $userLog = UserLog::where('action', 'LOGIN')->where('user_id', $request->user()->id)->first();
+        $userLog = UserLog::where('action', 'LOGIN')
+            ->whereRaw('DATE(created_at) = ?', [$request->date])
+            ->where('user_id', $request->user()->id)
+            ->orderBy('created_at', 'asc')
+            ->first();
 
         try {
             if ($gate->printer_type == "network") {
