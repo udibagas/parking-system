@@ -4,12 +4,14 @@ import { Message } from 'element-ui';
 
 Vue.use(Vuex)
 
+const currentUser = window.sessionStorage.getItem('user')
+
 export default new Vuex.Store({
     state: {
         base_url: BASE_URL,
         appName: APP_NAME,
-        user: {},
-        token: null,
+        user: currentUser ? JSON.parse(currentUser) : {},
+        token: window.sessionStorage.getItem('token'),
         vehicleTypeList: [],
         parkingGateList: [],
         groupMemberList: [],

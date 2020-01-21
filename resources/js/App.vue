@@ -111,6 +111,8 @@ export default {
                     showClose: true
                 })
             }).finally(() => {
+                window.sessionStorage.removeItem('token')
+                window.sessionStorage.removeItem('user')
                 this.$store.state.user = {}
                 this.$store.state.token = null
             })

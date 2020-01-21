@@ -49,6 +49,8 @@ export default {
 
             axios.post('login', data).then(r => {
                 window.axios.defaults.headers.common['Authorization'] = 'bearer ' + r.data.token;
+                window.sessionStorage.setItem('token', r.data.token)
+                window.sessionStorage.setItem('user', JSON.stringify(r.data.user))
                 this.$store.state.user = r.data.user
                 this.$store.state.token = r.data.token
                 this.$router.push('home')
