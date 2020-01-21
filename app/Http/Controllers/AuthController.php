@@ -38,30 +38,15 @@ class AuthController extends Controller
         ], 401);
     }
 
-    public function logout(Request $request)
+    public function logout()
     {
-        $this->validate($request, [
-            'token' => 'required'
+        UserLog::create([
+            'user_id' => auth()->user()->id,
+            'action' => 'LOGOUT'
         ]);
 
-        try {
-            JWTAuth::invalidate($request->token);
-
-            UserLog::create([
-                'user_id' => $request->user()->id,
-                'action' => 'LOGOUT'
-            ]);
-
-            return response()->json([
-                'success' => true,
-                'message' => 'User logged out successfully'
-            ]);
-        } catch (JWTException $exception) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Sorry, the user cannot be logged out'
-            ], 500);
-        }
+        auth()->logout();
+        return response()->json(['message' => 'Successfully logged out']);
     }
 
     public function getAuthUser(Request $request)
