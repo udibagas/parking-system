@@ -38,7 +38,7 @@ class ParkingTransactionController extends Controller
             ->join('parking_gates AS parking_gate_in', 'parking_gate_in.id', '=', 'parking_transactions.gate_in_id', 'LEFT')
             ->join('parking_gates AS parking_gate_out', 'parking_gate_out.id', '=', 'parking_transactions.gate_out_id', 'LEFT')
             ->when($request->dateRange, function($q) use ($request) {
-                return $q->whereBetween('parking_transactions.updated_at', $request->dateRange);
+                return $q->whereBetween('parking_transactions.time_in', $request->dateRange);
             })->when($request->keyword, function ($q) use ($request) {
                 return $q->where(function($qq) use ($request) {
                     return $qq->where('parking_transactions.barcode_number', 'LIKE', '%' . $request->keyword . '%')
@@ -497,7 +497,7 @@ class ParkingTransactionController extends Controller
             WHERE time_out IS NOT NULL
                 AND is_member = 0
                 AND operator = :operator
-                AND DATE(updated_at) = :date
+                AND DATE(time_out) = :date
                 AND gate_out_id = :gate_out_id
             GROUP BY vehicle_type
         ";
@@ -510,7 +510,7 @@ class ParkingTransactionController extends Controller
             WHERE time_out IS NOT NULL
                 AND is_member = 0
                 AND operator = :operator
-                AND DATE(updated_at) = :date
+                AND DATE(time_out) = :date
                 AND gate_out_id = :gate_out_id
                 AND denda > 0
             GROUP BY vehicle_type
@@ -523,7 +523,7 @@ class ParkingTransactionController extends Controller
             WHERE time_out IS NOT NULL
                 AND is_member = 1
                 AND operator = :operator
-                AND DATE(updated_at) = :date
+                AND DATE(time_out) = :date
                 AND gate_out_id = :gate_out_id
             GROUP BY vehicle_type
         ";
@@ -533,7 +533,7 @@ class ParkingTransactionController extends Controller
         $sqlBukaManual = "SELECT COUNT(id) AS jumlah
             FROM manual_open_logs
             WHERE user_id = :user_id
-                AND DATE(updated_at) = :date
+                AND DATE(time_out) = :date
                 AND parking_gate_id = :gate_out_id
         ";
 
