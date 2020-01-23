@@ -533,7 +533,7 @@ class ParkingTransactionController extends Controller
         $sqlBukaManual = "SELECT COUNT(id) AS jumlah
             FROM manual_open_logs
             WHERE user_id = :user_id
-                AND DATE(time_out) = :date
+                AND DATE(updated_at) = :date
                 AND parking_gate_id = :gate_out_id
         ";
 
