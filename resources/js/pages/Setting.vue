@@ -76,6 +76,9 @@
             <el-tab-pane lazy label="Jenis Kendaraan">
                 <VehicleType />
             </el-tab-pane>
+            <el-tab-pane lazy label="Shift">
+                <ShiftSetting />
+            </el-tab-pane>
             <el-tab-pane lazy label="Backup &amp; Restore DB">
                 <Backup />
             </el-tab-pane>
@@ -87,9 +90,10 @@
 import ParkingGate from './ParkingGate'
 import VehicleType from './VehicleType'
 import Backup from './Backup'
+import ShiftSetting from './ShiftSetting'
 
 export default {
-    components: { ParkingGate, VehicleType, Backup },
+    components: { ParkingGate, VehicleType, Backup, ShiftSetting },
     data() {
         return {
             formModel: {},
