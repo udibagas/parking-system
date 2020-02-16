@@ -30,14 +30,15 @@ class ReportController extends Controller
         return DB::select('
             SELECT vehicle_type, SUM(fare) AS `total`
             FROM parking_transactions
-            WHERE DATE(updated_at) BETWEEN :start AND :stop
+            WHERE DATE(time_out) BETWEEN :start AND :stop
             GROUP BY vehicle_type', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
     }
 
-    public function getParkedVehicle(Request $request) {
+    public function getParkedVehicle(Request $request)
+    {
         return DB::select('
             SELECT vehicle_type, COUNT(id) AS `total`
             FROM parking_transactions
@@ -49,7 +50,8 @@ class ReportController extends Controller
         ]);
     }
 
-    public function getVehicleIn(Request $request) {
+    public function getVehicleIn(Request $request)
+    {
         return DB::select('
             SELECT parking_gates.name AS `gate`, COUNT(parking_transactions.id) AS `total`
             FROM parking_transactions
@@ -68,7 +70,7 @@ class ReportController extends Controller
                 COUNT(id) AS jumlah,
                 SUM(fare) AS `pendapatan`
             FROM parking_transactions
-            WHERE DATE(updated_at) BETWEEN :start AND :stop
+            WHERE DATE(time_out) BETWEEN :start AND :stop
                 AND time_out IS NOT NULL
             GROUP BY vehicle_type', [
             ':start' => $request->dateRange[0],
@@ -80,7 +82,7 @@ class ReportController extends Controller
                 COUNT(id) AS jumlah,
                 SUM(fare) AS `pendapatan`
             FROM parking_transactions
-            WHERE DATE(updated_at) BETWEEN :start AND :stop
+            WHERE DATE(time_out) BETWEEN :start AND :stop
                 AND time_out IS NOT NULL
             GROUP BY operator', [
             ':start' => $request->dateRange[0],
@@ -101,6 +103,5 @@ class ReportController extends Controller
         } else {
             return view('report', $data);
         }
-
     }
 }
