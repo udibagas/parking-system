@@ -74,7 +74,7 @@ class ParkingTransactionController extends Controller
     {
         $setting = Setting::first();
 
-        if (!$setting || !$setting->camera_image_snapshot_url) {
+        if (!$setting || !$setting->camera_snapshot_url) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
         }
 
@@ -86,7 +86,7 @@ class ParkingTransactionController extends Controller
         }
 
         try {
-            $response = $client->request('GET', $setting->camera_image_snapshot_url, [
+            $response = $client->request('GET', $setting->camera_snapshot_url, [
                 'auth' => [
                     $setting->camera_username,
                     $setting->camera_password,
