@@ -20,6 +20,8 @@ class CreateMemberRenewalsTable extends Migration
             $table->date('from_date');
             $table->date('to_date');
             $table->bigInteger('amount')->default(0);
+            $table->integer('billing_cycle')->default(0);
+            $table->string('billing_cycle_unit')->default('months');
             $table->timestamps();
         });
     }

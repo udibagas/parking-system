@@ -13,8 +13,6 @@ class ParkingTransaction extends Model
         'fare', 'snapshot_in', 'operator'
     ];
 
-    protected $appends = ['durasi'];
-
     public function member()
     {
         return $this->belongsTo(ParkingMember::class, 'parking_member_id');

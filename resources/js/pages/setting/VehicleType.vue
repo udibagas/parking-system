@@ -50,26 +50,6 @@
         min-width="100px"
       ></el-table-column>
       <el-table-column
-        label="Mode Tarif"
-        sortable="custom"
-        align="center"
-        header-align="center"
-        min-width="120px"
-      >
-        <template slot-scope="scope">{{scope.row.mode_tarif ? 'PROGRESIF' : 'FLAT'}}</template>
-      </el-table-column>
-      <el-table-column
-        label="Mode Inap"
-        sortable="custom"
-        align="center"
-        header-align="center"
-        min-width="120px"
-      >
-        <template
-          slot-scope="scope"
-        >{{scope.row.mode_menginap ? 'LEWAT TENGAH MALAM' : '24 JAM DARI CHECK IN'}}</template>
-      </el-table-column>
-      <el-table-column
         prop="tarif_flat"
         label="Tarif Flat"
         sortable="custom"
@@ -78,18 +58,6 @@
         min-width="120px"
       >
         <template slot-scope="scope">Rp {{scope.row.tarif_flat | formatNumber}}</template>
-      </el-table-column>
-      <el-table-column label="Tarif Non Flat" min-width="250px">
-        <template slot-scope="scope">
-          Tarif {{scope.row.menit_pertama}} menit pertama = Rp {{scope.row.tarif_menit_pertama | formatNumber}}
-          <br />
-          Tarif {{scope.row.menit_selanjutnya}} menit selanjutnya = Rp {{scope.row.tarif_menit_selanjutnya | formatNumber}}
-          <br />
-          Tarif maksimal per hari = Rp {{scope.row.tarif_maksimum | formatNumber}}
-          <br />
-          Tarif menginap per hari = Rp {{scope.row.tarif_menginap | formatNumber}}
-          <br />
-        </template>
       </el-table-column>
       <el-table-column width="40px" align="center" header-align="center">
         <template slot="header">

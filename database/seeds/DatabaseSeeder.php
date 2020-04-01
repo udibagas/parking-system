@@ -15,7 +15,6 @@ class DatabaseSeeder extends Seeder
         User::create([
             'name' => 'Admin',
             'email' => 'admin@mitrateknik.co.id',
-            'phone' => '0888',
             'password' => bcrypt('mitrateknik'),
             'role' => 1,
             'status' => 1

@@ -1,8 +1,25 @@
 <template>
   <div id="gate-in-app" style="padding:0px 200px;">
-    <h1 style="text-align:center;font-size:26px;">{{location.name}}</h1>
-    <div style="text-align:center">{{location.address}}</div>
+    <h1 style="text-align:center;font-size:26px;">{{setting.location_name}}</h1>
+    <div style="text-align:center">{{setting.location_address}}</div>
     <el-divider></el-divider>
+
+    <el-row :gutter="10" style="margin-bottom:10px;">
+      <el-col :span="10">
+        <div class="label-big">[-] NO. PLAT</div>
+      </el-col>
+      <el-col :span="14">
+        <input
+          id="plate-number"
+          autocomplete="off"
+          @keyup.enter="toVehicleField"
+          type="text"
+          placeholder="NO. PLAT"
+          v-model="formModel.plate_number"
+          class="my-input"
+        />
+      </el-col>
+    </el-row>
 
     <el-row :gutter="10" style="margin-bottom:10px;">
       <el-col :span="10">
@@ -27,23 +44,6 @@
 
     <el-row :gutter="10" style="margin-bottom:10px;">
       <el-col :span="10">
-        <div class="label-big">[-] NO. PLAT</div>
-      </el-col>
-      <el-col :span="14">
-        <input
-          id="plate-number"
-          autocomplete="off"
-          @keyup.enter="submit"
-          type="text"
-          placeholder="NO. PLAT"
-          v-model="formModel.plate_number"
-          class="my-input"
-        />
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="10" style="margin-bottom:10px;">
-      <el-col :span="10">
         <div class="label-big">TARIF</div>
       </el-col>
       <el-col :span="14">
@@ -51,11 +51,12 @@
       </el-col>
     </el-row>
 
-    <button class="my-big-btn" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
+    <button class="my-big-btn" id="submit-button" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
   </div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 export default {
   data() {
     return {
@@ -65,7 +66,13 @@ export default {
       vehicleTypeList: []
     };
   },
+  computed: {
+    ...mapState(["setting"])
+  },
   methods: {
+    toVehicleField() {
+      document.getElementById("vehicle-type").focus();
+    },
     generateBarcodeNumber() {
       let result = "";
       let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -84,7 +91,7 @@ export default {
         this.formModel.fare = this.formModel.is_member ? 0 : vehicle.tarif_flat;
         this.$forceUpdate();
       }
-      document.getElementById("plate-number").focus();
+      document.getElementById("submit-button").focus();
     },
     resetForm() {
       let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1);
@@ -102,11 +109,7 @@ export default {
       document.getElementById("plate-number").focus();
     },
     submit() {
-      if (
-        !this.formModel.gate_in_id ||
-        !this.formModel.plate_number ||
-        !this.formModel.vehicle_type
-      ) {
+      if (!this.formModel.plate_number || !this.formModel.vehicle_type) {
         return;
       }
 
@@ -196,19 +199,6 @@ export default {
           }
 
           this.vehicleTypeList = r.data;
-          let default_vehicle = r.data.find(v => v.is_default == 1);
-
-          if (default_vehicle) {
-            this.formModel.vehicle_type = default_vehicle.name;
-            this.formModel.fare = default_vehicle.tarif_flat;
-            this.$forceUpdate();
-          } else {
-            this.$message({
-              message: "MOHON SET DEFAULT JENIS KENDARAAN",
-              type: "error",
-              showClose: true
-            });
-          }
         })
         .catch(e => {
           this.$message({
@@ -220,6 +210,7 @@ export default {
     }
   },
   mounted() {
+    this.$store.commit("getSetting");
     this.getVehicleTypeList();
     document.getElementById("plate-number").focus();
 
@@ -287,6 +278,10 @@ export default {
   color: #fff;
   border-radius: 4px;
   margin-top: 10px;
+}
+
+.my-big-btn:focus {
+  background: rgb(199, 24, 24);
 }
 
 .label {

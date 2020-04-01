@@ -4,16 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\ParkingTransaction;
-use App\Http\Requests\ParkingTransactionRequest;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
-use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+// use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\ParkingMember;
 use App\Setting;
-use App\User;
 use App\UserLog;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
+use PhpSerial\PhpSerial;
 
 class ParkingTransactionController extends Controller
 {
@@ -71,11 +70,11 @@ class ParkingTransactionController extends Controller
         return ParkingTransaction::create($input);
     }
 
-    public function takeSnapshot(Request $request, ParkingTransaction $parkingTransaction)
+    public function takeSnapshot(ParkingTransaction $parkingTransaction)
     {
         $setting = Setting::first();
 
-        if (!$setting || !$setting->camera_status || !$setting->camera_image_snapshot_url) {
+        if (!$setting || !$setting->camera_image_snapshot_url) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
         }
 
@@ -116,72 +115,58 @@ class ParkingTransactionController extends Controller
         }
 
         try {
-            if ($setting->printer_type == "network") {
-                $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
-            } else if ($setting->printer_type == "local") {
-                $connector = new FilePrintConnector($setting->printer_device);
-            } else {
-                return response(['message' => 'INVALID PRINTER'], 500);
-            }
-
+            $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
         }
 
-        if ($request->trx == 'OUT') {
-            try {
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text("STRUK PARKIR\n");
-                $printer->text($setting->location_name . "\n");
-                $printer->text($setting->location_address . "\n\n");
+        try {
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("TIKET PARKIR\n");
+            $printer->text($setting->location_name . "\n");
+            $printer->text($setting->location_address . "\n\n");
 
-                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
-                $printer->text($parkingTransaction->plate_number . "/" . $parkingTransaction->vehicle_type . "/" . $gate->name);
-                $printer->text("\n\n");
+            $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
+            $printer->text($parkingTransaction->plate_number . "/" . $parkingTransaction->vehicle_type);
+            $printer->text("\n\n");
 
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
-
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
-
-                $printer->cut();
-                $printer->close();
-            } catch (\Exeption $e) {
-                return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
-            }
-        }
-
-        if ($request->trx == 'IN') {
-            try {
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text("TIKET PARKIR\n");
-                $printer->text($setting->location_name . "\n");
-                $printer->text($setting->location_address . "\n\n");
-
-                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
-                $printer->text($parkingTransaction->plate_number . "/" . $parkingTransaction->vehicle_type);
-                $printer->text("\n\n");
-
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                // $printer->setBarcodeHeight(100);
-                // $printer->setBarcodeWidth(4);
-                // $printer->barcode($parkingTransaction->barcode_number, 'CODE39');
-                // $printer->text("\n");
-                $printer->text($setting->additional_info_ticket . "\n");
-                $printer->cut();
-                $printer->close();
-            } catch (\Exception $e) {
-                return response(['message' => 'GAGAL MENCETAK TIKET.' . $e->getMessage()], 500);
-            }
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+            $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
+            $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            // $printer->setBarcodeHeight(100);
+            // $printer->setBarcodeWidth(4);
+            // $printer->barcode($parkingTransaction->barcode_number, 'CODE39');
+            // $printer->text("\n");
+            $printer->text($setting->additional_info_ticket . "\n");
+            $printer->cut();
+            $printer->close();
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENCETAK TIKET.' . $e->getMessage()], 500);
         }
 
         return ['message' => 'SILAKAN AMBIL TIKET'];
+    }
+
+    public function openGate()
+    {
+        try {
+            $serial = new PhpSerial;
+            $serial->deviceSet(env('SERIAL_DEVICE', '/dev/gate'));
+            $serial->confBaudRate(env('SERIAL_BAUDRATE', 9600));
+            $serial->confParity("none");
+            $serial->confCharacterLength(8);
+            $serial->confStopBits(1);
+            $serial->confFlowControl("none");
+            $serial->deviceOpen();
+            $serial->sendMessage(env('SERIAL_OPEN_CMD', '*TRIG1#'));
+            $serial->deviceClose();
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MEMBUKA GATE. ' . $e->getMessage()], 500);
+        }
+
+        return ['message' => 'GATE BERHASIL DIBUKA'];
     }
 
     /**
@@ -265,14 +250,7 @@ class ParkingTransactionController extends Controller
             ->first();
 
         try {
-            if ($setting->printer_type == "network") {
-                $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
-            } else if ($setting->printer_type == "local") {
-                $connector = new FilePrintConnector($setting->printer_device);
-            } else {
-                return response(['message' => 'INVALID PRINTER'], 500);
-            }
-
+            $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);

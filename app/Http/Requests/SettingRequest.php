@@ -25,9 +25,7 @@ class SettingRequest extends FormRequest
     {
         return [
             'jml_kendaraan_per_kartu' => 'required|numeric',
-            // 'masa_aktif_member' => 'required|boolean',
             'location_name' => 'required',
-            'must_checkout' => 'required|boolean'
         ];
     }
 
@@ -36,7 +34,6 @@ class SettingRequest extends FormRequest
         return [
             'jml_kendaraan_per_kartu' => 'Jumlah kendaraan per kartu',
             'location_name' => 'Nama lokasi',
-            'must_checkout' => 'Kartu tap in harus check out'
         ];
     }
 }

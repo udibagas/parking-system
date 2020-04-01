@@ -26,6 +26,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('parkingMember', 'ParkingMemberController')->except(['create', 'edit']);
     Route::resource('groupMember', 'GroupMemberController')->except(['create', 'edit', 'show']);
     Route::post('parkingTransaction/printReport', 'ParkingTransactionController@printReport');
+    Route::post('openGate', 'ParkingTransactionController@openGate');
     Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');
     Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
     Route::get('parkingTransaction/search', 'ParkingTransactionController@search');

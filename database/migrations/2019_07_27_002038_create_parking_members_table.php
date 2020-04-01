@@ -17,11 +17,16 @@ class CreateParkingMembersTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('card_number');
-            $table->string('vehicle_type'); // mobil atau motor
             $table->boolean('is_active')->default(0);
             $table->date('expiry_date')->nullable();
-            $table->bigInteger('balance')->default(0);
             $table->dateTime('last_transaction')->nullable();
+            $table->bigInteger('group_member_id')->nullable();
+            $table->bigInteger('fare')->default(0);
+            $table->boolean('paid')->default(0);
+            $table->date('register_date')->nullable();
+            $table->tinyInteger('billing_cycle')->default(1);
+            $table->string('billing_cycle_unit')->default('months');
+            $table->string('phone')->nullable();
             $table->timestamps();
         });
     }

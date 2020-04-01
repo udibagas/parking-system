@@ -22,6 +22,11 @@ class CreateParkingTransactionsTable extends Migration
             $table->string('card_number')->nullable();
             $table->bigInteger('user_id')->nullable();
             $table->bigInteger('parking_member_id')->nullable();
+            $table->string('plate_number')->nullable();
+            $table->integer('fare')->default(0);
+            $table->string('snapshot_in')->nullable();
+            $table->string('operator')->nullable();
+            $table->boolean('is_member')->default(0)->change();
             $table->timestamps();
         });
     }

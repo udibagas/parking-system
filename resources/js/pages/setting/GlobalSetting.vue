@@ -63,28 +63,6 @@
       </el-form-item>
 
       <el-form-item
-        label="Mode Transaksi Member"
-        :class="formErrors.must_checkout ? 'is-error' : ''"
-      >
-        <el-select
-          placeholder="Mode Transaksi Member"
-          v-model="formModel.must_checkout"
-          style="width:100%"
-        >
-          <el-option
-            v-for="(l, i) in ['Tidak harus check out', 'Harus check out']"
-            :key="i"
-            :value="i"
-            :label="l"
-          ></el-option>
-        </el-select>
-        <div
-          class="el-form-item__error"
-          v-if="formErrors.must_checkout"
-        >{{formErrors.must_checkout[0]}}</div>
-      </el-form-item>
-
-      <el-form-item
         label="Mode Buka Gate Untuk Member"
         :class="formErrors.member_auto_open ? 'is-error' : ''"
       >
@@ -104,23 +82,6 @@
           class="el-form-item__error"
           v-if="formErrors.member_auto_open"
         >{{formErrors.member_auto_open[0]}}</div>
-      </el-form-item>
-
-      <el-form-item
-        label="Disable Plat Nomor di Pos Keluar"
-        :class="formErrors.disable_plat_nomor ? 'is-error' : ''"
-      >
-        <el-select
-          placeholder="Disable Plat Nomor di Pos Keluar"
-          v-model="formModel.disable_plat_nomor"
-          style="width:100%"
-        >
-          <el-option v-for="(l, i) in ['Tidak', 'Ya']" :key="i" :value="i" :label="l"></el-option>
-        </el-select>
-        <div
-          class="el-form-item__error"
-          v-if="formErrors.disable_plat_nomor"
-        >{{formErrors.disable_plat_nomor[0]}}</div>
       </el-form-item>
 
       <el-form-item
@@ -153,19 +114,66 @@
         >{{formErrors.hapus_transaksi_dalam_hari[0]}}</div>
       </el-form-item>
 
-      <!-- <el-form-item label="Masa Aktif Member" :class="formErrors.masa_aktif_member ? 'is-error' : ''">
-                            <el-select placeholder="Masa Aktif Member" v-model="formModel.masa_aktif_member" style="width:100%">
-                                <el-option v-for="(l, i) in ['24 JAM', 'LEWAT TENGAH MALAM']" :key="i" :value="i" :label="l"></el-option>
-                            </el-select>
-                            <div class="el-form-item__error" v-if="formErrors.masa_aktif_member">{{formErrors.masa_aktif_member[0]}}</div>
-      </el-form-item>-->
+      <el-form-item
+        label="IP Address Printer"
+        :class="formErrors.printer_ip_address ? 'is-error' : ''"
+      >
+        <el-input placeholder="IP Address Printer" v-model="formModel.printer_ip_address"></el-input>
+        <div
+          class="el-form-item__error"
+          v-if="formErrors.printer_ip_address"
+        >{{formErrors.printer_ip_address[0]}}</div>
+      </el-form-item>
+
+      <el-form-item
+        label="URL Snapshot Kamera"
+        :class="formErrors.camera_snapshot_url ? 'is-error' : ''"
+      >
+        <el-input placeholder="URL Snapshot Kamera" v-model="formModel.camera_snapshot_url"></el-input>
+        <div
+          class="el-form-item__error"
+          v-if="formErrors.camera_snapshot_url"
+        >{{formErrors.camera_snapshot_url[0]}}</div>
+      </el-form-item>
+
+      <el-form-item label="Username Kamera" :class="formErrors.camera_username ? 'is-error' : ''">
+        <el-input placeholder="Username Kamera" v-model="formModel.camera_username"></el-input>
+        <div
+          class="el-form-item__error"
+          v-if="formErrors.camera_username"
+        >{{formErrors.camera_username[0]}}</div>
+      </el-form-item>
+
+      <el-form-item label="Password Kamera" :class="formErrors.camera_password ? 'is-error' : ''">
+        <el-input placeholder="Password Kamera" v-model="formModel.camera_password"></el-input>
+        <div
+          class="el-form-item__error"
+          v-if="formErrors.camera_password"
+        >{{formErrors.camera_password[0]}}</div>
+      </el-form-item>
+
+      <el-form-item label="Camera Auth Type" :class="formErrors.camera_auth_type ? 'is-error' : ''">
+        <el-select
+          placeholder="Camera Auth Type"
+          v-model="formModel.camera_auth_type"
+          style="width:100%"
+        >
+          <el-option v-for="(l, i) in ['basic', 'digest']" :key="i" :value="i" :label="l"></el-option>
+        </el-select>
+        <div
+          class="el-form-item__error"
+          v-if="formErrors.camera_auth_type"
+        >{{formErrors.camera_auth_type[0]}}</div>
+      </el-form-item>
+
+      <el-form-item>
+        <el-button
+          type="primary"
+          @click="() => { !!formModel.id ? update() : store(); }"
+          icon="el-icon-success"
+        >SIMPAN</el-button>
+      </el-form-item>
     </el-form>
-    <el-button
-      style="width:100%"
-      type="primary"
-      @click="() => { !!formModel.id ? update() : store(); }"
-      icon="el-icon-success"
-    >SIMPAN</el-button>
   </el-card>
 </template>
 

@@ -44,11 +44,15 @@ class ParkingMemberController extends Controller
             return $q->where('paid', 0);
         })->orderBy($sort, $order)->paginate($request->pageSize);
 
-        $data = $data->map(function ($d) {
-            return array_merge($d->toArray(), [
-                'group' => $d->groupMember->name
-            ]);
-        });
+        $data = [
+            'from' => $data->firstItem(),
+            'to' => $data->lastItem(),
+            'data' => $data->map(function ($d) {
+                return array_merge($d->toArray(), [
+                    'group' => $d->groupMember->name
+                ]);
+            })
+        ];
 
         if ($request->action == 'print') {
             return view('parking_member.print', [
@@ -57,11 +61,7 @@ class ParkingMemberController extends Controller
             ]);
         }
 
-        return [
-            'from' => $data->firstItem(),
-            'to' => $data->lastItem(),
-            'data' => $data
-        ];
+        return $data;
     }
 
     /**
