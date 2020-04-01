@@ -39,7 +39,7 @@ class DeleteSnapshotCommand extends Command
      */
     public function handle()
     {
-        $data = ParkingTransaction::whereRaw('DATEDIFF(NOW(), created_at) >= :age AND (snapshot_in != "" OR snapshot_out != "")', [
+        $data = ParkingTransaction::whereRaw('DATEDIFF(NOW(), created_at) >= :age AND snapshot_in != ""', [
             ':age' => $this->argument('age')
         ])->get();
 
@@ -55,20 +55,6 @@ class DeleteSnapshotCommand extends Command
                         ->update(['snapshot_in' => '']);
                 } catch (\Exception $e) {
                     $this->error('Gagal menghapus file ' . $d->snapshot_in . '. ' . $e->getMessage());
-                }
-            }
-
-            if ($d->snapshot_out && file_exists('./public/' . $d->snapshot_out)) {
-                $this->info('Delete file ' . $d->snapshot_out);
-
-                try {
-                    unlink('./public/' . $d->snapshot_out);
-                    $this->info('File ' . $d->snapshot_out . ' telah dihapus');
-                    DB::table('parking_transactions')
-                        ->where('snapshot_out', $d->snapshot_out)
-                        ->update(['snapshot_out' => '']);
-                } catch (\Exception $e) {
-                    $this->error('Gagal menghapus file ' . $d->snapshot_out . '. ' . $e->getMessage());
                 }
             }
         }
