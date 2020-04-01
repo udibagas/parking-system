@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
-use App\ParkingGate;
 use App\ParkingMember;
 use App\Setting;
 use Illuminate\Support\Facades\DB;
@@ -33,12 +32,12 @@ class MemberRenewalController extends Controller
             ')
             ->join('parking_members', 'parking_members.id', '=', 'member_renewals.parking_member_id')
             ->join('users', 'users.id', '=', 'member_renewals.user_id')
-            ->when($request->dateRange, function($q) use ($request) {
+            ->when($request->dateRange, function ($q) use ($request) {
                 return $q->whereRaw("DATE(member_renewals.updated_at) BETWEEN '{$request->dateRange[0]}' AND '{$request->dateRange[1]}' ");
-            })->when($request->keyword, function($q) use ($request) {
-                return $q->where('parking_members.name', 'LIKE', '%'.$request->keyword.'%')
-                    ->orWhere('parking_members.card_number', 'LIKE', '%'.$request->keyword.'%')
-                    ->orWhere('users.name', 'LIKE', '%'.$request->keyword.'%');
+            })->when($request->keyword, function ($q) use ($request) {
+                return $q->where('parking_members.name', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('parking_members.card_number', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('users.name', 'LIKE', '%' . $request->keyword . '%');
             })
             ->orderBy($sort, $order)->paginate($request->pageSize);
     }
@@ -90,12 +89,8 @@ class MemberRenewalController extends Controller
 
     public function printSlip(MemberRenewal $memberRenewal)
     {
-        // $parkingGate = ParkingGate::where('type', 'OUT')->where('active', 1)->first();
         $setting = Setting::first();
 
-        // if (!$parkingGate) {
-        //     return response(['message' => 'TIDAK ADA PRINTER YANG DIPILIH'], 404);
-        // }
 
         if (!$setting) {
             return response(['message' => 'BELUM ADA SETTING'], 500);
@@ -104,20 +99,6 @@ class MemberRenewalController extends Controller
         if (!$setting->location_name) {
             return response(['message' => 'LOKASI BELUM DISET'], 500);
         }
-
-        // try {
-        //     if ($parkingGate->printer_type == "network") {
-        //         $connector = new NetworkPrintConnector($parkingGate->printer_ip_address, 9100);
-        //     } else if ($parkingGate->printer_type == "local") {
-        //         $connector = new FilePrintConnector($parkingGate->printer_device);
-        //     } else {
-        //         return response(['message' => 'INVALID PRINTER'], 500);
-        //     }
-
-        //     $printer = new Printer($connector);
-        // } catch (\Exception $e) {
-        //     return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
-        // }
 
         try {
             $connector = new NetworkPrintConnector(env('PRINTER_ADDRESS'), 9100);
@@ -129,7 +110,7 @@ class MemberRenewalController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("SLIP PEMBAYARAN KEANGGOTAAN PARKIR\n");
-            $printer->text($setting->location_name."\n");
+            $printer->text($setting->location_name . "\n");
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -138,7 +119,7 @@ class MemberRenewalController extends Controller
             $printer->text(str_pad('Nomor Kartu', 15, ' ') . ' : ' . $memberRenewal->parkingMember->card_number . "\n");
             $printer->text(str_pad('Dari Tangal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->from_date)) . "\n");
             $printer->text(str_pad('Sampai Tanggal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->to_date)) . "\n");
-            $printer->text(str_pad('Jumlah', 15, ' ') . ' : ' .'Rp. ' . number_format($memberRenewal->amount, 0, ',', '.') . ",-\n");
+            $printer->text(str_pad('Jumlah', 15, ' ') . ' : ' . 'Rp. ' . number_format($memberRenewal->amount, 0, ',', '.') . ",-\n");
             $printer->text(str_pad('Petugas', 15, ' ') . ' : ' . strtoupper($memberRenewal->user->name) . "\n\n");
             $printer->cut();
             $printer->close();
@@ -206,7 +187,7 @@ class MemberRenewalController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("LAPORAN PENDAPATAN ANGGOTA\n");
-            $printer->text($setting->location_name."\n");
+            $printer->text($setting->location_name . "\n");
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -216,8 +197,7 @@ class MemberRenewalController extends Controller
             $totalJumlah = 0;
             $totalPendapatan = 0;
 
-            foreach ($data as $d)
-            {
+            foreach ($data as $d) {
                 $totalJumlah += $d->jumlah;
                 $totalPendapatan += $d->pendapatan;
 
@@ -228,8 +208,8 @@ class MemberRenewalController extends Controller
 
             $printer->text("\n\n");
             $printer->text(str_pad('TOTAL', 15, ' ')
-                    . str_pad(number_format($totalJumlah, 0, ',', '.'), 15, ' ')
-                    . str_pad(number_format($totalPendapatan, 0, ',', '.'), 15, ' ')  . "\n");
+                . str_pad(number_format($totalJumlah, 0, ',', '.'), 15, ' ')
+                . str_pad(number_format($totalPendapatan, 0, ',', '.'), 15, ' ')  . "\n");
 
             $printer->cut();
             $printer->close();
@@ -262,8 +242,8 @@ class MemberRenewalController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("LAPORAN PENDAPATAN ANGGOTA\n");
-            $printer->text($setting->location_name."\n");
-            $printer->text("TANGGAL ".date('d/M/Y', strtotime($date)));
+            $printer->text($setting->location_name . "\n");
+            $printer->text("TANGGAL " . date('d/M/Y', strtotime($date)));
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);

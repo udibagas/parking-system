@@ -5,15 +5,13 @@ namespace App\Http\Controllers;
 use App\User;
 use App\UserLog;
 use Illuminate\Http\Request;
-use JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
 
 class AuthController extends Controller
 {
     public function login(Request $request)
     {
         $user = User::where('status', 1)
-            ->where(function($q) use ($request) {
+            ->where(function ($q) use ($request) {
                 return $q->where('name', $request->email)
                     ->orWhere('email', $request->email);
             })->first();
@@ -49,14 +47,8 @@ class AuthController extends Controller
         return response()->json(['message' => 'Successfully logged out']);
     }
 
-    public function getAuthUser(Request $request)
+    public function me()
     {
-        $this->validate($request, [
-            'token' => 'required'
-        ]);
-
-        $user = JWTAuth::authenticate($request->token);
-
-        return response()->json(['user' => $user]);
+        return auth()->user();
     }
 }

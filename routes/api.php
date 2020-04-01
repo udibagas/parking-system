@@ -12,14 +12,3 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
-Route::middleware('auth:api')->get('/user', function (Request $request) {
-    return $request->user();
-});
-
-Route::post('parkingTransaction', 'ParkingTransactionController@store');
-Route::get('parkingGate/search', 'ParkingGateController@search');
-Route::get('parkingMember/search', 'ParkingMemberController@search');
-Route::get('parkingGate/takeSnapshot/{parkingGate}', 'ParkingGateController@takeSnapshot');
-Route::get('setting', 'SettingController@index');
-Route::post('notification', 'NotificationController@store');

@@ -27,7 +27,6 @@ class VehicleTypeRequest extends FormRequest
             'name' => 'required',
             'shortcut_key' => 'required|max:1',
             'tarif_flat' => 'numeric',
-            'denda_tiket_hilang' => 'numeric'
         ];
     }
 
@@ -37,7 +36,6 @@ class VehicleTypeRequest extends FormRequest
             'name' => 'Nama',
             'shortcut_key' => 'Shortcut Key',
             'tarif_flat' => 'Tarif Flat',
-            'denda_tiket_hilang' => 'Denda Tiket Hilang'
         ];
     }
 }

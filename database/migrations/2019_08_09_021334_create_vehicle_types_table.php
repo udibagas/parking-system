@@ -18,7 +18,6 @@ class CreateVehicleTypesTable extends Migration
             $table->string('name');
             $table->string('shortcut_key', 1);
             $table->integer('tarif_flat')->default(0);
-            $table->integer('denda_tiket_hilang')->default(0);
             $table->timestamps();
         });
     }

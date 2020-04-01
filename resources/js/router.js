@@ -6,10 +6,8 @@ import ParkingTransaction from './pages/ParkingTransaction'
 import User from './pages/User'
 import Report from './pages/Report'
 import Snapshot from './pages/Snapshot'
-// import ServerInformation from './pages/ServerInformation'
-import Setting from './pages/Setting'
+import Setting from './pages/setting/Index'
 import Member from './pages/Member'
-import Notification from './pages/Notification'
 
 Vue.use(VueRouter)
 
@@ -20,10 +18,8 @@ const router = new VueRouter({
         { path: '/parking-transaction', component: ParkingTransaction, name: 'parking-transaction' },
         { path: '/report', component: Report, name: 'report' },
         { path: '/snapshot', component: Snapshot, name: 'snapshot' },
-        // { path: '/server-information', component: ServerInformation, name: 'server-information' },
         { path: '/setting', component: Setting, name: 'setting' },
         { path: '/member', component: Member, name: 'member' },
-        { path: '/notification', component: Notification, name: 'notification' },
         { path: '*', component: Home },
     ]
 })

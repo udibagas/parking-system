@@ -30,6 +30,9 @@ sudo mysql -uroot -e 'create database parking_system'
 sudo mysql -uroot -e 'grant all on parking_system.* to parking_system@localhost identified by Bismillah1@#$%"'
 sudo mysql -uroot -e 'flush privileges'
 
+ grant all on parking.* to 'parking'@'localhost' identified by 'Bismillah1@#$%';
+
+
 # migrate then populate db
 php artisan migrate
 php artisan db:seed

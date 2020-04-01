@@ -13,16 +13,15 @@ export default new Vuex.Store({
         user: currentUser ? JSON.parse(currentUser) : {},
         token: window.sessionStorage.getItem('token'),
         vehicleTypeList: [],
-        parkingGateList: [],
         groupMemberList: [],
         memberList: [],
         navigationList: [],
         setting: {},
         siklus: [
-            {value: 'days', label: 'hari'},
-            {value: 'weeks', label: 'minggu'},
-            {value: 'months', label: 'bulan'},
-            {value: 'years', label: 'tahun'},
+            { value: 'days', label: 'hari' },
+            { value: 'weeks', label: 'minggu' },
+            { value: 'months', label: 'bulan' },
+            { value: 'years', label: 'tahun' },
         ]
     },
     mutations: {
@@ -36,10 +35,6 @@ export default new Vuex.Store({
         },
         getMemberList(state) {
             axios.get('/parkingMember/getList').then(r => state.memberList = r.data)
-                .catch(e => console.log(e))
-        },
-        getParkingGateList(state) {
-            axios.get('/parkingGate/getList').then(r => state.parkingGateList = r.data)
                 .catch(e => console.log(e))
         },
         getNavigationList(state) {

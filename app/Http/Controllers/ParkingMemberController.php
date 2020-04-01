@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ParkingMember;
 use App\Http\Requests\ParkingMemberRequest;
-use App\ParkingTransaction;
 use App\Setting;
 use Illuminate\Support\Facades\DB;
 
@@ -26,29 +25,30 @@ class ParkingMemberController extends Controller
         $sort = $request->sort ? $request->sort : 'name';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
-        $data = ParkingMember::selectRaw('
-                parking_members.*,
-                group_members.name AS `group`
-            ')
-            ->join('group_members', 'group_members.id', '=', 'parking_members.group_member_id', 'LEFT')
-            ->when($request->keyword, function ($q) use ($request) {
-                return $q->where(function($qq) use ($request) {
-                    return $qq->where('parking_members.name', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhere('parking_members.card_number', 'LIKE', '%' . $request->keyword . '%');
-                });
-            })->when($request->is_active, function ($q) use ($request) {
-                return $q->whereIn('parking_members.is_active', $request->is_active);
-            })->when($request->group_member_id, function ($q) use ($request) {
-                return $q->whereIn('parking_members.group_member_id', $request->group_member_id);
-            })->when($request->expired == ['y'] || $request->expired == 'y', function ($q) {
-                return $q->whereRaw('parking_members.expiry_date < DATE(NOW())');
-            })->when($request->expired == ['n'] || $request->expired == 'n', function ($q) {
-                return $q->whereRaw('parking_members.expiry_date >= DATE(NOW())');
-            })->when($request->paid == ['y'] || $request->paid == 'y', function ($q) {
-                return $q->where('paid', 1);
-            })->when($request->paid == ['n'] || $request->paid == 'n', function ($q) {
-                return $q->where('paid', 0);
-            })->orderBy($sort, $order)->paginate($request->pageSize);
+        $data = ParkingMember::when($request->keyword, function ($q) use ($request) {
+            return $q->where(function ($qq) use ($request) {
+                return $qq->where('name', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('card_number', 'LIKE', '%' . $request->keyword . '%');
+            });
+        })->when($request->is_active, function ($q) use ($request) {
+            return $q->whereIn('is_active', $request->is_active);
+        })->when($request->group_member_id, function ($q) use ($request) {
+            return $q->whereIn('group_member_id', $request->group_member_id);
+        })->when($request->expired == ['y'] || $request->expired == 'y', function ($q) {
+            return $q->whereRaw('expiry_date < DATE(NOW())');
+        })->when($request->expired == ['n'] || $request->expired == 'n', function ($q) {
+            return $q->whereRaw('expiry_date >= DATE(NOW())');
+        })->when($request->paid == ['y'] || $request->paid == 'y', function ($q) {
+            return $q->where('paid', 1);
+        })->when($request->paid == ['n'] || $request->paid == 'n', function ($q) {
+            return $q->where('paid', 0);
+        })->orderBy($sort, $order)->paginate($request->pageSize);
+
+        $data = $data->map(function ($d) {
+            return array_merge($d->toArray(), [
+                'group' => $d->groupMember->name
+            ]);
+        });
 
         if ($request->action == 'print') {
             return view('parking_member.print', [
@@ -57,7 +57,11 @@ class ParkingMemberController extends Controller
             ]);
         }
 
-        return $data;
+        return [
+            'from' => $data->firstItem(),
+            'to' => $data->lastItem(),
+            'data' => $data
+        ];
     }
 
     /**
@@ -68,18 +72,10 @@ class ParkingMemberController extends Controller
      */
     public function store(ParkingMemberRequest $request)
     {
-        try {
-            DB::transaction(function () use ($request) {
-                $id = DB::table('parking_members')->insertGetId($request->only((new ParkingMember())->getFillable()));
-
-                DB::table('member_vehicles')->insert(array_map(function($vehicle) use ($id) {
-                    $vehicle['parking_member_id'] = $id;
-                    return $vehicle;
-                }, $request->vehicles));
-            });
-        } catch (\Exception $e) {
-            return response(['message' => 'Data gagal disimpan. ' . $e->getMessage()], 500);
-        }
+        DB::transaction(function () use ($request) {
+            $m = ParkingMember::create($request->all());
+            $m->vehicles()->createMany($request->vehicles);
+        });
 
         return ['message' => 'Data berhasil disimpan'];
     }
@@ -106,30 +102,14 @@ class ParkingMemberController extends Controller
             ->where('parking_members.is_active', 1)
             // comment this line. prosesnya nanti di client
             // ->where('parking_members.expiry_date', '>=', date('Y-m-d'))
-            ->when($request->card_number, function($q) use ($request) {
-                return $q->where('parking_members.card_number', 'LIKE', '%'.$request->card_number);
-            })->when($request->plate_number, function($q) use ($request) {
+            ->when($request->card_number, function ($q) use ($request) {
+                return $q->where('parking_members.card_number', 'LIKE', '%' . $request->card_number);
+            })->when($request->plate_number, function ($q) use ($request) {
                 return $q->where('member_vehicles.plate_number', 'LIKE', $request->plate_number);
             })->first();
 
         if (!$member) {
             return response(['message' => 'No member found'], 404);
-        }
-
-        // kalau cari berdasarkan kartu berarti di gate in, cari apa dia ada transaksi yg blm closed
-        if ($request->card_number)
-        {
-            $unclosed = ParkingTransaction::where('card_number', 'LIKE', '%'.$request->card_number)
-                ->where('time_out', null)
-                ->first();
-
-            $setting = Setting::first();
-            $member->unclosed = $setting && $setting->must_checkout && $unclosed ? true : false;
-
-            // kalau gak harus check out otomatis close trx sebelumnya
-            if ($setting && !$setting->must_checkout && $unclosed) {
-                $unclosed->update(['time_out' => now()]);
-            }
         }
 
         return $member;
@@ -144,24 +124,11 @@ class ParkingMemberController extends Controller
      */
     public function update(ParkingMemberRequest $request, ParkingMember $parkingMember)
     {
-        try {
-            DB::transaction(function () use ($request, $parkingMember) {
-                DB::table('parking_members')
-                    ->where('id', $parkingMember->id)
-                    ->update($request->only((new ParkingMember())->getFillable()));
-
-                DB::table('member_vehicles')
-                    ->where('parking_member_id', $parkingMember->id)
-                    ->delete();
-
-                DB::table('member_vehicles')->insert(array_map(function($vehicle) use ($parkingMember) {
-                    $vehicle['parking_member_id'] = $parkingMember->id;
-                    return $vehicle;
-                }, $request->vehicles));
-            });
-        } catch (\Exception $e) {
-            return response(['message' => 'Data gagal disimpan. ' . $e->getMessage()], 500);
-        }
+        DB::transaction(function () use ($request, $parkingMember) {
+            $parkingMember->update($request->all());
+            $parkingMember->vehicles()->delete();
+            $parkingMember->vehicles()->createMany($request->vehicles);
+        });
 
         return ['message' => 'Data berhasil disimpan'];
     }
@@ -174,7 +141,11 @@ class ParkingMemberController extends Controller
      */
     public function destroy(ParkingMember $parkingMember)
     {
-        $parkingMember->delete();
+        DB::transaction(function () use ($parkingMember) {
+            $parkingMember->delete();
+            $parkingMember->vehicles()->delete();
+        });
+
         return ['message' => 'Member telah dihapus'];
     }
 
