@@ -154,55 +154,50 @@
       :visible.sync="showTrxDetail"
       :title="'DETAIL TRANSAKSI ' + trx.barcode_number"
     >
-      <el-row :gutter="20">
-        <el-col :span="14">
-          <table style="width:100%">
-            <tbody>
-              <tr>
-                <td class="td-label">Nomor Barcode</td>
-                <td class="td-value">{{trx.barcode_number}}</td>
-              </tr>
-              <tr>
-                <td class="td-label">Jenis Kendaraan</td>
-                <td class="td-value">{{trx.vehicle_type}}</td>
-              </tr>
-              <tr>
-                <td class="td-label">Plat Nomor</td>
-                <td class="td-value">{{trx.plate_number}}</td>
-              </tr>
-              <tr>
-                <td class="td-label">Member</td>
-                <td class="td-value">{{trx.is_member ? 'Ya' : 'Tidak'}}</td>
-              </tr>
-              <tr>
-                <td class="td-label">Nomor Kartu</td>
-                <td class="td-value">{{trx.card_number}}</td>
-              </tr>
-              <tr>
-                <td class="td-label">Waktu Masuk</td>
-                <td class="td-value">{{trx.time_in}}</td>
-              </tr>
-              <tr v-if="$store.state.user.role == 1">
-                <td class="td-label">Tarif</td>
-                <td class="td-value">Rp {{trx.fare | formatNumber}}</td>
-              </tr>
-              <tr>
-                <td class="td-label">Operator</td>
-                <td class="td-value">{{trx.operator}}</td>
-              </tr>
-            </tbody>
-          </table>
-        </el-col>
-        <el-col :span="10">
-          <div class="block">
-            <el-image :src="trx.snapshot_in" style="width: 100%; height: 100%" fit="cover">
-              <div slot="error" class="el-image__error">
-                <i class="el-icon-picture-outline"></i>
-              </div>
-            </el-image>
-          </div>
-        </el-col>
-      </el-row>
+      <table style="width:100%">
+        <tbody>
+          <tr>
+            <td class="td-label">Nomor Barcode</td>
+            <td class="td-value">{{trx.barcode_number}}</td>
+          </tr>
+          <tr>
+            <td class="td-label">Jenis Kendaraan</td>
+            <td class="td-value">{{trx.vehicle_type}}</td>
+          </tr>
+          <tr>
+            <td class="td-label">Plat Nomor</td>
+            <td class="td-value">{{trx.plate_number}}</td>
+          </tr>
+          <tr>
+            <td class="td-label">Member</td>
+            <td class="td-value">{{trx.is_member ? 'Ya' : 'Tidak'}}</td>
+          </tr>
+          <tr>
+            <td class="td-label">Nomor Kartu</td>
+            <td class="td-value">{{trx.card_number}}</td>
+          </tr>
+          <tr>
+            <td class="td-label">Waktu Masuk</td>
+            <td class="td-value">{{trx.time_in}}</td>
+          </tr>
+          <tr v-if="$store.state.user.role == 1">
+            <td class="td-label">Tarif</td>
+            <td class="td-value">Rp {{trx.fare | formatNumber}}</td>
+          </tr>
+          <tr>
+            <td class="td-label">Operator</td>
+            <td class="td-value">{{trx.operator}}</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <br />
+
+      <el-image :src="trx.snapshot_in" style="width: 100%; height: 100%" fit="cover">
+        <div slot="error" class="el-image__error">
+          <i class="el-icon-picture-outline"></i>
+        </div>
+      </el-image>
     </el-dialog>
   </div>
 </template>

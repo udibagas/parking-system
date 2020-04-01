@@ -168,13 +168,7 @@ export default {
     takeSnapshot(id) {
       axios
         .post("/parkingTransaction/takeSnapshot/" + id)
-        .then(r => {
-          this.$message({
-            message: r.data.message,
-            type: "success",
-            showClose: true
-          });
-        })
+        .then(r => {})
         .catch(e => {
           this.$message({
             message: e.response.data.message,
