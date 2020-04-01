@@ -158,7 +158,7 @@
           v-model="formModel.camera_auth_type"
           style="width:100%"
         >
-          <el-option v-for="(l, i) in ['basic', 'digest']" :key="i" :value="i" :label="l"></el-option>
+          <el-option v-for="(l, i) in ['basic', 'digest']" :key="i" :value="l" :label="l"></el-option>
         </el-select>
         <div
           class="el-form-item__error"
