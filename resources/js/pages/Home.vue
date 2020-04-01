@@ -133,6 +133,7 @@ export default {
             .post("/parkingTransaction", this.formModel)
             .then(r => {
               this.printTicket(r.data.id);
+              this.takeSnapshot(r.data.id);
             })
             .catch(e => {
               this.$message({
@@ -162,6 +163,24 @@ export default {
         })
         .finally(() => {
           setTimeout(this.openGate, 3000);
+        });
+    },
+    takeSnapshot(id) {
+      axios
+        .post("/parkingTransaction/takeSnapshot/" + id)
+        .then(r => {
+          this.$message({
+            message: r.data.message,
+            type: "success",
+            showClose: true
+          });
+        })
+        .catch(e => {
+          this.$message({
+            message: e.response.data.message,
+            type: "error",
+            showClose: true
+          });
         });
     },
     openGate() {
