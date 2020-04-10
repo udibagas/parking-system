@@ -6,6 +6,23 @@
 
     <el-row :gutter="10" style="margin-bottom:10px;">
       <el-col :span="10">
+        <div class="label-big">[/] NO. KARTU</div>
+      </el-col>
+      <el-col :span="14">
+        <input
+          id="card-number"
+          autocomplete="off"
+          @keyup.enter="toPlateField"
+          type="text"
+          placeholder="NO. KARTU"
+          v-model="formModel.card_number"
+          class="my-input"
+        />
+      </el-col>
+    </el-row>
+
+    <el-row :gutter="10" style="margin-bottom:10px;">
+      <el-col :span="10">
         <div class="label-big">[-] NO. PLAT</div>
       </el-col>
       <el-col :span="14">
@@ -72,6 +89,9 @@ export default {
   methods: {
     toVehicleField() {
       document.getElementById("vehicle-type").focus();
+    },
+    toPlateField() {
+      document.getElementById("plate-number").focus();
     },
     generateBarcodeNumber() {
       let result = "";
@@ -229,6 +249,13 @@ export default {
 
     document.getElementById("gate-in-app").onkeypress = e => {
       // ke field nomor plat
+      if (e.key == "/") {
+        e.preventDefault();
+        this.resetForm();
+        this.$forceUpdate();
+        document.getElementById("card-number").focus();
+      }
+
       if (e.key == "-") {
         e.preventDefault();
         this.resetForm();
