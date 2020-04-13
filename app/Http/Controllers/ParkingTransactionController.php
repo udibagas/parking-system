@@ -12,6 +12,7 @@ use App\Setting;
 use App\UserLog;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
+use Mike42\Escpos\EscposImage;
 use PhpSerial\PhpSerial;
 
 class ParkingTransactionController extends Controller
@@ -123,7 +124,8 @@ class ParkingTransactionController extends Controller
 
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("TIKET PARKIR\n");
+            $printer->graphics(EscposImage::load(public_path('images/logo.jpeg')));
+            $printer->text("\nTIKET PARKIR\n");
             $printer->text($setting->location_name . "\n");
             $printer->text($setting->location_address . "\n\n");
 
