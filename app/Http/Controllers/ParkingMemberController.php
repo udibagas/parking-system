@@ -109,7 +109,7 @@ class ParkingMemberController extends Controller
             })->first();
 
         if (!$member) {
-            return response(['message' => 'No member found'], 404);
+            return response(['message' => 'MEMBER TIDAK DITEMUKAN'], 404);
         }
 
         return $member;

@@ -1,74 +1,89 @@
 <template>
-  <div id="gate-in-app" style="padding:0px 200px;">
-    <h1 style="text-align:center;font-size:26px;">{{setting.location_name}}</h1>
+  <div id="gate-in-app">
+    <!-- <h1 style="text-align:center;font-size:26px;">{{setting.location_name}}</h1>
     <div style="text-align:center">{{setting.location_address}}</div>
-    <el-divider></el-divider>
+    <el-divider></el-divider>-->
 
-    <el-row :gutter="10" style="margin-bottom:10px;">
-      <el-col :span="10">
-        <div class="label-big">[/] NO. KARTU</div>
+    <el-row :gutter="20">
+      <el-col :span="12">
+        <el-row :gutter="10" style="margin-bottom:10px;">
+          <el-col :span="10">
+            <div class="label-big">[-] NO. PLAT</div>
+          </el-col>
+          <el-col :span="14">
+            <input
+              id="plate-number"
+              autocomplete="off"
+              @keyup.enter="toVehicleField"
+              type="text"
+              placeholder="NO. PLAT"
+              v-model="formModel.plate_number"
+              class="my-input"
+            />
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="10" style="margin-bottom:10px;">
+          <el-col :span="10">
+            <div class="label-big">[/] NO. KARTU</div>
+          </el-col>
+          <el-col :span="14">
+            <input
+              id="card-number"
+              autocomplete="off"
+              @keyup.enter="checkCard"
+              type="text"
+              placeholder="NO. KARTU"
+              v-model="formModel.card_number"
+              class="my-input"
+            />
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="10" style="margin-bottom:10px;">
+          <el-col :span="10">
+            <div class="label-big">[*] JENIS KENDARAAN</div>
+          </el-col>
+          <el-col :span="14">
+            <select
+              placeholder="JENIS KENDARAAN"
+              @change="setFare"
+              v-model="formModel.vehicle_type"
+              id="vehicle-type"
+              class="my-input"
+            >
+              <option
+                v-for="g in vehicleTypeList"
+                :value="g.name"
+                :key="g.id"
+              >{{g.shortcut_key}} - {{g.name}}</option>
+            </select>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="10" style="margin-bottom:10px;">
+          <el-col :span="10">
+            <div class="label-big">TARIF</div>
+          </el-col>
+          <el-col :span="14">
+            <input disabled v-model="formModel.fare" class="my-input tarif-input" />
+          </el-col>
+        </el-row>
+
+        <button
+          class="my-big-btn"
+          id="submit-button"
+          @click="submit"
+        >[ENTER] PRINT TIKET & BUKA GATE</button>
       </el-col>
-      <el-col :span="14">
-        <input
-          id="card-number"
-          autocomplete="off"
-          @keyup.enter="toPlateField"
-          type="text"
-          placeholder="NO. KARTU"
-          v-model="formModel.card_number"
-          class="my-input"
-        />
+      <el-col :span="12">
+        <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
+          <div slot="error" class="el-image__error">
+            <h1>SNAPSHOT</h1>
+          </div>
+        </el-image>
       </el-col>
     </el-row>
-
-    <el-row :gutter="10" style="margin-bottom:10px;">
-      <el-col :span="10">
-        <div class="label-big">[-] NO. PLAT</div>
-      </el-col>
-      <el-col :span="14">
-        <input
-          id="plate-number"
-          autocomplete="off"
-          @keyup.enter="toVehicleField"
-          type="text"
-          placeholder="NO. PLAT"
-          v-model="formModel.plate_number"
-          class="my-input"
-        />
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="10" style="margin-bottom:10px;">
-      <el-col :span="10">
-        <div class="label-big">[*] JENIS KENDARAAN</div>
-      </el-col>
-      <el-col :span="14">
-        <select
-          placeholder="JENIS KENDARAAN"
-          @change="setFare"
-          v-model="formModel.vehicle_type"
-          id="vehicle-type"
-          class="my-input"
-        >
-          <option
-            v-for="g in vehicleTypeList"
-            :value="g.name"
-            :key="g.id"
-          >{{g.shortcut_key}} - {{g.name}}</option>
-        </select>
-      </el-col>
-    </el-row>
-
-    <el-row :gutter="10" style="margin-bottom:10px;">
-      <el-col :span="10">
-        <div class="label-big">TARIF</div>
-      </el-col>
-      <el-col :span="14">
-        <input disabled v-model="formModel.fare" class="my-input tarif-input" />
-      </el-col>
-    </el-row>
-
-    <button class="my-big-btn" id="submit-button" @click="submit">[ENTER] PRINT TIKET & BUKA GATE</button>
   </div>
 </template>
 
@@ -80,7 +95,8 @@ export default {
       formModel: {},
       formErrors: {},
       location: {},
-      vehicleTypeList: []
+      vehicleTypeList: [],
+      snapshot_in: null
     };
   },
   computed: {
@@ -89,9 +105,6 @@ export default {
   methods: {
     toVehicleField() {
       document.getElementById("vehicle-type").focus();
-    },
-    toPlateField() {
-      document.getElementById("plate-number").focus();
     },
     generateBarcodeNumber() {
       let result = "";
@@ -113,18 +126,78 @@ export default {
       }
       document.getElementById("submit-button").focus();
     },
+    checkCard() {
+      const params = { card_number: this.formModel.card_number };
+      axios
+        .get("/parkingMember/search", { params })
+        .then(r => {
+          this.formModel.is_member = true;
+
+          if (!!r.data.expired) {
+            this.$alert("Kartu telah habis masa berlaku", "Perhatian", {
+              type: "warning",
+              center: true,
+              roundButton: true,
+              confirmButtonText: "OK",
+              confirmButtonClass: "bg-red"
+            });
+            this.formModel.is_member = 0;
+            return;
+          }
+
+          if (!r.data.expired && r.data.expired_in <= 5) {
+            this.$alert(
+              "Kartu akan habis masa berlaku dalam " +
+                r.data.expired_in +
+                " hari",
+              "Perhatian",
+              {
+                type: "warning",
+                center: true,
+                roundButton: true,
+                confirmButtonText: "OK",
+                confirmButtonClass: "bg-red"
+              }
+            );
+          }
+
+          const vehicle = r.data.vehicles.find(
+            v => v.plate_number == this.formModel.plate_number
+          );
+
+          if (!vehicle) {
+            this.$alert(
+              "Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
+                r.data.vehicles.map(v => v.plate_number).join(", "),
+              "Perhatian",
+              {
+                type: "warning",
+                center: true,
+                roundButton: true,
+                confirmButtonText: "OK",
+                confirmButtonClass: "bg-red"
+              }
+            );
+            document.getElementById("plate-number").focus();
+          } else {
+            document.getElementById("vehicle-type").focus();
+          }
+        })
+        .catch(e => {
+          console.log(e);
+          this.$message({
+            message: e.response.data.message,
+            type: "error",
+            showClose: true
+          });
+        });
+    },
     resetForm() {
-      let default_vehicle = this.vehicleTypeList.find(v => v.is_default == 1);
-      this.formModel.plate_number = this.location.default_plate_number;
-
-      if (default_vehicle) {
-        this.formModel.vehicle_type = default_vehicle.name;
-        this.formModel.fare = default_vehicle.tarif_flat;
-      } else {
-        this.formModel.vehicle_type = "";
-        this.formModel.fare = "";
-      }
-
+      this.formModel.plate_number = this.setting.default_plate_number;
+      this.formModel.card_number = "";
+      this.formModel.vehicle_type = "";
+      this.formModel.fare = "";
+      this.snapshot_in = null;
       this.$forceUpdate();
       document.getElementById("plate-number").focus();
     },
@@ -188,7 +261,9 @@ export default {
     takeSnapshot(id) {
       axios
         .post("/parkingTransaction/takeSnapshot/" + id)
-        .then(r => {})
+        .then(r => {
+          this.snapshot_in = r.data.snapshot_in;
+        })
         .catch(e => {
           this.$message({
             message: e.response.data.message,
@@ -244,6 +319,10 @@ export default {
   },
   mounted() {
     this.$store.commit("getSetting");
+    setTimeout(() => {
+      this.formModel.plate_number = this.setting.default_plate_number;
+      this.$forceUpdate();
+    }, 100);
     this.getVehicleTypeList();
     document.getElementById("plate-number").focus();
 
@@ -251,7 +330,7 @@ export default {
       // ke field nomor plat
       if (e.key == "/") {
         e.preventDefault();
-        this.resetForm();
+        this.formModel.card_number = "";
         this.$forceUpdate();
         document.getElementById("card-number").focus();
       }
