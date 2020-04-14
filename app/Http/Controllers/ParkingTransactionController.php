@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\ParkingTransaction;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
-// use Mike42\Escpos\PrintConnectors\FilePrintConnector;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\ParkingMember;
 use App\Setting;
@@ -116,7 +116,12 @@ class ParkingTransactionController extends Controller
         }
 
         try {
-            $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
+            if ($setting->printer_ip_address) {
+                $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
+            }
+            if ($setting->printer_device) {
+                $connector = new FilePrintConnector($setting->printer_device);
+            }
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);

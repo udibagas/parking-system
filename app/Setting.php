@@ -13,6 +13,6 @@ class Setting extends Model
         'hapus_snapshot_dalam_hari', 'hapus_transaksi_dalam_hari',
         'camera_snapshot_url', 'camera_username',
         'camera_password', 'camera_auth_type',
-        'printer_ip_address'
+        'printer_ip_address', 'printer_device'
     ];
 }

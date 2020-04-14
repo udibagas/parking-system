@@ -125,6 +125,14 @@
         >{{formErrors.printer_ip_address[0]}}</div>
       </el-form-item>
 
+      <el-form-item label="Device Printer" :class="formErrors.printer_device ? 'is-error' : ''">
+        <el-input placeholder="Device Printer" v-model="formModel.printer_device"></el-input>
+        <div
+          class="el-form-item__error"
+          v-if="formErrors.printer_device"
+        >{{formErrors.printer_device[0]}}</div>
+      </el-form-item>
+
       <el-form-item
         label="URL Snapshot Kamera"
         :class="formErrors.camera_snapshot_url ? 'is-error' : ''"
