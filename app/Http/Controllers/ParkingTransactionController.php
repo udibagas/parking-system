@@ -115,7 +115,7 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'LOKASI BELUM DISET'], 404);
         }
 
-        $logo = EscposImage::load('resources/logo.jpeg', false);
+        $logo = EscposImage::load(public_path('images/logo.jpeg'), false);
 
         try {
             if ($setting->printer_ip_address) {
