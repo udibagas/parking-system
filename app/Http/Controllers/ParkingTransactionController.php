@@ -115,6 +115,8 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'LOKASI BELUM DISET'], 404);
         }
 
+        $logo = EscposImage::load('resources/logo.jpeg', false);
+
         try {
             if ($setting->printer_ip_address) {
                 $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
@@ -129,7 +131,7 @@ class ParkingTransactionController extends Controller
 
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->graphics(EscposImage::load(public_path('images/logo.jpeg')));
+            $printer->graphics($logo);
             $printer->text("\nTIKET PARKIR\n");
             $printer->text($setting->location_name . "\n");
             $printer->text($setting->location_address . "\n\n");
