@@ -131,7 +131,7 @@ class ParkingTransactionController extends Controller
 
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->bitImage($logo);
+            $printer->bitImageColumnFormat($logo);
             $printer->text("\nTIKET PARKIR\n");
             $printer->text($setting->location_name . "\n");
             $printer->text($setting->location_address . "\n\n");
