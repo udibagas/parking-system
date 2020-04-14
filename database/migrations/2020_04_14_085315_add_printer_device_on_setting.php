@@ -14,7 +14,8 @@ class AddPrinterDeviceOnSetting extends Migration
     public function up()
     {
         Schema::table('settings', function (Blueprint $table) {
-            $table->string('printer_device');
+            $table->string('printer_device')->nullable();
+            $table->string('printer_ip_address')->nullable()->change();
         });
     }
 
