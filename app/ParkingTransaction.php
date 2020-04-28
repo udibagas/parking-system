@@ -10,7 +10,7 @@ class ParkingTransaction extends Model
         'is_member', 'vehicle_type',
         'time_in', 'barcode_number', 'card_number',
         'user_id', 'parking_member_id', 'plate_number',
-        'fare', 'snapshot_in', 'operator'
+        'fare', 'snapshot_in', 'operator', 'drive_thru'
     ];
 
     public function member()

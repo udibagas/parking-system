@@ -66,6 +66,19 @@
         show-overflow-tooltip
         min-width="150px"
       ></el-table-column>
+
+      <el-table-column
+        prop="drive_thru"
+        label="Drive Thru"
+        min-width="120px"
+        align="center"
+        header-align="center"
+        column-key="drive_thru"
+        :filters="[{text: 'TIDAK', value: 0}, {text: 'YA', value: 1}]"
+      >
+        <template slot-scope="scope">{{scope.row.drive_thru ? 'Ya' : 'Tidak'}}</template>
+      </el-table-column>
+
       <el-table-column
         prop="member"
         label="Nama Member"
@@ -171,6 +184,10 @@
           <tr>
             <td class="td-label">Member</td>
             <td class="td-value">{{trx.is_member ? 'Ya' : 'Tidak'}}</td>
+          </tr>
+          <tr>
+            <td class="td-label">Drive Thru</td>
+            <td class="td-value">{{trx.drive_thru ? 'Ya' : 'Tidak'}}</td>
           </tr>
           <tr>
             <td class="td-label">Nomor Kartu</td>

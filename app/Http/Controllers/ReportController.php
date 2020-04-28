@@ -15,13 +15,18 @@ class ReportController extends Controller
 
     public function getTransaction(Request $request)
     {
+        $request->validate([
+            'dateRange' => 'required',
+            'group' => 'required|in:vehicle_type,is_member,drive_thru'
+        ]);
+
         return DB::select('
-            SELECT vehicle_type, COUNT(id) AS `total`
+            SELECT ' . $request->group . ', COUNT(id) AS `total`
             FROM parking_transactions
             WHERE DATE(updated_at) BETWEEN :start AND :stop
-            GROUP BY vehicle_type', [
+            GROUP BY ' . $request->group, [
             ':start' => $request->dateRange[0],
-            ':stop' => $request->dateRange[1]
+            ':stop' => $request->dateRange[1],
         ]);
     }
 
@@ -32,29 +37,6 @@ class ReportController extends Controller
             FROM parking_transactions
             WHERE DATE(time_in) BETWEEN :start AND :stop
             GROUP BY vehicle_type', [
-            ':start' => $request->dateRange[0],
-            ':stop' => $request->dateRange[1]
-        ]);
-    }
-
-    public function getParkedVehicle(Request $request)
-    {
-        return DB::select('
-            SELECT vehicle_type, COUNT(id) AS `total`
-            FROM parking_transactions
-            WHERE DATE(updated_at) BETWEEN :start AND :stop
-            GROUP BY vehicle_type', [
-            ':start' => $request->dateRange[0],
-            ':stop' => $request->dateRange[1]
-        ]);
-    }
-
-    public function getVehicleIn(Request $request)
-    {
-        return DB::select('
-            SELECT COUNT(parking_transactions.id) AS `total`
-            FROM parking_transactions
-            WHERE DATE(parking_transactions.updated_at) BETWEEN :start AND :stop', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);

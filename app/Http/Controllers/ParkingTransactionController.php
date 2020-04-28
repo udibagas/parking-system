@@ -43,6 +43,8 @@ class ParkingTransactionController extends Controller
                 });
             })->when($request->is_member, function ($q) use ($request) {
                 return $q->whereIn('parking_transactions.is_member', $request->is_member);
+            })->when($request->drive_thru, function ($q) use ($request) {
+                return $q->whereIn('parking_transactions.drive_thru', $request->drive_thru);
             })->when($request->vehicle_type, function ($q) use ($request) {
                 return $q->whereIn('parking_transactions.vehicle_type', $request->vehicle_type);
             })->orderBy($sort, $order)->paginate($request->pageSize);

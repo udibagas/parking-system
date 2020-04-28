@@ -47,7 +47,7 @@
           <el-col :span="14">
             <select
               placeholder="JENIS KENDARAAN"
-              @change="setFare"
+              @change="toDriveThruField"
               v-model="formModel.vehicle_type"
               id="vehicle-type"
               class="my-input"
@@ -57,6 +57,24 @@
                 :value="g.name"
                 :key="g.id"
               >{{g.shortcut_key}} - {{g.name}}</option>
+            </select>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="10" style="margin-bottom:10px;">
+          <el-col :span="10">
+            <div class="label-big">[+] DRIVE THRU</div>
+          </el-col>
+          <el-col :span="14">
+            <select
+              placeholder="DRIVE THRU"
+              v-model="formModel.drive_thru"
+              @change="setFare"
+              id="drive-thru"
+              class="my-input"
+            >
+              <option :value="0">0 - TIDAK</option>
+              <option :value="1">1 - YA</option>
             </select>
           </el-col>
         </el-row>
@@ -106,6 +124,9 @@ export default {
     toVehicleField() {
       document.getElementById("vehicle-type").focus();
     },
+    toDriveThruField() {
+      document.getElementById("drive-thru").focus();
+    },
     generateBarcodeNumber() {
       let result = "";
       let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -117,13 +138,18 @@ export default {
       return result;
     },
     setFare() {
-      let vehicle = this.vehicleTypeList.find(
-        vt => vt.name == this.formModel.vehicle_type
-      );
-      if (vehicle) {
-        this.formModel.fare = this.formModel.is_member ? 0 : vehicle.tarif_flat;
-        this.$forceUpdate();
+      if (this.formModel.is_member || this.formModel.drive_thru) {
+        this.formModel.fare = 0;
+      } else {
+        let vehicle = this.vehicleTypeList.find(
+          vt => vt.name == this.formModel.vehicle_type
+        );
+        if (vehicle) {
+          this.formModel.fare = vehicle.tarif_flat;
+        }
       }
+
+      this.$forceUpdate();
       document.getElementById("submit-button").focus();
     },
     checkCard() {
@@ -197,6 +223,7 @@ export default {
       this.formModel.card_number = "";
       this.formModel.vehicle_type = "";
       this.formModel.fare = "";
+      this.formModel.drive_thru = "";
       this.snapshot_in = null;
       this.$forceUpdate();
       document.getElementById("plate-number").focus();
@@ -225,7 +252,9 @@ export default {
           axios
             .post("/parkingTransaction", this.formModel)
             .then(r => {
-              this.printTicket(r.data.id);
+              if (!this.formModel.drive_thru || !this.formModel.is_member) {
+                this.printTicket(r.data.id);
+              }
               this.takeSnapshot(r.data.id);
             })
             .catch(e => {
@@ -348,6 +377,13 @@ export default {
         this.formModel.vehicle_type = "";
         this.formModel.fare = "";
         document.getElementById("vehicle-type").focus();
+      }
+
+      // ke field drive thru
+      if (e.key == "+") {
+        e.preventDefault();
+        this.formModel.drive_thru = "";
+        document.getElementById("drive-thru").focus();
       }
     };
   }

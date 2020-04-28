@@ -32,31 +32,7 @@
     <el-tabs type="card">
       <el-tab-pane lazy label="RANGKUMAN">
         <el-row :gutter="10">
-          <el-col :span="6">
-            <!-- kendaraan masuk -->
-            <el-card class="summary-container">
-              <div slot="header">
-                <span>Kendaraan Masuk</span>
-              </div>
-              <el-row v-for="(t, id) in vehicleIn" :key="id" :gutter="10">
-                <el-col :span="12" class="col-label">{{t.gate}}</el-col>
-                <el-col :span="12" class="col-value">: {{t.total | formatNumber}}</el-col>
-              </el-row>
-            </el-card>
-          </el-col>
-          <el-col :span="6">
-            <!-- jumlah transaksi -->
-            <el-card class="summary-container">
-              <div slot="header">
-                <span>Transaksi</span>
-              </div>
-              <el-row v-for="(t, id) in transaction" :key="id" :gutter="10">
-                <el-col :span="12" class="col-label">{{t.vehicle_type}}</el-col>
-                <el-col :span="12" class="col-value">: {{t.total | formatNumber}}</el-col>
-              </el-row>
-            </el-card>
-          </el-col>
-          <el-col :span="6">
+          <el-col :span="12">
             <!-- total tarif -->
             <el-card class="summary-container">
               <div slot="header">
@@ -65,6 +41,45 @@
               <el-row v-for="(t, id) in income" :key="id">
                 <el-col :span="12" class="col-label">{{t.vehicle_type}}</el-col>
                 <el-col :span="12" class="col-value">: Rp. {{t.total | formatNumber}}</el-col>
+              </el-row>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
+            <!-- jumlah transaksi -->
+            <el-card class="summary-container">
+              <div slot="header">
+                <span>Transaksi berdasarkan jenis kendaraan</span>
+              </div>
+              <el-row v-for="(t, id) in transaction.vehicle_type" :key="id" :gutter="10">
+                <el-col :span="12" class="col-label">{{t.group}}</el-col>
+                <el-col :span="12" class="col-value">: {{t.total | formatNumber}}</el-col>
+              </el-row>
+            </el-card>
+          </el-col>
+        </el-row>
+        <br />
+        <el-row :gutter="10">
+          <el-col :span="12">
+            <!-- jumlah transaksi berdasarkan membership -->
+            <el-card class="summary-container">
+              <div slot="header">
+                <span>Transaksi berdasarkan membership</span>
+              </div>
+              <el-row v-for="(t, id) in transaction.is_member" :key="id" :gutter="10">
+                <el-col :span="12" class="col-label">{{t.group}}</el-col>
+                <el-col :span="12" class="col-value">: {{t.total | formatNumber}}</el-col>
+              </el-row>
+            </el-card>
+          </el-col>
+          <el-col :span="12">
+            <!-- jumlah transaksi berdasarkan drive thru -->
+            <el-card class="summary-container">
+              <div slot="header">
+                <span>Transaksi berdasarkan jenis</span>
+              </div>
+              <el-row v-for="(t, id) in transaction.drive_thru" :key="id" :gutter="10">
+                <el-col :span="12" class="col-label">{{ t.group }}</el-col>
+                <el-col :span="12" class="col-value">: {{t.total | formatNumber}}</el-col>
               </el-row>
             </el-card>
           </el-col>
@@ -87,10 +102,12 @@ export default {
   components: { UserLog },
   data() {
     return {
-      transaction: [],
+      transaction: {
+        drive_thru: [],
+        vehicle_type: [],
+        is_member: []
+      },
       income: [],
-      parkedVehicle: [],
-      vehicleIn: [],
       dateRange: [moment().format("YYYY-MM-01"), moment().format("YYYY-MM-DD")],
       report: null
     };
@@ -108,16 +125,30 @@ export default {
         "_blank"
       );
     },
-    getTransaction() {
-      axios
-        .get("getTransaction", { params: { dateRange: this.dateRange } })
-        .then(r => {
-          this.transaction = r.data;
-          let total = r.data
-            .map(d => d.total)
-            .reduce((sum, total) => sum + parseInt(total), 0);
-          this.transaction.push({ vehicle_type: "TOTAL", total });
+    getTransaction(group) {
+      const params = { dateRange: this.dateRange, group };
+      axios.get("getTransaction", { params }).then(r => {
+        this.transaction[group] = r.data.map(d => {
+          if (group == "is_member") {
+            d.group = d.is_member ? "MEMBER" : "NON-MEMBER";
+          }
+
+          if (group == "drive_thru") {
+            d.group = d.drive_thru ? "DRIVE THRU" : "REGULER";
+          }
+
+          if (group == "vehicle_type") {
+            d.group = d.vehicle_type;
+          }
+
+          return d;
         });
+
+        let total = r.data
+          .map(d => d.total)
+          .reduce((sum, total) => sum + parseInt(total), 0);
+        this.transaction[group].push({ group: "TOTAL", total });
+      });
     },
     getIncome() {
       axios
@@ -130,38 +161,16 @@ export default {
           this.income.push({ vehicle_type: "TOTAL", total });
         });
     },
-    getParkedVehicle() {
-      axios
-        .get("getParkedVehicle", { params: { dateRange: this.dateRange } })
-        .then(r => {
-          this.parkedVehicle = r.data;
-          let total = r.data
-            .map(d => d.total)
-            .reduce((sum, total) => sum + parseInt(total), 0);
-          this.parkedVehicle.push({ vehicle_type: "TOTAL", total });
-        });
-    },
-    getVehicleIn() {
-      axios
-        .get("getVehicleIn", { params: { dateRange: this.dateRange } })
-        .then(r => {
-          this.vehicleIn = r.data;
-          let total = r.data
-            .map(d => d.total)
-            .reduce((sum, total) => sum + parseInt(total), 0);
-          this.vehicleIn.push({ gate: "TOTAL", total });
-        });
-    },
     getReport() {
       axios.get("report", { params: { dateRange: this.dateRange } }).then(r => {
         this.report = r.data;
       });
     },
     requestData() {
-      this.getTransaction();
+      this.getTransaction("vehicle_type");
+      this.getTransaction("drive_thru");
+      this.getTransaction("is_member");
       this.getIncome();
-      this.getParkedVehicle();
-      this.getVehicleIn();
       this.getReport();
     }
   },
