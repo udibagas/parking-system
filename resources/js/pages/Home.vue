@@ -93,6 +93,13 @@
           id="submit-button"
           @click="submit"
         >[ENTER] PRINT TIKET & BUKA GATE</button>
+
+        <br />
+        <button
+          @keydown.enter="printReport"
+          class="my-big-btn"
+          @click="printReport"
+        >[F10] PRINT LAPORAN</button>
       </el-col>
       <el-col :span="12">
         <el-image :src="snapshot_in" style="width: 100%; height: 100%" fit="cover">
@@ -322,6 +329,26 @@ export default {
           this.resetForm();
         });
     },
+    printReport() {
+      let payload = { date: moment().format("YYYY-MM-DD") };
+
+      axios
+        .post("/parkingTransaction/printReport", payload)
+        .then(r => {
+          this.$message({
+            message: "SILAKAN AMBIL STRUK",
+            type: "success",
+            showClose: true
+          });
+        })
+        .catch(e => {
+          this.$message({
+            message: e.response.data.message,
+            type: "error",
+            showClose: true
+          });
+        });
+    },
     getVehicleTypeList() {
       axios
         .get("/vehicleType/getList")
@@ -384,6 +411,12 @@ export default {
         e.preventDefault();
         this.formModel.drive_thru = "";
         document.getElementById("drive-thru").focus();
+      }
+
+      // print report
+      if (e.key == "F10") {
+        e.preventDefault();
+        this.printReport();
       }
     };
   }
