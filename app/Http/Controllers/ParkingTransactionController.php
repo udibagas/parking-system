@@ -217,11 +217,21 @@ class ParkingTransactionController extends Controller
             GROUP BY vehicle_type
         ";
 
-        // ambil data transaksi per tanggal, per operator, per gate
+        // ambil data transaksi per tanggal, per operator
         // member
         $sqlMember = "SELECT vehicle_type, COUNT(id) AS jumlah
             FROM parking_transactions
             WHERE is_member = 1
+                AND operator = :operator
+                AND DATE(time_in) = :date
+            GROUP BY vehicle_type
+        ";
+
+        // ambil data transaksi per tanggal, per operator
+        // member
+        $sqlDriveThru = "SELECT vehicle_type, COUNT(id) AS jumlah
+            FROM parking_transactions
+            WHERE drive_thru = 1
                 AND operator = :operator
                 AND DATE(time_in) = :date
             GROUP BY vehicle_type
@@ -233,6 +243,11 @@ class ParkingTransactionController extends Controller
         ]);
 
         $trxMember = DB::select($sqlMember, [
+            ':date' => $request->date,
+            ':operator' => $request->user()->name,
+        ]);
+
+        $trxDriveThru = DB::select($sqlDriveThru, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
         ]);
@@ -309,10 +324,20 @@ class ParkingTransactionController extends Controller
 
             $printer->text(str_pad('SUB TOTAL', 15, ' ') . str_pad($subTotalMember['jumlah'], 5, ' ', STR_PAD_LEFT) . "\n\n");
 
+            // DRIVE THRU SECTION
+            $printer->text("DRIVE THRU\n");
+            $subTotalDriveThru = ['jumlah' => 0];
+
+            foreach ($trxDriveThru as $d) {
+                $subTotalDriveThru['jumlah'] += $d->jumlah;
+                $printer->text(str_pad('-- ' . $d->vehicle_type, 15, ' ', STR_PAD_LEFT) . str_pad($d->jumlah, 5, ' ') . "\n");
+            }
+
+            $printer->text(str_pad('SUB TOTAL', 15, ' ') . str_pad($subTotalDriveThru['jumlah'], 5, ' ', STR_PAD_LEFT) . "\n\n");
+
             $printer->text(str_pad('GRAND TOTAL', 15, ' ')
                 . str_pad(' ', 5, ' ', STR_PAD_LEFT)
                 . str_pad(number_format($subTotalReguler['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n");
-
 
             $printer->cut();
             $printer->close();
