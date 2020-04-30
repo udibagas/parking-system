@@ -4,8 +4,11 @@
 <table class="table" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
-            <th style="text-align:left;width:33%">JENIS KENDARAAN</th>
-            <th style="text-align:center;width:33%">JUMLAH KENDARAAN</th>
+            <th style="text-align:left">JENIS KENDARAAN</th>
+            <th style="text-align:center">REGULER</th>
+            <th style="text-align:center">MEMBER</th>
+            <th style="text-align:center">DRIVE THRU</th>
+            <th style="text-align:center">JUMLAH KENDARAAN</th>
             <th style="text-align:right">PENDAPATAN</th>
         </tr>
     </thead>
@@ -13,6 +16,9 @@
         @foreach ($perKendaraan as $d)
         <tr>
             <td style="text-align:left">{{$d->vehicle_type}}</td>
+            <td style="text-align:center">{{number_format($d->reguler, 0, ',', '.')}}</td>
+            <td style="text-align:center">{{number_format($d->member, 0, ',', '.')}}</td>
+            <td style="text-align:center">{{number_format($d->drive_thru, 0, ',', '.')}}</td>
             <td style="text-align:center">{{number_format($d->jumlah, 0, ',', '.')}}</td>
             <td style="text-align:right">Rp {{number_format($d->pendapatan, 0, ',', '.')}}</td>
         </tr>
@@ -21,6 +27,9 @@
     <tfoot>
         <tr>
             <th style="text-align:left">TOTAL</th>
+            <th style="text-align:center">{{number_format(array_reduce($perKendaraan, function($total, $current) { return $total + $current->reguler; }, 0), 0, ',', '.')}}</th>
+            <th style="text-align:center">{{number_format(array_reduce($perKendaraan, function($total, $current) { return $total + $current->member; }, 0), 0, ',', '.')}}</th>
+            <th style="text-align:center">{{number_format(array_reduce($perKendaraan, function($total, $current) { return $total + $current->drive_thru; }, 0), 0, ',', '.')}}</th>
             <th style="text-align:center">{{number_format(array_reduce($perKendaraan, function($total, $current) { return $total + $current->jumlah; }, 0), 0, ',', '.')}}</th>
             <th style="text-align:right">Rp {{number_format(array_reduce($perKendaraan, function($total, $current) { return $total + $current->pendapatan; }, 0), 0, ',', '.')}}</th>
         </tr>
@@ -35,8 +44,11 @@
 <table class="table" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
-            <th style="text-align:left;width:33%">NAMA</th>
-            <th style="text-align:center;width:33%">JUMLAH TRANSAKSI</th>
+            <th style="text-align:left">NAMA</th>
+            <th style="text-align:center">REGULER</th>
+            <th style="text-align:center">MEMBER</th>
+            <th style="text-align:center">DRIVE THRU</th>
+            <th style="text-align:center">JUMLAH TRANSAKSI</th>
             <th style="text-align:right">PENDAPATAN</th>
         </tr>
     </thead>
@@ -44,6 +56,9 @@
         @foreach ($perPetugas as $d)
         <tr>
                 <td style="text-align:left">{{$d->operator}}</td>
+                <td style="text-align:center">{{number_format($d->reguler, 0, ',', '.')}}</td>
+                <td style="text-align:center">{{number_format($d->member, 0, ',', '.')}}</td>
+                <td style="text-align:center">{{number_format($d->drive_thru, 0, ',', '.')}}</td>
                 <td style="text-align:center">{{number_format($d->jumlah, 0, ',', '.')}}</td>
                 <td style="text-align:right">Rp {{number_format($d->pendapatan, 0, ',', '.')}}</td>
             </tr>
@@ -52,6 +67,9 @@
     <tfoot>
         <tr>
             <th style="text-align:left">TOTAL</th>
+            <th style="text-align:center">{{number_format(array_reduce($perPetugas, function($total, $current) { return $total + $current->reguler; }, 0), 0, ',', '.')}}</th>
+            <th style="text-align:center">{{number_format(array_reduce($perPetugas, function($total, $current) { return $total + $current->member; }, 0), 0, ',', '.')}}</th>
+            <th style="text-align:center">{{number_format(array_reduce($perPetugas, function($total, $current) { return $total + $current->drive_thru; }, 0), 0, ',', '.')}}</th>
             <th style="text-align:center">{{number_format(array_reduce($perPetugas, function($total, $current) { return $total + $current->jumlah; }, 0), 0, ',', '.')}}</th>
             <th style="text-align:right">Rp {{number_format(array_reduce($perPetugas, function($total, $current) { return $total + $current->pendapatan; }, 0), 0, ',', '.')}}</th>
         </tr>
