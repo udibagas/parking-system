@@ -101,7 +101,12 @@ class MemberRenewalController extends Controller
         }
 
         try {
-            $connector = new NetworkPrintConnector(env('PRINTER_ADDRESS'), 9100);
+            if ($setting->printer_ip_address) {
+                $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
+            }
+            if ($setting->printer_device) {
+                $connector = new FilePrintConnector($setting->printer_device);
+            }
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
