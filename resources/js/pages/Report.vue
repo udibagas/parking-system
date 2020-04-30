@@ -18,12 +18,13 @@
           end-placeholder="End date"
         ></el-date-picker>
 
-        <el-button
-          size="small"
-          type="primary"
-          icon="el-icon-printer"
-          @click="printReport"
-        >PRINT LAPORAN</el-button>
+        <el-dropdown size="small" split-button type="primary" @command="handlePrint">
+          PRINT LAPORAN
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item command="struk">STRUK</el-dropdown-item>
+            <el-dropdown-item command="a4">A4</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
       </el-col>
     </el-row>
 
@@ -113,17 +114,43 @@ export default {
     };
   },
   methods: {
-    printReport() {
-      window.open(
-        BASE_URL +
-          "/report?action=print&dateRange[]=" +
-          this.dateRange[0] +
-          "&dateRange[1]=" +
-          this.dateRange[1] +
-          "&token=" +
-          this.$store.state.token,
-        "_blank"
-      );
+    handlePrint(command) {
+      if (command == "a4") {
+        window.open(
+          BASE_URL +
+            "/report?action=print&dateRange[]=" +
+            this.dateRange[0] +
+            "&dateRange[1]=" +
+            this.dateRange[1] +
+            "&token=" +
+            this.$store.state.token,
+          "_blank"
+        );
+      }
+
+      if (command == "struk") {
+        const params = {
+          action: "print-struk",
+          dateRange: this.dateRange
+        };
+
+        axios
+          .get("report", { params })
+          .then(r => {
+            this.$message({
+              message: r.data.message,
+              showClose: true,
+              type: "success"
+            });
+          })
+          .catch(e => {
+            this.$message({
+              message: e.response.data.message,
+              showClose: true,
+              type: "error"
+            });
+          });
+      }
     },
     getTransaction(group) {
       const params = { dateRange: this.dateRange, group };
