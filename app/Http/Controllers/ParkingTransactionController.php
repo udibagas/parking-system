@@ -212,6 +212,7 @@ class ParkingTransactionController extends Controller
                 SUM(fare) AS pendapatan
             FROM parking_transactions
             WHERE is_member = 0
+                AND drive_thru = 0
                 AND operator = :operator
                 AND DATE(time_in) = :date
             GROUP BY vehicle_type
@@ -291,8 +292,9 @@ class ParkingTransactionController extends Controller
             $printer->text($setting->location_name . "\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . $request->date . "\n");
-            $printer->text(str_pad('JAM', 15, ' ') . ' : ' . date('d-M-Y H:i', strtotime($userLog->created_at)) . ' - ' . date('d-M-Y H:i') . "\n");
+            $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . date('d-M-Y', strtotime($request->date)) . "\n");
+            $printer->text(str_pad('DARI JAM', 15, ' ') . ' : ' . date('d-M-Y H:i', strtotime($userLog->created_at))  . "\n");
+            $printer->text(str_pad('SAMPAI JAM', 15, ' ') . ' : ' . date('d-M-Y H:i')  . "\n");
             $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper($request->user()->name) . "\n\n");
 
             // REGULER SECTION
