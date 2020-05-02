@@ -321,7 +321,7 @@ class ParkingTransactionController extends Controller
 
             foreach ($trxMember as $d) {
                 $subTotalMember['jumlah'] += $d->jumlah;
-                $printer->text(str_pad('-- ' . $d->vehicle_type, 15, ' ', STR_PAD_LEFT) . str_pad($d->jumlah, 5, ' ') . "\n");
+                $printer->text(str_pad('-- ' . $d->vehicle_type, 15, ' ') . str_pad($d->jumlah, 5, ' ', STR_PAD_LEFT) . "\n");
             }
 
             $printer->text(str_pad('SUB TOTAL', 15, ' ') . str_pad($subTotalMember['jumlah'], 5, ' ', STR_PAD_LEFT) . "\n\n");
@@ -332,7 +332,7 @@ class ParkingTransactionController extends Controller
 
             foreach ($trxDriveThru as $d) {
                 $subTotalDriveThru['jumlah'] += $d->jumlah;
-                $printer->text(str_pad('-- ' . $d->vehicle_type, 15, ' ', STR_PAD_LEFT) . str_pad($d->jumlah, 5, ' ') . "\n");
+                $printer->text(str_pad('-- ' . $d->vehicle_type, 15, ' ') . str_pad($d->jumlah, 5, ' ', STR_PAD_LEFT) . "\n");
             }
 
             $printer->text(str_pad('SUB TOTAL', 15, ' ') . str_pad($subTotalDriveThru['jumlah'], 5, ' ', STR_PAD_LEFT) . "\n\n");
