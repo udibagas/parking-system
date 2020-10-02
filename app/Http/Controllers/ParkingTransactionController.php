@@ -293,7 +293,7 @@ class ParkingTransactionController extends Controller
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . date('d-M-Y', strtotime($request->date)) . "\n");
-            $printer->text(str_pad('DARI JAM', 15, ' ') . ' : ' . date('d-M-Y H:i', strtotime($userLog->created_at))  . "\n");
+            $printer->text(str_pad('DARI JAM', 15, ' ') . ' : ' . date('d-M-Y H:i', strtotime($userLog ? $userLog->created_at : strtotime(date('Y-m-d 00:00:00'))))  . "\n");
             $printer->text(str_pad('SAMPAI JAM', 15, ' ') . ' : ' . date('d-M-Y H:i')  . "\n");
             $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper($request->user()->name) . "\n\n");
 
