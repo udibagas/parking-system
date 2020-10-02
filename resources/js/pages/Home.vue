@@ -207,6 +207,7 @@ export default {
 						this.formModel.plate_number = r.data.vehicles[0].plate_number;
 						this.formModel.vehicle_type = r.data.vehicles[0].vehicle_type;
 						this.formModel.drive_thru = 0;
+						this.submit();
 						this.openGate();
 						return;
 					}
