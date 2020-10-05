@@ -15,11 +15,11 @@ class CreateMemberVehiclesTable extends Migration
     {
         Schema::create('member_vehicles', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('parking_member_id');
-            $table->string('vehicle_type');
-            $table->string('plate_number');
+            $table->bigInteger('member_id');
+            $table->string('jenis_kendaraan');
+            $table->string('plat_nomor');
             $table->string('merk');
-            $table->string('type');
+            $table->string('tipe');
             $table->string('tahun', 4);
             $table->string('warna');
             $table->timestamps();

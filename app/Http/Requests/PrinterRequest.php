@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class VehicleTypeRequest extends FormRequest
+class PrinterRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,20 +24,20 @@ class VehicleTypeRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'shortcut_key' => 'required|max:1',
-            'tarif_flat' => 'numeric',
-            'denda_tiket_hilang' => 'numeric'
+            'nama' => 'required',
+            'ip_address' => 'required|ipv4',
+            'port' => 'required|numeric',
+            'status' => 'boolean'
         ];
     }
 
     public function attributes()
     {
         return [
-            'name' => 'Nama',
-            'shortcut_key' => 'Shortcut Key',
-            'tarif_flat' => 'Tarif Flat',
-            'denda_tiket_hilang' => 'Denda Tiket Hilang'
+            'nama' => 'Nama',
+            'ip_address' => 'Alamat IP',
+            'port' => 'Port',
+            'status' => 'Status'
         ];
     }
 }

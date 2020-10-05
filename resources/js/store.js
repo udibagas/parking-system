@@ -1,6 +1,8 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import { Message } from 'element-ui';
+import {
+    Message
+} from 'element-ui';
 
 Vue.use(Vuex)
 
@@ -12,22 +14,37 @@ export default new Vuex.Store({
         appName: APP_NAME,
         user: currentUser ? JSON.parse(currentUser) : {},
         token: window.sessionStorage.getItem('token'),
-        vehicleTypeList: [],
-        parkingGateList: [],
+        jenisKendaraanList: [],
+        gateInList: [],
+        gateOutList: [],
+        kameraList: [],
+        posList: [],
+        printerList: [],
         groupMemberList: [],
         memberList: [],
         navigationList: [],
         setting: {},
-        siklus: [
-            {value: 'days', label: 'hari'},
-            {value: 'weeks', label: 'minggu'},
-            {value: 'months', label: 'bulan'},
-            {value: 'years', label: 'tahun'},
+        siklus: [{
+                value: 'days',
+                label: 'hari'
+            },
+            {
+                value: 'weeks',
+                label: 'minggu'
+            },
+            {
+                value: 'months',
+                label: 'bulan'
+            },
+            {
+                value: 'years',
+                label: 'tahun'
+            },
         ]
     },
     mutations: {
-        getVehicleTypeList(state) {
-            axios.get('/vehicleType/getList').then(r => state.vehicleTypeList = r.data)
+        getJenisKendaraanList(state) {
+            axios.get('/jenisKendaraan/getList').then(r => state.jenisKendaraanList = r.data)
                 .catch(e => console.log(e))
         },
         getGroupMemberList(state) {
@@ -35,11 +52,27 @@ export default new Vuex.Store({
                 .catch(e => console.log(e))
         },
         getMemberList(state) {
-            axios.get('/parkingMember/getList').then(r => state.memberList = r.data)
+            axios.get('/member/getList').then(r => state.memberList = r.data)
                 .catch(e => console.log(e))
         },
-        getParkingGateList(state) {
-            axios.get('/parkingGate/getList').then(r => state.parkingGateList = r.data)
+        getGateInList(state) {
+            axios.get('/gateIn').then(r => state.gateInList = r.data)
+                .catch(e => console.log(e))
+        },
+        getGateOutList(state) {
+            axios.get('/gateOut').then(r => state.gateOutList = r.data)
+                .catch(e => console.log(e))
+        },
+        getKameraList(state) {
+            axios.get('/kamera').then(r => state.kameraList = r.data)
+                .catch(e => console.log(e))
+        },
+        getPosList(state) {
+            axios.get('/pos').then(r => state.posList = r.data)
+                .catch(e => console.log(e))
+        },
+        getPrinterList(state) {
+            axios.get('/printer').then(r => state.printerList = r.data)
                 .catch(e => console.log(e))
         },
         getNavigationList(state) {

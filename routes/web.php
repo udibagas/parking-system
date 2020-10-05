@@ -19,20 +19,20 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('user', 'UserController')->except(['create', 'edit']);
 
     // untuk dropdown
-    Route::get('parkingGate/getList', 'ParkingGateController@getList');
-    Route::get('vehicleType/getList', 'VehicleTypeController@getList');
-    Route::get('parkingMember/getList', 'ParkingMemberController@getList');
-    Route::get('groupMember/getList', 'GroupMemberController@getList');
+    Route::get('member/getList', 'MemberController@getList');
 
-    Route::post('parkingGate/openGate/{parkingGate}', 'ParkingGateController@openGate');
-    Route::post('parkingGate/testPrinter/{parkingGate}', 'ParkingGateController@testPrinter');
-    Route::post('parkingGate/testCamera/{parkingGate}', 'ParkingGateController@testCamera');
-    Route::resource('parkingGate', 'ParkingGateController')->except(['create', 'edit']);
+    Route::resource('gateIn', 'GateInController')->except(['create', 'show', 'edit']);
+    Route::post('gateOut/test/{gateOut}', 'GateOutController@test');
+    Route::resource('gateOut', 'GateOutController')->except(['create', 'show', 'edit']);
+    Route::get('printer/test/{printer}', 'PrinterController@test');
+    Route::resource('printer', 'PrinterController')->except(['create', 'show', 'edit']);
+    Route::get('kamera/test/{kamera}', 'KameraController@test');
+    Route::resource('kamera', 'KameraController')->except(['create', 'show', 'edit']);
+    Route::resource('pos', 'PosController')->except(['create', 'show', 'edit']);
+    Route::resource('jenisKendaraan', 'JenisKendaraanController')->except(['create', 'show', 'edit']);
 
-    Route::resource('vehicleType', 'VehicleTypeController')->except(['create', 'edit']);
-
-    Route::get('parkingMember/search', 'ParkingMemberController@search');
-    Route::resource('parkingMember', 'ParkingMemberController')->except(['create', 'edit']);
+    Route::get('member/search', 'MemberController@search');
+    Route::resource('member', 'MemberController')->except(['create', 'edit']);
     Route::resource('groupMember', 'GroupMemberController')->except(['create', 'edit', 'show']);
 
     Route::post('parkingTransaction/printReport', 'ParkingTransactionController@printReport');
@@ -77,7 +77,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getVehicleIn', 'ReportController@getVehicleIn');
     Route::get('report', 'ReportController@pendapatan');
 
-    Route::get('controller-log', function() {
+    Route::get('controller-log', function () {
         $output = shell_exec('tail -n 250 /var/log/parking.log');
         return nl2br($output);
     });

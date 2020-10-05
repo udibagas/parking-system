@@ -1,4 +1,9 @@
-@import 'variables';
+@import "~tailwindcss/base";
+
+@import "~tailwindcss/components";
+
+@import "~tailwindcss/utilities";
+
 @import '~element-ui/lib/theme-chalk/index.css';
 
 @font-face {
@@ -22,124 +27,6 @@ body {
     padding: 0;
 }
 
-.el-dialog__header, .el-dialog__footer {
-    background-color: #324057;
-    padding: 15px;
-}
-
-.el-dialog__title {
-    color: #fff;
-}
-
-.el-icon-more {
-    transform: rotate(90deg);
-    -webkit-transform: rotate(90deg);
-    -moz-transform: rotate(90deg);
-    -ms-transform: rotate(90deg);
-    -o-transform: rotate(90deg);
-}
-
 .el-table {
-    width:100%;
-    border-top:1px solid #eee;
-}
-
-.no-padding-dialog > .el-dialog__body {
-    padding: 0px;
-}
-
-.pointer {
-    cursor: pointer;
-}
-
-.text-right {
-    text-align: right;
-}
-
-.text-center {
-    text-align: center;
-}
-
-.text-white, .text-white:hover, .text-white:active, .text-white:focus {
-    color: #fff !important;
-}
-
-.el-form-item__label {
-    font-weight: bold;
-}
-
-.bg-blue {
-    background-color: $blue !important;
-}
-.bg-indigo {
-    background-color: $indigo !important;
-}
-.bg-purple {
-    background-color: $purple !important;
-}
-.bg-pink {
-    background-color: $pink !important;
-}
-.bg-red {
-    background-color: $red !important;
-}
-.bg-orange {
-    background-color: $orange !important;
-}
-.bg-yellow {
-    background-color: $yellow !important;
-}
-.bg-green {
-    background-color: $green !important;
-}
-.bg-teal {
-    background-color: $teal !important;
-}
-.bg-cyan {
-    background-color: $cyan !important;
-}
-
-.el-table th, .el-table thead.is-group th {
-    background-color: #060446;
-    color: #fff;
-    padding: 4px 0;
-}
-
-.el-pagination {
-    margin-top: 4px;
-}
-
-.el-form--inline .el-form-item {
-    margin-bottom: 5px;
-}
-
-.text-red, .text-danger {
-    color: $red;
-}
-
-.text-green, .text-success {
-    color: $green;
-}
-
-table {
-    border-spacing: 0px;
-    border-collapse: separate;
-}
-
-.table {
-    width: 100%;
-    border-top: 2px solid #ddd;
-}
-
-.table th, .table td {
-    padding: 10px;
-    border-bottom: 1px solid #ddd;
-}
-
-.el-table .inactive-row {
-    background: #ffeff0;
-}
-
-.el-table .cell, .el-dialog__body {
-    word-break: normal;
+    border-top: 1px solid #eee;
 }

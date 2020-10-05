@@ -24,7 +24,7 @@ class MemberRenewalRequest extends FormRequest
     public function rules()
     {
         return [
-            'parking_member_id' => 'required|exists:parking_members,id',
+            'member_id' => 'required|exists:members,id',
             'from_date' => 'required|date',
             'to_date' => 'required|date',
             'billing_cycle' => 'numeric|required',
@@ -35,7 +35,7 @@ class MemberRenewalRequest extends FormRequest
     public function attributes()
     {
         return [
-            'parking_member_id' => 'Member',
+            'member_id' => 'Member',
             'from_date' => 'Dari Tanggal',
             'to_date' => 'Sampai Tanggal',
             'billing_cycle' => 'Siklus Pembayaran',

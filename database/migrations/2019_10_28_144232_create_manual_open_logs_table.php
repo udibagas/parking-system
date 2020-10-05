@@ -15,7 +15,7 @@ class CreateManualOpenLogsTable extends Migration
     {
         Schema::create('manual_open_logs', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->bigInteger('parking_gate_id');
+            $table->bigInteger('gate_out_id');
             $table->bigInteger('user_id')->comment('Operator');
             $table->string('alasan');
             $table->string('snapshot')->nullable();

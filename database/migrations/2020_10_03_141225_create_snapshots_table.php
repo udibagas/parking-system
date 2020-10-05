@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateVehicleTypesTable extends Migration
+class CreateSnapshotsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,12 +13,12 @@ class CreateVehicleTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('vehicle_types', function (Blueprint $table) {
+        Schema::create('snapshots', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('shortcut_key', 1);
-            $table->integer('tarif_flat')->default(0);
-            $table->integer('denda_tiket_hilang')->default(0);
+            $table->unsignedBigInteger('parking_transaction_id');
+            $table->unsignedBigInteger('kamera_id');
+            $table->morphs('snapshotable');
+            $table->string('path');
             $table->timestamps();
         });
     }
@@ -30,6 +30,6 @@ class CreateVehicleTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('vehicle_types');
+        Schema::dropIfExists('snapshots');
     }
 }

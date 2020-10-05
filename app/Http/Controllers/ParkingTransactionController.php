@@ -2,9 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\GateIn;
+use App\GateOut;
 use Illuminate\Http\Request;
 use App\ParkingTransaction;
 use App\Http\Requests\ParkingTransactionRequest;
+use App\Jobs\PrintTicketIn;
+use App\Jobs\TakeSnapshot;
+use App\Member;
+use App\Notifications\PrintTicketFailedNotification;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
@@ -13,8 +19,8 @@ use App\ParkingMember;
 use App\Setting;
 use App\User;
 use App\UserLog;
-use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 
 class ParkingTransactionController extends Controller
 {
@@ -37,12 +43,12 @@ class ParkingTransactionController extends Controller
             ->join('parking_members', 'parking_members.id', '=', 'parking_transactions.parking_member_id', 'LEFT')
             ->join('parking_gates AS parking_gate_in', 'parking_gate_in.id', '=', 'parking_transactions.gate_in_id', 'LEFT')
             ->join('parking_gates AS parking_gate_out', 'parking_gate_out.id', '=', 'parking_transactions.gate_out_id', 'LEFT')
-            ->when($request->dateRange, function($q) use ($request) {
+            ->when($request->dateRange, function ($q) use ($request) {
                 return $q->whereBetween('parking_transactions.time_in', $request->dateRange);
             })->when($request->keyword, function ($q) use ($request) {
-                return $q->where(function($qq) use ($request) {
-                    return $qq->where('parking_transactions.barcode_number', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhere('parking_transactions.plate_number', 'LIKE', '%' . $request->keyword . '%')
+                return $q->where(function ($qq) use ($request) {
+                    return $qq->where('parking_transactions.nomor_barcode', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('parking_transactions.plat_nomor', 'LIKE', '%' . $request->keyword . '%')
                         ->orWhere('parking_transactions.card_number', 'LIKE', '%' . $request->keyword . '%')
                         ->orWhere('parking_transactions.operator', 'LIKE', '%' . $request->keyword . '%')
                         ->orWhere('parking_transactions.edit_by', 'LIKE', '%' . $request->keyword . '%')
@@ -51,27 +57,27 @@ class ParkingTransactionController extends Controller
                 });
             })->when($request->is_member, function ($q) use ($request) {
                 return $q->whereIn('parking_transactions.is_member', $request->is_member);
-            })->when($request->vehicle_type, function ($q) use ($request) {
-                return $q->whereIn('parking_transactions.vehicle_type', $request->vehicle_type);
+            })->when($request->jenis_kendaraan, function ($q) use ($request) {
+                return $q->whereIn('parking_transactions.jenis_kendaraan', $request->jenis_kendaraan);
             })->when($request->gate_in_id, function ($q) use ($request) {
                 return $q->whereIn('parking_transactions.gate_in_id', $request->gate_in_id);
             })->when($request->gate_out_id, function ($q) use ($request) {
                 return $q->whereIn('parking_transactions.gate_out_id', $request->gate_out_id);
-            })->when($request->denda, function($q) use ($request) {
+            })->when($request->denda, function ($q) use ($request) {
                 if ($request->denda[0] == 'Y') {
                     return $q->where('denda', '>', 0);
                 }
                 if ($request->denda[0] == 'T') {
                     return $q->where('denda', 0);
                 }
-            })->when($request->edit, function($q)  use ($request)  {
+            })->when($request->edit, function ($q)  use ($request) {
                 if ($request->edit[0] == 'Y') {
                     return $q->where('edit', 1);
                 }
                 if ($request->edit[0] == 'T') {
                     return $q->where('edit', 0);
                 }
-            })->when($request->manual, function($q)  use ($request)  {
+            })->when($request->manual, function ($q)  use ($request) {
                 if ($request->manual[0] == 'Y') {
                     return $q->where('manual', 1);
                 }
@@ -91,26 +97,25 @@ class ParkingTransactionController extends Controller
     {
         $input = $request->all();
 
-        if ($request->manual)
-        {
-            $input['barcode_number'] = strtoupper(str_random(5));
+        if ($request->manual) {
+            $input['nomor_barcode'] = Str::random(5);
             $input['is_member'] = 0;
             $input['manual'] = 1;
 
             $request->validate([
-                'plate_number' => 'required',
-                'vehicle_type' => 'required',
+                'plat_nomor' => 'required',
+                'jenis_kendaraan' => 'required',
                 'gate_in_id' => 'required',
                 'gate_out_id' => 'required',
                 'time_in' => 'required',
                 'time_out' => 'required',
-                'username' => ['required', function($attribute, $value, $fail) {
+                'username' => ['required', function ($attribute, $value, $fail) {
                     $user = User::where('role', 1)->where('status', 1)->where('name', 'LIKE', $value)->first();
                     if (!$user) {
                         $fail('User admin tidak terdaftar');
                     }
                 }],
-                'password' => ['required', function($attribute, $value, $fail) use ($request) {
+                'password' => ['required', function ($attribute, $value, $fail) use ($request) {
                     $user = User::where('role', 1)->where('status', 1)
                         ->where('name', 'LIKE', $request->username)
                         ->first();
@@ -122,8 +127,8 @@ class ParkingTransactionController extends Controller
                     }
                 }],
             ], [], [
-                'plate_number' => 'Plat Nomor',
-                'vehicle_type' => 'Jenis Kendaraan',
+                'plat_nomor' => 'Plat Nomor',
+                'jenis_kendaraan' => 'Jenis Kendaraan',
                 'gate_in_id' => 'Gate Masuk',
                 'gate_out_id' => 'Gate Keluar',
                 'time_in' => 'Waktu Masuk',
@@ -138,7 +143,7 @@ class ParkingTransactionController extends Controller
         }
 
         if ($request->is_member) {
-            ParkingMember::where('id', $request->parking_member_id)->update([
+            Member::where('id', $request->member_id)->update([
                 'last_transaction' => now()
             ]);
         }
@@ -146,41 +151,39 @@ class ParkingTransactionController extends Controller
         return ParkingTransaction::create($input);
     }
 
-    public function takeSnapshot(Request $request, ParkingTransaction $parkingTransaction)
+    // untuk handle waktu gate in tertrigger
+    public function apiStore(Request $request)
     {
-        $gateId = $request->gate_in_id ? $request->gate_in_id : $request->gate_out_id;
-        $gate = ParkingGate::find($gateId);
+        $request->validate([
+            'gate_in_id' => 'required',
+            'vehicle_tye' => 'required',
+        ]);
 
-        if (!$gate || !$gate->camera_status || !$gate->camera_image_snapshot_url) {
-            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
+        $input = array_merge($request->all(), [
+            'nomor_barcode' => Str::random(5),
+            'time_in' => now()
+        ]);
+
+        $parkingTransaction = ParkingTransaction::create($input);
+        TakeSnapshot::dispatch($parkingTransaction->gateIn, $parkingTransaction);
+
+        if (!$request->is_member) {
+            PrintTicketIn::dispatch($parkingTransaction);
         }
 
-        $client = new Client(['timeout' => 3]);
-        $fileName = 'snapshot/'.date('Y/m/d/H/').$gate->name.'-'.date('YmdHis').'.jpg';
-
-        if (!is_dir('snapshot/'.date('Y/m/d/H'))) {
-            mkdir('snapshot/'.date('Y/m/d/H'), 0777, true);
-        }
-
-        try {
-            $response = $client->request('GET', $gate->camera_image_snapshot_url, [
-                'auth' => [
-                    $gate->camera_username,
-                    $gate->camera_password,
-                    $gate->camera_auth_type == 'digest' ? 'digest' : null
-                ]
+        if ($request->is_member) {
+            Member::where('id', $request->member_id)->update([
+                'last_transaction' => now()
             ]);
-            file_put_contents($fileName, $response->getBody());
-        } catch (\Exception $e) {
-            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. '. $e->getMessage()], 500);
         }
 
-        $data = $request->gate_in_id ? ['snapshot_in' => $fileName] : ['snapshot_out' => $fileName];
-        $parkingTransaction->update($data);
-        return $parkingTransaction;
+        return [
+            'message' => 'Data berhasil disimpan',
+            'data' => $parkingTransaction,
+        ];
     }
 
-    public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
+    public function printTicketOut(ParkingTransaction $parkingTransaction)
     {
         $setting = Setting::first();
 
@@ -188,88 +191,48 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'BELUM ADA SETTING'], 500);
         }
 
-        if (!$setting->location_name) {
+        if (!$setting->nama_lokasi) {
             return response(['message' => 'LOKASI BELUM DISET'], 404);
         }
 
-        $gateId = $request->trx == 'OUT' ? $parkingTransaction->gate_out_id : $parkingTransaction->gate_in_id;
-        $gate = ParkingGate::find($gateId);
+        $printer = $parkingTransaction->gateIn->printer;
 
         try {
-            if ($gate->printer_type == "network") {
-                $connector = new NetworkPrintConnector($gate->printer_ip_address, 9100);
-            } else if ($gate->printer_type == "local") {
-                $connector = new FilePrintConnector($gate->printer_device);
-            } else {
-                return response(['message' => 'INVALID PRINTER'], 500);
-            }
-
-            $printer = new Printer($connector);
+            $connector = new NetworkPrintConnector($printer->ip_address, $printer->ip_address ?: 9100);
+            $p = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
         }
 
-        if ($request->trx == 'OUT')
-        {
-            try {
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text("STRUK PARKIR\n");
-                $printer->text($setting->location_name . "\n");
-                $printer->text($setting->location_address . "\n\n");
+        try {
+            $p->setJustification(Printer::JUSTIFY_CENTER);
+            $p->text("STRUK PARKIR\n");
+            $p->text($setting->nama_lokasi . "\n");
+            $p->text($setting->alamat_lokasi . "\n\n");
 
-                $printer->text('Rp. ' . number_format($parkingTransaction->fare + $parkingTransaction->denda, 0, ',', '.') . ",-\n");
-                $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type . "/" . $gate->name);
-                $printer->text("\n\n");
+            $p->text('Rp. ' . number_format($parkingTransaction->tarif + $parkingTransaction->denda, 0, ',', '.') . ",-\n");
+            $p->text($parkingTransaction->plat_nomor . "/" . $parkingTransaction->jenis_kendaraan . "/" . $parkingTransaction->gateOut->nama);
+            $p->text("\n\n");
 
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-                $printer->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
-                $printer->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
+            $p->setJustification(Printer::JUSTIFY_LEFT);
+            $p->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
+            $p->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
+            $p->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
 
-                // kalau tiket hilang
-                if ($parkingTransaction->barcode_number == 'xxxxx' || $parkingTransaction->denda > 0) {
-                    $printer->text(str_pad('DENDA', 15, ' ') . ' : Rp. ' . number_format($parkingTransaction->denda, 0, ',', '.') . "\n");
-                }
-
-                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
-
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
-
-                $printer->cut();
-                $printer->close();
-            } catch (\Exeption $e) {
-                return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
+            // kalau tiket hilang
+            if ($parkingTransaction->nomor_barcode == 'xxxxx' || $parkingTransaction->denda > 0) {
+                $p->text(str_pad('DENDA', 15, ' ') . ' : Rp. ' . number_format($parkingTransaction->denda, 0, ',', '.') . "\n");
             }
-        }
 
-        if ($request->trx == 'IN')
-        {
-            try {
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                $printer->text("TIKET PARKIR\n");
-                $printer->text($setting->location_name . "\n");
-                $printer->text($setting->location_address . "\n\n");
+            $p->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
 
-                $printer->text('Rp. ' . number_format($parkingTransaction->fare, 0, ',', '.') . ",-\n");
-                $printer->text($parkingTransaction->plate_number . "/". $parkingTransaction->vehicle_type);
-                $printer->text("\n\n");
+            $p->setJustification(Printer::JUSTIFY_CENTER);
+            $p->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
 
-                $printer->setJustification(Printer::JUSTIFY_LEFT);
-                $printer->text(str_pad('GATE', 15, ' ') . ' : ' . $gate->name . "\n");
-                $printer->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-                $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
-                $printer->setJustification(Printer::JUSTIFY_CENTER);
-                // $printer->setBarcodeHeight(100);
-                // $printer->setBarcodeWidth(4);
-                // $printer->barcode($parkingTransaction->barcode_number, 'CODE39');
-                // $printer->text("\n");
-                $printer->text($setting->additional_info_ticket . "\n");
-                $printer->cut();
-                $printer->close();
-            } catch (\Exception $e) {
-                return response(['message' => 'GAGAL MENCETAK TIKET.' . $e->getMessage()], 500);
-            }
+            $p->cut();
+            $p->close();
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
         }
 
         return ['message' => 'SILAKAN AMBIL TIKET'];
@@ -297,25 +260,24 @@ class ParkingTransactionController extends Controller
         }
 
         // ambil transaksi terakhir yg blm tap out
-        $data = ParkingTransaction::with(['member'])->when($request->barcode_number, function($q) use ($request) {
-                return $q->where(function($qq) use ($request) {
-                    return $qq->where('barcode_number', $request->barcode_number)
-                        ->orWhere('card_number', $request->barcode_number);
-                });
-            })->where('time_out', null)
-            ->orderBy('id', 'DESC')->first();
+        $data = ParkingTransaction::with(['member'])->when($request->nomor_barcode, function ($q) use ($request) {
+            $q->where(function ($q) use ($request) {
+                $q->where('nomor_barcode', $request->nomor_barcode)
+                    ->orWhere('nomor_kartu', $request->nomor_barcode);
+            });
+        })->whereNull('time_out')->orderBy('id', 'DESC')->first();
 
         if ($data) {
             // kalau member cek dulu ada yg masih blm tap out ga selain data yg ini
             if ($data->is_member) {
-                ParkingTransaction::where('parking_member_id', $data->parking_member_id)
+                ParkingTransaction::where('member_id', $data->member_id)
                     ->where('id', '<', $data->id)
-                    ->where('time_out', null)
+                    ->whereNull('time_out')
                     ->update([
                         'time_out' => now(),
                         'operator' => $request->user()->name,
                         'user_id' => $request->user()->id,
-                        'gate_out_id' => ParkingGate::where('type', 'OUT')->where('active', 1)->first()->id
+                        'gate_out_id' => GateOut::where('status', true)->first()->id
                     ]);
             }
 
@@ -323,11 +285,10 @@ class ParkingTransactionController extends Controller
         }
 
         // member, tapi gak tap in karena rusak gate in
-        $member = ParkingMember::where('card_number', $request->barcode_number)->first();
+        $member = Member::where('nomor_kartu', $request->nomor_barcode)->first();
 
-        if ($member)
-        {
-            if (!$member->is_active) {
+        if ($member) {
+            if (!$member->status) {
                 return response(['message' => 'KARTU TIDAK AKTIF'], 500);
             }
 
@@ -336,17 +297,17 @@ class ParkingTransactionController extends Controller
             }
 
             $data = [
-                'barcode_number' => 'NOTAP',
-                'vehicle_type' => $member->vehicles[0]->vehicle_type,
-                'is_member' => 1,
+                'nomor_barcode' => 'NOTAP',
+                'jenis_kendaraan' => $member->vehicles[0]->jenis_kendaraan,
+                'is_member' => true,
                 'parking_member_id' => $member->id,
                 'time_in' => now(),
-                'gate_in_id' => ParkingGate::where('type', 'IN')->where('active', 1)->first()->id,
+                'gate_in_id' => GateIn::where('status', true)->first()->id,
                 'card_number' => $member->card_number
             ];
 
             $trx = ParkingTransaction::create($data);
-            return ParkingTransaction::with(['member'])->find($trx->id);
+            return $trx->load(['member']);
         }
 
         return response(['message' => 'NOMOR TIKET/KARTU INVALID'], 404);
@@ -363,22 +324,21 @@ class ParkingTransactionController extends Controller
     {
         $input = $request->all();
 
-        if ($request->edit)
-        {
+        if ($request->edit) {
             $request->validate([
-                'plate_number' => 'required',
-                'vehicle_type' => 'required',
+                'plat_nomor' => 'required',
+                'jenis_kendaraan' => 'required',
                 'gate_in_id' => 'required',
                 'gate_out_id' => 'required',
                 'time_in' => 'required',
                 'time_out' => 'required',
-                'username' => ['required', function($attribute, $value, $fail) {
+                'username' => ['required', function ($attribute, $value, $fail) {
                     $user = User::where('role', 1)->where('status', 1)->where('name', 'LIKE', $value)->first();
                     if (!$user) {
                         $fail('User admin tidak terdaftar');
                     }
                 }],
-                'password' => ['required', function($attribute, $value, $fail) use ($request) {
+                'password' => ['required', function ($attribute, $value, $fail) use ($request) {
                     $user = User::where('role', 1)->where('status', 1)
                         ->where('name', 'LIKE', $request->username)
                         ->first();
@@ -392,8 +352,8 @@ class ParkingTransactionController extends Controller
                     }
                 }],
             ], [], [
-                'plate_number' => 'Plat Nomor',
-                'vehicle_type' => 'Jenis Kendaraan',
+                'plat_nomor' => 'Plat Nomor',
+                'jenis_kendaraan' => 'Jenis Kendaraan',
                 'gate_in_id' => 'Gate Masuk',
                 'gate_out_id' => 'Gate Keluar',
                 'time_in' => 'Waktu Masuk',
@@ -411,14 +371,14 @@ class ParkingTransactionController extends Controller
         }
 
         if ($request->is_member) {
-            ParkingMember::where('id', $request->parking_member_id)->update([
+            Member::where('id', $request->member_id)->update([
                 'last_transaction' => now()
             ]);
         }
 
         // value ini ga perlu diupdate
-        unset($input['card_number']);
-        unset($input['barcode_number']);
+        unset($input['nomor_kartu']);
+        unset($input['nomor_barcode']);
 
         $parkingTransaction->update($input);
         return $parkingTransaction;
@@ -433,6 +393,7 @@ class ParkingTransactionController extends Controller
     public function destroy(ParkingTransaction $parkingTransaction)
     {
         $parkingTransaction->delete();
+        // TODO: hapus snapshot
         return ['message' => 'Transaksi telah dihapus'];
     }
 
@@ -479,11 +440,11 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'BELUM ADA SETTING'], 500);
         }
 
-        if (!$setting->location_name) {
+        if (!$setting->nama_lokasi) {
             return response(['message' => 'LOKASI BELUM DISET'], 404);
         }
 
-        $gate = ParkingGate::find($request->gate_out_id);
+        $gate = GateOut::find($request->gate_out_id);
 
         if (!$gate) {
             return response(['message' => 'GATE TIDAK DITEMUKAN'], 404);
@@ -491,20 +452,20 @@ class ParkingTransactionController extends Controller
 
         // ambil data transaksi per tanggal, per operator, per gate
         // reguler
-        $sqlReguler = "SELECT vehicle_type, COUNT(id) AS jumlah,
-                SUM(fare) AS pendapatan
+        $sqlReguler = "SELECT jenis_kendaraan, COUNT(id) AS jumlah,
+                SUM(tarif) AS pendapatan
             FROM parking_transactions
             WHERE time_out IS NOT NULL
                 AND is_member = 0
                 AND operator = :operator
                 AND DATE(time_out) = :date
                 AND gate_out_id = :gate_out_id
-            GROUP BY vehicle_type
+            GROUP BY jenis_kendaraan
         ";
 
         // ambil data transaksi per tanggal, per operator, per gate
         // denda
-        $sqlDenda = "SELECT vehicle_type, COUNT(id) AS jumlah,
+        $sqlDenda = "SELECT jenis_kendaraan, COUNT(id) AS jumlah,
                 SUM(denda) AS pendapatan
             FROM parking_transactions
             WHERE time_out IS NOT NULL
@@ -513,19 +474,19 @@ class ParkingTransactionController extends Controller
                 AND DATE(time_out) = :date
                 AND gate_out_id = :gate_out_id
                 AND denda > 0
-            GROUP BY vehicle_type
+            GROUP BY jenis_kendaraan
         ";
 
         // ambil data transaksi per tanggal, per operator, per gate
         // member
-        $sqlMember = "SELECT vehicle_type, COUNT(id) AS jumlah
+        $sqlMember = "SELECT jenis_kendaraan, COUNT(id) AS jumlah
             FROM parking_transactions
             WHERE time_out IS NOT NULL
                 AND is_member = 1
                 AND operator = :operator
                 AND DATE(time_out) = :date
                 AND gate_out_id = :gate_out_id
-            GROUP BY vehicle_type
+            GROUP BY jenis_kendaraan
         ";
 
         // ambil data transaksi per tanggal, per operator, per gate
@@ -534,7 +495,7 @@ class ParkingTransactionController extends Controller
             FROM manual_open_logs
             WHERE user_id = :user_id
                 AND DATE(updated_at) = :date
-                AND parking_gate_id = :gate_out_id
+                AND gate_out_id = :gate_out_id
         ";
 
         $pendapatanReguler = DB::select($sqlReguler, [
@@ -569,9 +530,9 @@ class ParkingTransactionController extends Controller
                 AND DATE(time_out) = :date
             ORDER BY time_out ASC
             ', [
-                ':date' => $request->date,
-                ':operator' => $request->user()->name,
-                ':gate_out_id' => $request->gate_out_id
+            ':date' => $request->date,
+            ':operator' => $request->user()->name,
+            ':gate_out_id' => $request->gate_out_id
         ]);
 
         if (!$start) {
@@ -583,6 +544,8 @@ class ParkingTransactionController extends Controller
             ->where('user_id', $request->user()->id)
             ->orderBy('created_at', 'asc')
             ->first();
+
+        // TODO: benerin pilih printer
 
         try {
             if ($gate->printer_type == "network") {
@@ -601,7 +564,7 @@ class ParkingTransactionController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("LAPORAN PENDAPATAN PARKIR\n");
-            $printer->text($setting->location_name . "\n\n");
+            $printer->text($setting->nama_lokasi . "\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . $request->date . "\n");
@@ -612,60 +575,57 @@ class ParkingTransactionController extends Controller
             $printer->text("REGULER\n");
             $subTotalReguler = ['jumlah' => 0, 'pendapatan' => 0];
 
-            foreach ($pendapatanReguler as $d)
-            {
+            foreach ($pendapatanReguler as $d) {
                 $subTotalReguler['jumlah'] += $d->jumlah;
                 $subTotalReguler['pendapatan'] += $d->pendapatan;
 
-                $printer->text(str_pad('-- '.$d->vehicle_type, 15, ' ')
+                $printer->text(str_pad('-- ' . $d->jenis_kendaraan, 15, ' ')
                     . str_pad($d->jumlah, 5, ' ', STR_PAD_LEFT)
-                    . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
+                    . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n");
             }
 
             $printer->text(str_pad('SUB TOTAL', 15, ' ')
                 . str_pad($subTotalReguler['jumlah'], 5, ' ', STR_PAD_LEFT)
-                . str_pad(number_format($subTotalReguler['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n\n");
+                . str_pad(number_format($subTotalReguler['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n\n");
 
 
             // DENDA SECTION
             $printer->text("DENDA\n");
             $subTotalDenda = ['jumlah' => 0, 'pendapatan' => 0];
 
-            foreach ($pendapatanDenda as $d)
-            {
+            foreach ($pendapatanDenda as $d) {
                 $subTotalDenda['jumlah'] += $d->jumlah;
                 $subTotalDenda['pendapatan'] += $d->pendapatan;
 
-                $printer->text(str_pad('-- '.$d->vehicle_type, 15, ' ')
+                $printer->text(str_pad('-- ' . $d->jenis_kendaraan, 15, ' ')
                     . str_pad($d->jumlah, 5, ' ', STR_PAD_LEFT)
                     . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n");
             }
 
             $printer->text(str_pad('SUB TOTAL', 15, ' ')
                 . str_pad($subTotalDenda['jumlah'], 5, ' ', STR_PAD_LEFT)
-                . str_pad(number_format($subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n\n");
+                . str_pad(number_format($subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n\n");
 
             // MEMBER SECTION
             $printer->text("MEMBER\n");
             $subTotalMember = ['jumlah' => 0];
 
-            foreach ($trxMember as $d)
-            {
+            foreach ($trxMember as $d) {
                 $subTotalMember['jumlah'] += $d->jumlah;
-                $printer->text(str_pad('-- '.$d->vehicle_type, 15, ' ', STR_PAD_LEFT) . str_pad($d->jumlah, 5, ' ') ."\n");
+                $printer->text(str_pad('-- ' . $d->jenis_kendaraan, 15, ' ', STR_PAD_LEFT) . str_pad($d->jumlah, 5, ' ') . "\n");
             }
 
-            $printer->text(str_pad('SUB TOTAL', 15, ' ') . str_pad($subTotalMember['jumlah'], 5, ' ', STR_PAD_LEFT) ."\n\n");
+            $printer->text(str_pad('SUB TOTAL', 15, ' ') . str_pad($subTotalMember['jumlah'], 5, ' ', STR_PAD_LEFT) . "\n\n");
 
             $printer->text(str_pad('GRAND TOTAL', 15, ' ')
                 . str_pad(' ', 5, ' ', STR_PAD_LEFT)
-                . str_pad(number_format($subTotalReguler['pendapatan'] + $subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) ."\n");
+                . str_pad(number_format($subTotalReguler['pendapatan'] + $subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n");
 
             $printer->text(str_pad('BUKA MANUAL', 15, ' ') . str_pad($bukaManual[0]->jumlah, 5, ' ', STR_PAD_LEFT) . "\n\n");
 
             $printer->cut();
             $printer->close();
-        } catch (\Exeption $e) {
+        } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
         }
     }

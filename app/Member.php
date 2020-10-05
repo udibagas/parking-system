@@ -5,10 +5,10 @@ namespace App;
 use DateTime;
 use Illuminate\Database\Eloquent\Model;
 
-class ParkingMember extends Model
+class Member extends Model
 {
     protected $fillable = [
-        'name', 'card_number',
+        'nama', 'card_number',
         'is_active', 'expiry_date', 'balance',
         'last_transaction', 'email', 'phone',
         'group_member_id', 'paid', 'billing_cycle_unit',
@@ -17,7 +17,7 @@ class ParkingMember extends Model
 
     protected $appends = ['expired_in', 'expired'];
 
-    protected $with = ['vehicles'];
+    protected $with = ['vehicles', 'group'];
 
     public function vehicles()
     {
@@ -32,5 +32,10 @@ class ParkingMember extends Model
     public function getExpiredAttribute()
     {
         return strtotime(date('Y-m-d')) > strtotime($this->expiry_date);
+    }
+
+    public function group()
+    {
+        return $this->belongsTo(GroupMember::class);
     }
 }

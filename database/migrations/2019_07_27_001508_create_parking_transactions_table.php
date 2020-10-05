@@ -16,16 +16,24 @@ class CreateParkingTransactionsTable extends Migration
         Schema::create('parking_transactions', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->boolean('is_member');
-            $table->string('vehicle_type'); // MOBIL or MOTOR
+            $table->string('jenis_kendaraan'); // MOBIL or MOTOR
             $table->bigInteger('gate_in_id');
             $table->bigInteger('gate_out_id')->nullable();
             $table->dateTime('time_in');
             $table->dateTime('time_out')->nullable();
-            $table->string('barcode_number')->nullable();
-            $table->string('card_number')->nullable();
+            $table->string('nomor_barcode')->nullable();
+            $table->string('nomor_kartu')->nullable();
             $table->string('note')->nullable(); //pesan error
             $table->bigInteger('user_id')->nullable();
-            $table->bigInteger('parking_member_id')->nullable();
+            $table->bigInteger('member_id')->nullable();
+            $table->string('operator')->nullable();
+            $table->boolean('is_member')->default(0)->change();
+            $table->integer('denda')->default(0);
+            $table->boolean('edit')->default(0);
+            $table->boolean('manual')->default(0);
+            $table->string('edit_by')->nullable();
+            $table->string('plat_nomor')->nullable();
+            $table->integer('tarif')->default(0);
             $table->timestamps();
         });
     }

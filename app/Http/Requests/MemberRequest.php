@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ParkingMemberRequest extends FormRequest
+class MemberRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -24,9 +24,9 @@ class ParkingMemberRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required',
-            'card_number' => 'required',
-            'is_active' => 'boolean',
+            'nama' => 'required',
+            'nomor_kartu' => 'required',
+            'status' => 'boolean',
             'expiry_date' => 'required|date',
             'phone' => 'required',
             // 'email' => 'required|email',
@@ -42,8 +42,8 @@ class ParkingMemberRequest extends FormRequest
     public function attributes()
     {
         return [
-            'name' => 'Nama',
-            'card_number' => 'Nomor Kartu',
+            'nama' => 'Nama',
+            'nomor_kartu' => 'Nomor Kartu',
             'is_active' => 'Aktif',
             'expiry_date' => 'Tanggal Kedaluarsa',
             'phone' => 'Nomor HP',

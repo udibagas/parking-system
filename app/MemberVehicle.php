@@ -7,8 +7,12 @@ use Illuminate\Database\Eloquent\Model;
 class MemberVehicle extends Model
 {
     protected $fillable = [
-        'parking_member_id', 'vehicle_type',
-        'plate_number', 'merk', 'type',
-        'tahun', 'warna',
+        'member_id',
+        'jenis_kendaraan',
+        'plat_nomor',
+        'merk',
+        'type',
+        'tahun',
+        'warna',
     ];
 }

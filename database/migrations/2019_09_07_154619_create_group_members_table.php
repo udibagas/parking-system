@@ -15,8 +15,8 @@ class CreateGroupMembersTable extends Migration
     {
         Schema::create('group_members', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->string('name');
-            $table->string('description')->nullable();
+            $table->string('nama');
+            $table->string('keterangan')->nullable();
             $table->string('contact_person_name')->nullable();
             $table->string('contact_person_phone')->nullable();
             $table->string('contact_person_email')->nullable();

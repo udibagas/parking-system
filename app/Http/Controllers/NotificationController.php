@@ -3,19 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Notification;
+use Illuminate\Support\Facades\DB;
 
 class NotificationController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware('role:1')->except([
-            'index', 'update', 'store',
-            'unreadNotification',
-            'markAllAsRead'
-        ]);
-    }
-
     /**
      * Display a listing of the resource.
      *
@@ -23,30 +14,14 @@ class NotificationController extends Controller
      */
     public function index(Request $request)
     {
-        return Notification::when($request->keyword, function ($q) use ($request) {
-                return $q->where('message', 'LIKE', '%' . $request->keyword . '%');
-            })->when($request->read == 0, function($q) {
-                return $q->where('read', 0);
-            })->when($request->dateRange, function($q) use ($request) {
-                return $q->whereRaw('DATE(updated_at) BETWEEN "'.$request->dateRange[0].'" AND "'.$request->dateRange[1].'"');
-            })->orderBy($request->sort ? $request->sort : 'created_at', $request->order == 'ascending' ? 'asc' : 'desc')
+        return DB::table('notifications')->when($request->keyword, function ($q) use ($request) {
+            return $q->whereJsonContains('message', 'LIKE', '%' . $request->keyword . '%');
+        })->when($request->read == 0, function ($q) {
+            return $q->whereNull('read_at');
+        })->when($request->dateRange, function ($q) use ($request) {
+            return $q->whereRaw('DATE(updated_at) BETWEEN "' . $request->dateRange[0] . '" AND "' . $request->dateRange[1] . '"');
+        })->orderBy($request->sort ? $request->sort : 'created_at', $request->order == 'ascending' ? 'asc' : 'desc')
             ->paginate($request->pageSize);
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'message' => 'required',
-            'parking_gate_id' => 'required|exists:parking_gates,id'
-        ]);
-
-        return Notification::create($request->all());
     }
 
     /**
@@ -56,10 +31,9 @@ class NotificationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Notification $notification)
+    public function markAsRead($id)
     {
-        $notification->update($request->all());
-        return $notification;
+        DB::table('notifications')->where('id', $id)->update(['read_at' => now()]);
     }
 
     /**
@@ -68,26 +42,26 @@ class NotificationController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Notification $notification)
+    public function destroy($id)
     {
-        $notification->delete();
+        DB::table('notifications')->where('id', $id)->delete();
         return ['message' => 'Data telah dihapus.'];
     }
 
     public function clearNotification()
     {
-        Notification::truncate();
+        DB::table('notifications')->truncate();
         return ['message' => 'Data telah dihapus.'];
     }
 
     public function unreadNotification()
     {
-        return Notification::where('read', 0)->orderBy('created_at', 'desc')->get();
+        return DB::table('notifications')->whereNull('read_at')->orderBy('created_at', 'desc')->get();
     }
 
     public function markAllAsRead()
     {
-        Notification::where('read', 0)->update(['read' => 1]);
+        DB::table('notifications')->update(['read_at' => now()]);
         return ['message' => 'Data telah disimpan'];
     }
 }

@@ -16,7 +16,7 @@ class DatabaseSeeder extends Seeder
             'name' => 'Admin',
             'email' => 'admin@mitrateknik.co.id',
             'phone' => '0888',
-            'password' => bcrypt('mitrateknik'),
+            'password' => 'admin123',
             'role' => 1,
             'status' => 1
         ]);

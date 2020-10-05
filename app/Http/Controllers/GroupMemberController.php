@@ -20,13 +20,13 @@ class GroupMemberController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'name';
+        $sort = $request->sort ? $request->sort : 'nama';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
         return GroupMember::when($request->keyword, function ($q) use ($request) {
-                return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('description', 'LIKE', '%' . $request->keyword . '%');
-            })->orderBy($sort, $order)->paginate($request->pageSize);
+            return $q->where('nama', 'LIKE', '%' . $request->keyword . '%')
+                ->orWhere('keterangan', 'LIKE', '%' . $request->keyword . '%');
+        })->orderBy($sort, $order)->paginate($request->pageSize);
     }
 
     /**
@@ -67,6 +67,6 @@ class GroupMemberController extends Controller
 
     public function getList()
     {
-        return GroupMember::orderBy('name', 'ASC')->get();
+        return GroupMember::orderBy('nama', 'ASC')->get();
     }
 }

@@ -25,17 +25,19 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        $schedule->command('telescope:prune')->daily();
+
         try {
             $age = Setting::first()->hapus_snapshot_dalam_hari;
 
             if ($age > 0) {
-                $schedule->command('snapshot:delete '.$age)->dailyAt('12:00');
+                $schedule->command('snapshot:delete ' . $age)->dailyAt('12:00');
             }
 
             $age = Setting::first()->hapus_transaksi_dalam_hari;
 
             if ($age > 0) {
-                $schedule->command('trx:delete '.$age)->dailyAt('12:00');
+                $schedule->command('trx:delete ' . $age)->dailyAt('12:00');
             }
         } catch (\Exception $e) {
             // nothing todo
@@ -49,7 +51,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
     }

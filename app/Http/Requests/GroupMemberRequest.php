@@ -24,7 +24,8 @@ class GroupMemberRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required'
+            'nama' => 'required',
+            'keterangan' => 'max:255'
         ];
     }
 }
