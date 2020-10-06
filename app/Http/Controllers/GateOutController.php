@@ -66,9 +66,12 @@ class GateOutController extends Controller
         $connection = \ssh2_connect($gateOut->pos->ip_address);
         \ssh2_auth_password($connection, $gateOut->pos->username, $gateOut->pos->password);
 
-        $openCommand = "stty -F {$gateOut->device} {$gateOut->baudrate} && echo {$gateOut->open_command} > {$gateOut->device}";
-        $closeCommand = "stty -F {$gateOut->device} {$gateOut->baudrate} && echo {$gateOut->close_command} > {$gateOut->device}";
 
+
+        $openCommand = "echo {$gateOut->open_command} > {$gateOut->device}";
+        $closeCommand = "echo {$gateOut->close_command} > {$gateOut->device}";
+
+        \ssh2_exec($connection, "stty -F {$gateOut->device} {$gateOut->baudrate}");
         \ssh2_exec($connection, $openCommand);
 
         if ($gateOut->close_command) {
