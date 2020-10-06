@@ -22,7 +22,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('member/getList', 'MemberController@getList');
 
     Route::resource('gateIn', 'GateInController')->except(['create', 'show', 'edit']);
-    Route::post('gateOut/test/{gateOut}', 'GateOutController@test');
+    Route::get('gateOut/test/{gateOut}', 'GateOutController@test');
     Route::resource('gateOut', 'GateOutController')->except(['create', 'show', 'edit']);
     Route::get('printer/test/{printer}', 'PrinterController@test');
     Route::resource('printer', 'PrinterController')->except(['create', 'show', 'edit']);
