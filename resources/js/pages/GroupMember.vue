@@ -40,7 +40,7 @@
 		<el-table
 			:data="tableData"
 			stripe
-			height="calc(100vh - 255px)"
+			height="calc(100vh - 215px)"
 			v-loading="loading"
 		>
 			<el-table-column
@@ -194,15 +194,15 @@
                     <div class="el-form-item__error" v-if="formErrors.contact_person_email">{{formErrors.contact_person_email[0]}}</div>
                 </el-form-item> -->
 			</el-form>
-			<span slot="footer" class="dialog-footer">
+			<span slot="footer">
+				<el-button icon="el-icon-error" @click="showForm = false"
+					>BATAL</el-button
+				>
 				<el-button
 					type="primary"
 					icon="el-icon-success"
 					@click="() => (!!formModel.id ? update() : store())"
 					>SIMPAN</el-button
-				>
-				<el-button type="info" icon="el-icon-error" @click="showForm = false"
-					>BATAL</el-button
 				>
 			</span>
 		</el-dialog>
