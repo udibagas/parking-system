@@ -24,32 +24,8 @@
 			></el-table-column>
 			<el-table-column
 				min-width="100"
-				label="SSH Port"
-				prop="ssh_port"
-			></el-table-column>
-			<!-- <el-table-column min-width="150" label="Gate Keluar">
-				<template slot-scope="scope">
-					{{
-						scope.row.gateOutList
-							? scope.row.gateOutList.map((g) => g.nama).join(",")
-							: ""
-					}}
-				</template>
-			</el-table-column> -->
-			<el-table-column
-				min-width="100"
 				label="Printer"
 				prop="printer.nama"
-			></el-table-column>
-			<el-table-column
-				min-width="100"
-				label="Username"
-				prop="username"
-			></el-table-column>
-			<el-table-column
-				min-width="100"
-				label="Password"
-				prop="password"
 			></el-table-column>
 			<el-table-column
 				fixed="right"

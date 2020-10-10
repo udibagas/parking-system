@@ -33,49 +33,6 @@
 			</el-form-item>
 
 			<el-form-item
-				label="SSH Port"
-				:class="formErrors.ssh_port ? 'is-error' : ''"
-			>
-				<el-input
-					type="number"
-					placeholder="SSH Port"
-					v-model="formModel.ssh_port"
-				></el-input>
-
-				<div class="el-form-item__error" v-if="formErrors.ssh_port">
-					{{ formErrors.ssh_port[0] }}
-				</div>
-			</el-form-item>
-
-			<el-form-item
-				label="Username"
-				:class="formErrors.username ? 'is-error' : ''"
-			>
-				<el-input
-					placeholder="Username"
-					v-model="formModel.username"
-				></el-input>
-
-				<div class="el-form-item__error" v-if="formErrors.username">
-					{{ formErrors.username[0] }}
-				</div>
-			</el-form-item>
-
-			<el-form-item
-				label="Password"
-				:class="formErrors.password ? 'is-error' : ''"
-			>
-				<el-input
-					placeholder="Password"
-					v-model="formModel.password"
-				></el-input>
-
-				<div class="el-form-item__error" v-if="formErrors.password">
-					{{ formErrors.password[0] }}
-				</div>
-			</el-form-item>
-
-			<el-form-item
 				label="Printer"
 				:class="formErrors.printer_id ? 'is-error' : ''"
 			>
@@ -95,28 +52,6 @@
 					{{ formErrors.printer_id[0] }}
 				</div>
 			</el-form-item>
-
-			<!-- <el-form-item
-				label="Gate Keluar"
-				:class="formErrors.gate_out ? 'is-error' : ''"
-			>
-				<el-select
-					v-model="formModel.gate_out"
-					placeholder="Gate Keluar"
-					style="width: 100%"
-					multiple
-				>
-					<el-option
-						v-for="gate in gateOutList"
-						:value="gate.id"
-						:label="gate.nama"
-						:key="gate.id"
-					></el-option>
-				</el-select>
-				<div class="el-form-item__error" v-if="formErrors.gate_out">
-					{{ formErrors.gate_out[0] }}
-				</div>
-			</el-form-item> -->
 		</el-form>
 
 		<div slot="footer">
