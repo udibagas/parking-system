@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -10,6 +12,7 @@
 | contains the "web" middleware group. Now create something great!
 |
 */
+
 Route::post('login', 'AuthController@login');
 
 Route::group(['middleware' => 'auth'], function () {
@@ -22,7 +25,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('member/getList', 'MemberController@getList');
 
     Route::resource('gateIn', 'GateInController')->except(['create', 'show', 'edit']);
-    Route::get('gateOut/test/{gateOut}', 'GateOutController@test');
+    // Route::get('gateOut/test/{gateOut}', 'GateOutController@test');
     Route::resource('gateOut', 'GateOutController')->except(['create', 'show', 'edit']);
     Route::get('printer/test/{printer}', 'PrinterController@test');
     Route::resource('printer', 'PrinterController')->except(['create', 'show', 'edit']);
@@ -61,8 +64,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('userLog', 'UserLogController@index');
     Route::delete('userLog', 'UserLogController@clear');
 
-    Route::get('snapshots', 'SnapshotsController@index');
-    Route::delete('snapshots', 'SnapshotsController@delete');
+    Route::get('snapshot', 'SnapshotController@index');
+    Route::delete('snapshot', 'SnapshotController@delete');
 
     Route::post('backup', 'BackupController@store');
     Route::get('backup', 'BackupController@index');
