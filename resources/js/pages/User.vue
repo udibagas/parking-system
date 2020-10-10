@@ -1,47 +1,48 @@
 <template>
 	<div>
-		<el-page-header @back="$emit('back')" content="USER"> </el-page-header>
-		<br />
-		<el-form
-			inline
-			class="text-right"
-			@submit.native.prevent="
-				() => {
-					return;
-				}
-			"
-		>
-			<el-form-item>
-				<el-button
-					size="small"
-					@click="openForm({ role: 0, password: '' })"
-					type="primary"
-					icon="el-icon-plus"
-					>TAMBAH USER</el-button
-				>
-			</el-form-item>
-			<el-form-item>
-				<el-input
-					size="small"
-					v-model="keyword"
-					placeholder="Cari"
-					prefix-icon="el-icon-search"
-					:clearable="true"
-					@change="
-						(v) => {
-							keyword = v;
-							requestData();
-						}
-					"
-				>
-				</el-input>
-			</el-form-item>
-		</el-form>
+		<div class="flex flex-row">
+			<div class="text-lg text-blue-700 flex-grow">KELOLA USER</div>
+			<el-form
+				inline
+				class="text-right"
+				@submit.native.prevent="
+					() => {
+						return;
+					}
+				"
+			>
+				<el-form-item>
+					<el-button
+						size="small"
+						@click="openForm({ role: 0, password: '' })"
+						type="primary"
+						icon="el-icon-plus"
+						>TAMBAH USER</el-button
+					>
+				</el-form-item>
+				<el-form-item>
+					<el-input
+						size="small"
+						v-model="keyword"
+						placeholder="Cari"
+						prefix-icon="el-icon-search"
+						:clearable="true"
+						@change="
+							(v) => {
+								keyword = v;
+								requestData();
+							}
+						"
+					>
+					</el-input>
+				</el-form-item>
+			</el-form>
+		</div>
 
 		<el-table
 			:data="tableData"
 			stripe
-			height="calc(100vh - 210px)"
+			height="calc(100vh - 165px)"
 			v-loading="loading"
 		>
 			<el-table-column
