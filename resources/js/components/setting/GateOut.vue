@@ -79,7 +79,7 @@
 						</span>
 						<el-dropdown-menu slot="dropdown">
 							<el-dropdown-item
-								icon="el-icon-camera"
+								icon="el-icon-minus"
 								@click.native.prevent="testGate(scope.row.id)"
 								>Test Gate</el-dropdown-item
 							>
@@ -122,6 +122,7 @@ export default {
 			selectedData: {},
 			showForm: false,
 			loading: false,
+			ws: null,
 		};
 	},
 	methods: {
@@ -167,21 +168,33 @@ export default {
 				})
 				.catch((e) => console.log(e));
 		},
-		testGate(id) {
-			axios
-				.get(`/gateOut/test/${id}`)
-				.then((r) => {
-					this.$message({
-						message: r.data.message,
-						type: "success",
-					});
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: "error",
-					});
+		testGate(gate) {
+			this.connectToPos(gate.pos);
+			this.ws.send(
+				[
+					"open",
+					gate.device,
+					gate.baudrate,
+					gate.open_command,
+					gate.close_command,
+				].join(";")
+			);
+		},
+		connectToPos(pos) {
+			this.ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
+			this.ws.onerror = (event) => {
+				this.$message({
+					message: "KONEKSI KE POS GAGAL",
+					type: "error",
 				});
+			};
+			this.ws.onmessage = (event) => {
+				let data = JSON.parse(event.data);
+				this.$message({
+					message: data.message,
+					type: data.status ? "success" : "error",
+				});
+			};
 		},
 	},
 };
