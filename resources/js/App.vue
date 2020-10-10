@@ -10,7 +10,7 @@
 			<el-aside width="auto">
 				<div v-show="!collapse" class="brand-box">
 					<img
-						:src="'/images/' + appLogo"
+						:src="`/storage/images/${appLogo}`"
 						style="
 							height: 60px;
 							width: 60px;
@@ -253,7 +253,7 @@ export default {
 .sidebar {
 	background-color: #060446;
 	border-color: #060446;
-	height: calc(100vh - 150px);
+	height: calc(100vh - 175px);
 	overflow: auto;
 }
 
