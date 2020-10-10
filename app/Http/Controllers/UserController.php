@@ -21,9 +21,6 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'name';
-        $order = $request->order == 'ascending' ? 'asc' : 'desc';
-
         return User::when($request->keyword, function ($q) use ($request) {
             return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
                 ->orWhere('email', 'LIKE', '%' . $request->keyword . '%');
@@ -31,7 +28,7 @@ class UserController extends Controller
             return $q->whereIn('role', $request->role);
         })->when($request->status, function ($q) use ($request) {
             return $q->whereIn('status', $request->status);
-        })->orderBy($sort, $order)->paginate($request->pageSize);
+        })->orderBy('name', 'asc')->get();
     }
 
     /**
@@ -43,10 +40,9 @@ class UserController extends Controller
     public function store(UserRequest $request)
     {
         $input = $request->all();
-
         $input['email'] = Str::random(20) . '@dummy.com';
-
-        return User::create($input);
+        $user = User::create($input);
+        return ['message' => 'Data telah disimpan', 'data' => $user];
     }
 
     /**
@@ -71,7 +67,7 @@ class UserController extends Controller
     {
         $input = $request->all();
         $user->update($input);
-        return $user;
+        return ['message' => 'Data telah disimpan', 'data' => $user];
     }
 
     /**

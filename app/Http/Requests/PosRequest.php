@@ -26,9 +26,6 @@ class PosRequest extends FormRequest
         return [
             'nama' => 'required',
             'ip_address' => 'required|ipv4',
-            'ssh_port' => 'required|numeric',
-            'username' => 'required',
-            'password' => 'required'
         ];
     }
 
@@ -37,9 +34,6 @@ class PosRequest extends FormRequest
         return [
             'nama' => 'Nama',
             'ip_address' => 'IP Address',
-            'ssh_port' => 'SSH Port',
-            'username' => 'Username',
-            'password' => 'Password'
         ];
     }
 }
