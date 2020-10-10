@@ -20,13 +20,10 @@ class GroupMemberController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'nama';
-        $order = $request->order == 'ascending' ? 'asc' : 'desc';
-
         return GroupMember::when($request->keyword, function ($q) use ($request) {
-            return $q->where('nama', 'LIKE', '%' . $request->keyword . '%')
-                ->orWhere('keterangan', 'LIKE', '%' . $request->keyword . '%');
-        })->orderBy($sort, $order)->paginate($request->pageSize);
+            return $q->where('nama', 'LIKE', "%{$request->keyword}%")
+                ->orWhere('keterangan', 'LIKE', "%{$request->keyword}%");
+        })->orderBy('nama', 'asc')->get();
     }
 
     /**
@@ -37,7 +34,8 @@ class GroupMemberController extends Controller
      */
     public function store(GroupMemberRequest $request)
     {
-        return GroupMember::create($request->all());
+        $groupMember = GroupMember::create($request->all());
+        return ['message' => "Data telah disimpan", 'data' => $groupMember];
     }
 
     /**
@@ -50,7 +48,7 @@ class GroupMemberController extends Controller
     public function update(GroupMemberRequest $request, GroupMember $groupMember)
     {
         $groupMember->update($request->all());
-        return $groupMember;
+        return ['message' => "Data telah disimpan", 'data' => $groupMember];
     }
 
     /**
@@ -63,10 +61,5 @@ class GroupMemberController extends Controller
     {
         $groupMember->delete();
         return ['message' => 'Data telah dihapus'];
-    }
-
-    public function getList()
-    {
-        return GroupMember::orderBy('nama', 'ASC')->get();
     }
 }
