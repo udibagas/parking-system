@@ -15,11 +15,7 @@ class GateOutController extends Controller
      */
     public function index()
     {
-        return GateOut::orderBy('nama', 'asc')->get()->map(function ($item) {
-            return array_merge($item->toArray(), [
-                'pos' => $item->pos->nama
-            ]);
-        });
+        return GateOut::orderBy('nama', 'asc')->with(['pos'])->get();
     }
 
     /**
@@ -61,25 +57,25 @@ class GateOutController extends Controller
         return ['message' => 'Data telah dihapus'];
     }
 
-    public function test(GateOut $gateOut)
-    {
-        $connection = \ssh2_connect($gateOut->pos->ip_address);
-        \ssh2_auth_password($connection, $gateOut->pos->username, $gateOut->pos->password);
+    // public function test(GateOut $gateOut)
+    // {
+    //     $connection = \ssh2_connect($gateOut->pos->ip_address);
+    //     \ssh2_auth_password($connection, $gateOut->pos->username, $gateOut->pos->password);
 
-        $openCommand = "echo {$gateOut->open_command} > {$gateOut->device}";
-        $closeCommand = "echo {$gateOut->close_command} > {$gateOut->device}";
+    //     $openCommand = "stty -F {$gateOut->device} {$gateOut->baudrate}; echo {$gateOut->open_command} > {$gateOut->device}";
+    //     $closeCommand = "stty -F {$gateOut->device} {$gateOut->baudrate}; echo {$gateOut->close_command} > {$gateOut->device}";
 
-        \ssh2_exec($connection, $openCommand);
+    //     \ssh2_exec($connection, $openCommand);
 
-        if ($gateOut->close_command) {
-            sleep(1);
-            \ssh2_exec($connection, $closeCommand);
-        }
+    //     if ($gateOut->close_command) {
+    //         sleep(1);
+    //         \ssh2_exec($connection, $closeCommand);
+    //     }
 
-        return [
-            'open_command' => $openCommand,
-            'close_command' => $closeCommand,
-            'message' => 'GATE BERHASIL DIBUKA'
-        ];
-    }
+    //     return [
+    //         'open_command' => $openCommand,
+    //         'close_command' => $closeCommand,
+    //         'message' => 'GATE BERHASIL DIBUKA'
+    //     ];
+    // }
 }
