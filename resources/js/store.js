@@ -44,11 +44,11 @@ export default new Vuex.Store({
     },
     mutations: {
         getJenisKendaraanList(state) {
-            axios.get('/jenisKendaraan/getList').then(r => state.jenisKendaraanList = r.data)
+            axios.get('/jenisKendaraan').then(r => state.jenisKendaraanList = r.data)
                 .catch(e => console.log(e))
         },
         getGroupMemberList(state) {
-            axios.get('/groupMember/getList').then(r => state.groupMemberList = r.data)
+            axios.get('/groupMember').then(r => state.groupMemberList = r.data)
                 .catch(e => console.log(e))
         },
         getMemberList(state) {
