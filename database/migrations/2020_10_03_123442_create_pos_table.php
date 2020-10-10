@@ -16,11 +16,7 @@ class CreatePosTable extends Migration
         Schema::create('pos', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('nama');
-            $table->string('ip_address');
-            $table->smallInteger('ssh_port')->default(22);
-            $table->string('username');
-            $table->string('password');
-            $table->json('gate_out')->nullable();
+            $table->string('ip_address')->comment('untuk connect web socket');
             $table->unsignedBigInteger('printer_id')->nullable();
             $table->timestamps();
         });
