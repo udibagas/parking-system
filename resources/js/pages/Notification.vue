@@ -1,10 +1,7 @@
 <template>
 	<div>
-		<el-page-header @back="$emit('back')" content="NOTIFIKASI">
-		</el-page-header>
-		<br />
-		<el-tabs type="card">
-			<el-tab-pane label="Notifikasi">
+		<el-tabs>
+			<el-tab-pane label="NOTIFIKASI">
 				<el-form
 					:inline="true"
 					style="text-align: right"
@@ -59,7 +56,7 @@
 					:data="tableData.data"
 					stripe
 					:default-sort="{ prop: sort, order: order }"
-					height="calc(100vh - 300px)"
+					height="calc(100vh - 275px)"
 					v-loading="loading"
 					@sort-change="sortChange"
 				>
@@ -129,7 +126,7 @@
 				>
 				</el-pagination>
 			</el-tab-pane>
-			<el-tab-pane lazy label="Controller Log">
+			<el-tab-pane lazy label="LOG GATE MASUK">
 				<ControllerLog />
 			</el-tab-pane>
 		</el-tabs>
@@ -167,20 +164,18 @@ export default {
 			})
 				.then(() => {
 					axios
-						.delete("/notification/" + id)
+						.delete(`/notification/${id}`)
 						.then((r) => {
 							this.requestData();
 							this.$message({
 								message: r.data.message,
 								type: "success",
-								showClose: true,
 							});
 						})
 						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
 								type: "error",
-								showClose: true,
 							});
 						});
 				})
@@ -204,18 +199,10 @@ export default {
 					this.tableData = r.data;
 				})
 				.catch((e) => {
-					if (e.response.status == 500) {
-						this.$message({
-							message:
-								e.response.data.message +
-								"\n" +
-								e.response.data.file +
-								":" +
-								e.response.data.line,
-							type: "error",
-							showClose: true,
-						});
-					}
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+					});
 				})
 				.finally(() => {
 					this.loading = false;
@@ -233,14 +220,12 @@ export default {
 							this.$message({
 								message: r.data.message,
 								type: "success",
-								showClose: true,
 							});
 						})
 						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
 								type: "error",
-								showClose: true,
 							});
 						});
 				})
