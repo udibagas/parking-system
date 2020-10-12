@@ -12,7 +12,8 @@ class Snapshot extends Model
         'kamera_id',
         'snapshotable_id',
         'snapshotable_type',
-        'path'
+        'path',
+        'filename'
     ];
 
     protected $appends = ['url'];

@@ -1,7 +1,7 @@
 <template>
 	<div class="flex">
 		<el-card
-			style="height: calc(100vh - 100px); overflow: auto; width: 800px"
+			style="height: calc(100vh - 100px); overflow: auto; min-width: 700px"
 			class="mr-3"
 		>
 			<el-tree

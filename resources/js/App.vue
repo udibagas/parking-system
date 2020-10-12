@@ -258,8 +258,6 @@ export default {
 .sidebar {
 	background-color: #060446;
 	border-color: #060446;
-	height: calc(100vh - 175px);
-	overflow: auto;
 }
 
 .sidebar:not(.el-menu--collapse) {
@@ -269,6 +267,7 @@ export default {
 .el-aside {
 	height: 100vh;
 	background-color: #060446;
+	overflow: auto;
 }
 
 .el-main {

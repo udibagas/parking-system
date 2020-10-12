@@ -19,6 +19,7 @@ class CreateSnapshotsTable extends Migration
             $table->unsignedBigInteger('kamera_id');
             $table->morphs('snapshotable');
             $table->string('path');
+            $table->string('filename');
             $table->timestamps();
         });
     }
