@@ -3,13 +3,9 @@
 import sys
 import time
 import socket
-import random
-import string
 import datetime
 import requests
 import threading
-from escpos.printer import Network
-from requests.auth import HTTPDigestAuth
 import os
 import logging
 
