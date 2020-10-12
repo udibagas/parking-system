@@ -17,11 +17,11 @@ class CreateMemberRenewalsTable extends Migration
             $table->bigIncrements('id');
             $table->bigInteger('member_id');
             $table->bigInteger('user_id');
-            $table->date('from_date');
-            $table->date('to_date');
-            $table->bigInteger('amount')->default(0);
-            $table->integer('billing_cycle')->default(0);
-            $table->string('billing_cycle_unit')->default('months');
+            $table->date('dari_tanggal');
+            $table->date('sampai_tanggal');
+            $table->bigInteger('jumlah')->default(0);
+            $table->integer('siklus_pembayaran')->default(0);
+            $table->string('siklus_pembayaran_unit')->default('months');
             $table->timestamps();
         });
     }

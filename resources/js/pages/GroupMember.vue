@@ -40,7 +40,7 @@
 		<el-table
 			:data="tableData"
 			stripe
-			height="calc(100vh - 215px)"
+			height="calc(100vh - 220px)"
 			v-loading="loading"
 		>
 			<el-table-column

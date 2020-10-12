@@ -8,11 +8,11 @@ use Illuminate\Database\Eloquent\Model;
 class Member extends Model
 {
     protected $fillable = [
-        'nama', 'card_number',
-        'is_active', 'expiry_date', 'balance',
+        'nama', 'nomor_kartu',
+        'status', 'expiry_date', 'balance',
         'last_transaction', 'email', 'phone',
-        'group_member_id', 'paid', 'billing_cycle_unit',
-        'register_date', 'billing_cycle', 'fare'
+        'group_member_id', 'berbayar', 'siklus_pembayaran_unit',
+        'register_date', 'siklus_pembayaran', 'tarif'
     ];
 
     protected $appends = ['expired_in', 'expired'];
@@ -36,6 +36,6 @@ class Member extends Model
 
     public function group()
     {
-        return $this->belongsTo(GroupMember::class);
+        return $this->belongsTo(GroupMember::class, 'group_member_id');
     }
 }

@@ -25,10 +25,10 @@ class MemberRenewalRequest extends FormRequest
     {
         return [
             'member_id' => 'required|exists:members,id',
-            'from_date' => 'required|date',
-            'to_date' => 'required|date',
-            'billing_cycle' => 'numeric|required',
-            'billing_cycle_unit' => 'required|in:days,weeks,months,years',
+            'dari_tanggal' => 'required|date',
+            'sampai_tanggal' => 'required|date',
+            'siklus_pembayaran' => 'numeric|required',
+            'siklus_pembayaran_unit' => 'required|in:days,weeks,months,years',
         ];
     }
 
@@ -36,10 +36,10 @@ class MemberRenewalRequest extends FormRequest
     {
         return [
             'member_id' => 'Member',
-            'from_date' => 'Dari Tanggal',
-            'to_date' => 'Sampai Tanggal',
-            'billing_cycle' => 'Siklus Pembayaran',
-            'billing_cycle_unit' => 'Siklus Pembayaran',
+            'dari_tanggal' => 'Dari Tanggal',
+            'sampai_tanggal' => 'Sampai Tanggal',
+            'siklus_pembayaran' => 'Siklus Pembayaran',
+            'siklus_pembayaran_unit' => 'Siklus Pembayaran',
         ];
     }
 }

@@ -24,11 +24,11 @@ class CreateMembersTable extends Migration
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
             $table->bigInteger('group_member_id')->nullable();
-            $table->bigInteger('fare')->default(0);
-            $table->boolean('paid')->default(0);
+            $table->bigInteger('tarif')->default(0);
+            $table->boolean('berbayar')->default(0);
             $table->date('register_date')->nullable();
-            $table->tinyInteger('billing_cycle')->default(1);
-            $table->string('billing_cycle_unit')->default('months');
+            $table->tinyInteger('siklus_pembayaran')->default(1);
+            $table->string('siklus_pembayaran_unit')->default('months');
             $table->timestamps();
         });
     }

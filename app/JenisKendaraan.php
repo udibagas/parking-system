@@ -21,4 +21,8 @@ class JenisKendaraan extends Model
         'tarif_menginap',
         'mode_menginap'
     ];
+
+    const MODE_TARIF_FLAT = 0;
+
+    const MODE_TARIF_PROGRESIF = 1;
 }

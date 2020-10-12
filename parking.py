@@ -17,7 +17,7 @@ API_URL = 'http://localhost/api'
 
 def get_gates():
     try:
-        r = requests.get(API_URL + '/gateIn', params={'status': True}, timeout=3)
+        r = requests.get(API_URL + '/gateIn', params={'status': 1}, timeout=3)
     except Exception as e:
         logging.error('Failed to get gates ' + str(e))
         return False
@@ -38,10 +38,10 @@ def send_notification(gate, message):
 
     return True
 
-def check_card(gate, card_number):
-    payload = { 'card_number': card_number, 'active': 1 }
+def check_card(gate, nomor_kartu):
+    payload = { 'nomor_kartu': nomor_kartu, 'status': 1 }
     try:
-        r = requests.get(API_URL + '/parkingMember/search', params=payload, timeout=3)
+        r = requests.get(API_URL + '/member/search', params=payload, timeout=3)
     except Exception as e:
         logging.info(gate['nama'] + ' : Failed to check card ' + str(e))
         return False
@@ -123,8 +123,8 @@ def gate_in_thread(gate):
                     logging.debug(gate['nama'] + ' : Detecting button or card ' + str(push_button_or_card))
 
                     if b'W' in push_button_or_card:
-                        card_number = str(push_button_or_card).split('W')[1].split('\\xa9')[0]
-                        member = check_card(gate, str(int(card_number, 16)))
+                        nomor_kartu = str(push_button_or_card).split('W')[1].split('\\xa9')[0]
+                        member = check_card(gate, str(int(nomor_kartu, 16)))
                         time.sleep(.1) # kasih jeda biar audio bisa play
 
                         if not member:
@@ -176,12 +176,12 @@ def gate_in_thread(gate):
                                 logging.error(gate['nama'] + ' : Failed to respon card expired in 1 day ' + str(e))
                                 send_notification(gate, gate['nama'] + ' : Gagal merespon kartu expired dalam 1 hari')
 
-                        data = {'is_member': 1, 'nomor_kartu': member['nomor_kartu'], 'parking_member_id': member['id']}
+                        data = {'is_member': 1, 'nomor_kartu': member['nomor_kartu'], 'member_id': member['id']}
                         logging.info(gate['nama'] + ' : Kartu terdeteksi :' + member['nomor_kartu'])
                         break
 
                     elif b'IN2ON' in push_button_or_card or b'STAT11' in push_button_or_card:
-                        logging.info(gate['nama'] + ' : Ticket button pressed')
+                        logging.info(gate['nama'] + ' : Tombol tiket ditekan')
                         data = {'is_member': 0}
                         break
 
@@ -197,12 +197,12 @@ def gate_in_thread(gate):
                             s.sendall(b'\xa6MT00005\xa9')
                             time.sleep(10)
                         except Exception as e:
-                            logging.error(gate['nama'] + ' : Failed to respon help button ' + str(e))
+                            logging.error(gate['nama'] + ' : Gagal merespon tombol bantuan ' + str(e))
                             send_notification(gate, gate['nama'] + ' : Gagal merespon tombol bantuan')
                             error = True
                             break
 
-                        logging.info(gate['nama'] + ' : Help button pressed')
+                        logging.info(gate['nama'] + ' : Tombol bantuan ditekan')
                         send_notification(gate, 'Pengunjung di ' + gate['nama'] + ' membutuhkan bantuan Anda')
                         break
 
@@ -236,7 +236,7 @@ def gate_in_thread(gate):
                         s.sendall(b'\xa6MT00002\xa9')
                         logging.debug(gate['nama'] + ' : ' + str(s.recv(1024)))
                     except Exception as e:
-                        logging.error(gate['nama'] + ' : Failed to play silakan ambil tiket' + str(e))
+                        logging.error(gate['nama'] + ' : Gagal play silakan ambil tiket' + str(e))
                         send_notification(gate, gate['nama'] + ' : Gagal play silakan ambil tiket')
                         break
 
@@ -245,7 +245,7 @@ def gate_in_thread(gate):
                     s.sendall(b'\xa6MT00006\xa9')
                     logging.debug(gate['nama'] + ' : ' + str(s.recv(1024)))
                 except Exception:
-                    logging.error(gate['nama'] + ' : Failed to play terimakasih' + str(e))
+                    logging.error(gate['nama'] + ' : Gagal play terimakasih' + str(e))
                     send_notification(gate, gate['nama'] + ' : Gagal play terimakasih')
                     break
 
@@ -256,11 +256,11 @@ def gate_in_thread(gate):
                     s.sendall(b'\xa6TRIG1\xa9')
                     logging.debug(gate['nama'] + ' : ' + str(s.recv(1024)))
                 except Exception as e:
-                    logging.error(gate['nama'] + ' : Failed to open gate ' + str(e))
+                    logging.error(gate['nama'] + ' : Gagal membuka gate ' + str(e))
                     send_notification(gate, gate['nama'] + ' : Gagal membuka gate')
                     break
 
-                logging.info(gate['nama'] + ' : Gate Opened')
+                logging.info(gate['nama'] + ' : Gate terbuka')
 
                 # wait until vehicle in
                 counter = 0
@@ -268,7 +268,7 @@ def gate_in_thread(gate):
                 while True:
                     # 5x cek aja biar ga kelamaan
                     if counter > 5:
-                        logging.info(gate['nama'] + ' : Waiting too long')
+                        logging.info(gate['nama'] + ' : Terlalu lama menunggu')
                         break
 
                     counter += 1
@@ -278,14 +278,14 @@ def gate_in_thread(gate):
                         vehicle_in = s.recv(1024)
                         logging.debug(gate['nama'] + ' : ' + str(vehicle_in))
                     except Exception as e:
-                        logging.error(gate['nama'] + ' : Failed to sense loop 2 ' + str(e))
+                        logging.error(gate['nama'] + ' : Gagal deteksi kendaraan sudah masuk ' + str(e))
                         send_notification(gate, gate['nama'] + ' : Gagal deteksi kendaraan sudah masuk')
                         error = True
                         # break sensing loop 2
                         break
 
                     if b'IN3OFF' in vehicle_in:
-                        logging.info(gate['nama'] + ' : Vehicle in')
+                        logging.info(gate['nama'] + ' : Kendaraan masuk')
                         break
 
                     time.sleep(1)
@@ -298,11 +298,11 @@ def start_app():
     gates = get_gates()
 
     if gates == False:
-        logging.info('Gate not set. Exit application.')
+        logging.info('Tidak ada gate. Keluar dari aplikasi')
         sys.exit()
 
-    logging.info('Gate set : ' + ', '.join(map(lambda x: x['name'], gates)))
-    logging.info('Starting application...')
+    logging.info('Gate : ' + ', '.join(map(lambda x: x['nama'], gates)))
+    logging.info('Memulai aplikasi...')
 
     for g in gates:
         threading.Thread(target=gate_in_thread, args=(g,)).start()

@@ -136,7 +136,7 @@ export default {
 				})
 				.finally(() => (this.loading = false));
 
-			this.$store.commit("getJenisKameraList");
+			this.$store.commit("getKameraList");
 		},
 		openForm(data = null) {
 			this.selectedData = data ? JSON.parse(JSON.stringify(data)) : {};

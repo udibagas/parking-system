@@ -5,8 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
-use App\ParkingGate;
-use App\ParkingMember;
+use App\Member;
 use App\Setting;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
@@ -33,12 +32,12 @@ class MemberRenewalController extends Controller
             ')
             ->join('parking_members', 'parking_members.id', '=', 'member_renewals.parking_member_id')
             ->join('users', 'users.id', '=', 'member_renewals.user_id')
-            ->when($request->dateRange, function($q) use ($request) {
+            ->when($request->dateRange, function ($q) use ($request) {
                 return $q->whereRaw("DATE(member_renewals.updated_at) BETWEEN '{$request->dateRange[0]}' AND '{$request->dateRange[1]}' ");
-            })->when($request->keyword, function($q) use ($request) {
-                return $q->where('parking_members.name', 'LIKE', '%'.$request->keyword.'%')
-                    ->orWhere('parking_members.card_number', 'LIKE', '%'.$request->keyword.'%')
-                    ->orWhere('users.name', 'LIKE', '%'.$request->keyword.'%');
+            })->when($request->keyword, function ($q) use ($request) {
+                return $q->where('parking_members.name', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('parking_members.card_number', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('users.name', 'LIKE', '%' . $request->keyword . '%');
             })
             ->orderBy($sort, $order)->paginate($request->pageSize);
     }
@@ -54,11 +53,11 @@ class MemberRenewalController extends Controller
         $input = $request->all();
         $input['user_id'] = auth()->user()->id;
         $renewal = MemberRenewal::create($input);
-        ParkingMember::where('id', $request->parking_member_id)->update([
-            'register_date' => $request->from_date,
-            'expiry_date' => $request->to_date,
-            'billing_cycle' => $request->billing_cycle,
-            'billing_cycle_unit' => $request->billing_cycle_unit,
+        Member::where('id', $request->parking_member_id)->update([
+            'register_date' => $request->dari_tanggal,
+            'expiry_date' => $request->sampai_tanggal,
+            'siklus_pembayaran' => $request->siklus_pembayaran,
+            'siklus_pembayaran_unit' => $request->siklus_pembayaran_unit,
         ]);
         return $renewal;
     }
@@ -90,18 +89,13 @@ class MemberRenewalController extends Controller
 
     public function printSlip(MemberRenewal $memberRenewal)
     {
-        // $parkingGate = ParkingGate::where('type', 'OUT')->where('active', 1)->first();
         $setting = Setting::first();
-
-        // if (!$parkingGate) {
-        //     return response(['message' => 'TIDAK ADA PRINTER YANG DIPILIH'], 404);
-        // }
 
         if (!$setting) {
             return response(['message' => 'BELUM ADA SETTING'], 500);
         }
 
-        if (!$setting->location_name) {
+        if (!$setting->nama_lokasi) {
             return response(['message' => 'LOKASI BELUM DISET'], 500);
         }
 
@@ -129,16 +123,16 @@ class MemberRenewalController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("SLIP PEMBAYARAN KEANGGOTAAN PARKIR\n");
-            $printer->text($setting->location_name."\n");
+            $printer->text($setting->nama_lokasi . "\n");
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
             $printer->text(str_pad('Tanggal Trx', 15, ' ') . ' : ' . date('d-M-Y H:i:s', strtotime($memberRenewal->created_at)) . "\n");
-            $printer->text(str_pad('Nama Member', 15, ' ') . ' : ' . strtoupper($memberRenewal->parkingMember->name) . "\n");
-            $printer->text(str_pad('Nomor Kartu', 15, ' ') . ' : ' . $memberRenewal->parkingMember->card_number . "\n");
-            $printer->text(str_pad('Dari Tangal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->from_date)) . "\n");
-            $printer->text(str_pad('Sampai Tanggal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->to_date)) . "\n");
-            $printer->text(str_pad('Jumlah', 15, ' ') . ' : ' .'Rp. ' . number_format($memberRenewal->amount, 0, ',', '.') . ",-\n");
+            $printer->text(str_pad('Nama Member', 15, ' ') . ' : ' . strtoupper($memberRenewal->member->nama) . "\n");
+            $printer->text(str_pad('Nomor Kartu', 15, ' ') . ' : ' . $memberRenewal->member->nomor_kartu . "\n");
+            $printer->text(str_pad('Dari Tangal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->dari_tanggal)) . "\n");
+            $printer->text(str_pad('Sampai Tanggal', 15, ' ') . ' : ' . date('d-M-Y', strtotime($memberRenewal->sampai_tanggal)) . "\n");
+            $printer->text(str_pad('Jumlah', 15, ' ') . ' : ' . 'Rp. ' . number_format($memberRenewal->jumlah, 0, ',', '.') . ",-\n");
             $printer->text(str_pad('Petugas', 15, ' ') . ' : ' . strtoupper($memberRenewal->user->name) . "\n\n");
             $printer->cut();
             $printer->close();
@@ -153,7 +147,7 @@ class MemberRenewalController extends Controller
     {
         $sql = "SELECT DATE(created_at) AS tanggal,
             COUNT(id) AS jumlah,
-            SUM(amount) AS pendapatan
+            SUM(jumlah) AS pendapatan
         FROM member_renewals
         WHERE DATE(created_at) BETWEEN :start AND :end
         GROUP BY DATE(created_at)";
@@ -172,7 +166,7 @@ class MemberRenewalController extends Controller
 
     public function reportDaily(Request $request)
     {
-        $data = MemberRenewal::with('parkingMember')
+        $data = MemberRenewal::with('member')
             ->whereRaw('DATE(member_renewals.created_at) = ?', [$request->date])
             ->orderBy('member_renewals.created_at', 'ASC')
             ->get();
@@ -192,7 +186,7 @@ class MemberRenewalController extends Controller
             return response(['message' => 'BELUM ADA SETTING'], 500);
         }
 
-        if (!$setting->location_name) {
+        if (!$setting->nama_lokasi) {
             return response(['message' => 'LOKASI BELUM DISET'], 500);
         }
 
@@ -206,7 +200,7 @@ class MemberRenewalController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("LAPORAN PENDAPATAN ANGGOTA\n");
-            $printer->text($setting->location_name."\n");
+            $printer->text($setting->nama_lokasi . "\n");
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -216,8 +210,7 @@ class MemberRenewalController extends Controller
             $totalJumlah = 0;
             $totalPendapatan = 0;
 
-            foreach ($data as $d)
-            {
+            foreach ($data as $d) {
                 $totalJumlah += $d->jumlah;
                 $totalPendapatan += $d->pendapatan;
 
@@ -228,8 +221,8 @@ class MemberRenewalController extends Controller
 
             $printer->text("\n\n");
             $printer->text(str_pad('TOTAL', 15, ' ')
-                    . str_pad(number_format($totalJumlah, 0, ',', '.'), 15, ' ')
-                    . str_pad(number_format($totalPendapatan, 0, ',', '.'), 15, ' ')  . "\n");
+                . str_pad(number_format($totalJumlah, 0, ',', '.'), 15, ' ')
+                . str_pad(number_format($totalPendapatan, 0, ',', '.'), 15, ' ')  . "\n");
 
             $printer->cut();
             $printer->close();
@@ -248,7 +241,7 @@ class MemberRenewalController extends Controller
             return response(['message' => 'BELUM ADA SETTING'], 500);
         }
 
-        if (!$setting->location_name) {
+        if (!$setting->nama_lokasi) {
             return response(['message' => 'LOKASI BELUM DISET'], 500);
         }
 
@@ -262,8 +255,8 @@ class MemberRenewalController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("LAPORAN PENDAPATAN ANGGOTA\n");
-            $printer->text($setting->location_name."\n");
-            $printer->text("TANGGAL ".date('d/M/Y', strtotime($date)));
+            $printer->text($setting->nama_lokasi . "\n");
+            $printer->text("TANGGAL " . date('d/M/Y', strtotime($date)));
             $printer->text("\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
@@ -273,9 +266,9 @@ class MemberRenewalController extends Controller
             $total = 0;
 
             foreach ($data as $d) {
-                $total += $d->amount;
-                $printer->text(str_pad($d->parkingMember->name, 15, ' ')
-                    . str_pad(number_format($d->amount, 0, ',', '.'), 15, ' ')  . "\n");
+                $total += $d->jumlah;
+                $printer->text(str_pad($d->member->nama, 15, ' ')
+                    . str_pad(number_format($d->jumlah, 0, ',', '.'), 15, ' ')  . "\n");
             }
 
             $printer->text("\n\n");

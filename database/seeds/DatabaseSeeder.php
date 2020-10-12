@@ -2,6 +2,7 @@
 
 use Illuminate\Database\Seeder;
 use App\User;
+use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -12,14 +13,14 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        User::create([
-            'name' => 'Admin',
-            'email' => 'admin@mitrateknik.co.id',
-            'phone' => '0888',
-            'password' => 'admin123',
-            'role' => 1,
-            'status' => 1
-        ]);
-        // $this->call(UsersTableSeeder::class);
+        $this->call(UserSeeder::class);
+        $this->call(SettingSeeder::class);
+        $this->call(JenisKendaraanSeeder::class);
+        $this->call(KameraSeeder::class);
+        $this->call(PrinterSeeder::class);
+        $this->call(PosSeeder::class);
+        $this->call(GateInSeeder::class);
+        $this->call(GateOutSeeder::class);
+        $this->call(GroupMemberSeeder::class);
     }
 }

@@ -9,16 +9,16 @@ class MemberRenewal extends Model
     protected $fillable = [
         'member_id',
         'user_id',
-        'from_date',
-        'to_date',
-        'amount',
-        'billing_cycle_unit',
-        'billing_cycle'
+        'dari_tanggal',
+        'sampai_tanggal',
+        'jumlah',
+        'siklus_pembayaran_unit',
+        'siklus_pembayaran'
     ];
 
-    public function parkingMember()
+    public function member()
     {
-        return $this->belongsTo(ParkingMember::class);
+        return $this->belongsTo(Member::class);
     }
 
     public function user()

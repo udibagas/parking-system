@@ -11,7 +11,7 @@ class MemberVehicle extends Model
         'jenis_kendaraan',
         'plat_nomor',
         'merk',
-        'type',
+        'tipe',
         'tahun',
         'warna',
     ];

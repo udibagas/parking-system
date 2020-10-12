@@ -31,11 +31,11 @@ class MemberRequest extends FormRequest
             'phone' => 'required',
             // 'email' => 'required|email',
             'group_member_id' => 'required',
-            'paid' => 'boolean',
+            'berbayar' => 'boolean',
             'register_date' => 'required|date',
-            'billing_cycle' => 'numeric|required',
-            'billing_cycle_unit' => 'required|in:days,weeks,months,years',
-            'fare' => 'numeric'
+            'siklus_pembayaran' => 'numeric|required',
+            'siklus_pembayaran_unit' => 'required|in:days,weeks,months,years',
+            'tarif' => 'numeric'
         ];
     }
 
@@ -44,16 +44,16 @@ class MemberRequest extends FormRequest
         return [
             'nama' => 'Nama',
             'nomor_kartu' => 'Nomor Kartu',
-            'is_active' => 'Aktif',
+            'status' => 'Status',
             'expiry_date' => 'Tanggal Kedaluarsa',
             'phone' => 'Nomor HP',
             'email' => 'Alamat Email',
             'group_member_id' => 'Group',
-            'paid' => 'Berbayar',
+            'berbayar' => 'Berbayar',
             'register_date' => 'Tanggal Daftar',
-            'billing_cycle' => 'Siklus Pembayaran',
-            'billing_cycle_unit' => 'Siklus Pembayaran',
-            'fare' => 'Tarif'
+            'siklus_pembayaran' => 'Siklus Pembayaran',
+            'siklus_pembayaran_unit' => 'Siklus Pembayaran',
+            'tarif' => 'Tarif'
         ];
     }
 }
