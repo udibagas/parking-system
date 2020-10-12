@@ -8,6 +8,7 @@ class Snapshot extends Model
 {
     protected $fillable = [
         'parking_transaction_id',
+        'kamera_id',
         'snapshotable_id',
         'snapshotable_type',
         'path'
