@@ -96,6 +96,7 @@ class ParkingTransactionController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
+        $input['time_in'] = now();
 
         if ($request->manual) {
             $input['nomor_barcode'] = Str::random(5);
