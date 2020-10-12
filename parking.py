@@ -27,7 +27,7 @@ def send_notification(gate, message):
     notification = { 'message': message }
 
     try:
-        requests.post(API_URL + '/gateIn/notification/' + gate['id'], data=notification, timeout=3)
+        requests.post(API_URL + '/gateIn/notification/' + str(gate['id']), data=notification, timeout=3)
     except Exception as e:
         logging.info(gate['nama'] + ' : Failed to send notification ' + str(e))
         return False
