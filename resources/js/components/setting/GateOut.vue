@@ -27,7 +27,11 @@
 				label="Nama"
 				prop="nama"
 			></el-table-column>
-			<el-table-column min-width="100" label="Pos" prop="pos"></el-table-column>
+			<el-table-column
+				min-width="100"
+				label="Pos"
+				prop="pos.nama"
+			></el-table-column>
 			<el-table-column
 				min-width="150"
 				label="Jenis Kendaraan"
