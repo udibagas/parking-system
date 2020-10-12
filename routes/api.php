@@ -17,7 +17,7 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-Route::post('parkingTransaction', 'ParkingTransactionController@store');
+Route::post('parkingTransaction', 'ParkingTransactionController@apiStore');
 Route::post('gateIn/notification/{gateIn}', 'GateInController@notification');
 Route::get('gateIn', 'GateInController@index');
 Route::get('member/search', 'MemberController@search');
