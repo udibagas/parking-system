@@ -1,43 +1,37 @@
 <template>
-	<div>
-		<el-page-header @back="$emit('back')" content="SNAPSHOT"> </el-page-header>
-		<br />
-
-		<el-row :gutter="20">
-			<el-col :span="12">
-				<el-card style="height: calc(100vh - 180px); overflow: auto">
-					<el-tree
-						v-if="show"
-						lazy
-						:load="loadData"
-						node-key="id"
-						:expand-on-click-node="false"
-						@node-click="showPreview"
-						:props="{ children: 'children', label: 'label', isLeaf: 'leaf' }"
-					>
-						<span class="custom-tree-node" slot-scope="{ node, data }">
-							<span>{{ node.label }}</span>
-							<span>
-								<el-button
-									type="text"
-									size="mini"
-									icon="el-icon-delete"
-									@click="() => deleteSnapshot(node, data)"
-								>
-								</el-button>
-							</span>
-						</span>
-					</el-tree>
-				</el-card>
-			</el-col>
-			<el-col :span="12">
-				<el-image style="width: 100%; height: 100%" :src="preview" fit="cover">
-					<div slot="error" class="el-image__error">
-						<i class="el-icon-picture-outline"></i>
-					</div>
-				</el-image>
-			</el-col>
-		</el-row>
+	<div class="flex">
+		<el-card
+			style="height: calc(100vh - 100px); overflow: auto; width: 800px"
+			class="mr-3"
+		>
+			<el-tree
+				v-if="show"
+				lazy
+				:load="loadData"
+				node-key="id"
+				:expand-on-click-node="false"
+				@node-click="showPreview"
+				:props="{ children: 'children', label: 'label', isLeaf: 'leaf' }"
+			>
+				<span class="custom-tree-node" slot-scope="{ node, data }">
+					<span>{{ node.label }}</span>
+					<span>
+						<el-button
+							type="text"
+							size="mini"
+							icon="el-icon-delete"
+							@click="() => deleteSnapshot(node, data)"
+						>
+						</el-button>
+					</span>
+				</span>
+			</el-tree>
+		</el-card>
+		<el-image style="width: 100%; height: 100%" :src="preview" fit="cover">
+			<div slot="error" class="el-image__error">
+				<i class="el-icon-picture-outline"></i>
+			</div>
+		</el-image>
 	</div>
 </template>
 
@@ -73,20 +67,21 @@ export default {
 			}
 
 			if (node.level == 2) {
-				(params.year = node.parent.data.id), (params.month = node.data.id);
+				params.year = node.parent.data.id;
+				params.month = node.data.id;
 				path = params.year + "/" + params.month;
 			}
 
 			if (node.level == 3) {
-				(params.year = node.parent.parent.data.id),
-					(params.month = node.parent.data.id);
+				params.year = node.parent.parent.data.id;
+				params.month = node.parent.data.id;
 				params.day = node.data.id;
 				path = params.year + "/" + params.month + "/" + params.day;
 			}
 
 			if (node.level == 4) {
-				(params.year = node.parent.parent.parent.data.id),
-					(params.month = node.parent.parent.data.id);
+				params.year = node.parent.parent.parent.data.id;
+				params.month = node.parent.parent.data.id;
 				params.day = node.parent.data.id;
 				params.hour = node.data.id;
 				path = `${params.year}/${params.month}/${params.day}/${params.hour}`;
@@ -94,19 +89,21 @@ export default {
 
 			axios.get("snapshot", { params: params }).then((r) => {
 				resolve(
-					r.data
-						.filter((d) => d != "." && d != "..")
-						.map((d) => {
-							return {
-								id: d,
-								label: node.level == 1 ? this.months[parseInt(d) - 1] : d,
-								leaf: d.includes(".jpg") || d.includes(".png"),
-								path: "storage/snapshots/" + path + "/" + d,
-							};
-						})
+					r.data.map((d) => {
+						return {
+							id: d,
+							label: node.level == 1 ? this.months[parseInt(d) - 1] : d,
+							leaf:
+								d.toString().includes(".jpg") ||
+								d.toString().includes(".png") ||
+								d.toString().includes(".jpeg"),
+							path: d,
+						};
+					})
 				);
 			});
 		},
+		// TODO: benerin ini
 		deleteSnapshot(node) {
 			let params = null;
 
@@ -180,12 +177,11 @@ export default {
 							});
 						})
 						.catch((e) => {
-							console.log(e);
-							// this.$message({
-							//     message: e.response.data.message,
-							//     type: 'error',
-							//     showClose: true
-							// });
+							this.$message({
+								message: e.response.data.message,
+								type: "error",
+								showClose: true,
+							});
 						})
 						.finally(() => {
 							this.preview = null;

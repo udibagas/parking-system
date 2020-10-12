@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class Snapshot extends Model
 {
@@ -14,8 +15,15 @@ class Snapshot extends Model
         'path'
     ];
 
+    protected $appends = ['url'];
+
     public function snapshotable()
     {
         return $this->morphTo();
+    }
+
+    public function getUrlAttribute()
+    {
+        return Storage::url($this->path);
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class SnapshotController extends Controller
 {
@@ -60,7 +61,7 @@ class SnapshotController extends Controller
                     [$request->year, $request->month, $request->day, $request->hour]
                 )
                 ->get()->map(function ($i) {
-                    return $i->path;
+                    return Storage::url($i->path);
                 })->flatten();
         }
 
