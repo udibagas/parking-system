@@ -79,7 +79,6 @@
 						<template slot="header">
 							<el-button
 								type="text"
-								class="text-white"
 								@click="
 									() => {
 										page = 1;
