@@ -16,10 +16,10 @@ class ReportController extends Controller
     public function getTransaction(Request $request)
     {
         return DB::select('
-            SELECT vehicle_type, COUNT(id) AS `total`
+            SELECT jenis_kendaraan, COUNT(id) AS `total`
             FROM parking_transactions
             WHERE DATE(updated_at) BETWEEN :start AND :stop
-            GROUP BY vehicle_type', [
+            GROUP BY jenis_kendaraan', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
@@ -28,10 +28,10 @@ class ReportController extends Controller
     public function getIncome(Request $request)
     {
         return DB::select('
-            SELECT vehicle_type, SUM(fare) AS `total`
+            SELECT jenis_kendaraan, SUM(fare) AS `total`
             FROM parking_transactions
             WHERE DATE(time_out) BETWEEN :start AND :stop
-            GROUP BY vehicle_type', [
+            GROUP BY jenis_kendaraan', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
@@ -40,11 +40,11 @@ class ReportController extends Controller
     public function getParkedVehicle(Request $request)
     {
         return DB::select('
-            SELECT vehicle_type, COUNT(id) AS `total`
+            SELECT jenis_kendaraan, COUNT(id) AS `total`
             FROM parking_transactions
             WHERE DATE(updated_at) BETWEEN :start AND :stop
                 AND time_out IS NULL
-            GROUP BY vehicle_type', [
+            GROUP BY jenis_kendaraan', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
@@ -53,9 +53,9 @@ class ReportController extends Controller
     public function getVehicleIn(Request $request)
     {
         return DB::select('
-            SELECT parking_gates.name AS `gate`, COUNT(parking_transactions.id) AS `total`
+            SELECT gate_ins.nama AS `gate`, COUNT(parking_transactions.id) AS `total`
             FROM parking_transactions
-            JOIN parking_gates ON parking_gates.id = parking_transactions.gate_in_id
+            JOIN gate_ins ON gate_ins.id = parking_transactions.gate_in_id
             WHERE DATE(parking_transactions.updated_at) BETWEEN :start AND :stop
             GROUP BY `gate`', [
             ':start' => $request->dateRange[0],
@@ -66,13 +66,13 @@ class ReportController extends Controller
     public function pendapatan(Request $request)
     {
         $perKendaraan = DB::select('
-            SELECT vehicle_type,
+            SELECT jenis_kendaraan,
                 COUNT(id) AS jumlah,
                 SUM(fare) AS `pendapatan`
             FROM parking_transactions
             WHERE DATE(time_out) BETWEEN :start AND :stop
                 AND time_out IS NOT NULL
-            GROUP BY vehicle_type', [
+            GROUP BY jenis_kendaraan', [
             ':start' => $request->dateRange[0],
             ':stop' => $request->dateRange[1]
         ]);
