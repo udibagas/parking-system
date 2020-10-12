@@ -37,31 +37,30 @@
         height="calc(100vh - 250px)"
         v-loading="loading"
         @sort-change="sortChange">
-            <el-table-column prop="barcode_number" label="No. Tiket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="nomor_barcode" label="No. Tiket" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
 
             <el-table-column
-            prop="vehicle_type"
+            prop="jenis_kendaraan"
             label="Jenis Kendaraan"
             sortable="custom"
             show-overflow-tooltip
             :filters="vehicleTypes.map(v => { return { value: v.name, text: v.name } })"
-            column-key="vehicle_type"
+            column-key="jenis_kendaraan"
             min-width="180px">
             </el-table-column>
 
-            <el-table-column prop="plate_number" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="plat_nomor" label="Plat Nomor" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <!-- <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
                 <template slot-scope="scope">
                     {{scope.row.is_member ? 'Ya' : 'Tidak'}}
                 </template>
             </el-table-column> -->
             <el-table-column prop="member" label="Nama Member" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
-            <el-table-column prop="card_number" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
+            <el-table-column prop="nomor_kartu" label="Nomor Kartu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
 
             <el-table-column
-            prop="gate_in"
+            prop="gate_in.nama"
             label="Gate Masuk"
-            sortable="custom"
             show-overflow-tooltip
             min-width="150px"
             column-key="gate_in_id"
@@ -69,9 +68,8 @@
             </el-table-column>
 
             <el-table-column
-            prop="gate_out"
+            prop="gate_out.nama"
             label="Gate Keluar"
-            sortable="custom"
             show-overflow-tooltip
             min-width="150px"
             column-key="gate_out_id"
@@ -81,9 +79,9 @@
             <el-table-column prop="time_in" label="Waktu Masuk" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="time_out" label="Waktu Keluar" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column>
             <el-table-column prop="durasi" label="Durasi" show-overflow-tooltip min-width="100px"></el-table-column>
-            <el-table-column v-if="$store.state.user.role == 1" prop="fare" label="Tarif" sortable="custom" align="right" header-align="right" min-width="100px">
+            <el-table-column v-if="$store.state.user.role == 1" prop="tarif" label="Tarif" sortable="custom" align="right" header-align="right" min-width="100px">
                 <template slot-scope="scope">
-                    Rp. {{scope.row.fare | formatNumber }}
+                    Rp. {{scope.row.tarif | formatNumber }}
                 </template>
             </el-table-column>
 
@@ -178,22 +176,22 @@
         :total="tableData.total">
         </el-pagination>
 
-        <el-dialog center top="60px" width="70%" v-if="trx" :visible.sync="showTrxDetail" :title="'DETAIL TRANSAKSI ' + trx.barcode_number">
+        <el-dialog center top="60px" width="70%" v-if="trx" :visible.sync="showTrxDetail" :title="'DETAIL TRANSAKSI ' + trx.nomor_barcode">
             <el-row :gutter="20">
                 <el-col :span="14">
                     <table style="width:100%">
                         <tbody>
-                            <tr><td class="td-label">Nomor Barcode</td><td class="td-value">{{trx.barcode_number}}</td></tr>
-                            <tr><td class="td-label">Jenis Kendaraan</td><td class="td-value">{{trx.vehicle_type}}</td></tr>
-                            <tr><td class="td-label">Plat Nomor</td><td class="td-value">{{trx.plate_number}}</td></tr>
+                            <tr><td class="td-label">Nomor Barcode</td><td class="td-value">{{trx.nomor_barcode}}</td></tr>
+                            <tr><td class="td-label">Jenis Kendaraan</td><td class="td-value">{{trx.jenis_kendaraan}}</td></tr>
+                            <tr><td class="td-label">Plat Nomor</td><td class="td-value">{{trx.plat_nomor}}</td></tr>
                             <tr><td class="td-label">Member</td><td class="td-value">{{trx.is_member ? 'Ya' : 'Tidak'}}</td></tr>
-                            <tr><td class="td-label">Nomor Kartu</td><td class="td-value">{{trx.card_number}}</td></tr>
+                            <tr><td class="td-label">Nomor Kartu</td><td class="td-value">{{trx.nomor_kartu}}</td></tr>
                             <tr><td class="td-label">Gate Masuk</td><td class="td-value">{{trx.gate_in}}</td></tr>
                             <tr><td class="td-label">Gate Keluar</td><td class="td-value">{{trx.gate_out}}</td></tr>
                             <tr><td class="td-label">Waktu Masuk</td><td class="td-value">{{trx.time_in}}</td></tr>
                             <tr><td class="td-label">Waktu Keluar</td><td class="td-value">{{trx.time_out}}</td></tr>
                             <tr><td class="td-label">Durasi</td><td class="td-value">{{trx.durasi}}</td></tr>
-                            <tr v-if="$store.state.user.role == 1"><td class="td-label">Tarif</td><td class="td-value">Rp {{trx.fare | formatNumber}}</td></tr>
+                            <tr v-if="$store.state.user.role == 1"><td class="td-label">Tarif</td><td class="td-value">Rp {{trx.tarif | formatNumber}}</td></tr>
                             <tr v-if="$store.state.user.role == 1"><td class="td-label">Denda</td><td class="td-value">Rp {{trx.denda | formatNumber}}</td></tr>
                             <tr><td class="td-label">Operator</td><td class="td-value">{{trx.operator}}</td></tr>
                         </tbody>
@@ -218,19 +216,19 @@
             </el-row>
         </el-dialog>
 
-        <el-dialog :close-on-click-modal="false" :title="!formModel.id ? 'TRANSAKSI MANUAL' : 'EDIT TRANSAKSI ' + formModel.barcode_number" :visible.sync="showForm" top="60px" width="800px">
+        <el-dialog :close-on-click-modal="false" :title="!formModel.id ? 'TRANSAKSI MANUAL' : 'EDIT TRANSAKSI ' + formModel.nomor_barcode" :visible.sync="showForm" top="60px" width="800px">
             <el-form label-position="left" label-width="150px">
                 <!-- <el-form-item label="Nomor Barcode">
-                    <el-input disabled placeholder="Nomor Barcode" v-model="formModel.barcode_number"></el-input>
+                    <el-input disabled placeholder="Nomor Barcode" v-model="formModel.nomor_barcode"></el-input>
                 </el-form-item> -->
                 <!-- <el-form-item label="Durasi" >
                     <el-input disabled placeholder="Durasi" v-model="durasi"></el-input>
                 </el-form-item> -->
                 <el-row :gutter="30">
                     <el-col :span="12">
-                        <el-form-item label="Plat Nomor" :class="formErrors.plate_number ? 'is-error' : ''">
-                            <el-input placeholder="Plat Nomor" v-model="formModel.plate_number"></el-input>
-                            <div class="el-form-item__error" v-if="formErrors.plate_number">{{formErrors.plate_number[0]}}</div>
+                        <el-form-item label="Plat Nomor" :class="formErrors.plat_nomor ? 'is-error' : ''">
+                            <el-input placeholder="Plat Nomor" v-model="formModel.plat_nomor"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.plat_nomor">{{formErrors.plat_nomor[0]}}</div>
                         </el-form-item>
                         <el-form-item label="Gate Masuk" :class="formErrors.gate_in_id ? 'is-error' : ''">
                             <el-select v-model="formModel.gate_in_id" placeholder="Gate Masuk" style="width:100%">
@@ -248,9 +246,9 @@
                             v-model="formModel.time_in"></el-date-picker>
                             <div class="el-form-item__error" v-if="formErrors.time_in">{{formErrors.time_in[0]}}</div>
                         </el-form-item>
-                        <el-form-item label="Tarif (Rp)" :class="formErrors.fare ? 'is-error' : ''">
-                            <el-input type="number" placeholder="Tarif" v-model="formModel.fare"></el-input>
-                            <div class="el-form-item__error" v-if="formErrors.fare">{{formErrors.fare[0]}}</div>
+                        <el-form-item label="Tarif (Rp)" :class="formErrors.tarif ? 'is-error' : ''">
+                            <el-input type="number" placeholder="Tarif" v-model="formModel.tarif"></el-input>
+                            <div class="el-form-item__error" v-if="formErrors.tarif">{{formErrors.tarif[0]}}</div>
                         </el-form-item>
                         <el-form-item label="User Admin" :class="formErrors.username ? 'is-error' : ''">
                             <el-input placeholder="User Admin" v-model="formModel.username"></el-input>
@@ -259,11 +257,11 @@
                     </el-col>
 
                     <el-col :span="12">
-                        <el-form-item label="Jenis Kendaraan" :class="formErrors.vehicle_type ? 'is-error' : ''">
-                            <el-select v-model="formModel.vehicle_type" placeholder="Jenis Kendaraan" style="width:100%">
+                        <el-form-item label="Jenis Kendaraan" :class="formErrors.jenis_kendaraan ? 'is-error' : ''">
+                            <el-select v-model="formModel.jenis_kendaraan" placeholder="Jenis Kendaraan" style="width:100%">
                                 <el-option v-for="(v, i) in vehicleTypes" :value="v.name" :label="v.name" :key="i"></el-option>
                             </el-select>
-                            <div class="el-form-item__error" v-if="formErrors.vehicle_type">{{formErrors.vehicle_type[0]}}</div>
+                            <div class="el-form-item__error" v-if="formErrors.jenis_kendaraan">{{formErrors.jenis_kendaraan[0]}}</div>
                         </el-form-item>
                         <el-form-item label="Gate Keluar" :class="formErrors.gate_out_id ? 'is-error' : ''">
                             <el-select v-model="formModel.gate_out_id" placeholder="Gate Keluar" style="width:100%">
