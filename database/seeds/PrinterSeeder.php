@@ -13,10 +13,18 @@ class PrinterSeeder extends Seeder
     public function run()
     {
         $data = [
-            'nama' => 'PRINTER1',
-            'ip_address' => '192.168.1.108',
-            'port' => 9100,
-            'status' => 1
+            [
+                'nama' => 'PRINTER1',
+                'ip_address' => '192.168.1.135',
+                'port' => 9100,
+                'status' => 1
+            ],
+            [
+                'nama' => 'PRINTER2',
+                'ip_address' => '192.168.1.136',
+                'port' => 9100,
+                'status' => 1
+            ]
         ];
 
         DB::table('printers')->truncate();

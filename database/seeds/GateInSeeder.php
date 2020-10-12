@@ -19,7 +19,7 @@ class GateInSeeder extends Seeder
                 'controller_ip_address' => '192.168.1.100',
                 'controller_port' => 5000,
                 'shortcut_key' => 1,
-                'printer_id' => 1,
+                'printer_id' => 2,
                 'kamera' => json_encode([1]),
                 'status' => 1
             ],
