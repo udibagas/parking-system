@@ -146,7 +146,7 @@ class ParkingTransactionController extends Controller
     {
         $request->validate([
             'gate_in_id' => 'required',
-            'vehicle_tye' => 'required',
+            'jenis_kendaraan' => 'required',
         ]);
 
         $input = array_merge($request->all(), [

@@ -761,7 +761,7 @@ export default {
 		},
 		printTicket(id) {
 			axios
-				.post("/parkingTransaction/printTicket/" + id, { trx: "OUT" })
+				.post(`/parkingTransaction/printTicketOut/${id}`)
 				.then((r) => {
 					this.$message({
 						message: r.data.message,
