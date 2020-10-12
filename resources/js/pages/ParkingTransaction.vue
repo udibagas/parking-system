@@ -1,9 +1,5 @@
 <template>
 	<div>
-		<el-page-header @back="$emit('back')" content="TRANSAKSI"> </el-page-header>
-
-		<br />
-
 		<el-form
 			inline
 			class="text-right"
@@ -87,7 +83,7 @@
 				}
 			"
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 250px)"
+			height="calc(100vh - 210px)"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -348,9 +344,8 @@
 			</el-table-column>
 		</el-table>
 
-		<br />
-
 		<el-pagination
+			class="mt-3"
 			background
 			@current-change="
 				(p) => {
@@ -371,99 +366,12 @@
 		>
 		</el-pagination>
 
-		<el-dialog
-			center
-			top="60px"
-			width="70%"
+		<DetailTransaksi
 			v-if="trx"
-			:visible.sync="showTrxDetail"
-			:title="'DETAIL TRANSAKSI ' + trx.nomor_barcode"
-		>
-			<el-row :gutter="20">
-				<el-col :span="14">
-					<table style="width: 100%">
-						<tbody>
-							<tr>
-								<td class="td-label">Nomor Barcode</td>
-								<td class="td-value">{{ trx.nomor_barcode }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Jenis Kendaraan</td>
-								<td class="td-value">{{ trx.jenis_kendaraan }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Plat Nomor</td>
-								<td class="td-value">{{ trx.plat_nomor }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Member</td>
-								<td class="td-value">{{ trx.is_member ? "Ya" : "Tidak" }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Nomor Kartu</td>
-								<td class="td-value">{{ trx.nomor_kartu }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Gate Masuk</td>
-								<td class="td-value">{{ trx.gate_in }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Gate Keluar</td>
-								<td class="td-value">{{ trx.gate_out }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Waktu Masuk</td>
-								<td class="td-value">{{ trx.time_in }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Waktu Keluar</td>
-								<td class="td-value">{{ trx.time_out }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Durasi</td>
-								<td class="td-value">{{ trx.durasi }}</td>
-							</tr>
-							<tr v-if="$store.state.user.role == 1">
-								<td class="td-label">Tarif</td>
-								<td class="td-value">Rp {{ trx.tarif | formatNumber }}</td>
-							</tr>
-							<tr v-if="$store.state.user.role == 1">
-								<td class="td-label">Denda</td>
-								<td class="td-value">Rp {{ trx.denda | formatNumber }}</td>
-							</tr>
-							<tr>
-								<td class="td-label">Operator</td>
-								<td class="td-value">{{ trx.operator }}</td>
-							</tr>
-						</tbody>
-					</table>
-				</el-col>
-				<el-col :span="10">
-					<div class="block">
-						<el-image
-							:src="trx.snapshot_in"
-							style="width: 100%; height: 100%"
-							fit="cover"
-						>
-							<div slot="error" class="el-image__error">
-								<i class="el-icon-picture-outline"></i>
-							</div>
-						</el-image>
-					</div>
-					<div class="block">
-						<el-image
-							:src="trx.snapshot_out"
-							style="width: 100%; height: 100%"
-							fit="cover"
-						>
-							<div slot="error" class="el-image__error">
-								<i class="el-icon-picture-outline"></i>
-							</div>
-						</el-image>
-					</div>
-				</el-col>
-			</el-row>
-		</el-dialog>
+			:trx="trx"
+			:show="showTrxDetail"
+			@close="showTrxDetail = false"
+		/>
 
 		<el-dialog
 			:close-on-click-modal="false"
@@ -507,7 +415,7 @@
 								style="width: 100%"
 							>
 								<el-option
-									v-for="(g, i) in gates.filter((g) => g.type == 'IN')"
+									v-for="(g, i) in gateInList"
 									:value="g.id"
 									:label="g.name"
 									:key="i"
@@ -594,7 +502,7 @@
 								style="width: 100%"
 							>
 								<el-option
-									v-for="(g, i) in gates.filter((g) => g.type == 'OUT')"
+									v-for="(g, i) in gateOutList"
 									:value="g.id"
 									:label="g.name"
 									:key="i"
@@ -668,7 +576,10 @@
 
 <script>
 import { mapState } from "vuex";
+import DetailTransaksi from "../components/DetailTransaksi";
+
 export default {
+	components: { DetailTransaksi },
 	computed: {
 		durasi() {
 			var date1 = moment(this.formModel.time_in);
@@ -689,9 +600,6 @@ export default {
 			loading: false,
 			trx: null,
 			showTrxDetail: false,
-			transaction: [],
-			income: [],
-			parkedVehicle: [],
 			date: moment().format("YYYY-MM-DD"),
 			dateRange: [
 				moment().format("YYYY-MM-DD 00:00:00"),
@@ -720,7 +628,6 @@ export default {
 							this.$message({
 								message: r.data.message,
 								type: "success",
-								showClose: true,
 							});
 							this.requestData();
 						})
@@ -728,7 +635,6 @@ export default {
 							this.$message({
 								message: r.response.data.message,
 								type: "error",
-								showClose: true,
 							});
 						});
 				})
@@ -745,7 +651,6 @@ export default {
 							this.$message({
 								message: r.data.message,
 								type: "success",
-								showClose: true,
 							});
 							this.requestData();
 						})
@@ -753,7 +658,6 @@ export default {
 							this.$message({
 								message: e.response.data.message,
 								type: "error",
-								showClose: true,
 							});
 						});
 				})
@@ -766,14 +670,12 @@ export default {
 					this.$message({
 						message: r.data.message,
 						type: "success",
-						showClose: true,
 					});
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
 					});
 				});
 		},
@@ -784,14 +686,12 @@ export default {
 					this.$message({
 						message: r.data.message,
 						type: "success",
-						showClose: true,
 					});
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
 					});
 				});
 		},
@@ -834,7 +734,7 @@ export default {
 			this.loading = true;
 			this.formModel.edit = 1;
 			axios
-				.put("/parkingTransaction/" + this.formModel.id, this.formModel)
+				.put(`/parkingTransaction/${this.formModel.id}`, this.formModel)
 				.then((r) => {
 					this.$message({
 						message: "Data berhasil disimpan",
@@ -843,22 +743,21 @@ export default {
 					});
 					this.showForm = false;
 					this.formModel = {};
-					(this.dateRange = [
+					this.dateRange = [
 						moment().format("YYYY-MM-DD 00:00:00"),
 						moment().format("YYYY-MM-DD HH:mm:ss"),
-					]),
-						this.requestData();
+					];
+					this.requestData();
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
 						this.formErrors = e.response.data.errors;
-					} else {
-						this.$message({
-							message: e.response.data.message,
-							type: "error",
-							showClose: true,
-						});
 					}
+
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+					});
 				})
 				.finally(() => {
 					this.loading = false;
@@ -886,7 +785,6 @@ export default {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
 					});
 				})
 				.finally(() => {

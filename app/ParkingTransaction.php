@@ -29,9 +29,9 @@ class ParkingTransaction extends Model
 
     protected $appends = ['durasi'];
 
-    public function setBarcodeNumberAttribute($value)
+    public function setNomorBarcodeAttribute($value)
     {
-        $this->attributes['barcode_number'] = strtoupper($value);
+        $this->attributes['nomor_barcode'] = strtoupper($value);
     }
 
     public function member()

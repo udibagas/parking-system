@@ -15,7 +15,7 @@ class CreateParkingTransactionsTable extends Migration
     {
         Schema::create('parking_transactions', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->boolean('is_member');
+            $table->boolean('is_member')->default(0);
             $table->string('jenis_kendaraan'); // MOBIL or MOTOR
             $table->bigInteger('gate_in_id');
             $table->bigInteger('gate_out_id')->nullable();

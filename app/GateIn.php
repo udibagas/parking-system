@@ -22,10 +22,6 @@ class GateIn extends Model
 
     protected $casts = ['kamera' => 'json'];
 
-    protected $with = ['printer'];
-
-    protected $appends = ['kameraList'];
-
     public function printer()
     {
         return $this->belongsTo(Printer::class);

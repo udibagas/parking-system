@@ -20,7 +20,7 @@ class GateInNotification extends Notification implements ShouldQueue
      */
     public function __construct($message)
     {
-        $this->message = $this->message;
+        $this->message = $message;
     }
 
     /**

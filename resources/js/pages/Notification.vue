@@ -70,11 +70,11 @@
 							{{ scope.row.created_at | readableDateTime }}
 						</template>
 					</el-table-column>
-					<el-table-column
-						prop="data.message"
-						label="Message"
-						min-width="150px"
-					></el-table-column>
+					<el-table-column label="Message" min-width="150px">
+						<template slot-scope="scope">
+							{{ JSON.parse(scope.row.data).message }}
+						</template>
+					</el-table-column>
 					<el-table-column width="70px" align="center" header-align="center">
 						<template slot="header">
 							<el-button
@@ -93,7 +93,7 @@
 						<template slot-scope="scope">
 							<el-button
 								size="small"
-								type="danger"
+								type="text"
 								plain
 								icon="el-icon-delete"
 								@click="deleteData(scope.row.id)"

@@ -21,9 +21,13 @@ class GateInController extends Controller
      */
     public function index(Request $request)
     {
-        return GateIn::orderBy('nama', 'asc')->when($request->status, function ($q) use ($request) {
-            $q->where('status', $request->status);
-        })->get();
+        return GateIn::with(['printer'])
+            ->orderBy('nama', 'asc')
+            ->when($request->status, function ($q) use ($request) {
+                $q->where('status', $request->status);
+            })->get()->map(function ($item) {
+                return array_merge($item->toArray(), ['kameraList' => $item->kameraList]);
+            });
     }
 
     /**

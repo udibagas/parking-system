@@ -87,10 +87,10 @@
 									@click="readAllNotification"
 									>Tandai Sudah Dibaca Semua</el-button
 								>
-								<div v-for="n in notifications" :key="n.id">
+								<div v-for="n in notifications" :key="n.id" class="mt-3">
 									<p style="margin-bottom: 0">
 										<strong>{{ n.created_at | readableDateTime }}</strong>
-										{{ n.message }}
+										{{ n.data.message }}
 									</p>
 									<el-button
 										type="text"
@@ -195,22 +195,26 @@ export default {
 			axios
 				.get("/notification/unreadNotification")
 				.then((r) => {
+					this.notifications = r.data.map((d) => {
+						d.data = JSON.parse(d.data);
+						return d;
+					});
 					// kalau jumlah lebih dari sebelumnya tampilkan record terakhir
 					if (r.data.length > this.notifications.length) {
+						let notif = r.data[0];
+						notif.data = JSON.parse(notif.data);
+
 						this.$notify.warning({
 							title: "Notifikasi",
-							message:
-								"[" + r.data[0].created_at + "] " + r.data[0].data.message,
+							message: "[" + notif.created_at + "] " + notif.data.message,
 						});
 					}
-					this.notifications = r.data;
 				})
 				.catch((e) => console.log(e));
 		},
 		readNotification(id) {
-			const params = { read: 1 };
 			axios
-				.put("/notification/" + id, { read: 1 })
+				.put(`/notification/markAsRead/${id}`)
 				.then((r) => console.log(r))
 				.catch((e) => console.log(e));
 		},

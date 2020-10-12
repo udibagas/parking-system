@@ -1,6 +1,6 @@
 <template>
 	<div
-		class="log-container bg-black text-green-700 p-3 font-mono text-sm overflow-auto"
+		class="log-container bg-black text-white p-3 font-mono text-sm overflow-auto"
 		v-html="log"
 	></div>
 </template>

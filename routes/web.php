@@ -49,6 +49,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::get('notification/unreadNotification', 'NotificationController@unreadNotification');
     Route::put('notification/markAllAsRead', 'NotificationController@markAllAsRead');
+    Route::put('notification/markAsRead/{id}', 'NotificationController@markAsRead');
     Route::delete('notification/clearNotification', 'NotificationController@clearNotification');
     Route::resource('notification', 'NotificationController')->only(['index', 'update', 'destroy']);
 
