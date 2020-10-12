@@ -199,7 +199,8 @@ export default {
 					if (r.data.length > this.notifications.length) {
 						this.$notify.warning({
 							title: "Notifikasi",
-							message: "[" + r.data[0].created_at + "] " + r.data[0].message,
+							message:
+								"[" + r.data[0].created_at + "] " + r.data[0].data.message,
 						});
 					}
 					this.notifications = r.data;
