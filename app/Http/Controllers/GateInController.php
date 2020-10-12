@@ -19,9 +19,11 @@ class GateInController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return GateIn::orderBy('nama', 'asc')->get();
+        return GateIn::orderBy('nama', 'asc')->when($request->status, function ($q) use ($request) {
+            $q->where('status', $request->status);
+        })->get();
     }
 
     /**
