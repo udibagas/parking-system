@@ -62,20 +62,19 @@ class PrintTicketIn implements ShouldQueue
 
         try {
             $p->setJustification(Printer::JUSTIFY_CENTER);
-            $p->text("TIKET PARKIR\n");
+            $p->text("TIKET PARKIR\n\n");
+            $p->setTextSize(2, 2);
             $p->text($setting->nama_lokasi . "\n");
             $p->text($setting->alamat_lokasi . "\n\n");
 
-            $p->text('Rp. ' . number_format($parkingTransaction->tarif, 0, ',', '.') . ",-\n");
-            $p->text($parkingTransaction->plat_nomor . "/" . $parkingTransaction->jenis_kendaraan);
-            $p->text("\n\n");
-
             $p->setJustification(Printer::JUSTIFY_LEFT);
-            $p->text(str_pad('GATE', 15, ' ') . ' : ' . $parkingTransaction->gateIn->nama . "\n");
-            $p->text(str_pad('WAKTU', 15, ' ') . ' : ' . date('d-m-Y H:i:s', strtotime($parkingTransaction->time_in)) . "\n\n");
+            $p->text(str_pad('GATE', 10, ' ') . " : {$parkingTransaction->gateIn->nama}/{ $parkingTransaction->jenis_kendaraan}\n");
+            $p->text(str_pad('TANGGAL', 10, ' ') . ' : ' . date('d-m-Y', strtotime($parkingTransaction->time_in)) . "\n");
+            $p->text(str_pad('JAM', 10, ' ') . ' : ' . date('H:i:s', strtotime($parkingTransaction->time_in)) . "\n\n");
             $p->setJustification(Printer::JUSTIFY_CENTER);
             $p->setBarcodeHeight(100);
             $p->setBarcodeWidth(4);
+            $p->setBarcodeTextPosition(Printer::BARCODE_TEXT_BELOW);
             $p->barcode($parkingTransaction->nomor_barcode, Printer::BARCODE_CODE39);
             $p->text("\n");
             $p->text($setting->info_tambahan_tiket . "\n");
