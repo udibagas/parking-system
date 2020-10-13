@@ -76,7 +76,7 @@ class PrintTicketIn implements ShouldQueue
             $p->setJustification(Printer::JUSTIFY_CENTER);
             $p->setBarcodeHeight(100);
             $p->setBarcodeWidth(4);
-            $p->barcode($parkingTransaction->nomor_barcode, 'CODE39');
+            $p->barcode($parkingTransaction->nomor_barcode, Printer::BARCODE_CODE39);
             $p->text("\n");
             $p->text($setting->info_tambahan_tiket . "\n");
             $p->cut();
