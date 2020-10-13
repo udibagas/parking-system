@@ -13,14 +13,18 @@ class PrintTicketFailedNotification extends Notification implements ShouldQueue
 
     public $parkingTransaction;
 
+    public $error;
+
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct(ParkingTransaction $parkingTransaction)
+    public function __construct(ParkingTransaction $parkingTransaction, $error)
     {
         $this->parkingTransaction = $parkingTransaction;
+
+        $this->error = $error;
     }
 
     /**
@@ -43,7 +47,7 @@ class PrintTicketFailedNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'message' => "Pengunjung di {$this->parkingTransaction->gateIn->nama} gagal print tiket. Informasikan nomor barcode kepada pengunjung. {$this->parkingTransaction->nomor_barcode}"
+            'message' => "Pengunjung di {$this->parkingTransaction->gateIn->nama} gagal print tiket. Informasikan nomor barcode kepada pengunjung. {$this->parkingTransaction->nomor_barcode}. {$this->error}",
         ];
     }
 }

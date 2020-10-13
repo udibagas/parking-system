@@ -57,7 +57,7 @@ class PrintTicketIn implements ShouldQueue
             $connector = new NetworkPrintConnector($printer->ip_address, $printer->port ?: 9100);
             $p = new Printer($connector);
         } catch (\Exception $e) {
-            $printer->notify(new PrintTicketFailedNotification($parkingTransaction));
+            $printer->notify(new PrintTicketFailedNotification($parkingTransaction, 'Koneksi ke printer gagal'));
         }
 
         try {
@@ -78,11 +78,11 @@ class PrintTicketIn implements ShouldQueue
             $p->setBarcodeWidth(4);
             $p->barcode($parkingTransaction->nomor_barcode, 'CODE39');
             $p->text("\n");
-            $p->text($setting->additional_info_ticket . "\n");
+            $p->text($setting->info_tambahan_tiket . "\n");
             $p->cut();
             $p->close();
         } catch (\Exception $e) {
-            $printer->notify(new PrintTicketFailedNotification($parkingTransaction));
+            $printer->notify(new PrintTicketFailedNotification($parkingTransaction, $e->getMessage()));
         }
     }
 }
