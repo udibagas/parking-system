@@ -90,21 +90,10 @@
 					</tr>
 				</tbody>
 			</table>
-			<div class="flex-grow ml-3">
-				<div class="block">
+			<div v-if="trx.snapshots" class="flex-grow flex flex-row ml-3">
+				<div v-for="snapshot in trx.snapshots" :key="snapshot.id">
 					<el-image
-						:src="trx.snapshot_in"
-						style="width: 100%; height: 100%"
-						fit="cover"
-					>
-						<div slot="error" class="el-image__error">
-							<i class="el-icon-picture-outline"></i>
-						</div>
-					</el-image>
-				</div>
-				<div class="block">
-					<el-image
-						:src="trx.snapshot_out"
+						:src="snapshot.url"
 						style="width: 100%; height: 100%"
 						fit="cover"
 					>

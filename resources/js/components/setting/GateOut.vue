@@ -84,7 +84,7 @@
 						<el-dropdown-menu slot="dropdown">
 							<el-dropdown-item
 								icon="el-icon-minus"
-								@click.native.prevent="testGate(scope.row.id)"
+								@click.native.prevent="testGate(scope.row)"
 								>Test Gate</el-dropdown-item
 							>
 							<el-dropdown-item
