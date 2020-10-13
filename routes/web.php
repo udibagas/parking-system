@@ -24,8 +24,7 @@ Route::group(['middleware' => 'auth'], function () {
     // untuk dropdown
     Route::get('member/getList', 'MemberController@getList');
     Route::resource('gateIn', 'GateInController')->except(['create', 'show', 'edit']);
-    // Route::get('gateOut/test/{gateOut}', 'GateOutController@test');
-    Route::resource('gateOut', 'GateOutController')->except(['create', 'show', 'edit']);
+    Route::resource('gateOut', 'GateOutController')->except(['create', 'edit']);
     Route::get('printer/test/{printer}', 'PrinterController@test');
     Route::resource('printer', 'PrinterController')->except(['create', 'show', 'edit']);
     Route::get('kamera/test/{kamera}', 'KameraController@test');

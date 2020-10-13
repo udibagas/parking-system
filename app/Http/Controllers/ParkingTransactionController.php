@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\ParkingTransaction;
 use App\Http\Requests\ParkingTransactionRequest;
 use App\Jobs\PrintTicketIn;
+use App\Jobs\PrintTicketOut;
 use App\Jobs\TakeSnapshot;
 use App\Member;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
@@ -138,7 +139,16 @@ class ParkingTransactionController extends Controller
             ]);
         }
 
-        return ParkingTransaction::create($input);
+        $parkingTransaction = ParkingTransaction::create($input);
+
+        TakeSnapshot::dispatch($parkingTransaction->gateOut, $parkingTransaction);
+
+        if (!$parkingTransaction->is_member && $request->ticket) {
+            PrintTicketOut::dispatchNow($parkingTransaction);
+            return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
+        }
+
+        return ['message' => 'TIDAK MENCETAK STRUK', 'data' => $parkingTransaction];
     }
 
     // untuk handle waktu gate in tertrigger
@@ -171,61 +181,6 @@ class ParkingTransactionController extends Controller
             'message' => 'Data berhasil disimpan',
             'data' => $parkingTransaction,
         ];
-    }
-
-    public function printTicketOut(ParkingTransaction $parkingTransaction)
-    {
-        $setting = Setting::first();
-
-        if (!$setting) {
-            return response(['message' => 'BELUM ADA SETTING'], 500);
-        }
-
-        if (!$setting->nama_lokasi) {
-            return response(['message' => 'LOKASI BELUM DISET'], 404);
-        }
-
-        $printer = $parkingTransaction->gateIn->printer;
-
-        try {
-            $connector = new NetworkPrintConnector($printer->ip_address, $printer->ip_address ?: 9100);
-            $p = new Printer($connector);
-        } catch (\Exception $e) {
-            return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
-        }
-
-        try {
-            $p->setJustification(Printer::JUSTIFY_CENTER);
-            $p->text("STRUK PARKIR\n");
-            $p->text($setting->nama_lokasi . "\n");
-            $p->text($setting->alamat_lokasi . "\n\n");
-
-            $p->text('Rp. ' . number_format($parkingTransaction->tarif + $parkingTransaction->denda, 0, ',', '.') . ",-\n");
-            $p->text($parkingTransaction->plat_nomor . "/" . $parkingTransaction->jenis_kendaraan . "/" . $parkingTransaction->gateOut->nama);
-            $p->text("\n\n");
-
-            $p->setJustification(Printer::JUSTIFY_LEFT);
-            $p->text(str_pad('WAKTU MASUK', 15, ' ') . ' : ' . $parkingTransaction->time_in . "\n");
-            $p->text(str_pad('WAKTU KELUAR', 15, ' ') . ' : ' . $parkingTransaction->time_out . "\n");
-            $p->text(str_pad('DURASI', 15, ' ') . ' : ' . $parkingTransaction->durasi . "\n");
-
-            // kalau tiket hilang
-            if ($parkingTransaction->nomor_barcode == 'xxxxx' || $parkingTransaction->denda > 0) {
-                $p->text(str_pad('DENDA', 15, ' ') . ' : Rp. ' . number_format($parkingTransaction->denda, 0, ',', '.') . "\n");
-            }
-
-            $p->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper(auth()->user()->name) . "\n\n");
-
-            $p->setJustification(Printer::JUSTIFY_CENTER);
-            $p->text("TERIMAKASIH ATAS KUNJUNGAN ANDA\n");
-
-            $p->cut();
-            $p->close();
-        } catch (\Exception $e) {
-            return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
-        }
-
-        return ['message' => 'SILAKAN AMBIL TIKET'];
     }
 
     /**
@@ -371,7 +326,15 @@ class ParkingTransactionController extends Controller
         unset($input['nomor_barcode']);
 
         $parkingTransaction->update($input);
-        return $parkingTransaction;
+
+        TakeSnapshot::dispatch($parkingTransaction->gateOut, $parkingTransaction);
+
+        if (!$parkingTransaction->is_member && $request->ticket) {
+            PrintTicketOut::dispatchNow($parkingTransaction);
+            return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
+        }
+
+        return ['message' => 'TIDAK MENCETAK STRUK', 'data' => $parkingTransaction];
     }
 
     /**

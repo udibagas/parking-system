@@ -31,6 +31,11 @@ class GateOutController extends Controller
         return ['message' => 'Data telah disimpan', 'data' => $gateOut];
     }
 
+    public function show(GateOut $gateOut)
+    {
+        return $gateOut->load(['pos']);
+    }
+
     /**
      * Update the specified resource in storage.
      *
