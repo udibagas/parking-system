@@ -173,8 +173,24 @@ export default {
 				.catch((e) => console.log(e));
 		},
 		testGate(gate) {
-			this.connectToPos(gate.pos);
-			this.ws.send(
+			const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
+
+			ws.onerror = (event) => {
+				this.$message({
+					message: "KONEKSI KE POS GAGAL",
+					type: "error",
+				});
+			};
+
+			ws.onmessage = (event) => {
+				let data = JSON.parse(event.data);
+				this.$message({
+					message: data.message,
+					type: data.status ? "success" : "error",
+				});
+			};
+
+			ws.send(
 				[
 					"open",
 					gate.device,
@@ -183,22 +199,6 @@ export default {
 					gate.close_command,
 				].join(";")
 			);
-		},
-		connectToPos(pos) {
-			this.ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
-			this.ws.onerror = (event) => {
-				this.$message({
-					message: "KONEKSI KE POS GAGAL",
-					type: "error",
-				});
-			};
-			this.ws.onmessage = (event) => {
-				let data = JSON.parse(event.data);
-				this.$message({
-					message: data.message,
-					type: data.status ? "success" : "error",
-				});
-			};
 		},
 	},
 };

@@ -9,7 +9,7 @@
 		"
 	>
 		<div class="flex flex-row">
-			<table class="table-auto">
+			<table class="table-auto" style="width: 350px">
 				<tbody>
 					<tr>
 						<td
@@ -91,17 +91,17 @@
 				</tbody>
 			</table>
 			<div v-if="trx.snapshots" class="flex-grow flex flex-row ml-3">
-				<div v-for="snapshot in trx.snapshots" :key="snapshot.id">
-					<el-image
-						:src="snapshot.url"
-						style="width: 100%; height: 100%"
-						fit="cover"
-					>
-						<div slot="error" class="el-image__error">
-							<i class="el-icon-picture-outline"></i>
-						</div>
-					</el-image>
-				</div>
+				<el-image
+					v-for="snapshot in trx.snapshots"
+					:key="snapshot.id"
+					:src="snapshot.url"
+					style="width: 100%; height: 100%"
+					fit="cover"
+				>
+					<div slot="error" class="el-image__error">
+						<i class="el-icon-picture-outline"></i>
+					</div>
+				</el-image>
 			</div>
 		</div>
 	</el-dialog>
