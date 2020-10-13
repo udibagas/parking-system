@@ -173,6 +173,7 @@ export default {
 				.catch((e) => console.log(e));
 		},
 		testGate(gate) {
+			console.log(`connecting to ${gate.pos.ip_address}:5678`);
 			const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
 
 			ws.onerror = (event) => {
