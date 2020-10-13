@@ -31,7 +31,7 @@ class ParkingTransactionController extends Controller
         $sort = $request->sort ? $request->sort : 'updated_at';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
-        return ParkingTransaction::with(['gateIn', 'gateOut'])->when($request->dateRange, function ($q) use ($request) {
+        return ParkingTransaction::with(['gateIn', 'gateOut', 'snapshots'])->when($request->dateRange, function ($q) use ($request) {
             return $q->whereBetween('time_in', $request->dateRange);
         })->when($request->keyword, function ($q) use ($request) {
             return $q->where(function ($qq) use ($request) {

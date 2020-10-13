@@ -56,4 +56,9 @@ class ParkingTransaction extends Model
     {
         return $this->belongsTo(GateOut::class);
     }
+
+    public function snapshots()
+    {
+        return $this->hasMany(Snapshot::class);
+    }
 }

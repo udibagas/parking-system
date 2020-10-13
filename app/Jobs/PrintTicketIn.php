@@ -40,20 +40,24 @@ class PrintTicketIn implements ShouldQueue
         $setting = Setting::first();
 
         if (!$setting) {
-            return response(['message' => 'BELUM ADA SETTING'], 500);
+            return;
         }
 
         if (!$setting->nama_lokasi) {
-            return response(['message' => 'LOKASI BELUM DISET'], 404);
+            return;
         }
 
         $printer = $parkingTransaction->gateIn->printer;
 
+        if (!$printer) {
+            return;
+        }
+
         try {
-            $connector = new NetworkPrintConnector($printer->ip_address, $printer->ip_address ?: 9100);
+            $connector = new NetworkPrintConnector($printer->ip_address, $printer->port ?: 9100);
             $p = new Printer($connector);
         } catch (\Exception $e) {
-            return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+            $printer->notify(new PrintTicketFailedNotification($parkingTransaction));
         }
 
         try {
