@@ -191,15 +191,15 @@ export default {
 				});
 			};
 
-			ws.send(
-				[
-					"open",
-					gate.device,
-					gate.baudrate,
-					gate.open_command,
-					gate.close_command,
-				].join(";")
-			);
+			// ws.send(
+			// 	[
+			// 		"open",
+			// 		gate.device,
+			// 		gate.baudrate,
+			// 		gate.open_command,
+			// 		gate.close_command,
+			// 	].join(";")
+			// );
 		},
 	},
 };
