@@ -183,23 +183,27 @@ export default {
 				});
 			};
 
+			ws.onopen = (event) => {
+				console.log(`connected to ${gate.pos.ip_address}:5678`);
+				ws.send(
+					[
+						"open",
+						gate.device,
+						gate.baudrate,
+						gate.open_command,
+						gate.close_command,
+					].join(";")
+				);
+			};
+
 			ws.onmessage = (event) => {
 				let data = JSON.parse(event.data);
 				this.$message({
 					message: data.message,
 					type: data.status ? "success" : "error",
 				});
+				ws.close();
 			};
-
-			// ws.send(
-			// 	[
-			// 		"open",
-			// 		gate.device,
-			// 		gate.baudrate,
-			// 		gate.open_command,
-			// 		gate.close_command,
-			// 	].join(";")
-			// );
 		},
 	},
 };
