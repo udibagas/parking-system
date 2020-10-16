@@ -280,7 +280,6 @@
 			>
 				<template slot="header">
 					<el-button
-						class="text-white"
 						type="text"
 						@click="
 							() => {

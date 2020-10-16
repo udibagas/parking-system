@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
+use App\Http\Resources\MemberRenewalCollection;
 use App\Member;
 use App\Setting;
 use Illuminate\Support\Facades\DB;
@@ -21,25 +22,18 @@ class MemberRenewalController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'id';
-        $order = $request->order == 'ascending' ? 'asc' : 'desc';
+        $resource = MemberRenewal::when($request->dateRange, function ($q) use ($request) {
+            return $q->whereRaw("DATE(updated_at) BETWEEN '{$request->dateRange[0]}' AND '{$request->dateRange[1]}' ");
+        })->when($request->keyword, function ($q) use ($request) {
+            return $q->whereHas('member', function ($q) use ($request) {
+                $q->where('nama', 'LIKE', "%{$request->keyword}%")
+                    ->orWhere('nomor_kartu', 'LIKE', "%{$request->keyword}%");
+            })->orWhereHas('user', function ($q) use ($request) {
+                $q->where('name', 'LIKE', "%{$request->keyword}%");
+            });
+        })->orderBy($request->sort ?: 'id', $request->order == 'ascending' ? 'asc' : 'desc')->paginate($request->pageSize);
 
-        return MemberRenewal::selectRaw('
-                member_renewals.*,
-                parking_members.name AS member_name,
-                parking_members.card_number AS card_number,
-                users.name AS operator
-            ')
-            ->join('parking_members', 'parking_members.id', '=', 'member_renewals.parking_member_id')
-            ->join('users', 'users.id', '=', 'member_renewals.user_id')
-            ->when($request->dateRange, function ($q) use ($request) {
-                return $q->whereRaw("DATE(member_renewals.updated_at) BETWEEN '{$request->dateRange[0]}' AND '{$request->dateRange[1]}' ");
-            })->when($request->keyword, function ($q) use ($request) {
-                return $q->where('parking_members.name', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('parking_members.card_number', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('users.name', 'LIKE', '%' . $request->keyword . '%');
-            })
-            ->orderBy($sort, $order)->paginate($request->pageSize);
+        return new MemberRenewalCollection($resource);
     }
 
     /**
@@ -53,13 +47,15 @@ class MemberRenewalController extends Controller
         $input = $request->all();
         $input['user_id'] = auth()->user()->id;
         $renewal = MemberRenewal::create($input);
-        Member::where('id', $request->parking_member_id)->update([
+
+        Member::where('id', $request->member_id)->update([
             'register_date' => $request->dari_tanggal,
             'expiry_date' => $request->sampai_tanggal,
             'siklus_pembayaran' => $request->siklus_pembayaran,
             'siklus_pembayaran_unit' => $request->siklus_pembayaran_unit,
         ]);
-        return $renewal;
+
+        return ['message' => 'Data telah disimpan', 'data' => $renewal];
     }
 
     /**
@@ -72,7 +68,15 @@ class MemberRenewalController extends Controller
     public function update(MemberRenewalRequest $request, MemberRenewal $memberRenewal)
     {
         $memberRenewal->update($request->all());
-        return $memberRenewal;
+
+        Member::where('id', $request->member_id)->update([
+            'register_date' => $request->dari_tanggal,
+            'expiry_date' => $request->sampai_tanggal,
+            'siklus_pembayaran' => $request->siklus_pembayaran,
+            'siklus_pembayaran_unit' => $request->siklus_pembayaran_unit,
+        ]);
+
+        return ['message' => 'Data telah disimpan', 'data' => $memberRenewal];
     }
 
     /**

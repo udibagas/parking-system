@@ -15,7 +15,7 @@ class PosController extends Controller
      */
     public function index()
     {
-        return Pos::orderBy('nama', 'asc')->get();
+        return Pos::with(['gateOuts'])->orderBy('nama', 'asc')->get();
     }
 
     /**

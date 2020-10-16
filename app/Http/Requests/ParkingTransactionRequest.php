@@ -25,17 +25,17 @@ class ParkingTransactionRequest extends FormRequest
     {
         return [
             'is_member' => 'boolean',
-            'vehicle_type' => 'required',
-            'gate_in_id' => 'sometimes|exists:parking_gates,id',
-            'gate_out_id' => 'exists:parking_gates,id',
-            'member_id' => 'exists:parking_members,id',
+            'jenis_kendaraan' => 'required',
+            'gate_in_id' => 'sometimes|exists:gate_ins,id',
+            'gate_out_id' => 'exists:gate_outs,id',
+            'member_id' => 'exists:members,id',
         ];
     }
 
     public function attributes()
     {
         return [
-            'vehicle_type' => 'Jenis Kendaraan',
+            'jenis_kendaraan' => 'Jenis Kendaraan',
             'gate_in_id' => 'Gate Masuk',
             'gate_out_id' => 'Gate Keluar'
         ];

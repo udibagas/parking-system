@@ -36,7 +36,7 @@ class ParkingTransaction extends Model
 
     public function member()
     {
-        return $this->belongsTo(ParkingMember::class, 'parking_member_id');
+        return $this->belongsTo(Member::class, 'member_id');
     }
 
     public function getDurasiAttribute()

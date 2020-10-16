@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\GateOut;
 use App\ManualOpenLog;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
@@ -49,20 +50,8 @@ class ManualOpenLogController extends Controller
 
         $input = $request->all();
         $input['user_id'] = $request->user()->id;
-        $input['snapshot'] = $this->takeSnapshot($request->parking_gate_id);
+        $input['snapshot'] = $this->takeSnapshot($request->gateOutId);
         return ManualOpenLog::create($input);
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     /**
@@ -79,9 +68,9 @@ class ManualOpenLogController extends Controller
         }
     }
 
-    protected function takeSnapshot($parking_gate_id)
+    protected function takeSnapshot($gateOutId)
     {
-        $gate = ParkingGate::find($parking_gate_id);
+        $gate = GateOut::find($gateOutId);
 
         if (!$gate || !$gate->camera_status || !$gate->camera_image_snapshot_url) {
             return '';

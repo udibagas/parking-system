@@ -11,6 +11,7 @@ use App\Jobs\PrintTicketIn;
 use App\Jobs\PrintTicketOut;
 use App\Jobs\TakeSnapshot;
 use App\Member;
+use App\Pos;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
@@ -226,7 +227,7 @@ class ParkingTransactionController extends Controller
                     ]);
             }
 
-            return $data;
+            return $data->load(['snapshots']);
         }
 
         // member, tapi gak tap in karena rusak gate in
@@ -337,6 +338,12 @@ class ParkingTransactionController extends Controller
         return ['message' => 'TIDAK MENCETAK STRUK', 'data' => $parkingTransaction];
     }
 
+    public function printTicketOut(ParkingTransaction $parkingTransaction)
+    {
+        PrintTicketOut::dispatchNow($parkingTransaction->gateOut, $parkingTransaction);
+        return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
+    }
+
     /**
      * Remove the specified resource from storage.
      *
@@ -379,13 +386,9 @@ class ParkingTransactionController extends Controller
     public function printReport(Request $request)
     {
         $request->validate([
-            'gate_out_id' => 'required',
+            'pos_id' => 'required',
             'date' => 'required|date'
         ]);
-
-        if (!$request->gate_out_id) {
-            return response(['message' => 'Mohon pilih gate'], 400);
-        }
 
         $setting = Setting::first();
 
@@ -397,10 +400,10 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'LOKASI BELUM DISET'], 404);
         }
 
-        $gate = GateOut::find($request->gate_out_id);
+        $pos = Pos::find($request->pos_id);
 
-        if (!$gate) {
-            return response(['message' => 'GATE TIDAK DITEMUKAN'], 404);
+        if (!$pos) {
+            return response(['message' => 'POS TIDAK DITEMUKAN'], 404);
         }
 
         // ambil data transaksi per tanggal, per operator, per gate
@@ -412,7 +415,7 @@ class ParkingTransactionController extends Controller
                 AND is_member = 0
                 AND operator = :operator
                 AND DATE(time_out) = :date
-                AND gate_out_id = :gate_out_id
+                AND gate_out_id IN (:gate_out_id)
             GROUP BY jenis_kendaraan
         ";
 
@@ -425,7 +428,7 @@ class ParkingTransactionController extends Controller
                 AND is_member = 0
                 AND operator = :operator
                 AND DATE(time_out) = :date
-                AND gate_out_id = :gate_out_id
+                AND gate_out_id IN (:gate_out_id)
                 AND denda > 0
             GROUP BY jenis_kendaraan
         ";
@@ -438,7 +441,7 @@ class ParkingTransactionController extends Controller
                 AND is_member = 1
                 AND operator = :operator
                 AND DATE(time_out) = :date
-                AND gate_out_id = :gate_out_id
+                AND gate_out_id IN (:gate_out_id)
             GROUP BY jenis_kendaraan
         ";
 
@@ -448,44 +451,46 @@ class ParkingTransactionController extends Controller
             FROM manual_open_logs
             WHERE user_id = :user_id
                 AND DATE(updated_at) = :date
-                AND gate_out_id = :gate_out_id
+                AND gate_out_id IN (:gate_out_id)
         ";
+
+        $gateOutId = implode(',', $pos->gateOuts()->pluck('id')->toArray());
 
         $pendapatanReguler = DB::select($sqlReguler, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
-            ':gate_out_id' => $request->gate_out_id
+            ':gate_out_id' => $gateOutId
         ]);
 
         $pendapatanDenda = DB::select($sqlDenda, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
-            ':gate_out_id' => $request->gate_out_id
+            ':gate_out_id' => $gateOutId
         ]);
 
         $trxMember = DB::select($sqlMember, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
-            ':gate_out_id' => $request->gate_out_id
+            ':gate_out_id' => $gateOutId
         ]);
 
         $bukaManual = DB::select($sqlBukaManual, [
             ':date' => $request->date,
             ':user_id' => $request->user()->id,
-            ':gate_out_id' => $request->gate_out_id
+            ':gate_out_id' => $gateOutId
         ]);
 
         // ambil data periode jam
         $start = DB::select('SELECT time_out
             FROM parking_transactions
             WHERE operator = :operator
-                AND gate_out_id = :gate_out_id
+                AND gate_out_id IN (:gate_out_id)
                 AND DATE(time_out) = :date
             ORDER BY time_out ASC
             ', [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
-            ':gate_out_id' => $request->gate_out_id
+            ':gate_out_id' => $gateOutId
         ]);
 
         if (!$start) {
@@ -501,13 +506,7 @@ class ParkingTransactionController extends Controller
         // TODO: benerin pilih printer
 
         try {
-            if ($gate->printer_type == "network") {
-                $connector = new NetworkPrintConnector($gate->printer_ip_address, 9100);
-            } else if ($gate->printer_type == "local") {
-                $connector = new FilePrintConnector($gate->printer_device);
-            } else {
-                return response(['message' => 'INVALID PRINTER'], 500);
-            }
+            $connector = new NetworkPrintConnector($pos->printer->ip_address, $pos->printer->port ?: 9100);
 
             $printer = new Printer($connector);
         } catch (\Exception $e) {

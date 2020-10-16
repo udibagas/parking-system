@@ -18,4 +18,9 @@ class Pos extends Model
     {
         return $this->belongsTo(Printer::class);
     }
+
+    public function gateOuts()
+    {
+        return $this->hasMany(GateOut::class);
+    }
 }

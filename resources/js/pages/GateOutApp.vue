@@ -67,7 +67,9 @@
 			</el-row>
 
 			<el-row
-				v-if="gateOutList.length > 1"
+				v-if="
+					gateOutList.filter((g) => g.pos_id == formModel.pos_id).length > 1
+				"
 				:gutter="10"
 				style="margin-bottom: 10px"
 			>
@@ -80,7 +82,13 @@
 						id="gate-out"
 						class="my-input"
 					>
-						<option v-for="g in gateOutList" :value="g.id" :key="g.id">
+						<option
+							v-for="g in gateOutList.filter(
+								(g) => g.pos_id == formModel.pos_id
+							)"
+							:value="g.id"
+							:key="g.id"
+						>
 							{{ g.nama }}
 						</option>
 					</select>
@@ -138,7 +146,7 @@
 					<input
 						disabled
 						v-model="formModel.tarif"
-						class="my-input tarif-input"
+						class="my-input bg-red-700 text-white"
 					/>
 				</el-col>
 			</el-row>
@@ -152,7 +160,11 @@
 					<div class="label-big">TARIF + DENDA</div>
 				</el-col>
 				<el-col :span="14">
-					<input disabled v-model="totalBayar" class="my-input tarif-input" />
+					<input
+						disabled
+						v-model="totalBayar"
+						class="my-input bg-red-700 text-white"
+					/>
 				</el-col>
 			</el-row>
 
@@ -272,7 +284,11 @@
 			</div>
 		</el-dialog>
 
-		<el-dialog center :show-close="false" :visible="!formModel.pos_id">
+		<el-dialog
+			center
+			:show-close="false"
+			:visible="!formModel.pos_id && posList.length > 1"
+		>
 			<div class="mb-5">
 				<h1 class="text-center mb-3 text-xl">PILIH POS</h1>
 				<select v-model="formModel.pos_id" class="my-input" id="pos-id">
@@ -295,7 +311,7 @@ export default {
 		// totalBayar() {
 		//     return this.formModel.tarif + this.formModel.denda
 		// }
-		...mapState(["gateOutList", "gateInList", "jenisKendaraanList", "posList"]),
+		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"]),
 	},
 	watch: {
 		"formModel.pos_id"(v) {
@@ -315,8 +331,8 @@ export default {
 			setting: {},
 			showManualOpenForm: false,
 			formModelManualOpen: {},
-			ws: null,
 			totalBayar: 0,
+			posList: [],
 		};
 	},
 	methods: {
@@ -340,12 +356,21 @@ export default {
 			if (this.formModel.is_member) {
 				this.formModel.tarif = 0;
 				this.$forceUpdate();
-				document.getElementById("submit-btn").focus();
+
+				if (
+					this.gateOutList.filter((g) => g.pos_id == this.formModel.pos_id)
+						.length > 1
+				) {
+					document.getElementById("gate-out").focus();
+				} else {
+					document.getElementById("submit-btn").focus();
+				}
+
 				return;
 			}
 
 			const tarif = this.jenisKendaraanList.find(
-				(v) => v.name == this.formModel.jenis_kendaraan
+				(v) => v.nama == this.formModel.jenis_kendaraan
 			);
 
 			if (!tarif) {
@@ -362,10 +387,26 @@ export default {
 			}
 
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
+				if (
+					this.gateOutList.filter((g) => g.pos_id == this.formModel.pos_id)
+						.length > 1
+				) {
+					document.getElementById("gate-out").focus();
+				} else {
+					document.getElementById("submit-btn").focus();
+				}
+
 				document.getElementById("time-in").focus();
 				this.formModel.denda = tarif.denda_tiket_hilang;
 			} else {
-				document.getElementById("submit-btn").focus();
+				if (
+					this.gateOutList.filter((g) => g.pos_id == this.formModel.pos_id)
+						.length > 1
+				) {
+					document.getElementById("gate-out").focus();
+				} else {
+					document.getElementById("submit-btn").focus();
+				}
 			}
 
 			if (tarif.mode_tarif == 0) {
@@ -534,7 +575,6 @@ export default {
 						this.formModel.jenis_kendaraan = data.jenis_kendaraan;
 						this.formModel.time_out = now;
 						this.formModel.tarif = 0;
-						this.takeSnapshot(this.formModel.id);
 						this.hitungTarif();
 
 						if (!data.is_member) {
@@ -710,18 +750,13 @@ export default {
 			}
 		},
 		store(ticket) {
+			this.formModel.ticket = ticket;
 			axios
 				.post("/parkingTransaction", this.formModel)
 				.then((r) => {
-					this.takeSnapshot(r.data.id);
-					if (ticket) {
-						this.printTicket(r.data.id);
-					}
 					this.openGate();
 				})
 				.catch((e) => {
-					// kecil kemungkinan
-					console.log(e);
 					this.$message({
 						message: "DATA GAGAL DISIMPAN",
 						type: "error",
@@ -730,16 +765,16 @@ export default {
 				});
 		},
 		update(ticket) {
+			this.formModel.ticket = ticket;
 			axios
-				.put("/parkingTransaction/" + this.formModel.id, this.formModel)
+				.put(`/parkingTransaction/${this.formModel.id}`, this.formModel)
 				.then((r) => {
-					// print tiket hanya untuk non member
-					if (r.data.is_member == 0 && ticket) {
-						this.printTicket(r.data.id);
-					}
+					this.$message({
+						message: r.data.message,
+						type: "success",
+					});
 				})
 				.catch((e) => {
-					console.log(e);
 					this.$message({
 						message: "DATA GAGAL DISIMPAN",
 						type: "error",
@@ -750,133 +785,57 @@ export default {
 					this.openGate();
 				});
 		},
-		takeSnapshot(id) {
+		printTicketOut(id) {
 			axios
-				.post("/parkingTransaction/takeSnapshot/" + id, {
-					gate_out_id: this.formModel.gate_out_id,
-				})
-				.then((r) => {
-					this.snapshot_out = r.data.snapshot_out;
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: "error",
-						showClose: true,
-					});
-				});
-		},
-		printTicket(id) {
-			axios
-				.post("/parkingTransaction/printTicket/" + id, { trx: "OUT" })
+				.post(`/parkingTransaction/printTicketOut/${id}`)
 				.then((r) => {
 					this.$message({
 						message: r.data.message,
 						type: "success",
-						showClose: true,
 					});
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
 					});
 				});
 		},
 		openGate() {
-			// get gate out
+			const pos = this.posList.find((p) => p.id == this.formModel.pos_id);
 			const gate = this.gateOutList.find(
 				(g) => g.id == this.formModel.gate_out_id
 			);
 
-			if (!gate) {
-				this.$message({
-					message: "MOHON PILIH GATE OUT",
-					type: "error",
-					showClose: true,
-				});
-				return;
-			}
+			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
 
-			// kalau ga ada ip berarti langsung nancep
-			if (!gate.controller_ip_address) {
-				axios
-					.post("/parkingGate/openGate/" + this.formModel.gate_out_id)
-					.then((r) => {
-						this.$message({
-							message: r.data.message,
-							type: "success",
-							showClose: true,
-						});
-					})
-					.catch((e) => {
-						this.$message({
-							message: e.response.data.message,
-							type: "error",
-							showClose: true,
-						});
-					})
-					.finally(() => {
-						this.resetForm();
-					});
-			} else {
-				this.ws.send(
+			ws.onerror = (event) => {
+				this.$message({
+					message: "KONEKSI KE POS GAGAL",
+					type: "error",
+				});
+			};
+
+			ws.onopen = (event) => {
+				ws.send(
 					[
 						"open",
-						gate.controller_device,
-						gate.controller_baudrate,
-						gate.cmd_open,
-						gate.cmd_close,
+						gate.device,
+						gate.baudrate,
+						gate.open_command,
+						gate.close_command,
 					].join(";")
 				);
-			}
-		},
-		getParkingGateList() {
-			axios
-				.get("/parkingGate/getList")
-				.then((r) => {
-					this.parkingGateList = r.data;
+			};
 
-					if (r.data.filter((g) => g.type == "IN").length == 0) {
-						this.$message({
-							message: "MOHON SET GATE IN",
-							type: "error",
-							showClose: true,
-						});
-						return;
-					}
-
-					if (r.data.filter((g) => g.type == "IN").length == 1) {
-						this.formModel.gate_in_id = r.data.find((g) => g.type == "IN").id;
-					}
-
-					if (r.data.filter((g) => g.type == "OUT").length == 0) {
-						this.$message({
-							message: "MOHON SET GATE OUT",
-							type: "error",
-							showClose: true,
-						});
-						return;
-					}
-
-					// kalau cuma 1 gate outnya set default
-					if (r.data.filter((g) => g.type == "OUT").length == 1) {
-						let gate = r.data.find((g) => g.type == "OUT");
-						this.formModel.gate_out_id = gate.id;
-
-						if (!!gate.controller_ip_address) {
-							this.connectToGateOut(gate);
-						}
-					}
-				})
-				.catch((e) => {
-					this.$message({
-						message: "MOHON SET GATE",
-						type: "error",
-						showClose: true,
-					});
+			ws.onmessage = (event) => {
+				let data = JSON.parse(event.data);
+				this.$message({
+					message: data.message,
+					type: data.status ? "success" : "error",
 				});
+				ws.close();
+			};
 		},
 		printLastTrx() {
 			if (!this.formModel.gate_out_id) {
@@ -887,7 +846,7 @@ export default {
 			axios
 				.get("/parkingTransaction/search", { params: params })
 				.then((r) => {
-					this.printTicket(r.data.id);
+					this.printTicketOut(r.data.id);
 				})
 				.catch((e) => {
 					this.$message({
@@ -899,7 +858,7 @@ export default {
 		},
 		printReport() {
 			let payload = {
-				gate_out_id: this.formModel.gate_out_id,
+				pos_id: this.formModel.pos_id,
 				date: moment().format("YYYY-MM-DD"),
 			};
 
@@ -942,34 +901,32 @@ export default {
 					});
 				});
 		},
-		connectToGateOut(gate) {
-			this.ws = new WebSocket(
-				"ws://" + gate.controller_ip_address + ":" + gate.controller_port + "/"
-			);
-			this.ws.onerror = (event) => {
-				console.log(event);
-				this.$message({
-					message: "KONEKSI KE CONTROLLER GATE KELUAR GAGAL",
-					type: "error",
-					showClose: true,
-					duration: 10000,
-				});
-			};
-			this.ws.onmessage = (event) => {
-				let data = JSON.parse(event.data);
-				this.$message({
-					message: data.message,
-					type: data.status ? "success" : "error",
-					showClose: true,
-				});
+		getPosList() {
+			axios.get("/pos").then((r) => {
+				if (r.data.length == 0) {
+					this.$message({
+						message: "BELUM ADA POS",
+						type: "error",
+						showClose: true,
+						duration: 10000,
+					});
+				} else {
+					this.posList = r.data;
 
-				this.resetForm();
-			};
+					if (this.posList.length == 1) {
+						this.formModel.pos_id = r.data[0].id;
+
+						if (r.data[0].gate_outs.length == 1) {
+							this.formModel.gate_out_id = r.data[0].gate_outs[0].id;
+						}
+					}
+				}
+			});
 		},
 	},
 	mounted() {
 		this.getSetting();
-		this.$store.commit("getPosList");
+		this.getPosList();
 		this.$store.commit("getGateInList");
 		this.$store.commit("getGateOutList");
 		this.$store.commit("getJenisKendaraanList");
@@ -1045,32 +1002,26 @@ export default {
 			}
 		};
 	},
-	destroyed() {
-		this.ws.close(1000, "Leaving app");
-	},
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .block {
 	background-color: #eee;
 	height: calc(50vh - 73px);
 }
 
 .my-input {
-	border: 2px solid #160047;
+	@apply border-2 border-blue-800 text-3xl py-0 px-3;
 	height: 43px;
 	line-height: 43px;
-	font-size: 30px;
-	display: block;
-	width: 100%;
-	padding: 0px 15px;
 	box-sizing: border-box;
+	width: 100%;
 }
 
 .my-input:focus,
 .my-input-time:focus {
-	background: rgb(255, 246, 122);
+	@apply bg-yellow-300;
 }
 
 .my-input-time {
@@ -1085,18 +1036,9 @@ export default {
 }
 
 .label-big {
-	box-sizing: border-box;
-	background-color: #160047;
-	color: #fff;
-	padding-left: 15px;
-	font-size: 20px;
+	@apply bg-blue-800 text-white text-xl pl-3;
 	height: 43px;
 	line-height: 43px;
-}
-
-.tarif-input {
-	background: rgb(199, 24, 24);
-	color: #fff;
 }
 
 .my-big-btn {
@@ -1113,19 +1055,6 @@ export default {
 }
 
 .my-big-btn:focus {
-	// border: 3px dotted red;
-	background-color: #cd0000;
-}
-
-.label {
-	box-sizing: border-box;
-	background-color: #160047;
-	color: #fff;
-	text-align: center;
-	padding: 10px;
-}
-
-.text-center {
-	text-align: center;
+	@apply bg-red-600;
 }
 </style>
