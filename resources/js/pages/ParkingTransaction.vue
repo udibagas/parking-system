@@ -416,7 +416,7 @@
 								<el-option
 									v-for="(g, i) in gateInList"
 									:value="g.id"
-									:label="g.name"
+									:label="g.nama"
 									:key="i"
 								></el-option>
 							</el-select>
@@ -479,8 +479,8 @@
 							>
 								<el-option
 									v-for="(v, i) in jenisKendaraanList"
-									:value="v.name"
-									:label="v.name"
+									:value="v.nama"
+									:label="v.nama"
 									:key="i"
 								></el-option>
 							</el-select>
@@ -503,7 +503,7 @@
 								<el-option
 									v-for="(g, i) in gateOutList"
 									:value="g.id"
-									:label="g.name"
+									:label="g.nama"
 									:key="i"
 								></el-option>
 							</el-select>
