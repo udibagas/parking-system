@@ -405,8 +405,9 @@ export default {
 			axios
 				.get("member", { params: Object.assign(params, this.filters) })
 				.then((r) => {
-					const data = r.data.data.map((d) => {
+					const data = r.data.data.map((d, i) => {
 						return {
+							No: i + 1,
 							Nama: d.nama,
 							Jenis: d.berbayar ? "BERBAYAR" : "GRATIS",
 							Group: d.group.nama,

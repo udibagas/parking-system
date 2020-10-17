@@ -9,7 +9,7 @@
 </head>
 <body>
     <div style="width:900px;margin: 40px auto;">
-        <h2 style="text-align:center;">{{$setting->location_name}}</h2>
+        <h1 class="text-center text-3xl">{{$setting->nama_lokasi}}</h1>
         <hr>
         <br><br>
         @include('report')

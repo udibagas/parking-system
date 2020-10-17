@@ -27,7 +27,7 @@ php artisan jwt:secret
 
 # prepare database server
 sudo mysql -uroot -e 'create database parking_system'
-sudo mysql -uroot -e 'grant all on parking_system.* to parking_system@localhost identified by Bismillah1@#$%"'
+sudo mysql -uroot -e 'grant all on parking_system.* to parking_system@localhost identified with mysql_native_password by Bismillah1@#$%"'
 sudo mysql -uroot -e 'flush privileges'
 
 # migrate then populate db

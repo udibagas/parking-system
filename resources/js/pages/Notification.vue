@@ -125,6 +125,12 @@
 				>
 				</el-pagination>
 			</el-tab-pane>
+			<el-tab-pane lazy label="SNAPSHOT">
+				<Snapshot />
+			</el-tab-pane>
+			<el-tab-pane lazy label="LOG USER">
+				<UserLog :range="dateRange" />
+			</el-tab-pane>
 			<el-tab-pane lazy label="LOG GATE MASUK">
 				<ControllerLog />
 			</el-tab-pane>
@@ -134,9 +140,11 @@
 
 <script>
 import ControllerLog from "./ControllerLog";
+import UserLog from "./UserLog";
+import Snapshot from "./Snapshot";
 
 export default {
-	components: { ControllerLog },
+	components: { ControllerLog, UserLog, Snapshot },
 	data() {
 		return {
 			keyword: "",
