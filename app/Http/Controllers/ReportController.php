@@ -28,7 +28,7 @@ class ReportController extends Controller
     public function getIncome(Request $request)
     {
         return DB::select('
-            SELECT jenis_kendaraan, SUM(fare) AS `total`
+            SELECT jenis_kendaraan, SUM(tarif) AS `total`
             FROM parking_transactions
             WHERE DATE(time_out) BETWEEN :start AND :stop
             GROUP BY jenis_kendaraan', [
@@ -68,7 +68,7 @@ class ReportController extends Controller
         $perKendaraan = DB::select('
             SELECT jenis_kendaraan,
                 COUNT(id) AS jumlah,
-                SUM(fare) AS `pendapatan`
+                SUM(tarif) AS `pendapatan`
             FROM parking_transactions
             WHERE DATE(time_out) BETWEEN :start AND :stop
                 AND time_out IS NOT NULL
@@ -80,7 +80,7 @@ class ReportController extends Controller
         $perPetugas = DB::select('
             SELECT operator,
                 COUNT(id) AS jumlah,
-                SUM(fare) AS `pendapatan`
+                SUM(tarif) AS `pendapatan`
             FROM parking_transactions
             WHERE DATE(time_out) BETWEEN :start AND :stop
                 AND time_out IS NOT NULL
