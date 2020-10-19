@@ -28,6 +28,13 @@
 				prop="nama"
 			></el-table-column>
 			<el-table-column
+				prop="shortcut_key"
+				label="Shortcut"
+				align="center"
+				header-align="center"
+				min-width="100px"
+			></el-table-column>
+			<el-table-column
 				min-width="100"
 				label="Pos"
 				prop="pos.nama"

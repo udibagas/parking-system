@@ -15,6 +15,7 @@ class CreateGateOutsTable extends Migration
     {
         Schema::create('gate_outs', function (Blueprint $table) {
             $table->bigIncrements('id');
+            $table->string('shortcut_key');
             $table->string('nama');
             $table->string('jenis_kendaraan');
             $table->string('device');

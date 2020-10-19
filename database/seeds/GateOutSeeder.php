@@ -14,6 +14,7 @@ class GateOutSeeder extends Seeder
     {
         $data = [
             [
+                'shortcut_key' => '1',
                 'nama' => 'GATE MOTOR',
                 'jenis_kendaraan' => 'MOTOR',
                 'device' => '/dev/ttyUSB0',
@@ -24,6 +25,7 @@ class GateOutSeeder extends Seeder
                 'status' => 1
             ],
             [
+                'shortcut_key' => '2',
                 'nama' => 'GATE MOBIL',
                 'jenis_kendaraan' => 'MOBIL',
                 'device' => '/dev/ttyUSB0',

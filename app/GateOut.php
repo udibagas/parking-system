@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class GateOut extends Model
 {
     protected $fillable = [
+        'shortcut_key',
         'nama',
         'jenis_kendaraan',
         'device',

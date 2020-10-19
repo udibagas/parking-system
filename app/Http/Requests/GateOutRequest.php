@@ -24,6 +24,7 @@ class GateOutRequest extends FormRequest
     public function rules()
     {
         return [
+            'shortcut_key' => 'required:max,1',
             'nama' => 'required',
             'jenis_kendaraan' => 'required',
             'device' => 'required',
@@ -36,6 +37,7 @@ class GateOutRequest extends FormRequest
     public function attributes()
     {
         return [
+            'shortcut_key' => 'Shortcut',
             'nama' => 'nama',
             'jenis_kendaraan' => 'Jenis Kendaraan',
             'device' => 'device',
