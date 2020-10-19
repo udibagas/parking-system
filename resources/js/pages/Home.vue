@@ -1,19 +1,14 @@
 <template>
-    <GateOutApp />
-    <!-- <el-tabs type="card">
-        <el-tab-pane label="GATE IN"><GateInApp /></el-tab-pane>
-        <el-tab-pane label="GATE OUT"><GateOutApp /></el-tab-pane>
-    </el-tabs> -->
+	<GateOutApp />
 </template>
 
 <script>
-import GateInApp from './GateInApp'
-import GateOutApp from './GateOutApp'
+import GateOutApp from "./GateOutApp";
 
 export default {
-    components: { GateInApp, GateOutApp },
-    mounted() {
-        this.$store.commit('getNavigationList')
-    }
-}
+	components: { GateOutApp },
+	mounted() {
+		this.$store.commit("getNavigationList");
+	},
+};
 </script>
