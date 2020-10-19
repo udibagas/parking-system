@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\GateOut;
+use App\Jobs\TakeSnapshotManualOpen;
 use App\ManualOpenLog;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
@@ -41,17 +42,27 @@ class ManualOpenLogController extends Controller
     {
         $request->validate([
             'alasan' => 'required',
+            'gate_out_id' => 'required'
             // 'password' => ['required', function($attribute, $value, $fail) {
             //     if (!password_verify($value, auth()->user()->password)) {
             //         $fail('Password yang Anda masukkan salah.');
             //     }
             // }]
+        ], [], [
+            'alasan' => 'Alasan harus diisi',
+            'gate_out_id' => 'Gate keluar harus diisi'
         ]);
 
-        $input = $request->all();
-        $input['user_id'] = $request->user()->id;
-        $input['snapshot'] = $this->takeSnapshot($request->gateOutId);
-        return ManualOpenLog::create($input);
+        $manualOpenLog = ManualOpenLog::create(array_merge($request->all(), [
+            'user_id' => $request->user()->id
+        ]));
+
+        TakeSnapshotManualOpen::dispatch($manualOpenLog);
+
+        return [
+            'message' => 'Data telah disimpan',
+            'data' => $manualOpenLog
+        ];
     }
 
     /**
@@ -63,40 +74,6 @@ class ManualOpenLogController extends Controller
     public function destroy(ManualOpenLog $manualOpenLog)
     {
         $manualOpenLog->delete();
-        if (file_exists($manualOpenLog->snapshot)) {
-            unlink($manualOpenLog->snapshot);
-        }
-    }
-
-    protected function takeSnapshot($gateOutId)
-    {
-        $gate = GateOut::find($gateOutId);
-
-        if (!$gate || !$gate->camera_status || !$gate->camera_image_snapshot_url) {
-            return '';
-        }
-
-        $client = new Client(['timeout' => 3]);
-
-        $fileName = 'snapshot/' . date('Y/m/d/H/') . $gate->name . '-' . date('YmdHis') . '.jpg';
-
-        if (!is_dir('snapshot/' . date('Y/m/d/H'))) {
-            mkdir('snapshot/' . date('Y/m/d/H'), 0777, true);
-        }
-
-        try {
-            $response = $client->request('GET', $gate->camera_image_snapshot_url, [
-                'auth' => [
-                    $gate->camera_username,
-                    $gate->camera_password,
-                    $gate->camera_auth_type == 'digest' ? 'digest' : null
-                ]
-            ]);
-            file_put_contents($fileName, $response->getBody());
-        } catch (\Exception $e) {
-            return '';
-        }
-
-        return $fileName;
+        // TODO: hapus snapshots
     }
 }

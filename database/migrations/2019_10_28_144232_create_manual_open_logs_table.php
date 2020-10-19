@@ -18,7 +18,7 @@ class CreateManualOpenLogsTable extends Migration
             $table->bigInteger('gate_out_id');
             $table->bigInteger('user_id')->comment('Operator');
             $table->string('alasan');
-            $table->string('snapshot')->nullable();
+            $table->json('snapshots')->nullable();
             $table->timestamps();
         });
     }

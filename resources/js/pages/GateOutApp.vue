@@ -89,7 +89,7 @@
 							:value="g.id"
 							:key="g.id"
 						>
-							{{ g.nama }}
+							{{ g.shortcut_key }} - {{ g.nama }}
 						</option>
 					</select>
 				</el-col>
@@ -245,44 +245,11 @@
 			</div>
 		</div>
 
-		<el-dialog
-			title="FORM BUKA MANUAL"
-			center
-			:visible.sync="showManualOpenForm"
-		>
-			<el-form label-position="left" label-width="200px">
-				<el-form-item
-					label="Alasan buka manual"
-					:class="formErrors.alasan ? 'is-error' : ''"
-				>
-					<el-input
-						autofocus
-						type="textarea"
-						v-model="formModelManualOpen.alasan"
-						rows="3"
-						placeholder="Alasan buka manual"
-					></el-input>
-					<div class="el-form-item__error" v-if="formErrors.alasan">
-						{{ formErrors.alasan[0] }}
-					</div>
-				</el-form-item>
-				<!-- <el-form-item label="Masukkan password Anda" :class="formErrors.password ? 'is-error' : ''">
-                    <el-input type="password" v-model="formModelManualOpen.password" placeholder="Password"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.password">{{formErrors.password[0]}}</div>
-                </el-form-item> -->
-			</el-form>
-			<div slot="footer">
-				<el-button icon="el-icon-success" type="primary" @click="manualOpen"
-					>SIMPAN</el-button
-				>
-				<el-button
-					icon="el-icon-error"
-					type="info"
-					@click="showManualOpenForm = false"
-					>BATAL</el-button
-				>
-			</div>
-		</el-dialog>
+		<FormBukaManual
+			:show="showManualOpenForm"
+			@close="showManualOpenForm = false"
+			@open-gate="(gate_out_id) => openGate(gate_in_id)"
+		/>
 
 		<el-dialog
 			center
@@ -303,14 +270,11 @@
 
 <script>
 import { mapState } from "vuex";
-import GateInApp from "./GateInApp";
+import FormBukaManual from "../components/FormBukaManual";
 
 export default {
-	components: { GateInApp },
+	components: { FormBukaManual },
 	computed: {
-		// totalBayar() {
-		//     return this.formModel.tarif + this.formModel.denda
-		// }
 		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"]),
 	},
 	watch: {
@@ -330,7 +294,6 @@ export default {
 			snapshot_out: null,
 			setting: {},
 			showManualOpenForm: false,
-			formModelManualOpen: {},
 			totalBayar: 0,
 			posList: [],
 		};
@@ -508,35 +471,6 @@ export default {
 
 			this.totalBayar = this.formModel.denda + this.formModel.tarif;
 			this.$forceUpdate();
-		},
-		manualOpen() {
-			this.$confirm(
-				"Aksi ini akan dicatat oleh sistem. Anda yakin?",
-				"Peringatan",
-				{ type: "warning" }
-			)
-				.then(() => {
-					this.formModelManualOpen.parking_gate_id = this.formModel.gate_out_id;
-					axios
-						.post("/manualOpenLog", this.formModelManualOpen)
-						.then((r) => {
-							this.openGate();
-							this.showManualOpenForm = false;
-							this.formModelManualOpen = {};
-						})
-						.catch((e) => {
-							if (e.response.status == 422) {
-								this.formErrors = e.response.data.errors;
-							} else {
-								this.$message({
-									message: e.response.data.message,
-									type: "error",
-									showClose: true,
-								});
-							}
-						});
-				})
-				.catch(() => console.log(e));
 		},
 		cekPlatNomor() {
 			let params = { plat_nomor: this.formModel.plat_nomor };
@@ -754,7 +688,7 @@ export default {
 			axios
 				.post("/parkingTransaction", this.formModel)
 				.then((r) => {
-					this.openGate();
+					this.openGate(this.formModel.gate_out_id);
 				})
 				.catch((e) => {
 					this.$message({
@@ -782,7 +716,7 @@ export default {
 					});
 				})
 				.finally(() => {
-					this.openGate();
+					this.openGate(this.formModel.gate_out_id);
 				});
 		},
 		printTicketOut(id) {
@@ -801,11 +735,9 @@ export default {
 					});
 				});
 		},
-		openGate() {
+		openGate(gate_out_id) {
 			const pos = this.posList.find((p) => p.id == this.formModel.pos_id);
-			const gate = this.gateOutList.find(
-				(g) => g.id == this.formModel.gate_out_id
-			);
+			const gate = this.gateOutList.find((g) => g.id == gate_out_id);
 
 			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
 

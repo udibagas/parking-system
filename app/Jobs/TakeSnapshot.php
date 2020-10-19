@@ -41,7 +41,7 @@ class TakeSnapshot implements ShouldQueue
     {
         $client = new Client(['timeout' => 3]);
 
-        foreach ($this->gate->kameraList as $kamera) {
+        foreach ($this->gate->kameraList()->active()->get() as $kamera) {
             try {
                 $response = $client->request('GET', $kamera->snapshot_url, [
                     'auth' => [

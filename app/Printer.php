@@ -15,4 +15,9 @@ class Printer extends Model
         'port',
         'status'
     ];
+
+    public function scopeActive($q)
+    {
+        return $q->where('status', 1);
+    }
 }

@@ -18,4 +18,9 @@ class Kamera extends Model
         'auth_type',
         'status'
     ];
+
+    public function scopeActive($q)
+    {
+        return $q->where('status', 1);
+    }
 }

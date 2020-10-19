@@ -36,4 +36,9 @@ class GateIn extends Model
     {
         return $this->morphMany(Snapshot::class, 'snapshotable');
     }
+
+    public function scopeActive($q)
+    {
+        return $q->where('status', 1);
+    }
 }
