@@ -4,7 +4,7 @@ Requires=network.target
 
 [Service]
 User=server
-WorkingDirectory=/home/server/apps/parking_system
+WorkingDirectory=/home/server/apps/parking-system
 ExecStart=/usr/bin/php artisan queue:work
 Restart=always
 RestartSec=3

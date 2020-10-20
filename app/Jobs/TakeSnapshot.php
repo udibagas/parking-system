@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Kamera;
 use App\Notifications\KameraErrorNotification;
 use App\ParkingTransaction;
 use Illuminate\Bus\Queueable;
@@ -39,9 +40,14 @@ class TakeSnapshot implements ShouldQueue
      */
     public function handle()
     {
+        if ($this->gate->kamera === null) {
+            return;
+        }
+
+        $kameras = Kamera::whereIn('id', $this->gate->kamera)->active()->get();
         $client = new Client(['timeout' => 3]);
 
-        foreach ($this->gate->kameraList()->active()->get() as $kamera) {
+        foreach ($kameras as $kamera) {
             try {
                 $response = $client->request('GET', $kamera->snapshot_url, [
                     'auth' => [
