@@ -220,8 +220,15 @@
 				</el-col>
 			</el-row>
 		</div>
-		<div class="ml-5 flex-grow">
-			<img v-for="s in snapshots" :key="s.id" :src="s.url" alt="" />
+		<div class="ml-5">
+			<img
+				v-for="s in snapshots"
+				:key="s.id"
+				:src="s.url"
+				alt=""
+				style="width: 300px"
+				class="mb-1"
+			/>
 		</div>
 
 		<FormBukaManual
