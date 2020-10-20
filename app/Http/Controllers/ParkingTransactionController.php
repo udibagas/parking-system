@@ -168,11 +168,11 @@ class ParkingTransactionController extends Controller
         $parkingTransaction = ParkingTransaction::create($input);
         TakeSnapshot::dispatch($parkingTransaction->gateIn, $parkingTransaction);
 
-        if (!$request->is_member) {
+        if (!$parkingTransaction->is_member) {
             PrintTicketIn::dispatch($parkingTransaction);
         }
 
-        if ($request->is_member) {
+        if ($parkingTransaction->is_member) {
             Member::where('id', $request->member_id)->update([
                 'last_transaction' => now()
             ]);

@@ -61,7 +61,7 @@
 				</template>
 			</el-table-column>
 			<el-table-column
-				min-width="100"
+				min-width="150"
 				label="Printer"
 				prop="printer.nama"
 			></el-table-column>
