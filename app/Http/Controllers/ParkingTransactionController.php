@@ -142,14 +142,20 @@ class ParkingTransactionController extends Controller
 
         $parkingTransaction = ParkingTransaction::create($input);
 
-        TakeSnapshot::dispatch($parkingTransaction->gateOut, $parkingTransaction);
+        TakeSnapshot::dispatchNow($parkingTransaction->gateOut, $parkingTransaction);
 
         if (!$parkingTransaction->is_member && $request->ticket) {
             PrintTicketOut::dispatchNow($parkingTransaction);
-            return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
+            return [
+                'message' => 'SILAKAN AMBIL STRUK PARKIR',
+                'data' => $parkingTransaction->load(['snapshots'])
+            ];
         }
 
-        return ['message' => 'TIDAK MENCETAK STRUK', 'data' => $parkingTransaction];
+        return [
+            'message' => 'TIDAK MENCETAK STRUK',
+            'data' => $parkingTransaction->load(['snapshots'])
+        ];
     }
 
     // untuk handle waktu gate in tertrigger
@@ -202,7 +208,7 @@ class ParkingTransactionController extends Controller
                 return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
             }
 
-            return $data;
+            return $data->load(['member', 'snapshots']);
         }
 
         // ambil transaksi terakhir yg blm tap out
@@ -227,7 +233,7 @@ class ParkingTransactionController extends Controller
                     ]);
             }
 
-            return $data->load(['snapshots']);
+            return $data->load(['member', 'snapshots']);
         }
 
         // member, tapi gak tap in karena rusak gate in
@@ -253,7 +259,7 @@ class ParkingTransactionController extends Controller
             ];
 
             $trx = ParkingTransaction::create($data);
-            return $trx->load(['member']);
+            return $trx->load(['member', 'snapshots']);
         }
 
         return response(['message' => 'NOMOR TIKET/KARTU INVALID'], 404);
@@ -328,14 +334,20 @@ class ParkingTransactionController extends Controller
 
         $parkingTransaction->update($input);
 
-        TakeSnapshot::dispatch($parkingTransaction->gateOut, $parkingTransaction);
+        TakeSnapshot::dispatchNow($parkingTransaction->gateOut, $parkingTransaction);
 
         if (!$parkingTransaction->is_member && $request->ticket) {
             PrintTicketOut::dispatchNow($parkingTransaction);
-            return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
+            return [
+                'message' => 'SILAKAN AMBIL STRUK PARKIR',
+                'data' => $parkingTransaction->load(['snapshots'])
+            ];
         }
 
-        return ['message' => 'TIDAK MENCETAK STRUK', 'data' => $parkingTransaction];
+        return [
+            'message' => 'TIDAK MENCETAK STRUK',
+            'data' => $parkingTransaction->load(['snapshots'])
+        ];
     }
 
     public function printTicketOut(ParkingTransaction $parkingTransaction)

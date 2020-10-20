@@ -221,28 +221,7 @@
 			</el-row>
 		</div>
 		<div class="ml-5 flex-grow">
-			<div class="block">
-				<el-image
-					:src="snapshot_in"
-					style="width: 100%; height: 100%"
-					fit="cover"
-				>
-					<div slot="error" class="el-image__error">
-						<h1>SNAPSHOT IN</h1>
-					</div>
-				</el-image>
-			</div>
-			<div class="block">
-				<el-image
-					:src="snapshot_out"
-					style="width: 100%; height: 100%"
-					fit="cover"
-				>
-					<div slot="error" class="el-image__error">
-						<h1>SNAPSHOT OUT</h1>
-					</div>
-				</el-image>
-			</div>
+			<img v-for="s in snapshots" :key="s.id" :src="s.url" alt="" />
 		</div>
 
 		<FormBukaManual
@@ -290,8 +269,7 @@ export default {
 		return {
 			formModel: { nomor_barcode: "" },
 			formErrors: {},
-			snapshot_in: null,
-			snapshot_out: null,
+			snapshots: [],
 			setting: {},
 			showManualOpenForm: false,
 			totalBayar: 0,
@@ -501,7 +479,7 @@ export default {
 					.get("/parkingTransaction/search", { params })
 					.then((r) => {
 						const data = r.data;
-						this.snapshot_in = data.snapshot_in;
+						this.snapshots = data.snapshots;
 						this.formModel.id = data.id;
 						this.formModel.gate_in_id = data.gate_in_id;
 						this.formModel.time_in = data.time_in;
@@ -616,8 +594,7 @@ export default {
 			this.formModel.time_out = "";
 			this.formModel.time_in = "";
 			this.formModel.duration = "";
-			this.snapshot_in = "";
-			this.snapshot_out = "";
+			this.snapshots = [];
 
 			if (default_vehicle) {
 				this.formModel.jenis_kendaraan = default_vehicle.name;
