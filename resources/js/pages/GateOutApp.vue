@@ -638,6 +638,8 @@ export default {
 				return;
 			}
 
+			console.log(this.formModel);
+
 			if (
 				!this.formModel.nomor_barcode ||
 				!this.formModel.gate_out_id ||
