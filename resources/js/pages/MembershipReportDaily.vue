@@ -17,7 +17,7 @@
 					size="small"
 					type="primary"
 					icon="el-icon-printer"
-					@click="printReport"
+					@click="showPrintDialog = true"
 					>PRINT LAPORAN</el-button
 				>
 			</el-form-item>
@@ -47,16 +47,26 @@
 				</template>
 			</el-table-column>
 		</el-table>
+
+		<PrintDialog
+			:show="showPrintDialog"
+			@print="(printer_id) => printReport(printer_id)"
+			@close="showPrintDialog = false"
+		/>
 	</div>
 </template>
 
 <script>
+import PrintDialog from "../components/PrintDialog";
+
 export default {
+	components: { PrintDialog },
 	data() {
 		return {
 			date: moment().format("YYYY-MM-DD"),
 			report: [],
 			loading: false,
+			showPrintDialog: false,
 		};
 	},
 	methods: {
@@ -80,8 +90,8 @@ export default {
 					this.loading = false;
 				});
 		},
-		printReport() {
-			let params = { date: this.date, action: "print" };
+		printReport(printer_id) {
+			let params = { date: this.date, action: "print", printer_id };
 			this.loading = true;
 
 			axios
@@ -103,6 +113,7 @@ export default {
 				})
 				.finally(() => {
 					this.loading = false;
+					this.showPrintDialog = false;
 				});
 		},
 		formatNumber(v) {

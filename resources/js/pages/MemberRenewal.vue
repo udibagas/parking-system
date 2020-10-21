@@ -203,55 +203,21 @@
 			@reload="requestData"
 		/>
 
-		<el-dialog
-			title="PILIH PRINTER"
-			center
-			:visible.sync="showPrintDialog"
-			width="500px"
-		>
-			<el-form>
-				<el-form-item>
-					<el-select
-						v-model="printer_id"
-						placeholder="Pilih Printer"
-						style="width: 100%"
-					>
-						<el-option
-							v-for="p in printerList"
-							:key="p.id"
-							:value="p.id"
-							:label="p.nama"
-						></el-option>
-					</el-select>
-				</el-form-item>
-			</el-form>
-
-			<div slot="footer">
-				<el-button
-					icon="el-icon-close"
-					@click="showPrintDialog = false"
-					type="info"
-				>
-					BATAL
-				</el-button>
-				<el-button
-					icon="el-icon-printer"
-					@click="printSlip"
-					type="primary"
-					:disabled="!printer_id"
-				>
-					CETAK STRUK
-				</el-button>
-			</div>
-		</el-dialog>
+		<PrintDialog
+			:show="showPrintDialog"
+			@print="(printer_id) => printSlip(printer_id)"
+			@close="showPrintDialog = false"
+		/>
 	</div>
 </template>
 
 <script>
 import { mapState } from "vuex";
 import FormRenewal from "../components/FormRenewal";
+import PrintDialog from "../components/PrintDialog";
+
 export default {
-	components: { FormRenewal },
+	components: { FormRenewal, PrintDialog },
 	data() {
 		return {
 			showForm: false,
@@ -265,12 +231,8 @@ export default {
 			loading: false,
 			dateRange: "",
 			showPrintDialog: false,
-			printer_id: null,
 			selectedData: {},
 		};
-	},
-	computed: {
-		...mapState(["printerList"]),
 	},
 	methods: {
 		sortChange(c) {
@@ -334,10 +296,10 @@ export default {
 					this.loading = false;
 				});
 		},
-		printSlip() {
+		printSlip(printer_id) {
 			axios
 				.post(`/memberRenewal/printSlip/${this.selectedData.id}`, {
-					printer_id: this.printer_id,
+					printer_id,
 				})
 				.then((r) => {
 					this.$message({
@@ -359,7 +321,6 @@ export default {
 	mounted() {
 		this.requestData();
 		this.$store.commit("getMemberList");
-		this.$store.commit("getPrinterList");
 	},
 };
 </script>

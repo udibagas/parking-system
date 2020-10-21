@@ -155,7 +155,8 @@ class MemberRenewalController extends Controller
         ]);
 
         if ($request->action == 'print') {
-            $this->printReport($data);
+            $request->validate(['printer_id' => 'required|exists:printers,id']);
+            return $this->printReport($data, AppPrinter::find($request->printer_id));
         }
 
         return $data;
@@ -169,13 +170,14 @@ class MemberRenewalController extends Controller
             ->get();
 
         if ($request->action == 'print') {
-            $this->printReportDaily($request->date, $data);
+            $request->validate(['printer_id' => 'required|exists:printers,id']);
+            return $this->printReportDaily($request->date, $data, AppPrinter::find($request->printer_id));
         }
 
         return $data;
     }
 
-    protected function printReport($data)
+    protected function printReport($data, AppPrinter $selectedPrinter)
     {
         $setting = Setting::first();
 
@@ -188,7 +190,7 @@ class MemberRenewalController extends Controller
         }
 
         try {
-            $connector = new NetworkPrintConnector(env('PRINTER_ADDRESS'), 9100);
+            $connector = new NetworkPrintConnector($selectedPrinter->ip_address, $selectedPrinter->port ?: 9100);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
@@ -230,7 +232,7 @@ class MemberRenewalController extends Controller
         return ['message' => 'SILAKAN AMBIL SLIP'];
     }
 
-    protected function printReportDaily($date, $data)
+    protected function printReportDaily($date, $data, AppPrinter $selectedPrinter)
     {
         $setting = Setting::first();
 
@@ -243,7 +245,7 @@ class MemberRenewalController extends Controller
         }
 
         try {
-            $connector = new NetworkPrintConnector(env('PRINTER_ADDRESS'), 9100);
+            $connector = new NetworkPrintConnector($selectedPrinter->ip_address, $selectedPrinter->port ?: 9100);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
