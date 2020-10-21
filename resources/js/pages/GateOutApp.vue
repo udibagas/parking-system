@@ -226,8 +226,8 @@
 				:key="s.id"
 				:src="s.url"
 				alt=""
-				style="width: 300px"
-				class="mb-1"
+				style="width: 500px"
+				class="mx-auto mb-1 border"
 			/>
 		</div>
 

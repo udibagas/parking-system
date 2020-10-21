@@ -9,6 +9,11 @@ use GuzzleHttp\Client;
 
 class KameraController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:1')->except(['index']);
+    }
+
     /**
      * Display a listing of the resource.
      *

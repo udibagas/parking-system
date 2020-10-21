@@ -9,7 +9,7 @@ class JenisKendaraanController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:1')->except(['getList']);
+        $this->middleware('role:1')->except(['index']);
     }
 
     /**
@@ -73,10 +73,5 @@ class JenisKendaraanController extends Controller
     {
         $jenisKendaraan->delete();
         return ['message' => 'Data telah dihapus'];
-    }
-
-    public function getList()
-    {
-        return JenisKendaraan::all();
     }
 }

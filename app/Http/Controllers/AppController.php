@@ -18,7 +18,7 @@ class AppController extends Controller
 
     public function checkAuth(Request $request)
     {
-        $operatorPath = ['/home', '/parking-transaction', '/member'];
+        $operatorPath = ['/home', '/transaksi', '/member'];
 
         if ($request->user()->role == 0 && !in_array($request->route, $operatorPath)) {
             return response(['message' => 'Anda tidak berhak mengakses halaman ini'], 401);
