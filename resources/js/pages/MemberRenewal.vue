@@ -143,7 +143,12 @@
 						<el-dropdown-menu slot="dropdown">
 							<el-dropdown-item
 								icon="el-icon-printer"
-								@click.native.prevent="printSlip(scope.row.id)"
+								@click.native.prevent="
+									() => {
+										selectedData = scope.row;
+										showPrintDialog = true;
+									}
+								"
 								>Print Slip</el-dropdown-item
 							>
 							<el-dropdown-item
@@ -197,10 +202,53 @@
 			@close="showForm = false"
 			@reload="requestData"
 		/>
+
+		<el-dialog
+			title="PILIH PRINTER"
+			center
+			:visible.sync="showPrintDialog"
+			width="500px"
+		>
+			<el-form>
+				<el-form-item>
+					<el-select
+						v-model="printer_id"
+						placeholder="Pilih Printer"
+						style="width: 100%"
+					>
+						<el-option
+							v-for="p in printerList"
+							:key="p.id"
+							:value="p.id"
+							:label="p.nama"
+						></el-option>
+					</el-select>
+				</el-form-item>
+			</el-form>
+
+			<div slot="footer">
+				<el-button
+					icon="el-icon-close"
+					@click="showPrintDialog = false"
+					type="info"
+				>
+					BATAL
+				</el-button>
+				<el-button
+					icon="el-icon-printer"
+					@click="printSlip"
+					type="primary"
+					:disabled="!printer_id"
+				>
+					CETAK STRUK
+				</el-button>
+			</div>
+		</el-dialog>
 	</div>
 </template>
 
 <script>
+import { mapState } from "vuex";
 import FormRenewal from "../components/FormRenewal";
 export default {
 	components: { FormRenewal },
@@ -216,7 +264,13 @@ export default {
 			order: "descending",
 			loading: false,
 			dateRange: "",
+			showPrintDialog: false,
+			printer_id: null,
+			selectedData: {},
 		};
+	},
+	computed: {
+		...mapState(["printerList"]),
 	},
 	methods: {
 		sortChange(c) {
@@ -280,9 +334,11 @@ export default {
 					this.loading = false;
 				});
 		},
-		printSlip(id) {
+		printSlip() {
 			axios
-				.post("/memberRenewal/printSlip/" + id)
+				.post(`/memberRenewal/printSlip/${this.selectedData.id}`, {
+					printer_id: this.printer_id,
+				})
 				.then((r) => {
 					this.$message({
 						message: r.data.message,
@@ -294,12 +350,16 @@ export default {
 						message: e.response.data.message,
 						type: "error",
 					});
+				})
+				.finally(() => {
+					this.showPrintDialog = false;
 				});
 		},
 	},
 	mounted() {
 		this.requestData();
 		this.$store.commit("getMemberList");
+		this.$store.commit("getPrinterList");
 	},
 };
 </script>

@@ -350,9 +350,26 @@ class ParkingTransactionController extends Controller
         ];
     }
 
+    public function printLastTransaction(Request $request)
+    {
+        $request->validate(['pos_id' => 'required|exists:pos,id']);
+
+        $parkingTransaction = ParkingTransaction::whereHas('gateOut', function ($q) use ($request) {
+            $q->where('pos_id', $request->pos_id);
+        })->latest()->first();
+
+        if (!$parkingTransaction) {
+            return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
+        }
+
+        PrintTicketOut::dispatchNow($parkingTransaction);
+
+        return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
+    }
+
     public function printTicketOut(ParkingTransaction $parkingTransaction)
     {
-        PrintTicketOut::dispatchNow($parkingTransaction->gateOut, $parkingTransaction);
+        PrintTicketOut::dispatchNow($parkingTransaction);
         return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
     }
 

@@ -669,6 +669,7 @@ export default {
 				this.store(ticket);
 			}
 		},
+
 		store(ticket) {
 			this.formModel.ticket = ticket;
 			axios
@@ -684,6 +685,7 @@ export default {
 					});
 				});
 		},
+
 		update(ticket) {
 			this.formModel.ticket = ticket;
 			axios
@@ -705,6 +707,7 @@ export default {
 					this.openGate(this.formModel.gate_out_id);
 				});
 		},
+
 		printTicketOut(id) {
 			axios
 				.post(`/parkingTransaction/printTicketOut/${id}`)
@@ -721,6 +724,7 @@ export default {
 					});
 				});
 		},
+
 		openGate(gate_out_id) {
 			const pos = this.posList.find((p) => p.id == this.formModel.pos_id);
 			const gate = this.gateOutList.find((g) => g.id == gate_out_id);
@@ -755,25 +759,28 @@ export default {
 				ws.close();
 			};
 		},
-		printLastTrx() {
-			if (!this.formModel.gate_out_id) {
-				return;
-			}
 
-			let params = { gate_out_id: this.formModel.gate_out_id };
+		printLastTrx() {
 			axios
-				.get("/parkingTransaction/search", { params: params })
+				.post("/parkingTransaction/printLastTransaction", {
+					pos_id: this.formModel.pos_id,
+				})
 				.then((r) => {
-					this.printTicketOut(r.data.id);
+					this.$message({
+						message: r.data.message,
+						type: "success",
+						showClose: true,
+					});
 				})
 				.catch((e) => {
 					this.$message({
-						message: "BELUM ADA TRANSAKSI",
+						message: e.response.data.message,
 						type: "error",
 						showClose: true,
 					});
 				});
 		},
+
 		printReport() {
 			let payload = {
 				pos_id: this.formModel.pos_id,

@@ -7,6 +7,7 @@ use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
 use App\Http\Resources\MemberRenewalCollection;
 use App\Member;
+use App\Printer as AppPrinter;
 use App\Setting;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
@@ -91,8 +92,12 @@ class MemberRenewalController extends Controller
         return ['message' => 'Data telah dihapus'];
     }
 
-    public function printSlip(MemberRenewal $memberRenewal)
+    public function printSlip(MemberRenewal $memberRenewal, Request $request)
     {
+        $request->validate([
+            'printer_id' => 'required|exists:printers,id'
+        ]);
+
         $setting = Setting::first();
 
         if (!$setting) {
@@ -103,22 +108,10 @@ class MemberRenewalController extends Controller
             return response(['message' => 'LOKASI BELUM DISET'], 500);
         }
 
-        // try {
-        //     if ($parkingGate->printer_type == "network") {
-        //         $connector = new NetworkPrintConnector($parkingGate->printer_ip_address, 9100);
-        //     } else if ($parkingGate->printer_type == "local") {
-        //         $connector = new FilePrintConnector($parkingGate->printer_device);
-        //     } else {
-        //         return response(['message' => 'INVALID PRINTER'], 500);
-        //     }
-
-        //     $printer = new Printer($connector);
-        // } catch (\Exception $e) {
-        //     return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
-        // }
+        $selectedPrinter = AppPrinter::find($request->printer_id);
 
         try {
-            $connector = new NetworkPrintConnector(env('PRINTER_ADDRESS'), 9100);
+            $connector = new NetworkPrintConnector($selectedPrinter->ip_address, $selectedPrinter->port ?: 9100);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
