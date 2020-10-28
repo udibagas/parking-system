@@ -36,7 +36,7 @@
 				</el-col>
 				<el-col :span="14">
 					<input
-						id="ticket-number"
+						id="nomor-tiket"
 						autocomplete="off"
 						@keyup.enter="cekTiket"
 						type="text"
@@ -60,35 +60,6 @@
 						placeholder="JENIS KENDARAAN"
 					>
 						<option v-for="g in jenisKendaraanList" :value="g.nama" :key="g.id">
-							{{ g.shortcut_key }} - {{ g.nama }}
-						</option>
-					</select>
-				</el-col>
-			</el-row>
-
-			<el-row
-				v-if="
-					gateOutList.filter((g) => g.pos_id == formModel.pos_id).length > 1
-				"
-				:gutter="10"
-				style="margin-bottom: 10px"
-			>
-				<el-col :span="10">
-					<div class="label-big">GATE KELUAR</div>
-				</el-col>
-				<el-col :span="14">
-					<select
-						v-model="formModel.gate_out_id"
-						id="gate-out"
-						class="my-input"
-					>
-						<option
-							v-for="g in gateOutList.filter(
-								(g) => g.pos_id == formModel.pos_id
-							)"
-							:value="g.id"
-							:key="g.id"
-						>
 							{{ g.shortcut_key }} - {{ g.nama }}
 						</option>
 					</select>
@@ -122,7 +93,7 @@
 				style="margin-bottom: 10px"
 			>
 				<el-col :span="10">
-					<div class="label-big">GATE IN</div>
+					<div class="label-big">GATE MASUK</div>
 				</el-col>
 				<el-col :span="14">
 					<select
@@ -168,6 +139,36 @@
 				</el-col>
 			</el-row>
 
+			<el-row
+				v-if="
+					gateOutList.filter((g) => g.pos_id == formModel.pos_id).length > 1
+				"
+				:gutter="10"
+				style="margin-bottom: 10px"
+			>
+				<el-col :span="10">
+					<div class="label-big">GATE KELUAR</div>
+				</el-col>
+				<el-col :span="14">
+					<select
+						v-model="formModel.gate_out_id"
+						id="gate-out"
+						class="my-input"
+						@change="toSubmit"
+					>
+						<option
+							v-for="g in gateOutList.filter(
+								(g) => g.pos_id == formModel.pos_id
+							)"
+							:value="g.id"
+							:key="g.id"
+						>
+							{{ g.shortcut_key }} - {{ g.nama }}
+						</option>
+					</select>
+				</el-col>
+			</el-row>
+
 			<button
 				id="submit-btn"
 				@keyup.right="nextBtn"
@@ -201,19 +202,9 @@
 				</el-col>
 				<el-col :span="12">
 					<button
-						@keydown.enter="
-							() => {
-								showManualOpenForm = true;
-								formModelManualOpen = {};
-							}
-						"
 						class="my-big-btn"
-						@click="
-							() => {
-								showManualOpenForm = true;
-								formModelManualOpen = {};
-							}
-						"
+						@keydown.enter="showManualOpenForm = true"
+						@click="showManualOpenForm = true"
 					>
 						[F11] BUKA GATE MANUAL
 					</button>
@@ -287,6 +278,7 @@ export default {
 		toSubmit() {
 			document.getElementById("submit-btn").focus();
 		},
+
 		toGateIn() {
 			if (!this.formModel.gate_in_id) {
 				document.getElementById("gate-in").focus();
@@ -294,12 +286,15 @@ export default {
 				document.getElementById("submit-btn").focus();
 			}
 		},
+
 		nextBtn() {
 			document.getElementById("submit-btn1").focus();
 		},
+
 		prevBtn() {
 			document.getElementById("submit-btn").focus();
 		},
+
 		hitungTarif() {
 			if (this.formModel.is_member) {
 				this.formModel.tarif = 0;
@@ -457,22 +452,28 @@ export default {
 			this.totalBayar = this.formModel.denda + this.formModel.tarif;
 			this.$forceUpdate();
 		},
+
 		cekPlatNomor() {
 			let params = { plat_nomor: this.formModel.plat_nomor };
 			axios
-				.get("/parkingMember/search", { params: params })
+				.get("/member/search", { params: params })
 				.then((r) => {
 					this.formModel.is_member = 1;
 					this.formModel.tarif = 0;
 				})
 				.catch((e) => {
 					this.formModel.is_member = 0;
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+					});
 				})
 				.finally(() => {
-					document.getElementById("ticket-number").focus();
+					document.getElementById("nomor-tiket").focus();
 					this.$forceUpdate();
 				});
 		},
+
 		cekTiket() {
 			let now = moment().format("YYYY-MM-DD HH:mm:ss");
 
@@ -592,30 +593,25 @@ export default {
 			}
 		},
 		resetForm() {
-			let default_vehicle = this.jenisKendaraanList.find(
-				(v) => v.is_default == 1
-			);
 			this.formModel.gate_in_id = null;
-			this.formModel.plat_nomor = this.setting.default_plat_nomor;
+			this.formModel.gate_out_id = null;
+			this.formModel.jenis_kendaraan = null;
+			this.formModel.plat_nomor = this.setting.plat_nomor_default;
 			this.formModel.nomor_barcode = "";
 			this.formModel.time_out = "";
 			this.formModel.time_in = "";
 			this.formModel.duration = "";
+			this.formModel.tarif = "";
+
 			this.snapshots = [];
 
-			if (default_vehicle) {
-				this.formModel.jenis_kendaraan = default_vehicle.name;
-				this.formModel.tarif = default_vehicle.tarif_flat;
-			} else {
-				this.formModel.jenis_kendaraan = "";
-				this.formModel.tarif = "";
-			}
-
 			if (this.setting.disable_plat_nomor) {
-				document.getElementById("ticket-number").focus();
+				document.getElementById("nomor-tiket").focus();
 			} else {
 				document.getElementById("plat-nomor").focus();
 			}
+
+			this.$forceUpdate();
 		},
 		submit(ticket) {
 			// kalau tiket hilang harus isi time in dulu
@@ -675,13 +671,17 @@ export default {
 			axios
 				.post("/parkingTransaction", this.formModel)
 				.then((r) => {
+					this.$message({
+						message: r.data.message,
+						type: "success",
+					});
 					this.openGate(this.formModel.gate_out_id);
+					this.resetForm();
 				})
 				.catch((e) => {
 					this.$message({
 						message: "DATA GAGAL DISIMPAN",
 						type: "error",
-						showClose: true,
 					});
 				});
 		},
@@ -695,8 +695,10 @@ export default {
 						message: r.data.message,
 						type: "success",
 					});
+					this.resetForm();
 				})
 				.catch((e) => {
+					// kemungkinan kecil
 					this.$message({
 						message: "DATA GAGAL DISIMPAN",
 						type: "error",
@@ -705,23 +707,6 @@ export default {
 				})
 				.finally(() => {
 					this.openGate(this.formModel.gate_out_id);
-				});
-		},
-
-		printTicketOut(id) {
-			axios
-				.post(`/parkingTransaction/printTicketOut/${id}`)
-				.then((r) => {
-					this.$message({
-						message: r.data.message,
-						type: "success",
-					});
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: "error",
-					});
 				});
 		},
 
@@ -804,15 +789,16 @@ export default {
 					});
 				});
 		},
+
 		getSetting(state) {
 			axios
 				.get("/setting")
 				.then((r) => {
 					this.setting = r.data;
-					this.formModel.plat_nomor = r.data.default_plat_nomor;
+					this.formModel.plat_nomor = r.data.plat_nomor_default;
 
 					if (this.setting.disable_plat_nomor) {
-						document.getElementById("ticket-number").focus();
+						document.getElementById("nomor-tiket").focus();
 					} else {
 						document.getElementById("plat-nomor").focus();
 					}
@@ -826,6 +812,7 @@ export default {
 					});
 				});
 		},
+
 		getPosList() {
 			axios.get("/pos").then((r) => {
 				if (r.data.length == 0) {
@@ -856,16 +843,6 @@ export default {
 		this.$store.commit("getGateOutList");
 		this.$store.commit("getJenisKendaraanList");
 
-		let default_vehicle = this.$store.state.jenisKendaraanList.find(
-			(v) => v.is_default == 1
-		);
-
-		if (default_vehicle) {
-			this.formModel.jenis_kendaraan = default_vehicle.name;
-			this.formModel.tarif = default_vehicle.tarif_flat;
-			this.$forceUpdate();
-		}
-
 		document.getElementById("gate-out-app").onkeydown = (e) => {
 			// console.log(e.key)
 			// ke field nomor plat
@@ -878,21 +855,11 @@ export default {
 			// ke field nomor tiket
 			if (e.key == "+") {
 				e.preventDefault();
-				let default_vehicle = this.jenisKendaraanList.find(
-					(v) => v.is_default == 1
-				);
 				this.formModel.nomor_barcode = "";
 				this.formModel.time_out = "";
-
-				if (default_vehicle) {
-					this.formModel.jenis_kendaraan = default_vehicle.name;
-					this.formModel.tarif = default_vehicle.tarif_flat;
-				} else {
-					this.formModel.jenis_kendaraan = "";
-					this.formModel.tarif = "";
-				}
-
-				document.getElementById("ticket-number").focus();
+				this.formModel.jenis_kendaraan = "";
+				this.formModel.tarif = "";
+				document.getElementById("nomor-tiket").focus();
 			}
 
 			// ke field jenis kendaraan
@@ -918,7 +885,6 @@ export default {
 			if (e.key == "F11") {
 				e.preventDefault();
 				this.showManualOpenForm = true;
-				this.formModelManualOpen = {};
 			}
 
 			if (e.key == "F12") {
@@ -930,18 +896,18 @@ export default {
 };
 </script>
 
-<style scoped>
+<style lang="css" scoped>
 .block {
 	background-color: #eee;
 	height: calc(50vh - 73px);
 }
 
 .my-input {
-	@apply border-2 border-blue-800 text-3xl py-0 px-3;
 	height: 43px;
 	line-height: 43px;
 	box-sizing: border-box;
 	width: 100%;
+	@apply border-2 border-blue-800 text-3xl py-0 px-3;
 }
 
 .my-input:focus,
@@ -961,9 +927,9 @@ export default {
 }
 
 .label-big {
-	@apply bg-blue-800 text-white text-xl pl-3;
 	height: 43px;
 	line-height: 43px;
+	@apply bg-blue-800 text-white text-xl pl-3;
 }
 
 .my-big-btn {
