@@ -47,7 +47,7 @@ class PrintTicketOut implements ShouldQueue
             return;
         }
 
-        $printer = $parkingTransaction->gateOut->printer;
+        $printer = $parkingTransaction->gateOut->pos->printer;
 
         if (!$printer) {
             return;

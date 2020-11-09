@@ -543,8 +543,6 @@ class ParkingTransactionController extends Controller
             ->orderBy('created_at', 'asc')
             ->first();
 
-        // TODO: benerin pilih printer
-
         try {
             $connector = new NetworkPrintConnector($pos->printer->ip_address, $pos->printer->port ?: 9100);
 

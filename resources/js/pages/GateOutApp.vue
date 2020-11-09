@@ -39,6 +39,7 @@
 						id="nomor-tiket"
 						autocomplete="off"
 						@keyup.enter="cekTiket"
+						@keydown.tab="cekTiket"
 						type="text"
 						placeholder="NO. TIKET/KARTU"
 						v-model="formModel.nomor_barcode"
@@ -576,12 +577,12 @@ export default {
 						}
 					})
 					.catch((e) => {
-						console.log(e);
 						this.$message({
 							message: e.response.data.message,
 							type: "error",
 							showClose: true,
 						});
+						document.getElementById("nomor-tiket").focus();
 					});
 			}
 		},
