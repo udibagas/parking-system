@@ -52,4 +52,14 @@ class User extends Authenticatable implements JWTSubject
     {
         $this->attributes['password'] = bcrypt($value);
     }
+
+    public function scopeAdmin($q)
+    {
+        return $q->where('role', 1);
+    }
+
+    public function scopeOperator($q)
+    {
+        return $q->where('role', 0);
+    }
 }

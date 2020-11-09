@@ -19,7 +19,7 @@ class GateOut extends Model
         'status'
     ];
 
-    protected $casts = ['kamera' => 'json'];
+    protected $casts = ['kamera' => 'json', 'jenis_kendaraan' => 'json'];
 
     protected $appends = ['kameraList'];
 

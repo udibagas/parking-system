@@ -139,7 +139,7 @@
 				</el-col>
 			</el-row>
 
-			<el-row
+			<!-- <el-row
 				v-if="
 					gateOutList.filter((g) => g.pos_id == formModel.pos_id).length > 1
 				"
@@ -167,7 +167,7 @@
 						</option>
 					</select>
 				</el-col>
-			</el-row>
+			</el-row> -->
 
 			<button
 				id="submit-btn"
@@ -225,7 +225,7 @@
 		<FormBukaManual
 			:show="showManualOpenForm"
 			@close="showManualOpenForm = false"
-			@open-gate="(gate_out_id) => openGate(gate_in_id)"
+			@open-gate="(gate_out_id) => openGate(gate_out_id)"
 		/>
 
 		<el-dialog
@@ -296,19 +296,28 @@ export default {
 		},
 
 		hitungTarif() {
+			const gateOut = this.gateOutList.find((g) => {
+				return (
+					g.pos_id == this.formModel.pos_id &&
+					g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
+				);
+			});
+
+			if (!gateOut) {
+				this.$message({
+					nessage: "Tidak ada gate keluar untuk jenis kendaraan terkait",
+					type: "error",
+				});
+				return;
+			}
+
+			this.formModel.gate_out_id = gateOut.id;
+			this.takeSnapshot();
+
 			if (this.formModel.is_member) {
 				this.formModel.tarif = 0;
 				this.$forceUpdate();
-
-				if (
-					this.gateOutList.filter((g) => g.pos_id == this.formModel.pos_id)
-						.length > 1
-				) {
-					document.getElementById("gate-out").focus();
-				} else {
-					document.getElementById("submit-btn").focus();
-				}
-
+				document.getElementById("submit-btn").focus();
 				return;
 			}
 
@@ -330,26 +339,10 @@ export default {
 			}
 
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
-				if (
-					this.gateOutList.filter((g) => g.pos_id == this.formModel.pos_id)
-						.length > 1
-				) {
-					document.getElementById("gate-out").focus();
-				} else {
-					document.getElementById("submit-btn").focus();
-				}
-
 				document.getElementById("time-in").focus();
 				this.formModel.denda = tarif.denda_tiket_hilang;
 			} else {
-				if (
-					this.gateOutList.filter((g) => g.pos_id == this.formModel.pos_id)
-						.length > 1
-				) {
-					document.getElementById("gate-out").focus();
-				} else {
-					document.getElementById("submit-btn").focus();
-				}
+				document.getElementById("submit-btn").focus();
 			}
 
 			if (tarif.mode_tarif == 0) {
@@ -592,6 +585,7 @@ export default {
 					});
 			}
 		},
+
 		resetForm() {
 			this.formModel.gate_in_id = null;
 			this.formModel.gate_out_id = null;
@@ -613,6 +607,7 @@ export default {
 
 			this.$forceUpdate();
 		},
+
 		submit(ticket) {
 			// kalau tiket hilang harus isi time in dulu
 			if (
@@ -835,7 +830,24 @@ export default {
 				}
 			});
 		},
+
+		takeSnapshot() {
+			axios
+				.post(`/parkingTransaction/takeSnapshot/${this.formModel.id}`, {
+					gate_out_id: this.formModel.gate_out_id,
+				})
+				.then((r) => {
+					this.snapshots = r.data;
+				})
+				.catch((e) => {
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+					});
+				});
+		},
 	},
+
 	mounted() {
 		this.getSetting();
 		this.getPosList();

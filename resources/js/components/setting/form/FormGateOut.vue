@@ -24,7 +24,6 @@
 				:class="formErrors.shortcut_key ? 'is-error' : ''"
 			>
 				<el-input
-					maxlength="1"
 					placeholder="Shortcut Key"
 					v-model="formModel.shortcut_key"
 				></el-input>
@@ -37,10 +36,19 @@
 				label="Jenis Kendaraan"
 				:class="formErrors.jenis_kendaraan ? 'is-error' : ''"
 			>
-				<el-input
-					placeholder="Jenis Kendaraan"
+				<el-select
 					v-model="formModel.jenis_kendaraan"
-				></el-input>
+					placeholder="Jenis Kendaraan"
+					style="width: 100%"
+					multiple
+				>
+					<el-option
+						v-for="k in jenisKendaraanList"
+						:value="k.nama"
+						:label="k.nama"
+						:key="k.id"
+					></el-option>
+				</el-select>
 				<div class="el-form-item__error" v-if="formErrors.jenis_kendaraan">
 					{{ formErrors.jenis_kendaraan[0] }}
 				</div>
@@ -175,7 +183,7 @@ export default {
 		formModel() {
 			return this.model;
 		},
-		...mapState(["kameraList", "posList"]),
+		...mapState(["kameraList", "posList", "jenisKendaraanList"]),
 	},
 	data() {
 		return {

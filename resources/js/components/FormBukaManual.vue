@@ -8,7 +8,7 @@
 		<el-form label-position="left" label-width="200px">
 			<el-form-item
 				label="Alasan buka manual"
-				:class="formErrors.alasan ? 'is-error' : ''"
+				:class="{ 'is-error': formErrors.alasan }"
 			>
 				<el-input
 					autofocus
@@ -22,7 +22,10 @@
 				</div>
 			</el-form-item>
 
-			<el-form-item label="Gate Keluar">
+			<el-form-item
+				label="Gate Keluar"
+				:class="{ 'is-error': formErrors.gate_out_id }"
+			>
 				<el-select
 					v-model="formModel.gate_out_id"
 					style="width: 100%"
@@ -35,20 +38,32 @@
 						:value="gate.id"
 					></el-option>
 				</el-select>
+				<div class="el-form-item__error" v-if="formErrors.gate_out_id">
+					{{ formErrors.gate_out_id[0] }}
+				</div>
 			</el-form-item>
 
-			<!-- <el-form-item label="Masukkan password Anda" :class="formErrors.password ? 'is-error' : ''">
-                    <el-input type="password" v-model="formModel.password" placeholder="Password"></el-input>
-                    <div class="el-form-item__error" v-if="formErrors.password">{{formErrors.password[0]}}</div>
-                </el-form-item> -->
+			<el-form-item
+				label="Masukkan password Admin"
+				:class="formErrors.password ? 'is-error' : ''"
+			>
+				<el-input
+					type="password"
+					v-model="formModel.password"
+					placeholder="Password"
+				></el-input>
+				<div class="el-form-item__error" v-if="formErrors.password">
+					{{ formErrors.password[0] }}
+				</div>
+			</el-form-item>
 		</el-form>
 		<div slot="footer">
-			<el-button icon="el-icon-success" type="primary" @click="save"
-				>SIMPAN</el-button
-			>
-			<el-button icon="el-icon-error" type="info" @click="closeForm"
-				>BATAL</el-button
-			>
+			<el-button icon="el-icon-success" type="primary" @click="save">
+				SIMPAN
+			</el-button>
+			<el-button icon="el-icon-error" type="info" @click="closeForm">
+				BATAL
+			</el-button>
 		</div>
 	</el-dialog>
 </template>
@@ -86,7 +101,7 @@ export default {
 								message: r.data.message,
 								type: "success",
 							});
-							$emit("open-gate", this.formModel.gate_out_id);
+							this.$emit("open-gate", this.formModel.gate_out_id);
 							this.closeForm();
 						})
 						.catch((e) => {

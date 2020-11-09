@@ -32,7 +32,7 @@
 			stripe
 			@row-dblclick="
 				(row, column, event) => {
-					snapshot = row.snapshot;
+					snapshots = row.snapshots;
 					showSnapshot = true;
 				}
 			"
@@ -135,7 +135,13 @@
 			:visible.sync="showSnapshot"
 			title="SNAPSHOT"
 		>
-			<el-image :src="snapshot" style="width: 100%; height: 100%" fit="cover">
+			<el-image
+				v-for="(snapshot, i) in snapshots"
+				:key="i"
+				:src="snapshot"
+				style="width: 100%; height: 100%"
+				fit="cover"
+			>
 				<div slot="error" class="el-image__error">
 					<i class="el-icon-picture-outline"></i>
 				</div>
@@ -162,7 +168,7 @@ export default {
 			order: "descending",
 			loading: false,
 			showSnapshot: false,
-			snapshot: "",
+			snapshots: [],
 		};
 	},
 	methods: {

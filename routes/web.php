@@ -38,6 +38,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('parkingTransaction/printReport', 'ParkingTransactionController@printReport');
     Route::post('parkingTransaction/printTicketOut/{parkingTransaction}', 'ParkingTransactionController@printTicketOut');
+    Route::post('parkingTransaction/takeSnapsot/{parkingTransaction}', 'ParkingTransactionController@takeSnapsot');
     Route::post('parkingTransaction/printLastTransaction', 'ParkingTransactionController@printLastTransaction');
     Route::put('parkingTransaction/setSudahKeluarSemua', 'ParkingTransactionController@setSudahKeluarSemua');
     Route::put('parkingTransaction/setSudahKeluar/{parkingTransaction}', 'ParkingTransactionController@setSudahKeluar');

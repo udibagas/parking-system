@@ -43,7 +43,15 @@
 				min-width="150"
 				label="Jenis Kendaraan"
 				prop="jenis_kendaraan"
-			></el-table-column>
+			>
+				<template slot-scope="scope">
+					{{
+						scope.row.jenis_kendaraan
+							? scope.row.jenis_kendaraan.join(", ")
+							: ""
+					}}
+				</template>
+			</el-table-column>
 			<el-table-column
 				min-width="100"
 				label="Device"
@@ -126,6 +134,7 @@ export default {
 	components: { FormGateOut },
 	mounted() {
 		this.requestData();
+		this.$store.commit("getJenisKendaraanList");
 	},
 	data() {
 		return {

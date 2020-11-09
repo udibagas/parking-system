@@ -142,7 +142,7 @@ class ParkingTransactionController extends Controller
 
         $parkingTransaction = ParkingTransaction::create($input);
 
-        TakeSnapshot::dispatchNow($parkingTransaction->gateOut, $parkingTransaction);
+        // TakeSnapshot::dispatchNow($parkingTransaction->gateOut, $parkingTransaction);
 
         if (!$parkingTransaction->is_member && $request->ticket) {
             PrintTicketOut::dispatchNow($parkingTransaction);
@@ -349,6 +349,17 @@ class ParkingTransactionController extends Controller
             'data' => $parkingTransaction->load(['snapshots'])
         ];
     }
+
+    public function takeSnapsot(Request $request, ParkingTransaction $parkingTransaction)
+    {
+        $request->validate([
+            'gate_out_id' => 'required|exists:gate_outs,id'
+        ]);
+
+        TakeSnapshot::dispatchNow(GateOut::find($request->gate_out_id), $parkingTransaction);
+        return $parkingTransaction->snapshots;
+    }
+
 
     public function printLastTransaction(Request $request)
     {
@@ -609,5 +620,9 @@ class ParkingTransactionController extends Controller
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
         }
+    }
+
+    public function takeSnapshot(ParkingTransaction $parkingTransaction)
+    {
     }
 }

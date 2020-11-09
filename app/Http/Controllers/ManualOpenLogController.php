@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\GateOut;
 use App\Jobs\TakeSnapshotManualOpen;
 use App\ManualOpenLog;
+use App\User;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 
@@ -42,12 +43,18 @@ class ManualOpenLogController extends Controller
     {
         $request->validate([
             'alasan' => 'required',
-            'gate_out_id' => 'required'
-            // 'password' => ['required', function($attribute, $value, $fail) {
-            //     if (!password_verify($value, auth()->user()->password)) {
-            //         $fail('Password yang Anda masukkan salah.');
-            //     }
-            // }]
+            'gate_out_id' => 'required',
+            'password' => ['required', function ($attribute, $value, $fail) {
+                $admin = User::admin()->first();
+
+                if (!$admin) {
+                    $fail('Tidak ada user admin');
+                }
+
+                if (!password_verify($value, $admin->password)) {
+                    $fail('Password yang Anda masukkan salah.');
+                }
+            }]
         ], [], [
             'alasan' => 'Alasan harus diisi',
             'gate_out_id' => 'Gate keluar harus diisi'
