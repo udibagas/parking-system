@@ -350,7 +350,7 @@ class ParkingTransactionController extends Controller
         ];
     }
 
-    public function takeSnapsot(Request $request, ParkingTransaction $parkingTransaction)
+    public function takeSnapshot(Request $request, ParkingTransaction $parkingTransaction)
     {
         $request->validate([
             'gate_out_id' => 'required|exists:gate_outs,id'
@@ -620,9 +620,5 @@ class ParkingTransactionController extends Controller
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
         }
-    }
-
-    public function takeSnapshot(ParkingTransaction $parkingTransaction)
-    {
     }
 }
