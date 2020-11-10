@@ -94,7 +94,7 @@
 								icon="el-icon-camera"
 								@click.native.prevent="
 									() => {
-										snapshot = scope.row.snapshot;
+										snapshots = scope.row.snapshots;
 										showSnapshot = true;
 									}
 								"
@@ -138,7 +138,7 @@
 			<el-image
 				v-for="(snapshot, i) in snapshots"
 				:key="i"
-				:src="snapshot"
+				:src="snapshot.path"
 				style="width: 100%; height: 100%"
 				fit="cover"
 			>

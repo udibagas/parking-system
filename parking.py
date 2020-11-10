@@ -163,6 +163,8 @@ def gate_in_thread(gate):
                             except Exception as e:
                                 logging.error(gate['nama'] + ' : Failed to respon card expired in 5 days ' + str(e))
                                 send_notification(gate, gate['nama'] + ' : Gagal merespon kartu expired dalam 5 hari')
+                                error = True
+                                break
 
                         if not member['expired'] and member['expired_in'] == 1:
                             try:
@@ -171,6 +173,8 @@ def gate_in_thread(gate):
                             except Exception as e:
                                 logging.error(gate['nama'] + ' : Failed to respon card expired in 1 day ' + str(e))
                                 send_notification(gate, gate['nama'] + ' : Gagal merespon kartu expired dalam 1 hari')
+                                error = True
+                                break
 
                         data = {'is_member': 1, 'nomor_kartu': member['nomor_kartu'], 'member_id': member['id']}
                         logging.info(gate['nama'] + ' : Kartu terdeteksi :' + member['nomor_kartu'])
