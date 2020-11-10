@@ -48,6 +48,15 @@
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
+
+			<el-table-column
+				prop="gate_out.nama"
+				label="Gate Out"
+				show-overflow-tooltip
+				min-width="150px"
+			>
+			</el-table-column>
+
 			<el-table-column
 				prop="user.name"
 				label="Operator"
@@ -55,6 +64,7 @@
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
+
 			<el-table-column
 				prop="alasan"
 				label="Alasan"
@@ -72,7 +82,6 @@
 				<template slot="header">
 					<el-button
 						type="text"
-						class="text-white"
 						@click="
 							() => {
 								page = 1;
