@@ -255,6 +255,7 @@ export default {
 	computed: {
 		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"]),
 	},
+
 	watch: {
 		"formModel.pos_id"(v) {
 			if (!v) {
@@ -263,7 +264,14 @@ export default {
 				document.getElementById("plat-nomor").focus();
 			}
 		},
+
+		"formModel.nomor_barcode"(v) {
+			if (v.length == 5) {
+				this.cekTiket();
+			}
+		},
 	},
+
 	data() {
 		return {
 			formModel: { nomor_barcode: "" },
@@ -334,6 +342,7 @@ export default {
 					type: "error",
 					showClose: true,
 				});
+
 				this.formModel.tarif = 0;
 				this.$forceUpdate();
 				return;
@@ -486,14 +495,12 @@ export default {
 						this.formModel.gate_in_id = data.gate_in_id;
 						this.formModel.time_in = data.time_in;
 						this.formModel.is_member = data.is_member;
-						this.formModel.jenis_kendaraan = data.jenis_kendaraan;
 						this.formModel.time_out = now;
 						this.formModel.tarif = 0;
-						this.hitungTarif();
 
 						if (!data.is_member) {
 							document.getElementById("jenis-kendaraan").focus();
-							return;
+							return false;
 						}
 
 						if (!!data.member.expired) {
@@ -505,7 +512,7 @@ export default {
 								confirmButtonClass: "bg-red",
 							});
 							this.formModel.is_member = 0;
-							return;
+							return false;
 						}
 
 						if (!data.member.expired && data.member.expired_in <= 5) {
