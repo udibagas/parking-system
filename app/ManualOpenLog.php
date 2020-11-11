@@ -25,13 +25,13 @@ class ManualOpenLog extends Model
 
     public function getSnapshotsAttribute($snapshots)
     {
-        if (is_array($snapshots)) {
+        if (is_array(json_decode($snapshots))) {
             return array_map(function ($snapshot) {
                 $snapshot['url'] = Storage::url($snapshot['path']);
                 return $snapshot;
             }, $snapshots);
         }
 
-        return null;
+        return $snapshots;
     }
 }
