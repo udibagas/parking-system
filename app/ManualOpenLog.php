@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 
 class ManualOpenLog extends Model
 {
@@ -20,5 +21,17 @@ class ManualOpenLog extends Model
     public function gateOut()
     {
         return $this->belongsTo(GateOut::class);
+    }
+
+    public function getSnapshotsAttribute($snapshots)
+    {
+        if (is_array($snapshots)) {
+            return array_map(function ($snapshot) {
+                $snapshot['url'] = Storage::url($snapshot['path']);
+                return $snapshot;
+            }, $snapshots);
+        }
+
+        return null;
     }
 }
