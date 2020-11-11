@@ -147,7 +147,7 @@
 			<el-image
 				v-for="(snapshot, i) in snapshots"
 				:key="i"
-				:src="snapshot.path"
+				:src="snapshot.url"
 				style="width: 100%; height: 100%"
 				fit="cover"
 			>
