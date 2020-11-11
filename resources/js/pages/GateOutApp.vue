@@ -257,14 +257,6 @@ export default {
 	},
 
 	watch: {
-		"formModel.pos_id"(v) {
-			if (!v) {
-				document.getElementById("pos-id").focus();
-			} else {
-				document.getElementById("plat-nomor").focus();
-			}
-		},
-
 		"formModel.nomor_barcode"(v) {
 			if (v.length == 5) {
 				this.cekTiket();
@@ -358,7 +350,6 @@ export default {
 			if (tarif.mode_tarif == 0) {
 				this.formModel.tarif = tarif.tarif_flat;
 				this.totalBayar = this.formModel.denda + this.formModel.tarif;
-				this.$forceUpdate();
 				return;
 			}
 
@@ -453,7 +444,6 @@ export default {
 			}
 
 			this.totalBayar = this.formModel.denda + this.formModel.tarif;
-			this.$forceUpdate();
 		},
 
 		cekPlatNomor() {
