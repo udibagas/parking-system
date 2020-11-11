@@ -466,10 +466,6 @@ export default {
 				})
 				.catch((e) => {
 					this.formModel.is_member = 0;
-					this.$message({
-						message: e.response.data.message,
-						type: "error",
-					});
 				})
 				.finally(() => {
 					document.getElementById("nomor-tiket").focus();
@@ -662,17 +658,19 @@ export default {
 				this.formModel.time_in += ":00";
 			}
 
-			if (!!this.formModel.id) {
-				this.update(ticket);
-			} else {
-				this.store(ticket);
-			}
+			this.save(ticket);
 		},
 
-		store(ticket) {
+		save(ticket) {
 			this.formModel.ticket = ticket;
-			axios
-				.post("/parkingTransaction", this.formModel)
+
+			axios({
+				method: this.formModel.id ? "put" : "post",
+				url: this.formModel.id
+					? `/parkingTransaction/${this.formModel.id}`
+					: "/parkingTransaction",
+				data: this.formModel,
+			})
 				.then((r) => {
 					this.$message({
 						message: r.data.message,
@@ -686,30 +684,6 @@ export default {
 						message: "DATA GAGAL DISIMPAN",
 						type: "error",
 					});
-				});
-		},
-
-		update(ticket) {
-			this.formModel.ticket = ticket;
-			axios
-				.put(`/parkingTransaction/${this.formModel.id}`, this.formModel)
-				.then((r) => {
-					this.$message({
-						message: r.data.message,
-						type: "success",
-					});
-					this.resetForm();
-				})
-				.catch((e) => {
-					// kemungkinan kecil
-					this.$message({
-						message: "DATA GAGAL DISIMPAN",
-						type: "error",
-						showClose: true,
-					});
-				})
-				.finally(() => {
-					this.openGate(this.formModel.gate_out_id);
 				});
 		},
 
