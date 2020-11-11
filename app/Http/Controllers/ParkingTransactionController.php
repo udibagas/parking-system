@@ -142,8 +142,6 @@ class ParkingTransactionController extends Controller
 
         $parkingTransaction = ParkingTransaction::create($input);
 
-        // TakeSnapshot::dispatchNow($parkingTransaction->gateOut, $parkingTransaction);
-
         if (!$parkingTransaction->is_member && $request->ticket) {
             PrintTicketOut::dispatchNow($parkingTransaction);
             return [
@@ -333,8 +331,6 @@ class ParkingTransactionController extends Controller
         unset($input['nomor_barcode']);
 
         $parkingTransaction->update($input);
-
-        TakeSnapshot::dispatchNow($parkingTransaction->gateOut, $parkingTransaction);
 
         if (!$parkingTransaction->is_member && $request->ticket) {
             PrintTicketOut::dispatchNow($parkingTransaction);
