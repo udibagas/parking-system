@@ -52,31 +52,29 @@ export default {
 				this.show = true;
 			});
 		},
+
 		showPreview(node) {
 			if (node.leaf == true) {
-				this.preview = node.path;
+				this.preview = node.url;
 			}
 		},
+
 		loadData(node, resolve) {
 			let params = { level: node.level };
-			let path = "";
 
 			if (node.level == 1) {
 				params.year = node.data.id;
-				path = params.year;
 			}
 
 			if (node.level == 2) {
 				params.year = node.parent.data.id;
 				params.month = node.data.id;
-				path = params.year + "/" + params.month;
 			}
 
 			if (node.level == 3) {
 				params.year = node.parent.parent.data.id;
 				params.month = node.parent.data.id;
 				params.day = node.data.id;
-				path = params.year + "/" + params.month + "/" + params.day;
 			}
 
 			if (node.level == 4) {
@@ -84,25 +82,35 @@ export default {
 				params.month = node.parent.parent.data.id;
 				params.day = node.parent.data.id;
 				params.hour = node.data.id;
-				path = `${params.year}/${params.month}/${params.day}/${params.hour}`;
 			}
 
 			axios.get("snapshot", { params: params }).then((r) => {
 				resolve(
 					r.data.map((d) => {
+						const leaf =
+							d.toString().includes(".jpg") ||
+							d.toString().includes(".png") ||
+							d.toString().includes(".jpeg");
+
+						let label = d;
+
+						if (node.level == 1) {
+							label = this.months[parseInt(d) - 1];
+						} else if (node.level == 4) {
+							label = d.filename;
+						}
+
 						return {
-							id: d,
-							label: node.level == 1 ? this.months[parseInt(d) - 1] : d,
-							leaf:
-								d.toString().includes(".jpg") ||
-								d.toString().includes(".png") ||
-								d.toString().includes(".jpeg"),
-							path: d,
+							id: node.level == 4 ? d.path : d,
+							label: label,
+							leaf: leaf,
+							url: node.level == 4 ? d.url : d,
 						};
 					})
 				);
 			});
 		},
+
 		// TODO: benerin ini
 		deleteSnapshot(node) {
 			let params = null;

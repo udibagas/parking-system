@@ -55,14 +55,16 @@ class SnapshotController extends Controller
         // file
         if ($request->level == 4) {
             return DB::table('snapshots')
-                ->select('path')
                 ->whereRaw(
                     "YEAR(created_at) = ? AND MONTH(created_at) = ? AND DAY(created_at) = ? AND HOUR(created_at) = ?",
                     [$request->year, $request->month, $request->day, $request->hour]
                 )
                 ->get()->map(function ($i) {
-                    return Storage::url($i->path);
-                })->flatten();
+                    return [
+                        'path' => $i->path,
+                        'url' => Storage::url($i->path)
+                    ];
+                });
         }
 
         return [];
