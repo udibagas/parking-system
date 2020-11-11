@@ -60,7 +60,6 @@
 			<el-table-column
 				prop="user.name"
 				label="Operator"
-				sortable="custom"
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
