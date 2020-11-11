@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Snapshot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -72,22 +73,23 @@ class SnapshotController extends Controller
 
     public function delete(Request $request)
     {
-        $this->deleteFiles('storage/snapshots/' . $request->target);
-        return ['message' => 'Snapshot berhasil dihapus'];
-    }
+        $data = Snapshot::when($request->year, function ($q) use ($request) {
+            $q->whereYear('created_at', $request->year);
+        })->when($request->month, function ($q) use ($request) {
+            $q->whereMonth('created_at', $request->month);
+        })->when($request->day, function ($q) use ($request) {
+            $q->whereRaw('DAY(created_at) = ?', [$request->day]);
+        })->when($request->hour, function ($q) use ($request) {
+            $q->whereRaw('HOUR(created_at) = ?', [$request->hour]);
+        })->when($request->filename, function ($q) use ($request) {
+            $q->where('filename', $request->filename);
+        })->get();
 
-    protected function deleteFiles($target)
-    {
-        if (is_dir($target)) {
-            $files = glob($target . '*', GLOB_MARK);
-
-            foreach ($files as $file) {
-                $this->deleteFiles($file);
-            }
-
-            rmdir($target);
-        } elseif (is_file($target)) {
-            unlink($target);
+        foreach ($data as $d) {
+            Storage::delete([$d->path]);
+            $d->delete();
         }
+
+        return ['message' => 'Snapshot berhasil dihapus'];
     }
 }

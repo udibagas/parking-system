@@ -100,78 +100,24 @@ export default {
 							label: label,
 							leaf: node.level == 4,
 							url: node.level == 4 ? d.url : d,
+							params,
 						};
 					})
 				);
 			});
 		},
 
-		// TODO: benerin ini
-		deleteSnapshot(node) {
-			let params = null;
+		deleteSnapshot(node, data) {
+			let params = data.params;
 
-			// tahun
-			if (node.level == 1) {
-				params = { level: 1, target: node.data.id };
-			}
-
-			// bulan
-			if (node.level == 2) {
-				params = {
-					level: 2,
-					target: node.parent.data.id + "/" + node.data.id,
-				};
-			}
-
-			// tanggal
-			if (node.level == 3) {
-				params = {
-					level: 3,
-					target:
-						node.parent.parent.data.id +
-						"/" +
-						node.parent.data.id +
-						"/" +
-						node.data.id,
-				};
-			}
-
-			// jam
-			if (node.level == 4) {
-				params = {
-					level: 4,
-					target:
-						node.parent.parent.parent.data.id +
-						"/" +
-						node.parent.parent.data.id +
-						"/" +
-						node.parent.data.id +
-						"/" +
-						node.data.id,
-				};
-			}
-
-			// file
 			if (node.level == 5) {
-				params = {
-					level: 5,
-					target:
-						node.parent.parent.parent.parent.data.id +
-						"/" +
-						node.parent.parent.parent.data.id +
-						"/" +
-						node.parent.parent.data.id +
-						"/" +
-						node.parent.data.id +
-						"/" +
-						node.data.id,
-				};
+				params.filename = data.id;
 			}
 
 			this.$confirm("Anda yakin?", "Peringatan", { type: "warning" })
 				.then(() => {
 					axios
-						.delete("snapshots", { params: params })
+						.delete("snapshot", { params })
 						.then((r) => {
 							this.$message({
 								message: r.data.message,
