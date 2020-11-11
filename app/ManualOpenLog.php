@@ -29,7 +29,7 @@ class ManualOpenLog extends Model
 
         if (is_array($snapshots)) {
             return array_map(function ($snapshot) {
-                $snapshot['url'] = Storage::url($snapshot['path']);
+                $snapshot->url = Storage::url($snapshot->path);
                 return $snapshot;
             }, $snapshots);
         }
