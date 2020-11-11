@@ -256,14 +256,6 @@ export default {
 		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"]),
 	},
 
-	watch: {
-		"formModel.nomor_barcode"(v) {
-			if (v.length == 5) {
-				this.cekTiket();
-			}
-		},
-	},
-
 	data() {
 		return {
 			formModel: { nomor_barcode: "" },
