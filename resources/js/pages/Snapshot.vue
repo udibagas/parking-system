@@ -87,11 +87,6 @@ export default {
 			axios.get("snapshot", { params: params }).then((r) => {
 				resolve(
 					r.data.map((d) => {
-						const leaf =
-							d.toString().includes(".jpg") ||
-							d.toString().includes(".png") ||
-							d.toString().includes(".jpeg");
-
 						let label = d;
 
 						if (node.level == 1) {
@@ -101,9 +96,9 @@ export default {
 						}
 
 						return {
-							id: node.level == 4 ? d.path : d,
+							id: node.level == 4 ? d.filename : d,
 							label: label,
-							leaf: leaf,
+							leaf: node.level == 4,
 							url: node.level == 4 ? d.url : d,
 						};
 					})

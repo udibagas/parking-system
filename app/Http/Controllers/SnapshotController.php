@@ -61,7 +61,7 @@ class SnapshotController extends Controller
                 )
                 ->get()->map(function ($i) {
                     return [
-                        'path' => $i->path,
+                        'filename' => $i->filename,
                         'url' => Storage::url($i->path)
                     ];
                 });
