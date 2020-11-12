@@ -444,7 +444,7 @@ class ParkingTransactionController extends Controller
 
         // ambil data transaksi per tanggal, per operator, per gate
         // reguler
-        $sqlReguler = "SELECT jenis_kendaraan, COUNT(id) AS jumlah,
+        $sqlReguler = "SELECT parking_transactions.jenis_kendaraan, COUNT(id) AS jumlah,
                 SUM(tarif) AS pendapatan
             FROM parking_transactions
             JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
@@ -453,12 +453,12 @@ class ParkingTransactionController extends Controller
                 AND operator = :operator
                 AND DATE(time_out) = :date
                 AND gate_outs.pos_id = :pos_id
-            GROUP BY jenis_kendaraan
+            GROUP BY parking_transactions.jenis_kendaraan
         ";
 
         // ambil data transaksi per tanggal, per operator, per gate
         // denda
-        $sqlDenda = "SELECT jenis_kendaraan, COUNT(id) AS jumlah,
+        $sqlDenda = "SELECT parking_transactions.jenis_kendaraan, COUNT(id) AS jumlah,
                 SUM(denda) AS pendapatan
             FROM parking_transactions
             JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
@@ -468,12 +468,12 @@ class ParkingTransactionController extends Controller
                 AND DATE(time_out) = :date
                 AND gate_outs.pos_id = :pos_id
                 AND denda > 0
-            GROUP BY jenis_kendaraan
+            GROUP BY parking_transactions.jenis_kendaraan
         ";
 
         // ambil data transaksi per tanggal, per operator, per gate
         // member
-        $sqlMember = "SELECT jenis_kendaraan, COUNT(id) AS jumlah
+        $sqlMember = "SELECT parking_transactions.jenis_kendaraan, COUNT(id) AS jumlah
             FROM parking_transactions
             JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
             WHERE time_out IS NOT NULL
@@ -481,7 +481,7 @@ class ParkingTransactionController extends Controller
                 AND operator = :operator
                 AND DATE(time_out) = :date
                 AND gate_outs.pos_id = :pos_id
-            GROUP BY jenis_kendaraan
+            GROUP BY parking_transactions.jenis_kendaraan
         ";
 
         // ambil data transaksi per tanggal, per operator, per gate
