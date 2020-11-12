@@ -490,7 +490,7 @@ class ParkingTransactionController extends Controller
             FROM manual_open_logs
             JOIN gate_outs ON gate_outs.id = manual_open_logs.gate_out_id
             WHERE user_id = :user_id
-                AND DATE(updated_at) = :date
+                AND DATE(manual_open_logs.updated_at) = :date
                 AND gate_outs.pos_id = :pos_id
         ";
 
