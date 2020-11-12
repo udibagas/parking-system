@@ -444,7 +444,7 @@ class ParkingTransactionController extends Controller
 
         // ambil data transaksi per tanggal, per operator, per gate
         // reguler
-        $sqlReguler = "SELECT parking_transactions.jenis_kendaraan, COUNT(id) AS jumlah,
+        $sqlReguler = "SELECT parking_transactions.jenis_kendaraan, COUNT(parking_transactions.id) AS jumlah,
                 SUM(tarif) AS pendapatan
             FROM parking_transactions
             JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
@@ -458,7 +458,7 @@ class ParkingTransactionController extends Controller
 
         // ambil data transaksi per tanggal, per operator, per gate
         // denda
-        $sqlDenda = "SELECT parking_transactions.jenis_kendaraan, COUNT(id) AS jumlah,
+        $sqlDenda = "SELECT parking_transactions.jenis_kendaraan, COUNT(parking_transactions.id) AS jumlah,
                 SUM(denda) AS pendapatan
             FROM parking_transactions
             JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
@@ -473,7 +473,7 @@ class ParkingTransactionController extends Controller
 
         // ambil data transaksi per tanggal, per operator, per gate
         // member
-        $sqlMember = "SELECT parking_transactions.jenis_kendaraan, COUNT(id) AS jumlah
+        $sqlMember = "SELECT parking_transactions.jenis_kendaraan, COUNT(parking_transactions.id) AS jumlah
             FROM parking_transactions
             JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
             WHERE time_out IS NOT NULL
@@ -486,7 +486,7 @@ class ParkingTransactionController extends Controller
 
         // ambil data transaksi per tanggal, per operator, per gate
         // member
-        $sqlBukaManual = "SELECT COUNT(id) AS jumlah
+        $sqlBukaManual = "SELECT COUNT(manual_open_logs.id) AS jumlah
             FROM manual_open_logs
             JOIN gate_outs ON gate_outs.id = manual_open_logs.gate_out_id
             WHERE user_id = :user_id
