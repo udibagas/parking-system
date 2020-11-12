@@ -141,6 +141,7 @@ class ParkingTransactionController extends Controller
         }
 
         $parkingTransaction = ParkingTransaction::create($input);
+        TakeSnapshot::dispatch($parkingTransaction->gateOut, $parkingTransaction);
 
         if (!$parkingTransaction->is_member && $request->ticket) {
             PrintTicketOut::dispatchNow($parkingTransaction);

@@ -104,7 +104,7 @@
 						class="my-input"
 					>
 						<option v-for="g in gateInList" :value="g.id" :key="g.id">
-							{{ g.shortcut_key }} - {{ g.name }}
+							{{ g.shortcut_key }} - {{ g.nama }}
 						</option>
 					</select>
 				</el-col>
@@ -139,36 +139,6 @@
 					/>
 				</el-col>
 			</el-row>
-
-			<!-- <el-row
-				v-if="
-					gateOutList.filter((g) => g.pos_id == formModel.pos_id).length > 1
-				"
-				:gutter="10"
-				style="margin-bottom: 10px"
-			>
-				<el-col :span="10">
-					<div class="label-big">GATE KELUAR</div>
-				</el-col>
-				<el-col :span="14">
-					<select
-						v-model="formModel.gate_out_id"
-						id="gate-out"
-						class="my-input"
-						@change="toSubmit"
-					>
-						<option
-							v-for="g in gateOutList.filter(
-								(g) => g.pos_id == formModel.pos_id
-							)"
-							:value="g.id"
-							:key="g.id"
-						>
-							{{ g.shortcut_key }} - {{ g.nama }}
-						</option>
-					</select>
-				</el-col>
-			</el-row> -->
 
 			<button
 				id="submit-btn"
@@ -304,7 +274,10 @@ export default {
 			}
 
 			this.formModel.gate_out_id = gateOut.id;
-			this.takeSnapshot();
+
+			if (this.formModel.id) {
+				this.takeSnapshot();
+			}
 
 			if (this.formModel.is_member) {
 				this.formModel.tarif = 0;
@@ -605,6 +578,10 @@ export default {
 				document.getElementById("submit-btn").blur();
 			}
 
+			if (this.gateInList.length == 1) {
+				this.formModel.gate_in_id = this.gateInList[0].id;
+			}
+
 			if (!this.formModel.gate_in_id) {
 				this.$message({
 					message: "MOHON ISI GATE IN",
@@ -613,8 +590,6 @@ export default {
 				});
 				return;
 			}
-
-			console.log(this.formModel);
 
 			if (
 				!this.formModel.nomor_barcode ||
