@@ -447,11 +447,12 @@ class ParkingTransactionController extends Controller
         $sqlReguler = "SELECT jenis_kendaraan, COUNT(id) AS jumlah,
                 SUM(tarif) AS pendapatan
             FROM parking_transactions
+            JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
             WHERE time_out IS NOT NULL
                 AND is_member = 0
                 AND operator = :operator
                 AND DATE(time_out) = :date
-                AND gate_out_id IN (:gate_out_id)
+                AND gate_outs.pos_id = :pos_id
             GROUP BY jenis_kendaraan
         ";
 
@@ -460,11 +461,12 @@ class ParkingTransactionController extends Controller
         $sqlDenda = "SELECT jenis_kendaraan, COUNT(id) AS jumlah,
                 SUM(denda) AS pendapatan
             FROM parking_transactions
+            JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
             WHERE time_out IS NOT NULL
                 AND is_member = 0
                 AND operator = :operator
                 AND DATE(time_out) = :date
-                AND gate_out_id IN (:gate_out_id)
+                AND gate_outs.pos_id = :pos_id
                 AND denda > 0
             GROUP BY jenis_kendaraan
         ";
@@ -473,11 +475,12 @@ class ParkingTransactionController extends Controller
         // member
         $sqlMember = "SELECT jenis_kendaraan, COUNT(id) AS jumlah
             FROM parking_transactions
+            JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
             WHERE time_out IS NOT NULL
                 AND is_member = 1
                 AND operator = :operator
                 AND DATE(time_out) = :date
-                AND gate_out_id IN (:gate_out_id)
+                AND gate_outs.pos_id = :pos_id
             GROUP BY jenis_kendaraan
         ";
 
@@ -485,48 +488,48 @@ class ParkingTransactionController extends Controller
         // member
         $sqlBukaManual = "SELECT COUNT(id) AS jumlah
             FROM manual_open_logs
+            JOIN gate_outs ON gate_outs.id = manual_open_logs.gate_out_id
             WHERE user_id = :user_id
                 AND DATE(updated_at) = :date
-                AND gate_out_id IN (:gate_out_id)
+                AND gate_outs.pos_id = :pos_id
         ";
-
-        $gateOutId = implode(',', $pos->gateOuts()->pluck('id')->toArray());
 
         $pendapatanReguler = DB::select($sqlReguler, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
-            ':gate_out_id' => $gateOutId
+            ':pos_id' => $request->pos_id
         ]);
 
         $pendapatanDenda = DB::select($sqlDenda, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
-            ':gate_out_id' => $gateOutId
+            ':pos_id' => $request->pos_id
         ]);
 
         $trxMember = DB::select($sqlMember, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
-            ':gate_out_id' => $gateOutId
+            ':pos_id' => $request->pos_id
         ]);
 
         $bukaManual = DB::select($sqlBukaManual, [
             ':date' => $request->date,
             ':user_id' => $request->user()->id,
-            ':gate_out_id' => $gateOutId
+            ':pos_id' => $request->pos_id
         ]);
 
         // ambil data periode jam
         $start = DB::select('SELECT time_out
             FROM parking_transactions
+            JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
             WHERE operator = :operator
-                AND gate_out_id IN (:gate_out_id)
+                AND gate_outs.pos_id = :pos_id
                 AND DATE(time_out) = :date
             ORDER BY time_out ASC
             ', [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
-            ':gate_out_id' => $gateOutId
+            ':pos_id' => $request->pos_id
         ]);
 
         if (!$start) {
