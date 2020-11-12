@@ -66,7 +66,7 @@
 							t.jenis_kendaraan
 						}}</el-col>
 						<el-col :span="12" class="col-value"
-							>: Rp. {{ t.total | formatNumber }}</el-col
+							>: Rp. {{ (t.total + t.denda) | formatNumber }}</el-col
 						>
 					</el-row>
 				</el-card>
@@ -137,10 +137,16 @@ export default {
 				.get("getIncome", { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.income = r.data;
+
 					let total = r.data
-						.map((d) => Number(d.total) + Number(d.denda))
+						.map((d) => Number(d.total))
 						.reduce((sum, total) => sum + Number(total), 0);
-					this.income.push({ jenis_kendaraan: "TOTAL", total });
+
+					let denda = r.data
+						.map((d) => Number(d.denda))
+						.reduce((sum, denda) => sum + Number(denda), 0);
+
+					this.income.push({ jenis_kendaraan: "TOTAL", total, denda });
 				});
 		},
 
