@@ -7,14 +7,13 @@
             <th class="border px-3 text-left" style="width:33%">JENIS KENDARAAN</th>
             <th class="border px-3 text-center" style="width:33%">JUMLAH KENDARAAN</th>
             <th class="border px-3 text-right">PENDAPATAN</th>
-        </tr>
     </thead>
     <tbody>
         @foreach ($perKendaraan as $d)
         <tr>
             <td class="border px-3 text-left">{{$d->jenis_kendaraan}}</td>
             <td class="border px-3 text-center">{{number_format($d->jumlah, 0, ',', '.')}}</td>
-            <td class="border px-3 text-right">Rp {{number_format($d->pendapatan, 0, ',', '.')}}</td>
+            <td class="border px-3 text-right">Rp {{number_format($d->pendapatan + $d->denda, 0, ',', '.')}}</td>
         </tr>
         @endforeach
     </tbody>
@@ -22,7 +21,7 @@
         <tr>
             <th class="border px-3 text-left">TOTAL</th>
             <th class="border px-3 text-center">{{number_format(array_reduce($perKendaraan, function($total, $current) { return $total + $current->jumlah; }, 0), 0, ',', '.')}}</th>
-            <th class="border px-3 text-right">Rp {{number_format(array_reduce($perKendaraan, function($total, $current) { return $total + $current->pendapatan; }, 0), 0, ',', '.')}}</th>
+            <th class="border px-3 text-right">Rp {{number_format(array_reduce($perKendaraan, function($total, $current) { return $total + $current->pendapatan + $current->denda; }, 0), 0, ',', '.')}}</th>
         </tr>
     </tfoot>
 </table>
@@ -45,7 +44,7 @@
         <tr>
                 <td class="border px-3 text-left">{{$d->operator}}</td>
                 <td class="border px-3 text-center">{{number_format($d->jumlah, 0, ',', '.')}}</td>
-                <td class="border px-3 text-right">Rp {{number_format($d->pendapatan, 0, ',', '.')}}</td>
+                <td class="border px-3 text-right">Rp {{number_format($d->pendapatan + $d->denda, 0, ',', '.')}}</td>
             </tr>
         @endforeach
     </tbody>
@@ -53,7 +52,7 @@
         <tr>
             <th class="border px-3 text-left">TOTAL</th>
             <th class="border px-3 text-center">{{number_format(array_reduce($perPetugas, function($total, $current) { return $total + $current->jumlah; }, 0), 0, ',', '.')}}</th>
-            <th class="border px-3 text-right">Rp {{number_format(array_reduce($perPetugas, function($total, $current) { return $total + $current->pendapatan; }, 0), 0, ',', '.')}}</th>
+            <th class="border px-3 text-right">Rp {{number_format(array_reduce($perPetugas, function($total, $current) { return $total + $current->pendapatan + $current->denda; }, 0), 0, ',', '.')}}</th>
         </tr>
     </tfoot>
 </table>

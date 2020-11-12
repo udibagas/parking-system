@@ -18,9 +18,9 @@
 				>
 				</el-date-picker>
 
-				<el-button type="primary" icon="el-icon-printer" @click="printReport"
-					>PRINT LAPORAN</el-button
-				>
+				<el-button type="primary" icon="el-icon-printer" @click="printReport">
+					PRINT LAPORAN
+				</el-button>
 			</el-col>
 		</el-row>
 
@@ -105,6 +105,7 @@ export default {
 			report: null,
 		};
 	},
+
 	methods: {
 		printReport() {
 			window.open(
@@ -118,6 +119,7 @@ export default {
 				"_blank"
 			);
 		},
+
 		getTransaction() {
 			axios
 				.get("getTransaction", { params: { dateRange: this.dateRange } })
@@ -129,17 +131,19 @@ export default {
 					this.transaction.push({ jenis_kendaraan: "TOTAL", total });
 				});
 		},
+
 		getIncome() {
 			axios
 				.get("getIncome", { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.income = r.data;
 					let total = r.data
-						.map((d) => d.total)
-						.reduce((sum, total) => sum + parseInt(total), 0);
+						.map((d) => Number(d.total) + Number(d.denda))
+						.reduce((sum, total) => sum + Number(total), 0);
 					this.income.push({ jenis_kendaraan: "TOTAL", total });
 				});
 		},
+
 		getParkedVehicle() {
 			axios
 				.get("getParkedVehicle", { params: { dateRange: this.dateRange } })
@@ -151,6 +155,7 @@ export default {
 					this.parkedVehicle.push({ jenis_kendaraan: "TOTAL", total });
 				});
 		},
+
 		getVehicleIn() {
 			axios
 				.get("getVehicleIn", { params: { dateRange: this.dateRange } })
@@ -162,6 +167,7 @@ export default {
 					this.vehicleIn.push({ gate: "TOTAL", total });
 				});
 		},
+
 		getReport() {
 			axios
 				.get("report", { params: { dateRange: this.dateRange } })
@@ -169,6 +175,7 @@ export default {
 					this.report = r.data;
 				});
 		},
+
 		requestData() {
 			this.getTransaction();
 			this.getIncome();
