@@ -217,7 +217,6 @@
 				v-for="s in snapshots"
 				:key="s.id"
 				:src="s.url"
-				alt=""
 				style="width: 500px"
 				class="mx-auto mb-1 border"
 			/>

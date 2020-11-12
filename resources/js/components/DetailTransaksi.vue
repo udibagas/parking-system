@@ -1,6 +1,6 @@
 <template>
 	<el-dialog
-		width="70%"
+		width="80%"
 		:visible.sync="show"
 		:before-close="
 			(done) => {
@@ -90,18 +90,14 @@
 					</tr>
 				</tbody>
 			</table>
-			<div v-if="trx.snapshots" class="flex-grow flex flex-row ml-3">
-				<el-image
+			<div v-if="trx.snapshots" class="flex-grow ml-3">
+				<img
 					v-for="snapshot in trx.snapshots"
 					:key="snapshot.id"
 					:src="snapshot.url"
-					style="width: 100%; height: 100%"
-					fit="cover"
-				>
-					<div slot="error" class="el-image__error">
-						<i class="el-icon-picture-outline"></i>
-					</div>
-				</el-image>
+					style="width: 500px"
+					class="mb-1"
+				/>
 			</div>
 		</div>
 	</el-dialog>
