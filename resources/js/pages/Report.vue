@@ -66,7 +66,8 @@
 							t.jenis_kendaraan
 						}}</el-col>
 						<el-col :span="12" class="col-value"
-							>: Rp. {{ (t.total + t.denda) | formatNumber }}</el-col
+							>: Rp.
+							{{ (Number(t.total) + Number(t.denda)) | formatNumber }}</el-col
 						>
 					</el-row>
 				</el-card>
