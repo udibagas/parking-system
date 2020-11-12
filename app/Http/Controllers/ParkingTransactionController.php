@@ -553,8 +553,10 @@ class ParkingTransactionController extends Controller
             $printer->text($setting->nama_lokasi . "\n\n");
 
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . $request->date . "\n");
-            $printer->text(str_pad('JAM', 15, ' ') . ' : ' . date('d-M-Y H:i', strtotime($userLog->created_at)) . ' - ' . date('d-M-Y H:i') . "\n");
+            $printer->text(str_pad('TANGGAL', 15, ' ') . ' : ' . date('d-M-Y', strtotime($request->date)) . "\n");
+            $dariJam = $userLog ? date('d-M-Y H:i', strtotime($userLog->created_at)) : date('d-M-Y 00:00');
+            $printer->text(str_pad('DARI JAM', 15, ' ') . ' : ' . $dariJam . "\n");
+            $printer->text(str_pad('SAMPAI JAM', 15, ' ') . ' : ' . date('d-M-Y H:i') . "\n");
             $printer->text(str_pad('PETUGAS', 15, ' ') . ' : ' . strtoupper($request->user()->name) . "\n\n");
 
             // REGULER SECTION
