@@ -152,11 +152,13 @@
 								>Print Slip</el-dropdown-item
 							>
 							<el-dropdown-item
+								v-if="user.role == 1"
 								icon="el-icon-edit-outline"
 								@click.native.prevent="openForm(scope.row)"
 								>Edit</el-dropdown-item
 							>
 							<el-dropdown-item
+								v-if="user.role == 1"
 								icon="el-icon-delete"
 								@click.native.prevent="deleteData(scope.row.id)"
 								>Hapus</el-dropdown-item
@@ -218,6 +220,9 @@ import PrintDialog from "../components/PrintDialog";
 
 export default {
 	components: { FormRenewal, PrintDialog },
+	computed: {
+		...mapState(["user"]),
+	},
 	data() {
 		return {
 			showForm: false,

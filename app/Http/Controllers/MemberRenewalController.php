@@ -16,6 +16,11 @@ use Mike42\Escpos\Printer;
 
 class MemberRenewalController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('role:1')->only(['update', 'destroy']);
+    }
+
     /**
      * Display a listing of the resource.
      *
