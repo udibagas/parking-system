@@ -311,10 +311,10 @@ export default {
 				document.getElementById("submit-btn").focus();
 			}
 
+			// tarif flat
 			if (tarif.mode_tarif == 0) {
 				this.formModel.tarif = tarif.tarif_flat;
 				this.totalBayar = this.formModel.denda + this.formModel.tarif;
-				return;
 			}
 
 			const timeIn = moment(this.formModel.time_in);
@@ -400,11 +400,14 @@ export default {
 					tarif_hari_terakhir = tarif.tarif_maksimum;
 				}
 
+				const first_day =
+					tarif.mode_tarif == 0 ? tarif.tarif_flat : tarif_hari_pertama;
+
+				const last_day =
+					tarif.mode_tarif == 0 ? tarif.tarif_flat : tarif_hari_terakhir;
+
 				this.formModel.tarif =
-					tarif_menginap +
-					tarif_maksimum +
-					tarif_hari_pertama +
-					tarif_hari_terakhir;
+					first_day + tarif_menginap + tarif_maksimum + last_day;
 			}
 
 			this.totalBayar = this.formModel.denda + this.formModel.tarif;
