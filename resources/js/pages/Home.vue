@@ -8,23 +8,6 @@
 			<el-col :span="12">
 				<el-row :gutter="10" style="margin-bottom: 10px">
 					<el-col :span="10">
-						<div class="label-big">[-] NO. PLAT</div>
-					</el-col>
-					<el-col :span="14">
-						<input
-							id="plate-number"
-							autocomplete="off"
-							@keyup.enter="toVehicleField"
-							type="text"
-							placeholder="NO. PLAT"
-							v-model="formModel.plate_number"
-							class="my-input"
-						/>
-					</el-col>
-				</el-row>
-
-				<el-row :gutter="10" style="margin-bottom: 10px">
-					<el-col :span="10">
 						<div class="label-big">[/] NO. KARTU</div>
 					</el-col>
 					<el-col :span="14">
@@ -35,6 +18,23 @@
 							type="text"
 							placeholder="NO. KARTU"
 							v-model="formModel.card_number"
+							class="my-input"
+						/>
+					</el-col>
+				</el-row>
+
+				<el-row :gutter="10" style="margin-bottom: 10px">
+					<el-col :span="10">
+						<div class="label-big">[-] NO. PLAT</div>
+					</el-col>
+					<el-col :span="14">
+						<input
+							id="plate-number"
+							autocomplete="off"
+							@keyup.enter="toVehicleField"
+							type="text"
+							placeholder="NO. PLAT"
+							v-model="formModel.plate_number"
 							class="my-input"
 						/>
 					</el-col>
@@ -137,9 +137,11 @@ export default {
 		toVehicleField() {
 			document.getElementById("vehicle-type").focus();
 		},
+
 		toDriveThruField() {
 			document.getElementById("drive-thru").focus();
 		},
+
 		generateBarcodeNumber() {
 			let result = "";
 			let characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
@@ -150,6 +152,7 @@ export default {
 			}
 			return result;
 		},
+
 		setFare() {
 			if (this.formModel.is_member || this.formModel.drive_thru) {
 				this.formModel.fare = 0;
@@ -165,6 +168,7 @@ export default {
 			this.$forceUpdate();
 			document.getElementById("submit-button").focus();
 		},
+
 		checkCard() {
 			const params = { card_number: this.formModel.card_number };
 			axios
@@ -235,7 +239,7 @@ export default {
 					}
 				})
 				.catch((e) => {
-					console.log(e);
+					document.getElementById("plate-number").focus();
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
@@ -243,6 +247,7 @@ export default {
 					});
 				});
 		},
+
 		resetForm() {
 			this.formModel.plate_number = this.setting.default_plate_number;
 			this.formModel.card_number = "";
@@ -251,8 +256,9 @@ export default {
 			this.formModel.drive_thru = "";
 			this.snapshot_in = null;
 			this.$forceUpdate();
-			document.getElementById("plate-number").focus();
+			document.getElementById("card-number").focus();
 		},
+
 		submit() {
 			if (!this.formModel.plate_number || !this.formModel.vehicle_type) {
 				return;
@@ -291,6 +297,7 @@ export default {
 						});
 				});
 		},
+
 		printTicket(id) {
 			axios
 				.post("/parkingTransaction/printTicket/" + id)
@@ -312,6 +319,7 @@ export default {
 					setTimeout(this.openGate, 3000);
 				});
 		},
+
 		takeSnapshot(id) {
 			axios
 				.post("/parkingTransaction/takeSnapshot/" + id)
@@ -326,6 +334,7 @@ export default {
 					});
 				});
 		},
+
 		openGate() {
 			axios
 				.post("openGate")
@@ -347,6 +356,7 @@ export default {
 					this.resetForm();
 				});
 		},
+
 		printReport() {
 			let payload = { date: moment().format("YYYY-MM-DD") };
 
@@ -367,6 +377,7 @@ export default {
 					});
 				});
 		},
+
 		getVehicleTypeList() {
 			axios
 				.get("/vehicleType/getList")
@@ -391,6 +402,7 @@ export default {
 				});
 		},
 	},
+
 	mounted() {
 		this.$store.commit("getSetting");
 		setTimeout(() => {
@@ -398,7 +410,7 @@ export default {
 			this.$forceUpdate();
 		}, 100);
 		this.getVehicleTypeList();
-		document.getElementById("plate-number").focus();
+		document.getElementById("card-number").focus();
 
 		document.getElementById("gate-in-app").onkeypress = (e) => {
 			// ke field nomor plat
