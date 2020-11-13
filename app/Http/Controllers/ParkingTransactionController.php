@@ -364,7 +364,7 @@ class ParkingTransactionController extends Controller
 
         $parkingTransaction = ParkingTransaction::whereHas('gateOut', function ($q) use ($request) {
             $q->where('pos_id', $request->pos_id);
-        })->latest()->first();
+        })->orderBy('time_out', 'desc')->first();
 
         if (!$parkingTransaction) {
             return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
