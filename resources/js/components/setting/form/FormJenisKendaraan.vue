@@ -1,5 +1,6 @@
 <template>
 	<el-dialog
+		width="650px"
 		v-loading="loading"
 		:visible.sync="show"
 		:title="!!formModel.id ? 'EDIT JENIS KENDARAAN' : 'TAMBAH JENIS KENDARAAN'"

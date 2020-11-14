@@ -19,7 +19,7 @@ class JenisKendaraanController extends Controller
      */
     public function index()
     {
-        return JenisKendaraan::orderBy('nama', 'asc')->get();
+        return JenisKendaraan::orderBy('shortcut_key', 'asc')->get();
     }
 
     /**

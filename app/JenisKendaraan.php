@@ -25,4 +25,8 @@ class JenisKendaraan extends Model
     const MODE_TARIF_FLAT = 0;
 
     const MODE_TARIF_PROGRESIF = 1;
+
+    const MODE_MENGINAP_24JAM = 0;
+
+    const MODE_MENGINAP_TENGAH_MALAM = 1;
 }
