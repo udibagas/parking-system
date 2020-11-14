@@ -351,7 +351,8 @@ export default {
 			// mode lewat tengah malam
 			else {
 				this.formModel.tarif =
-					hari_menginap * (tarif.tarif_menginap + tarif.tarif_flat);
+					hari_menginap * tarif.tarif_menginap +
+					(hari_menginap + 1) * tarif.tarif_flat;
 			}
 
 			this.totalBayar = this.formModel.denda + this.formModel.tarif;
