@@ -43,6 +43,13 @@
 						<i :class="m.icon"></i><span slot="title">{{ m.label }}</span>
 					</el-menu-item>
 				</el-menu>
+
+				<div
+					style="position: fixed; bottom: 20px; left: 30px; font-size: 12px"
+					class="text-white"
+				>
+					Tekan Alt+F4 untuk keluar
+				</div>
 			</el-aside>
 			<el-container>
 				<el-header class="flex">
