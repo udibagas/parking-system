@@ -600,12 +600,14 @@ export default {
 			this.snapshots = [];
 
 			if (this.setting.disable_plat_nomor) {
+				console.log("ke nomor tiket");
 				document.getElementById("nomor-tiket").focus();
 			} else {
+				console.log("ke plat nomor");
 				document.getElementById("plat-nomor").focus();
 			}
 
-			this.$forceUpdate();
+			// this.$forceUpdate();
 		},
 
 		submit(ticket) {
