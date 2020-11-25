@@ -129,7 +129,7 @@
 					<el-option
 						v-for="(l, i) in ['Tidak', 'Ya']"
 						:key="i"
-						:value="i"
+						:value="!!i"
 						:label="l"
 					></el-option>
 				</el-select>
