@@ -267,7 +267,7 @@ export default {
 
 			if (!gateOut) {
 				this.$message({
-					nessage: "Tidak ada gate keluar untuk jenis kendaraan terkait",
+					message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
 					type: "error",
 				});
 				return;
