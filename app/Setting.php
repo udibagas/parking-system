@@ -13,4 +13,6 @@ class Setting extends Model
         'disable_plat_nomor', 'hapus_snapshot_dalam_hari',
         'hapus_transaksi_dalam_hari'
     ];
+
+    protected $casts = ['disable_plat_nomor' => 'boolean'];
 }
