@@ -464,6 +464,7 @@ export default {
 					this.formModel.is_member = 0;
 				})
 				.finally(() => {
+					console.log("chekPlatNomor");
 					document.getElementById("nomor-tiket").focus();
 					this.$forceUpdate();
 				});
