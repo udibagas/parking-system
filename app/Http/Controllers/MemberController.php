@@ -150,7 +150,6 @@ class MemberController extends Controller
         DB::transaction(function () use ($member) {
             $member->delete();
             $member->vehicles()->delete();
-            $member->transcations()->delete();
         });
 
         return ['message' => 'Member telah dihapus'];
