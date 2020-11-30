@@ -16,7 +16,7 @@ class GateOutSeeder extends Seeder
             [
                 'shortcut_key' => '1',
                 'nama' => 'GATE MOTOR',
-                'jenis_kendaraan' => ['MOTOR'],
+                'jenis_kendaraan' => json_encode(['MOTOR']),
                 'device' => '/dev/ttyUSB0',
                 'baudrate' => 9600,
                 'open_command' => '*TRIG1#',
@@ -27,7 +27,7 @@ class GateOutSeeder extends Seeder
             [
                 'shortcut_key' => '2',
                 'nama' => 'GATE MOBIL',
-                'jenis_kendaraan' => ['MOBIL'],
+                'jenis_kendaraan' => json_encode(['MOBIL']),
                 'device' => '/dev/ttyUSB0',
                 'baudrate' => 9600,
                 'open_command' => '*TRIG2#',
