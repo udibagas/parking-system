@@ -304,7 +304,7 @@ export default {
 
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
 				document.getElementById("time-in").focus();
-				this.formModel.denda = tarif.denda_tiket_hilang;
+				this.formModel.denda = Number(tarif.denda_tiket_hilang);
 			} else {
 				document.getElementById("submit-btn").focus();
 			}
