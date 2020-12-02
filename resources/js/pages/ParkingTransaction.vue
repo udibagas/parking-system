@@ -38,7 +38,7 @@
 				>
 				</el-date-picker>
 			</el-form-item>
-			<el-form-item>
+			<el-form-item v-if="user.role == 1">
 				<el-button
 					size="small"
 					type="primary"
@@ -310,7 +310,7 @@
 							>
 							<el-dropdown-item
 								icon="el-icon-check"
-								v-if="!scope.row.time_out"
+								v-if="!scope.row.time_out && user.role == 1"
 								@click.native.prevent="setSudahKeluar(scope.row.id)"
 								>Set Sudah Keluar</el-dropdown-item
 							>
