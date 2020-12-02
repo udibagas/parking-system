@@ -15,6 +15,8 @@ class ReportController extends Controller
 
     public function getTransaction(Request $request)
     {
+        $request->validate(['dateRange' => 'required']);
+
         return DB::select('
             SELECT jenis_kendaraan, COUNT(id) AS `total`
             FROM parking_transactions
@@ -27,6 +29,8 @@ class ReportController extends Controller
 
     public function getIncome(Request $request)
     {
+        $request->validate(['dateRange' => 'required']);
+
         return DB::select('
             SELECT jenis_kendaraan,
                 SUM(tarif) AS `total`,
@@ -41,6 +45,8 @@ class ReportController extends Controller
 
     public function getParkedVehicle(Request $request)
     {
+        $request->validate(['dateRange' => 'required']);
+
         return DB::select('
             SELECT jenis_kendaraan, COUNT(id) AS `total`
             FROM parking_transactions
@@ -54,6 +60,8 @@ class ReportController extends Controller
 
     public function getVehicleIn(Request $request)
     {
+        $request->validate(['dateRange' => 'required']);
+
         return DB::select('
             SELECT gate_ins.nama AS `gate`, COUNT(parking_transactions.id) AS `total`
             FROM parking_transactions
@@ -67,6 +75,8 @@ class ReportController extends Controller
 
     public function pendapatan(Request $request)
     {
+        $request->validate(['dateRange' => 'required']);
+
         $perKendaraan = DB::select('
             SELECT jenis_kendaraan,
                 COUNT(id) AS jumlah,
