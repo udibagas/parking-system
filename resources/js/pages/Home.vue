@@ -608,7 +608,7 @@ export default {
 				document.getElementById("plat-nomor").focus();
 			}
 
-			// this.$forceUpdate();
+			this.$forceUpdate();
 		},
 
 		submit(ticket) {
