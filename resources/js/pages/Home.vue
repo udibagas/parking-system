@@ -306,6 +306,7 @@ export default {
 				document.getElementById("time-in").focus();
 				this.formModel.denda = Number(tarif.denda_tiket_hilang);
 			} else {
+        this.formModel.denda = 0;
 				document.getElementById("submit-btn").focus();
 			}
 
@@ -324,6 +325,12 @@ export default {
 			this.formModel.duration = moment
 				.utc(duration.asMilliseconds())
 				.format("DD HH:mm:ss");
+
+      if (durasi <= tarif.menit_pertama) {
+        this.formModel.tarif = tarif.tarif_menit_pertama
+        this.formModel.totalBayar = this.formModel.denda + this.formModel.tarif;
+        return;
+      }
 
 			// buat hitung hari lewat tengah malem
 			const dateIn = moment(this.formModel.time_in.slice(0, 10));
@@ -366,6 +373,12 @@ export default {
 			this.formModel.duration = moment
 				.utc(duration.asMilliseconds())
 				.format("DD HH:mm:ss");
+
+      if (durasi <= tarif.menit_pertama) {
+        this.formModel.tarif = tarif.tarif_menit_pertama
+        this.formModel.totalBayar = this.formModel.denda + this.formModel.tarif;
+        return;
+      }
 
 			// buat hitung hari lewat tengah malem
 			const dateIn = moment(this.formModel.time_in.slice(0, 10));
