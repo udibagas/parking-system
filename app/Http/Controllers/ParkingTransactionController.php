@@ -7,17 +7,18 @@ use App\GateOut;
 use Illuminate\Http\Request;
 use App\ParkingTransaction;
 use App\Http\Requests\ParkingTransactionRequest;
+use App\JenisKendaraan;
 use App\Jobs\PrintTicketIn;
 use App\Jobs\PrintTicketOut;
 use App\Jobs\TakeSnapshot;
 use App\Member;
 use App\Pos;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
-use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\Setting;
 use App\User;
 use App\UserLog;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -618,6 +619,80 @@ class ParkingTransactionController extends Controller
             $printer->close();
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
+        }
+    }
+
+    public function hitungTarif(Request $request)
+    {
+        $request->validate([
+            'time_in' => 'required',
+            'jenis_kendaraan' => 'required'
+        ]);
+
+        if ($request->is_member) {
+            return 0;
+        }
+
+        $in = new Carbon($request->time_in);
+        $out = $request->time_out ? new Carbon($request->time_out) : Carbon::now();
+        $durasiMenit = $out->diffInMinutes($in);
+
+        $jenisKendaraan = JenisKendaraan::where('nama', $request->jenis_kendaraan)->first();
+
+        if (!$jenisKendaraan) {
+            return response(['message' => 'Tarif tidak ditemukan untuk jenis kendaraan ' . $request->jenis_kendaraan], 404);
+        }
+
+        $tarifMenitPertama = $jenisKendaraan->tarif_menit_pertama;
+
+        // tak peduli flat atau progressif berlaku seperti ini
+        if ($durasiMenit <= $jenisKendaraan->menit_pertama) {
+            return $tarifMenitPertama;
+        }
+
+        $durasiReal = $durasiMenit - $jenisKendaraan->menit_pertama;
+
+        if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_24JAM) {
+            $hariParkir = ceil($durasiReal / (60 * 24));
+
+            if ($hariParkir == 0) {
+                $hariParkir = 1;
+            }
+        }
+
+        if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_TENGAH_MALAM) {
+            $hariIn = new Carbon($in->format('Y-m-d'));
+            $hariOut = new Carbon($out->format('Y-m-d'));
+            $hariParkir = $hariOut->diffInDays($hariIn);
+
+            if ($hariParkir == 0) {
+                $hariParkir = 1;
+            }
+        }
+
+        $hariMenginap = $hariParkir - 1;
+        $tarifMenginap = $hariMenginap * $jenisKendaraan->tarif_menginap;
+
+        // tarif flat per hari, kena tarif menginap, kena tarif maximal
+        if ($jenisKendaraan->mode_tarif == JenisKendaraan::MODE_TARIF_FLAT) {
+            return $tarifMenitPertama + ($hariParkir * $jenisKendaraan->tarif_flat) + $tarifMenginap;
+        }
+
+        if ($jenisKendaraan->mode_tarif == JenisKendaraan::MODE_TARIF_PROGRESIF) {
+            $tarifMaksimum = $hariMenginap * $jenisKendaraan->tarif_maksimum;
+
+            if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_24JAM) {
+                $tarifHariTerakhir = ceil(($durasiReal % (60 * 24)) / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+                return $tarifMenitPertama + $tarifMaksimum + $tarifHariTerakhir + $tarifMenginap;
+            }
+
+            if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_TENGAH_MALAM) {
+                $menitHariPertama = (new Carbon($in->format('Y-m-d') . ' 24:00:00'))->diffInMinutes($in) - $jenisKendaraan->menit_pertama;
+                $menitHariTerakhir = $out->diffInMinutes((new Carbon($out->format('Y-m-d') . ' 00:00:00')));
+                $tarifHariPertama = ceil($menitHariPertama / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+                $tarifHariTerakhir = ceil($menitHariTerakhir / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+                return $tarifMenitPertama + $tarifMaksimum + $tarifHariPertama + $tarifHariTerakhir + $tarifMenginap;
+            }
         }
     }
 }

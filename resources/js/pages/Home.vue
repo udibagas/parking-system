@@ -308,161 +308,25 @@ export default {
 			} else {
         this.formModel.denda = 0;
 				document.getElementById("submit-btn").focus();
-			}
-
-			if (tarif.mode_tarif == 0) {
-				this.hitungTarifFlat(tarif);
-			} else {
-				this.hitungTarifProgresif(tarif);
-			}
-		},
-
-		hitungTarifFlat(tarif) {
-			const timeIn = moment(this.formModel.time_in);
-			const timeOut = moment(this.formModel.time_out);
-			const durasi = timeOut.diff(timeIn, "minutes");
-			const duration = moment.duration(timeOut.diff(timeIn));
-			this.formModel.duration = moment
-				.utc(duration.asMilliseconds())
-				.format("DD HH:mm:ss");
-
-      if (durasi <= tarif.menit_pertama) {
-        this.formModel.tarif = tarif.tarif_menit_pertama
-        this.formModel.totalBayar = this.formModel.denda + this.formModel.tarif;
-        return;
       }
 
-			// buat hitung hari lewat tengah malem
-			const dateIn = moment(this.formModel.time_in.slice(0, 10));
-			const dateOut = moment(this.formModel.time_out.slice(0, 10));
-
-			// hitung dia menginap berapa hari (jumlah hari * tarif)
-			const hari_menginap =
-				tarif.mode_menginap == 0
-					? timeOut.diff(timeIn, "days") // mode 24 jam
-					: dateOut.diff(dateIn, "days"); // mode lewat tengah malam
-
-			const tarif_menginap = hari_menginap * tarif.tarif_menginap;
-
-			// mode 24 jam
-			if (tarif.mode_menginap == 0) {
-				const tarif_maksimum = hari_menginap * tarif.tarif_flat;
-				// sisa menit
-				const sisa_menit = durasi % (60 * 24);
-				let tarif_sisa_menit = sisa_menit > 0 ? tarif.tarif_flat : 0;
-
-				this.formModel.tarif =
-					tarif_menginap + tarif_maksimum + tarif_sisa_menit;
-			}
-
-			// mode lewat tengah malam
-			else {
-				this.formModel.tarif =
-					hari_menginap * tarif.tarif_menginap +
-					(hari_menginap + 1) * tarif.tarif_flat;
-			}
-
-			this.totalBayar = this.formModel.denda + this.formModel.tarif;
-		},
-
-		hitungTarifProgresif(tarif) {
-			const timeIn = moment(this.formModel.time_in);
-			const timeOut = moment(this.formModel.time_out);
-			const durasi = timeOut.diff(timeIn, "minutes");
-			const duration = moment.duration(timeOut.diff(timeIn));
-			this.formModel.duration = moment
-				.utc(duration.asMilliseconds())
-				.format("DD HH:mm:ss");
-
-      if (durasi <= tarif.menit_pertama) {
-        this.formModel.tarif = tarif.tarif_menit_pertama
-        this.formModel.totalBayar = this.formModel.denda + this.formModel.tarif;
-        return;
+      if (this.formModel.time_in) {
+        axios.post('parkingTransaction/hitungTarif', {
+          time_in: this.formModel.time_in,
+          jenis_kendaraan: this.formModel.jenis_kendaraan,
+          is_member: this.formModel.is_member
+          // time_out: this.formModel.time_out
+        }).then(r => {
+          this.formModel.tarif = Number(r.data);
+          this.totalBayar = this.formModel.denda + this.formModel.tarif;
+        }).catch(e => {
+          this.$message({
+            message: e.response.data.message,
+            type: 'error',
+            duration: 10000
+          })
+        })
       }
-
-			// buat hitung hari lewat tengah malem
-			const dateIn = moment(this.formModel.time_in.slice(0, 10));
-			const dateOut = moment(this.formModel.time_out.slice(0, 10));
-
-			// hitung dia menginap berapa hari (jumlah hari * tarif)
-			const hari_menginap =
-				tarif.mode_menginap == 0
-					? timeOut.diff(timeIn, "days") // mode 24 jam
-					: dateOut.diff(dateIn, "days"); // mode lewat tengah malam
-
-			const tarif_menginap = hari_menginap * tarif.tarif_menginap;
-
-			// mode 24 jam
-			if (tarif.mode_menginap == 0) {
-				const tarif_maksimum = hari_menginap * tarif.tarif_maksimum;
-				// sisa menit
-				const sisa_menit = durasi % (60 * 24);
-				let tarif_sisa_menit = tarif.tarif_menit_pertama;
-
-				// kalau menitnya lebih dari atau sama dengan menit pertama
-				if (sisa_menit > tarif.menit_pertama) {
-					const menit_selanjutnya = sisa_menit - tarif.menit_pertama;
-					const tarif_menit_selanjutnya =
-						Math.ceil(menit_selanjutnya / tarif.menit_selanjutnya) *
-						tarif.tarif_menit_selanjutnya;
-					tarif_sisa_menit += tarif_menit_selanjutnya;
-
-					if (tarif_sisa_menit > tarif.tarif_maksimum) {
-						tarif_sisa_menit = tarif.tarif_maksimum;
-					}
-				}
-
-				this.formModel.tarif =
-					tarif_menginap + tarif_maksimum + tarif_sisa_menit;
-			}
-
-			// mode lewat tengah malam
-			else {
-				const tarif_maksimum = (hari_menginap - 1) * tarif.tarif_maksimum;
-				const menit_hari_pertama = moment(
-					this.formModel.time_in.slice(0, 10) + " 24:00:00"
-				).diff(timeIn, "minutes");
-				const menit_hari_terakhir = timeOut.diff(dateOut, "minutes");
-				// hitung menit selanjutnya
-				const menit_selanjutnya_hari_pertama =
-					menit_hari_pertama - tarif.menit_pertama;
-				const menit_selanjutnya_hari_terakhir =
-					menit_hari_terakhir - tarif.menit_pertama;
-
-				// tarif menit pertama hari pertama & terakhir by default = tarif menit pertama
-				let tarif_hari_pertama = tarif.tarif_menit_pertama;
-				let tarif_hari_terakhir = tarif.tarif_menit_pertama;
-
-				if (menit_selanjutnya_hari_pertama > 0) {
-					tarif_hari_pertama +=
-						Math.ceil(
-							menit_selanjutnya_hari_pertama / tarif.menit_selanjutnya
-						) * tarif.tarif_menit_selanjutnya;
-				}
-
-				if (menit_selanjutnya_hari_terakhir > 0) {
-					tarif_hari_terakhir +=
-						Math.ceil(
-							menit_selanjutnya_hari_terakhir / tarif.menit_selanjutnya
-						) * tarif.tarif_menit_selanjutnya;
-				}
-
-				if (tarif_hari_pertama > tarif.tarif_maksimum) {
-					tarif_hari_pertama = tarif.tarif_maksimum;
-				}
-
-				if (tarif_hari_terakhir > tarif.tarif_maksimum) {
-					tarif_hari_terakhir = tarif.tarif_maksimum;
-				}
-
-				this.formModel.tarif =
-					tarif_hari_pertama +
-					tarif_menginap +
-					tarif_maksimum +
-					tarif_hari_terakhir;
-			}
-
-			this.totalBayar = this.formModel.denda + this.formModel.tarif;
 		},
 
 		cekPlatNomor() {
