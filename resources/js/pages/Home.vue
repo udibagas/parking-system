@@ -503,6 +503,7 @@ export default {
 						this.formModel.is_member = data.is_member;
 						this.formModel.time_out = now;
             this.formModel.tarif = 0;
+            this.$forceUpdate();
 
 						if (!data.is_member) {
 							document.getElementById("jenis-kendaraan").focus();
@@ -604,7 +605,6 @@ export default {
 		resetForm() {
       this.formModel.gate_in_id = null;
       this.formModel.gate_out_id = null;
-
 			this.formModel.jenis_kendaraan = null;
 			this.formModel.plat_nomor = this.setting.plat_nomor_default;
 			this.formModel.nomor_barcode = "";
@@ -835,7 +835,8 @@ export default {
 					gate_out_id: this.formModel.gate_out_id,
 				})
 				.then((r) => {
-					this.snapshots = r.data;
+          this.snapshots = r.data;
+          this.$forceUpdate()
 				})
 				.catch((e) => {
 					this.$message({
