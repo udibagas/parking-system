@@ -540,7 +540,8 @@ export default {
 						if (!!this.setting.disable_plat_nomor) {
                 // member auto open sesuai setingan
                 if (!!this.setting.member_auto_open) {
-                  this.formModel.jenis_kendaraan = data.jenis_kendaraan
+
+                  this.formModel.jenis_kendaraan = data.member.vehicles[0].jenis_kendaran
 
                   const gateOut = this.gateOutList.find((g) => {
                     return (
