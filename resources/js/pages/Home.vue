@@ -538,33 +538,10 @@ export default {
 						}
 
 						if (!!this.setting.disable_plat_nomor) {
-							this.$confirm(
-								"Plat nomor yang terdaftar atas kartu ini adalah " +
-									data.member.vehicles.map((v) => v.plat_nomor).join(", "),
-								"Perhatian",
-								{
-									type: "warning",
-									center: true,
-									roundButton: true,
-									confirmButtonText: "SESUAI",
-									cancelButtonText: "TIDAK SESUAI",
-								}
-							)
-								.then(() => {
-									if (data.member.vehicles.length == 1) {
-										this.formModel.plat_nomor =
-											data.member.vehicles[0].plat_nomor;
-									}
-
-									// member auto open sesuai setingan
-									if (!!this.setting.member_auto_open) {
-										this.update(false);
-									}
-								})
-								.catch(() => {
-									this.formModel.is_member = 0;
-									return;
-								});
+                // member auto open sesuai setingan
+                if (!!this.setting.member_auto_open) {
+                  this.save(false);
+                }
 						} else {
 							let vehicle = data.member.vehicles.find(
 								(v) => v.plat_nomor == this.formModel.plat_nomor
