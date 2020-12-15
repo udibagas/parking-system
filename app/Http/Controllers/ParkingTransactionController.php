@@ -87,7 +87,6 @@ class ParkingTransactionController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
-        $input['time_in'] = now();
 
         if ($request->manual) {
             $input['nomor_barcode'] = Str::random(5);
@@ -141,9 +140,9 @@ class ParkingTransactionController extends Controller
         }
 
         $parkingTransaction = ParkingTransaction::create($input);
-        // TakeSnapshot::dispatch($parkingTransaction->gateOut, $parkingTransaction);
 
-        if (!$parkingTransaction->is_member && $request->ticket) {
+        // kalau bukan member dan harus print ticket atau kalau tiket hilang
+        if ((!$parkingTransaction->is_member && $request->ticket) || $request->nomor_barcode == 'xxxxx') {
             PrintTicketOut::dispatchNow($parkingTransaction);
             return [
                 'message' => 'SILAKAN AMBIL STRUK PARKIR',
