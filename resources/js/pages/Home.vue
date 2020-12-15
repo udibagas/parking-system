@@ -182,7 +182,7 @@
 				</el-col>
 			</el-row>
 		</div>
-		<div class="ml-5">
+		<div class="ml-5" v-if="snapshots.length > 0">
 			<img
 				v-for="s in snapshots"
 				:key="s.id"
@@ -613,7 +613,8 @@ export default {
 			this.formModel.duration = "";
 			this.formModel.tarif = "";
 
-			this.snapshots = [];
+      this.snapshots = [];
+      this.$forceUpdate();
 
 			if (this.setting.disable_plat_nomor) {
 				console.log("ke nomor tiket");
@@ -623,7 +624,6 @@ export default {
 				document.getElementById("plat-nomor").focus();
 			}
 
-			this.$forceUpdate();
 		},
 
 		submit(ticket) {
