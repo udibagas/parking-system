@@ -250,7 +250,7 @@ class ParkingTransactionController extends Controller
                 'nomor_barcode' => 'NOTAP',
                 'jenis_kendaraan' => $member->vehicles[0]->jenis_kendaraan,
                 'is_member' => true,
-                'parking_member_id' => $member->id,
+                'member_id' => $member->id,
                 'time_in' => now(),
                 'gate_in_id' => GateIn::where('status', true)->first()->id,
                 'nomor_kartu' => $member->nomor_kartu

@@ -502,7 +502,7 @@ export default {
 						this.formModel.time_in = data.time_in;
 						this.formModel.is_member = data.is_member;
 						this.formModel.time_out = now;
-						this.formModel.tarif = 0;
+            this.formModel.tarif = 0;
 
 						if (!data.is_member) {
 							document.getElementById("jenis-kendaraan").focus();
@@ -540,6 +540,29 @@ export default {
 						if (!!this.setting.disable_plat_nomor) {
                 // member auto open sesuai setingan
                 if (!!this.setting.member_auto_open) {
+                  this.formModel.jenis_kendaraan = data.jenis_kendaraan
+
+                  const gateOut = this.gateOutList.find((g) => {
+                    return (
+                      g.pos_id == this.formModel.pos_id &&
+                      g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
+                    );
+                  });
+
+                  if (!gateOut) {
+                    this.$message({
+                      message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
+                      type: "error",
+                    });
+                    return;
+                  }
+
+                  this.formModel.gate_out_id = gateOut.id;
+
+                  if (this.formModel.id) {
+                    this.takeSnapshot();
+                  }
+
                   this.save(false);
                 }
 						} else {
@@ -578,8 +601,9 @@ export default {
 		},
 
 		resetForm() {
-			this.formModel.gate_in_id = null;
-			this.formModel.gate_out_id = null;
+      this.formModel.gate_in_id = null;
+      this.formModel.gate_out_id = null;
+
 			this.formModel.jenis_kendaraan = null;
 			this.formModel.plat_nomor = this.setting.plat_nomor_default;
 			this.formModel.nomor_barcode = "";

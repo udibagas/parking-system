@@ -102,10 +102,10 @@ export default {
             axios.get('/parkingMember/search', { params: params }).then(r => {
                 this.formModel.fare = 0;
                 this.formModel.is_member = 1;
-                this.formModel.parking_member_id = r.data.id;
+                this.formModel.member_id = r.data.id;
             }).catch(e => {
                 this.formModel.is_member = 0;
-                this.formModel.parking_member_id = null;
+                this.formModel.member_id = null;
             }).finally(() => {
                 this.formModel.barcode_number = this.generateBarcodeNumber();
                 this.formModel.time_in = moment().format('YYYY-MM-DD HH:mm:ss');

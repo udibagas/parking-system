@@ -24,7 +24,7 @@ class MemberVehicleRequest extends FormRequest
     public function rules()
     {
         return [
-            'parking_member_id' => 'required|exists:parking_members,id',
+            'member_id' => 'required|exists:parking_members,id',
             'vehicle_type' => 'required',
             'plate_number' => 'required',
             'merk' => 'required',
