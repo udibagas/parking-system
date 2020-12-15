@@ -541,7 +541,7 @@ export default {
                 // member auto open sesuai setingan
                 if (!!this.setting.member_auto_open) {
 
-                  this.formModel.jenis_kendaraan = data.member.vehicles[0].jenis_kendaran
+                  this.formModel.jenis_kendaraan = data.member.vehicles[0].jenis_kendaraan
 
                   const gateOut = this.gateOutList.find((g) => {
                     return (
