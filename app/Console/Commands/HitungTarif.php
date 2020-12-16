@@ -99,6 +99,7 @@ class HitungTarif extends Command
 
             if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_24JAM) {
                 $tarifHariTerakhir = ceil(($durasiReal % (60 * 24)) / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+                $this->info('Tarif hari terakhir = ' . $tarifHariTerakhir);
                 $ret = $tarifMenitPertama + $tarifMaksimum + $tarifHariTerakhir + $tarifMenginap;
             }
 
@@ -107,6 +108,8 @@ class HitungTarif extends Command
                 $menitHariTerakhir = $out->diffInMinutes((new Carbon($out->format('Y-m-d') . ' 00:00:00')));
                 $tarifHariPertama = ceil($menitHariPertama / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
                 $tarifHariTerakhir = ceil($menitHariTerakhir / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+                $this->info('Tarif hari pertama = ' . $tarifHariPertama);
+                $this->info('Tarif hari terakhir = ' . $tarifHariTerakhir);
                 $ret = $tarifMenitPertama + $tarifMaksimum + $tarifHariPertama + $tarifHariTerakhir + $tarifMenginap;
             }
         }
