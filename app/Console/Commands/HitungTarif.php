@@ -70,6 +70,8 @@ class HitungTarif extends Command
             if ($hariParkir == 0 && $jenisKendaraan->mode_tarif == JenisKendaraan::MODE_TARIF_FLAT) {
                 $hariParkir = 1;
             }
+
+            $hariMenginap = $hariParkir >= 1 ? $hariParkir - 1 : 0;
         }
 
         if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_TENGAH_MALAM) {
@@ -77,12 +79,11 @@ class HitungTarif extends Command
             $hariOut = new Carbon($out->format('Y-m-d'));
             $hariParkir = $hariOut->diffInDays($hariIn);
 
-            if ($hariParkir == 0 && $jenisKendaraan->mode_tarif == JenisKendaraan::MODE_TARIF_FLAT) {
-                $hariParkir = 1;
+            if ($jenisKendaraan->mode_tarif == JenisKendaraan::MODE_TARIF_FLAT) {
+                $hariMenginap = $hariParkir;
             }
         }
 
-        $hariMenginap = $hariParkir >= 1 ? $hariParkir - 1 : 0;
         $tarifMenginap = $hariMenginap * $jenisKendaraan->tarif_menginap;
 
         $this->line('Hari parkir = ' . $hariParkir);
