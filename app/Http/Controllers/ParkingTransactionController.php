@@ -666,10 +666,7 @@ class ParkingTransactionController extends Controller
             $hariIn = new Carbon($in->format('Y-m-d'));
             $hariOut = new Carbon($out->format('Y-m-d'));
             $hariParkir = $hariOut->diffInDays($hariIn);
-
-            if ($jenisKendaraan->mode_tarif == JenisKendaraan::MODE_TARIF_FLAT) {
-                $hariMenginap = $hariParkir;
-            }
+            $hariMenginap = $hariParkir;
         }
 
         $tarifMenginap = $hariMenginap * $jenisKendaraan->tarif_menginap;
