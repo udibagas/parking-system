@@ -653,7 +653,7 @@ class ParkingTransactionController extends Controller
         $durasiReal = $durasiMenit - $jenisKendaraan->menit_pertama;
 
         if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_24JAM) {
-            $hariParkir = ceil($durasiReal / (60 * 24));
+            $hariParkir = ceil($durasiMenit / (60 * 24));
 
             if ($hariParkir == 0 && $jenisKendaraan->mode_tarif == JenisKendaraan::MODE_TARIF_FLAT) {
                 $hariParkir = 1;
@@ -682,7 +682,7 @@ class ParkingTransactionController extends Controller
             $tarifMaksimum = $hariMenginap * $jenisKendaraan->tarif_maksimum;
 
             if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_24JAM) {
-                $tarifHariTerakhir = ceil(($durasiReal % (60 * 24)) / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+                $tarifHariTerakhir = ceil(($durasiMenit % (60 * 24)) / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
                 return $tarifMenitPertama + $tarifMaksimum + $tarifHariTerakhir + $tarifMenginap;
             }
 
