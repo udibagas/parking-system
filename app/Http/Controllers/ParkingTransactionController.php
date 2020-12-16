@@ -683,6 +683,11 @@ class ParkingTransactionController extends Controller
 
             if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_24JAM) {
                 $tarifHariTerakhir = ceil(($durasiMenit % (60 * 24)) / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+
+                if ($tarifHariTerakhir > $jenisKendaraan->tarif_maksimum) {
+                    $tarifHariTerakhir = $jenisKendaraan->tarif_maksimum;
+                }
+
                 return $tarifMenitPertama + $tarifMaksimum + $tarifHariTerakhir + $tarifMenginap;
             }
 
