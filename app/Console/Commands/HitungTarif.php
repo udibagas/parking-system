@@ -104,13 +104,37 @@ class HitungTarif extends Command
             }
 
             if ($jenisKendaraan->mode_menginap == JenisKendaraan::MODE_MENGINAP_TENGAH_MALAM) {
-                $menitHariPertama = (new Carbon($in->format('Y-m-d') . ' 24:00:00'))->diffInMinutes($in) - $jenisKendaraan->menit_pertama;
-                $menitHariTerakhir = $out->diffInMinutes((new Carbon($out->format('Y-m-d') . ' 00:00:00')));
-                $tarifHariPertama = ceil($menitHariPertama / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
-                $tarifHariTerakhir = ceil($menitHariTerakhir / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
-                $this->info('Tarif hari pertama = ' . $tarifHariPertama);
-                $this->info('Tarif hari terakhir = ' . $tarifHariTerakhir);
-                $ret = $tarifMenitPertama + $tarifMaksimum + $tarifHariPertama + $tarifHariTerakhir + $tarifMenginap;
+                if ($hariParkir > 0) {
+                    $menitHariPertama = (new Carbon($in->format('Y-m-d') . ' 24:00:00'))->diffInMinutes($in) - $jenisKendaraan->menit_pertama;
+                    $menitHariTerakhir = $out->diffInMinutes((new Carbon($out->format('Y-m-d') . ' 00:00:00')));
+                    $tarifHariPertama = ceil($menitHariPertama / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+                    $tarifHariTerakhir = ceil($menitHariTerakhir / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+
+                    if ($tarifHariPertama > $jenisKendaraan->tarif_maksimum) {
+                        $tarifHariPertama = $jenisKendaraan->tarif_maksimum;
+                    }
+
+                    if ($tarifHariTerakhir > $jenisKendaraan->tarif_maksimum) {
+                        $tarifHariTerakhir = $jenisKendaraan->tarif_maksimum;
+                    }
+
+
+                    $this->info('Menit hari pertama = ' . $menitHariPertama);
+                    $this->info('Menit hari terakhir = ' . $menitHariTerakhir);
+                    $this->info('Tarif hari pertama = ' . $tarifHariPertama);
+                    $this->info('Tarif hari terakhir = ' . $tarifHariTerakhir);
+                    $ret = $tarifMenitPertama + $tarifMaksimum + $tarifHariPertama + $tarifHariTerakhir + $tarifMenginap;
+                } else {
+                    $tarifHariPertama = ceil($durasiReal / $jenisKendaraan->menit_selanjutnya) * $jenisKendaraan->tarif_menit_selanjutnya;
+
+                    if ($tarifHariPertama > $jenisKendaraan->tarif_maksimum) {
+                        $tarifHariPertama = $jenisKendaraan->tarif_maksimum;
+                    }
+
+                    $this->info('Tarif hari pertama = ' . $tarifHariPertama);
+
+                    $ret = $tarifMenitPertama + $tarifHariPertama;
+                }
             }
         }
 
