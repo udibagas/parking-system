@@ -275,10 +275,6 @@ export default {
 
 			this.formModel.gate_out_id = gateOut.id;
 
-			if (this.formModel.id) {
-				this.takeSnapshot();
-			}
-
 			if (this.formModel.is_member) {
 				this.formModel.tarif = 0;
 				document.getElementById("submit-btn").focus();
@@ -310,23 +306,25 @@ export default {
 				document.getElementById("submit-btn").focus();
       }
 
-      if (this.formModel.time_in) {
-        axios.post('parkingTransaction/hitungTarif', {
-          time_in: this.formModel.time_in,
-          jenis_kendaraan: this.formModel.jenis_kendaraan,
-          is_member: this.formModel.is_member
-          // time_out: this.formModel.time_out
-        }).then(r => {
-          this.formModel.tarif = Number(r.data);
-          this.totalBayar = this.formModel.denda + this.formModel.tarif;
-        }).catch(e => {
-          this.$message({
-            message: e.response.data.message,
-            type: 'error',
-            duration: 10000
-          })
+      axios.post('parkingTransaction/hitungTarif', {
+        time_in: this.formModel.time_in,
+        jenis_kendaraan: this.formModel.jenis_kendaraan,
+        is_member: this.formModel.is_member
+      }).then(r => {
+        this.formModel.tarif = Number(r.data);
+        this.totalBayar = this.formModel.denda + this.formModel.tarif;
+        this.$forceUpdate()
+      }).catch(e => {
+        this.$message({
+          message: e.response.data.message,
+          type: 'error',
+          duration: 10000
         })
-      }
+      })
+
+      if (this.formModel.id) {
+				this.takeSnapshot();
+			}
 		},
 
 		cekPlatNomor() {
@@ -404,33 +402,33 @@ export default {
 
 						if (!!this.setting.disable_plat_nomor) {
                 // member auto open sesuai setingan
-                if (!!this.setting.member_auto_open) {
+              if (!!this.setting.member_auto_open) {
 
-                  this.formModel.jenis_kendaraan = data.member.vehicles[0].jenis_kendaraan
+                this.formModel.jenis_kendaraan = data.member.vehicles[0].jenis_kendaraan
 
-                  const gateOut = this.gateOutList.find((g) => {
-                    return (
-                      g.pos_id == this.formModel.pos_id &&
-                      g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
-                    );
+                const gateOut = this.gateOutList.find((g) => {
+                  return (
+                    g.pos_id == this.formModel.pos_id &&
+                    g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
+                  );
+                });
+
+                if (!gateOut) {
+                  this.$message({
+                    message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
+                    type: "error",
                   });
-
-                  if (!gateOut) {
-                    this.$message({
-                      message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
-                      type: "error",
-                    });
-                    return;
-                  }
-
-                  this.formModel.gate_out_id = gateOut.id;
-
-                  if (this.formModel.id) {
-                    this.takeSnapshot();
-                  }
-
-                  this.save(false);
+                  return;
                 }
+
+                this.formModel.gate_out_id = gateOut.id;
+
+                if (this.formModel.id) {
+                  this.takeSnapshot();
+                }
+
+                this.save(false);
+              }
 						} else {
 							let vehicle = data.member.vehicles.find(
 								(v) => v.plat_nomor == this.formModel.plat_nomor
