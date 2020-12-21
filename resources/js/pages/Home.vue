@@ -312,8 +312,10 @@ export default {
       }).then(r => {
         this.formModel.tarif = Number(r.data);
         this.totalBayar = this.formModel.denda + this.formModel.tarif;
-        document.getElementById("submit-btn").focus();
         this.$forceUpdate()
+        if (this.formModel.nomor_barcode.toLowerCase() != "xxxxx") {
+          document.getElementById("submit-btn").focus();
+        }
       }).catch(e => {
         this.$message({
           message: e.response.data.message,
