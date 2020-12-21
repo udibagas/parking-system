@@ -346,122 +346,125 @@ export default {
 		},
 
 		cekTiket() {
+      if (this.formModel.nomor_barcode.length < 5) return;
+
 			let now = moment().format("YYYY-MM-DD HH:mm:ss");
 
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
 				this.formModel.time_in = moment().format("YYYY-MM-DD");
 				this.formModel.time_out = now;
-				document.getElementById("jenis-kendaraan").focus();
-			} else {
-				let params = { nomor_barcode: this.formModel.nomor_barcode };
-				axios
-					.get("/parkingTransaction/search", { params })
-					.then((r) => {
-						const data = r.data;
-						this.snapshots = data.snapshots;
-						this.formModel.id = data.id;
-						this.formModel.gate_in_id = data.gate_in_id;
-						this.formModel.time_in = data.time_in;
-						this.formModel.is_member = data.is_member;
-						this.formModel.time_out = now;
-            this.formModel.tarif = 0;
-            this.$forceUpdate();
+        document.getElementById("jenis-kendaraan").focus();
+        return;
+      }
 
-						if (!data.is_member) {
-							document.getElementById("jenis-kendaraan").focus();
-							return false;
-						}
+      let params = { nomor_barcode: this.formModel.nomor_barcode };
+      axios
+        .get("/parkingTransaction/search", { params })
+        .then((r) => {
+          const data = r.data;
+          this.snapshots = data.snapshots;
+          this.formModel.id = data.id;
+          this.formModel.gate_in_id = data.gate_in_id;
+          this.formModel.time_in = data.time_in;
+          this.formModel.is_member = data.is_member;
+          this.formModel.time_out = now;
+          this.formModel.tarif = 0;
+          this.$forceUpdate();
 
-						if (!!data.member.expired) {
-							this.$alert("Kartu telah habis masa berlaku", "Perhatian", {
-								type: "warning",
-								center: true,
-								roundButton: true,
-								confirmButtonText: "OK",
-								confirmButtonClass: "bg-red",
-							});
-							this.formModel.is_member = 0;
-							return false;
-						}
+          if (!data.is_member) {
+            document.getElementById("jenis-kendaraan").focus();
+            return false;
+          }
 
-						if (!data.member.expired && data.member.expired_in <= 5) {
-							this.$alert(
-								"Kartu akan habis masa berlaku dalam " +
-									data.member.expired_in +
-									" hari",
-								"Perhatian",
-								{
-									type: "warning",
-									center: true,
-									roundButton: true,
-									confirmButtonText: "OK",
-									confirmButtonClass: "bg-red",
-								}
-							);
-						}
+          if (!!data.member.expired) {
+            this.$alert("Kartu telah habis masa berlaku", "Perhatian", {
+              type: "warning",
+              center: true,
+              roundButton: true,
+              confirmButtonText: "OK",
+              confirmButtonClass: "bg-red",
+            });
+            this.formModel.is_member = 0;
+            return false;
+          }
 
-						if (!!this.setting.disable_plat_nomor) {
-                // member auto open sesuai setingan
-              if (!!this.setting.member_auto_open) {
-
-                this.formModel.jenis_kendaraan = data.member.vehicles[0].jenis_kendaraan
-
-                const gateOut = this.gateOutList.find((g) => {
-                  return (
-                    g.pos_id == this.formModel.pos_id &&
-                    g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
-                  );
-                });
-
-                if (!gateOut) {
-                  this.$message({
-                    message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
-                    type: "error",
-                  });
-                  return;
-                }
-
-                this.formModel.gate_out_id = gateOut.id;
-
-                if (this.formModel.id) {
-                  this.takeSnapshot();
-                }
-
-                this.save(false);
+          if (!data.member.expired && data.member.expired_in <= 5) {
+            this.$alert(
+              "Kartu akan habis masa berlaku dalam " +
+                data.member.expired_in +
+                " hari",
+              "Perhatian",
+              {
+                type: "warning",
+                center: true,
+                roundButton: true,
+                confirmButtonText: "OK",
+                confirmButtonClass: "bg-red",
               }
-						} else {
-							let vehicle = data.member.vehicles.find(
-								(v) => v.plat_nomor == this.formModel.plat_nomor
-							);
+            );
+          }
 
-							if (!vehicle) {
-								this.$alert(
-									"Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
-										data.member.vehicles.map((v) => v.plat_nomor).join(", "),
-									"Perhatian",
-									{
-										type: "warning",
-										center: true,
-										roundButton: true,
-										confirmButtonText: "OK",
-										confirmButtonClass: "bg-red",
-									}
-								);
-								document.getElementById("plat-nomor").focus();
-							} else {
-								document.getElementById("jenis-kendaraan").focus();
-							}
-						}
-					})
-					.catch((e) => {
-						this.$message({
-							message: e.response.data.message,
-							type: "error",
-							showClose: true,
-						});
-						document.getElementById("nomor-tiket").focus();
-					});
-			}
+          if (!!this.setting.disable_plat_nomor) {
+              // member auto open sesuai setingan
+            if (!!this.setting.member_auto_open) {
+
+              this.formModel.jenis_kendaraan = data.member.vehicles[0].jenis_kendaraan
+
+              const gateOut = this.gateOutList.find((g) => {
+                return (
+                  g.pos_id == this.formModel.pos_id &&
+                  g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
+                );
+              });
+
+              if (!gateOut) {
+                this.$message({
+                  message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
+                  type: "error",
+                });
+                return;
+              }
+
+              this.formModel.gate_out_id = gateOut.id;
+
+              if (this.formModel.id) {
+                this.takeSnapshot();
+              }
+
+              this.save(false);
+            }
+          } else {
+            let vehicle = data.member.vehicles.find(
+              (v) => v.plat_nomor == this.formModel.plat_nomor
+            );
+
+            if (!vehicle) {
+              this.$alert(
+                "Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
+                  data.member.vehicles.map((v) => v.plat_nomor).join(", "),
+                "Perhatian",
+                {
+                  type: "warning",
+                  center: true,
+                  roundButton: true,
+                  confirmButtonText: "OK",
+                  confirmButtonClass: "bg-red",
+                }
+              );
+              document.getElementById("plat-nomor").focus();
+            } else {
+              document.getElementById("jenis-kendaraan").focus();
+            }
+          }
+        })
+        .catch((e) => {
+          this.$message({
+            message: e.response.data.message,
+            type: "error",
+            showClose: true,
+          });
+          document.getElementById("nomor-tiket").focus();
+        });
 		},
 
 		resetForm() {
