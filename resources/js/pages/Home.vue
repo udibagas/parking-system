@@ -303,7 +303,6 @@ export default {
 				this.formModel.denda = Number(tarif.denda_tiket_hilang);
 			} else {
         this.formModel.denda = 0;
-				document.getElementById("submit-btn").focus();
       }
 
       axios.post('parkingTransaction/hitungTarif', {
@@ -313,6 +312,7 @@ export default {
       }).then(r => {
         this.formModel.tarif = Number(r.data);
         this.totalBayar = this.formModel.denda + this.formModel.tarif;
+        document.getElementById("submit-btn").focus();
         this.$forceUpdate()
       }).catch(e => {
         this.$message({
