@@ -42,6 +42,7 @@ class ParkingTransactionController extends Controller
                     ->orWhere('plat_nomor', 'LIKE', '%' . $request->keyword . '%')
                     ->orWhere('nomor_kartu', 'LIKE', '%' . $request->keyword . '%')
                     ->orWhere('operator', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('jenis_kendaraan', 'LIKE', '%' . $request->keyword . '%')
                     ->orWhere('edit_by', 'LIKE', '%' . $request->keyword . '%');
                 // TODO: sesuaikan ini
                 // ->orWhere('parking_gate_in.name', 'LIKE', '%' . $request->keyword . '%')
