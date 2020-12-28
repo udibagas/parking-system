@@ -465,6 +465,19 @@ class ParkingTransactionController extends Controller
                 AND operator = :operator
                 AND DATE(time_out) = :date
                 AND gate_outs.pos_id = :pos_id
+                AND tarif > 0
+            GROUP BY parking_transactions.jenis_kendaraan
+        ";
+
+        $sqlDrop = "SELECT parking_transactions.jenis_kendaraan, COUNT(parking_transactions.id) AS jumlah
+            FROM parking_transactions
+            JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
+            WHERE time_out IS NOT NULL
+                AND is_member = 0
+                AND operator = :operator
+                AND DATE(time_out) = :date
+                AND gate_outs.pos_id = :pos_id
+                AND tarif = 0
             GROUP BY parking_transactions.jenis_kendaraan
         ";
 
@@ -507,6 +520,12 @@ class ParkingTransactionController extends Controller
         ";
 
         $pendapatanReguler = DB::select($sqlReguler, [
+            ':date' => $request->date,
+            ':operator' => $request->user()->name,
+            ':pos_id' => $request->pos_id
+        ]);
+
+        $drop = DB::select($sqlDrop, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
             ':pos_id' => $request->pos_id
@@ -625,6 +644,17 @@ class ParkingTransactionController extends Controller
                 . str_pad(number_format($subTotalReguler['pendapatan'] + $subTotalDenda['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n");
 
             $printer->text(str_pad('BUKA MANUAL', 15, ' ') . str_pad($bukaManual[0]->jumlah, 5, ' ', STR_PAD_LEFT) . "\n\n");
+
+            // DROP
+            $printer->text("DROP\n");
+            $totalDrop = 0;
+
+            foreach ($drop as $d) {
+                $totalDrop += $d->jumlah;
+                $printer->text(str_pad('-- ' . $d->jenis_kendaraan, 15, ' ') . str_pad($d->jumlah, 5, ' ', STR_PAD_LEFT) . "\n");
+            }
+
+            $printer->text(str_pad('TOTAL', 15, ' ') . str_pad($totalDrop, 5, ' ', STR_PAD_LEFT) . "\n\n");
 
             $printer->cut();
             $printer->close();
