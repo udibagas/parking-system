@@ -34,50 +34,53 @@ class ParkingTransactionController extends Controller
         $sort = $request->sort ? $request->sort : 'updated_at';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
-        return ParkingTransaction::with(['gateIn', 'gateOut', 'snapshots'])->when($request->dateRange, function ($q) use ($request) {
-            return $q->whereBetween('time_in', $request->dateRange);
-        })->when($request->keyword, function ($q) use ($request) {
-            return $q->where(function ($qq) use ($request) {
-                return $qq->where('nomor_barcode', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('plat_nomor', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('nomor_kartu', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('operator', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('jenis_kendaraan', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('edit_by', 'LIKE', '%' . $request->keyword . '%');
-                // TODO: sesuaikan ini
-                // ->orWhere('parking_gate_in.name', 'LIKE', '%' . $request->keyword . '%')
-                // ->orWhere('parking_gate_out.name', 'LIKE', '%' . $request->keyword . '%');
-            });
-        })->when($request->is_member, function ($q) use ($request) {
-            return $q->whereIn('is_member', $request->is_member);
-        })->when($request->jenis_kendaraan, function ($q) use ($request) {
-            return $q->whereIn('jenis_kendaraan', $request->jenis_kendaraan);
-        })->when($request->gate_in_id, function ($q) use ($request) {
-            return $q->whereIn('gate_in_id', $request->gate_in_id);
-        })->when($request->gate_out_id, function ($q) use ($request) {
-            return $q->whereIn('gate_out_id', $request->gate_out_id);
-        })->when($request->denda, function ($q) use ($request) {
-            if ($request->denda[0] == 'Y') {
-                return $q->where('denda', '>', 0);
-            }
-            if ($request->denda[0] == 'T') {
-                return $q->where('denda', 0);
-            }
-        })->when($request->edit, function ($q)  use ($request) {
-            if ($request->edit[0] == 'Y') {
-                return $q->where('edit', 1);
-            }
-            if ($request->edit[0] == 'T') {
-                return $q->where('edit', 0);
-            }
-        })->when($request->manual, function ($q)  use ($request) {
-            if ($request->manual[0] == 'Y') {
-                return $q->where('manual', 1);
-            }
-            if ($request->manual[0] == 'T') {
-                return $q->where('manual', 0);
-            }
-        })->orderBy($sort, $order)->paginate($request->pageSize);
+        return ParkingTransaction::with(['gateIn', 'gateOut', 'snapshots', 'shift'])
+            ->when($request->dateRange, function ($q) use ($request) {
+                return $q->whereBetween('time_in', $request->dateRange);
+            })->when($request->keyword, function ($q) use ($request) {
+                return $q->where(function ($qq) use ($request) {
+                    return $qq->where('nomor_barcode', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('plat_nomor', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('nomor_kartu', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('operator', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('jenis_kendaraan', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhere('edit_by', 'LIKE', '%' . $request->keyword . '%');
+                    // TODO: sesuaikan ini
+                    // ->orWhere('parking_gate_in.name', 'LIKE', '%' . $request->keyword . '%')
+                    // ->orWhere('parking_gate_out.name', 'LIKE', '%' . $request->keyword . '%');
+                });
+            })->when($request->is_member, function ($q) use ($request) {
+                return $q->whereIn('is_member', $request->is_member);
+            })->when($request->jenis_kendaraan, function ($q) use ($request) {
+                return $q->whereIn('jenis_kendaraan', $request->jenis_kendaraan);
+            })->when($request->gate_in_id, function ($q) use ($request) {
+                return $q->whereIn('gate_in_id', $request->gate_in_id);
+            })->when($request->gate_out_id, function ($q) use ($request) {
+                return $q->whereIn('gate_out_id', $request->gate_out_id);
+            })->when($request->shift_id, function ($q) use ($request) {
+                return $q->whereIn('shift_id', $request->shift_id);
+            })->when($request->denda, function ($q) use ($request) {
+                if ($request->denda[0] == 'Y') {
+                    return $q->where('denda', '>', 0);
+                }
+                if ($request->denda[0] == 'T') {
+                    return $q->where('denda', 0);
+                }
+            })->when($request->edit, function ($q)  use ($request) {
+                if ($request->edit[0] == 'Y') {
+                    return $q->where('edit', 1);
+                }
+                if ($request->edit[0] == 'T') {
+                    return $q->where('edit', 0);
+                }
+            })->when($request->manual, function ($q)  use ($request) {
+                if ($request->manual[0] == 'Y') {
+                    return $q->where('manual', 1);
+                }
+                if ($request->manual[0] == 'T') {
+                    return $q->where('manual', 0);
+                }
+            })->orderBy($sort, $order)->paginate($request->pageSize);
     }
 
     /**
@@ -89,6 +92,7 @@ class ParkingTransactionController extends Controller
     public function store(Request $request)
     {
         $input = $request->all();
+        $input['shift_id'] = ParkingTransaction::setShift($request->time_in);
 
         if ($request->manual) {
             $input['nomor_barcode'] = Str::random(5);
@@ -166,9 +170,12 @@ class ParkingTransactionController extends Controller
             'jenis_kendaraan' => 'required',
         ]);
 
+        $timeIn = now();
+
         $input = array_merge($request->all(), [
             'nomor_barcode' => Str::random(5),
-            'time_in' => now()
+            'shift_id' => ParkingTransaction::setShift($timeIn),
+            'time_in' => $timeIn
         ]);
 
         $parkingTransaction = ParkingTransaction::create($input);
@@ -248,12 +255,15 @@ class ParkingTransactionController extends Controller
                 return response(['message' => 'KARTU SUDAH KEDALUARSA'], 500);
             }
 
+            $timeIn = now();
+
             $data = [
                 'nomor_barcode' => 'NOTAP',
                 'jenis_kendaraan' => $member->vehicles[0]->jenis_kendaraan,
                 'is_member' => true,
                 'member_id' => $member->id,
-                'time_in' => now(),
+                'time_in' => $timeIn,
+                'shift_id' => ParkingTransaction::setShift($timeIn),
                 'gate_in_id' => GateIn::where('status', true)->first()->id,
                 'nomor_kartu' => $member->nomor_kartu
             ];

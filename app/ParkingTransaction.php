@@ -24,7 +24,8 @@ class ParkingTransaction extends Model
         'denda',
         'edit',
         'edit_by',
-        'manual'
+        'manual',
+        'shift_id'
     ];
 
     protected $appends = ['durasi'];
@@ -60,5 +61,16 @@ class ParkingTransaction extends Model
     public function snapshots()
     {
         return $this->hasMany(Snapshot::class);
+    }
+
+    public function shift()
+    {
+        return $this->belongsTo(Shift::class);
+    }
+
+    public static function setShift($timeIn)
+    {
+        $shift = Shift::whereRaw('TIME(?) BETWEEN mulai AND selesai', [$timeIn, $timeIn])->first();
+        return $shift ? $shift->id : null;
     }
 }

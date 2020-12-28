@@ -23,6 +23,7 @@ export default new Vuex.Store({
         groupMemberList: [],
         memberList: [],
         navigationList: [],
+        shiftList: [],
         setting: {},
         siklus: [{
                 value: 'days',
@@ -69,6 +70,10 @@ export default new Vuex.Store({
         },
         getPosList(state) {
             axios.get('/pos').then(r => state.posList = r.data)
+                .catch(e => console.log(e))
+        },
+        getShiftList(state) {
+            axios.get('/shift').then(r => state.shiftList = r.data)
                 .catch(e => console.log(e))
         },
         getPrinterList(state) {

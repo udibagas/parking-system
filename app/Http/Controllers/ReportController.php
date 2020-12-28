@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\JenisKendaraan;
+use App\ParkingTransaction;
 use App\Setting;
+use App\Shift;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -46,16 +49,42 @@ class ReportController extends Controller
     public function getParkedVehicle(Request $request)
     {
         $request->validate(['dateRange' => 'required']);
+        $shifts = Shift::orderBy('mulai', 'asc')->get();
 
-        return DB::select('
-            SELECT jenis_kendaraan, COUNT(id) AS `total`
-            FROM parking_transactions
-            WHERE DATE(updated_at) BETWEEN :start AND :stop
-                AND time_out IS NULL
-            GROUP BY jenis_kendaraan', [
-            ':start' => $request->dateRange[0],
-            ':stop' => $request->dateRange[1]
-        ]);
+        $data = JenisKendaraan::orderBy('nama', 'asc')->get()->map(function ($item) use ($request, $shifts) {
+            $data = ['Jenis Kendaraan' => $item->nama];
+
+            foreach ($shifts as $shift) {
+                $data[$shift->nama] = ParkingTransaction::where('jenis_kendaraan', $item->nama)
+                    ->whereRaw('DATE(time_in) BETWEEN ? AND ?', [$request->dateRange[0], $request->dateRange[1]])
+                    ->where('shift_id', $shift->id)
+                    ->where('time_out', null)
+                    ->count();
+            }
+
+            $data['Total'] = ParkingTransaction::where('jenis_kendaraan', $item->nama)
+                ->whereRaw('DATE(time_in) BETWEEN ? AND ?', [$request->dateRange[0], $request->dateRange[1]])
+                ->where('time_out', null)
+                ->count();
+
+            return $data;
+        })->toArray();
+
+        $length = count($data);
+        $data[$length] = ['Jenis Kendaraan' => 'TOTAL'];
+
+        foreach ($shifts as $shift) {
+            $data[$length][$shift->nama] = ParkingTransaction::where('time_out', null)
+                ->whereRaw('DATE(time_in) BETWEEN ? AND ?', [$request->dateRange[0], $request->dateRange[1]])
+                ->where('shift_id', $shift->id)
+                ->count();
+        }
+
+        $data[$length]['Total'] = ParkingTransaction::where('time_out', null)
+            ->whereRaw('DATE(time_in) BETWEEN ? AND ?', [$request->dateRange[0], $request->dateRange[1]])
+            ->count();
+
+        return $data;
     }
 
     public function getVehicleIn(Request $request)

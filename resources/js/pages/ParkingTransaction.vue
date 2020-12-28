@@ -92,10 +92,18 @@
 				label="No. Tiket"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="150px"
+				min-width="100px"
 			></el-table-column>
 
-			<el-table-column
+      <el-table-column
+        label="Shift"
+        prop="shift.nama"
+        column-key="shift_id"
+        min-width="80px"
+        :filters="shiftList.map(s => { return { value: s.id, text: s.nama } })">
+      </el-table-column>
+
+      <el-table-column
 				prop="jenis_kendaraan"
 				label="Jenis Kendaraan"
 				sortable="custom"
@@ -106,38 +114,32 @@
 					})
 				"
 				column-key="jenis_kendaraan"
-				min-width="180px"
+				min-width="160px"
 			>
 			</el-table-column>
 
 			<el-table-column
-				prop="plat_nomor"
-				label="Plat Nomor"
-				sortable="custom"
-				show-overflow-tooltip
-				min-width="150px"
-			></el-table-column>
-			<!-- <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
-                <template slot-scope="scope">
-                    {{scope.row.is_member ? 'Ya' : 'Tidak'}}
-                </template>
-            </el-table-column> -->
-			<el-table-column
-				prop="member"
-				label="Nama Member"
+				prop="time_in"
+				label="Waktu Masuk"
 				sortable="custom"
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
 			<el-table-column
-				prop="nomor_kartu"
-				label="Nomor Kartu"
+				prop="time_out"
+				label="Waktu Keluar"
 				sortable="custom"
 				show-overflow-tooltip
 				min-width="150px"
+			></el-table-column>
+			<el-table-column
+				prop="durasi"
+				label="Durasi"
+				show-overflow-tooltip
+				min-width="100px"
 			></el-table-column>
 
-			<el-table-column
+      <el-table-column
 				prop="gate_in.nama"
 				label="Gate Masuk"
 				show-overflow-tooltip
@@ -165,26 +167,6 @@
 			>
 			</el-table-column>
 
-			<el-table-column
-				prop="time_in"
-				label="Waktu Masuk"
-				sortable="custom"
-				show-overflow-tooltip
-				min-width="150px"
-			></el-table-column>
-			<el-table-column
-				prop="time_out"
-				label="Waktu Keluar"
-				sortable="custom"
-				show-overflow-tooltip
-				min-width="150px"
-			></el-table-column>
-			<el-table-column
-				prop="durasi"
-				label="Durasi"
-				show-overflow-tooltip
-				min-width="100px"
-			></el-table-column>
 			<el-table-column
 				v-if="user.role == 1"
 				prop="tarif"
@@ -220,13 +202,39 @@
 			</el-table-column>
 
 			<el-table-column
+				prop="plat_nomor"
+				label="Plat Nomor"
+				sortable="custom"
+				show-overflow-tooltip
+				min-width="150px"
+			></el-table-column>
+			<!-- <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
+                <template slot-scope="scope">
+                    {{scope.row.is_member ? 'Ya' : 'Tidak'}}
+                </template>
+            </el-table-column> -->
+			<el-table-column
+				prop="member"
+				label="Nama Member"
+				sortable="custom"
+				show-overflow-tooltip
+				min-width="150px"
+			></el-table-column>
+			<el-table-column
+				prop="nomor_kartu"
+				label="Nomor Kartu"
+				sortable="custom"
+				show-overflow-tooltip
+				min-width="150px"
+			></el-table-column>
+
+			<el-table-column
 				prop="operator"
 				label="Operator"
 				sortable="custom"
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
-			<!-- <el-table-column prop="updated_at" label="Waktu" sortable="custom" show-overflow-tooltip min-width="150px"></el-table-column> -->
 
 			<el-table-column
 				label="Edit"
@@ -390,7 +398,13 @@ import FormTransaksiManual from "../components/FormTransaksiManual";
 export default {
 	components: { DetailTransaksi, FormTransaksiManual },
 	computed: {
-		...mapState(["jenisKendaraanList", "gateInList", "gateOutList", "user"]),
+		...mapState([
+      "jenisKendaraanList",
+      "gateInList",
+      "gateOutList",
+      "user",
+      "shiftList"
+    ]),
 	},
 	data() {
 		return {
@@ -516,6 +530,7 @@ export default {
 		this.$store.commit("getGateInList");
 		this.$store.commit("getGateOutList");
 		this.$store.commit("getJenisKendaraanList");
+		this.$store.commit("getShiftList");
 	},
 };
 </script>

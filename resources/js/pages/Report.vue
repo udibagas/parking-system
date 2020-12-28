@@ -1,6 +1,7 @@
 <template>
-	<div>
-		<el-row>
+
+<div>
+  <el-row class="mb-3">
 			<el-col :span="8">
 				<div class="text-blue-700 text-2xl ml-3">LAPORAN</div>
 			</el-col>
@@ -24,74 +25,75 @@
 			</el-col>
 		</el-row>
 
-		<el-row :gutter="10" class="mt-3">
-			<el-col :span="6">
-				<!-- kendaraan masuk -->
-				<el-card class="summary-container">
-					<div slot="header">
-						<span>Kendaraan Masuk</span>
-					</div>
-					<el-row v-for="(t, id) in vehicleIn" :key="id" :gutter="10">
-						<el-col :span="12" class="col-label">{{ t.gate }}</el-col>
-						<el-col :span="12" class="col-value"
-							>: {{ t.total | formatNumber }}</el-col
-						>
-					</el-row>
-				</el-card>
-			</el-col>
-			<el-col :span="6">
-				<!-- jumlah transaksi -->
-				<el-card class="summary-container">
-					<div slot="header">
-						<span>Transaksi</span>
-					</div>
-					<el-row v-for="(t, id) in transaction" :key="id" :gutter="10">
-						<el-col :span="12" class="col-label">{{
-							t.jenis_kendaraan
-						}}</el-col>
-						<el-col :span="12" class="col-value"
-							>: {{ t.total | formatNumber }}</el-col
-						>
-					</el-row>
-				</el-card>
-			</el-col>
-			<el-col :span="6">
-				<!-- total tarif -->
-				<el-card class="summary-container">
-					<div slot="header">
-						<span>Pendapatan</span>
-					</div>
-					<el-row v-for="(t, id) in income" :key="id">
-						<el-col :span="12" class="col-label">{{
-							t.jenis_kendaraan
-						}}</el-col>
-						<el-col :span="12" class="col-value"
-							>: Rp.
-							{{ (Number(t.total) + Number(t.denda)) | formatNumber }}</el-col
-						>
-					</el-row>
-				</el-card>
-			</el-col>
-			<el-col :span="6">
-				<!-- Kendaraan masih di dalam -->
-				<el-card class="summary-container">
-					<div slot="header">
-						<span>Kendaraan Masih Terparkir</span>
-					</div>
-					<el-row v-for="(t, id) in parkedVehicle" :key="id">
-						<el-col :span="12" class="col-label">{{
-							t.jenis_kendaraan
-						}}</el-col>
-						<el-col :span="12" class="col-value"
-							>: {{ t.total | formatNumber }}</el-col
-						>
-					</el-row>
-				</el-card>
-			</el-col>
-		</el-row>
+    <el-row :gutter="15">
+      <el-col :span="10">
+        <!-- kendaraan masuk -->
+				<el-card class="bg-purple-600 text-white mb-3" :body-style="{padding: '0'}">
+					<div slot="header">Kendaraan Masuk</div>
 
-		<div v-html="report" class="mt-5"></div>
-	</div>
+          <table class="table min-w-full">
+            <tbody>
+              <tr v-for="(t, id) in vehicleIn" :key="id">
+                <td class="border-b px-3 py-1">{{ t.gate }}</td>
+                <td class="border-b px-3 py-1 text-right">{{ t.total | formatNumber }}</td>
+              </tr>
+            </tbody>
+          </table>
+				</el-card>
+
+        <el-card class="bg-blue-600 text-white mb-3" :body-style="{padding: '0'}">
+					<div slot="header"> Transaksi </div>
+          <table class="table min-w-full">
+            <tbody>
+              <tr v-for="(t, id) in transaction" :key="id">
+                <td class="border-b px-3 py-1">{{ t.jenis_kendaraan }}</td>
+                <td class="border-b px-3 py-1 text-right">{{ t.total | formatNumber }}</td>
+              </tr>
+            </tbody>
+          </table>
+				</el-card>
+
+        <el-card class="bg-green-600 text-white mb-3" :body-style="{padding: '0'}">
+					<div slot="header"> Pendapatan </div>
+          <table class="table min-w-full">
+            <tbody>
+              <tr v-for="(t, id) in income" :key="id">
+                <td class="border-b px-3 py-1">{{ t.jenis_kendaraan }}</td>
+                <td class="border-b px-3 py-1 text-right">Rp. {{ (Number(t.total) + Number(t.denda)) | formatNumber }}</td>
+              </tr>
+            </tbody>
+          </table>
+				</el-card>
+
+        <!-- Kendaraan masih di dalam -->
+				<el-card class="bg-orange-600 text-white mb-3" :body-style="{padding: '0'}">
+					<div slot="header"> Kendaraan Masih Terparkir </div>
+          <table class="table min-w-full">
+            <thead>
+              <tr>
+                <th v-for="(header, index) in Object.keys(parkedVehicle[0])" :key="index" class="border-b px-3 py-1">{{header}}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="(t, id) in parkedVehicle" :key="id">
+                <td class="border-b px-3 py-1 text-center"
+                  v-for="(header, index) in Object.keys(parkedVehicle[id])"
+                  :key="index">
+                  {{ t[header] }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+				</el-card>
+      </el-col>
+
+      <el-col :span="14">
+        <el-card>
+          <div v-html="report"></div>
+        </el-card>
+      </el-col>
+    </el-row>
+</div>
 </template>
 
 <script>
@@ -156,10 +158,6 @@ export default {
 				.get("getParkedVehicle", { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.parkedVehicle = r.data;
-					let total = r.data
-						.map((d) => d.total)
-						.reduce((sum, total) => sum + parseInt(total), 0);
-					this.parkedVehicle.push({ jenis_kendaraan: "TOTAL", total });
 				});
 		},
 
@@ -196,19 +194,3 @@ export default {
 	},
 };
 </script>
-
-<style lang="scss" scoped>
-.summary-container {
-	height: 200px;
-}
-
-.summary-info {
-	font-size: 30px;
-}
-
-.col-value,
-.col-label {
-	font-size: 16px;
-	// color: #fff;
-}
-</style>

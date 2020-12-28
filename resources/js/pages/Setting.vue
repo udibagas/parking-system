@@ -20,6 +20,7 @@ import JenisKendaraan from "../components/setting/JenisKendaraan";
 import Kamera from "../components/setting/Kamera";
 import Pos from "../components/setting/Pos";
 import Printer from "../components/setting/Printer";
+import Shift from "../components/setting/Shift";
 
 export default {
 	data() {
@@ -32,6 +33,10 @@ export default {
 				{
 					label: "Jenis Kendaraan & Tarif",
 					component: JenisKendaraan,
+				},
+				{
+					label: "Shift",
+					component: Shift,
 				},
 				{
 					label: "Kamera",
