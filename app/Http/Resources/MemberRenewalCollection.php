@@ -17,9 +17,9 @@ class MemberRenewalCollection extends ResourceCollection
         return [
             'data' => $this->collection->map(function ($item) {
                 return array_merge($item->toArray(), [
-                    'nama_member' => $item->member->nama,
-                    'nomor_kartu' => $item->member->nomor_kartu,
-                    'operator' => $item->user->name
+                    'nama_member' => $item->member ? $item->member->nama : '-',
+                    'nomor_kartu' => $item->member ? $item->member->nomor_kartu : '-',
+                    'operator' => $item->user->name ? $item->user : '-'
                 ]);
             })
         ];
