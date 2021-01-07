@@ -17,10 +17,10 @@ Vue.use(VueRouter)
 
 const router = new VueRouter({
     routes: [{
-            path: '/',
-            component: Home,
-            name: 'home'
-        },
+      path: '/',
+      component: Home,
+      name: 'home'
+    },
         {
             path: '/user',
             component: User,
@@ -61,6 +61,7 @@ const router = new VueRouter({
             path: '*',
             component: Home
         },
+
     ]
 })
 

@@ -216,13 +216,14 @@
 </template>
 
 <script>
+import moment from "moment";
 import { mapState } from "vuex";
 import FormBukaManual from "../components/FormBukaManual";
 
 export default {
 	components: { FormBukaManual },
 	computed: {
-		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"]),
+		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"])
 	},
 
 	data() {
@@ -233,7 +234,7 @@ export default {
 			setting: {},
 			showManualOpenForm: false,
 			totalBayar: 0,
-			posList: [],
+			posList: []
 		};
 	},
 	methods: {
@@ -258,7 +259,7 @@ export default {
 		},
 
 		hitungTarif() {
-			const gateOut = this.gateOutList.find((g) => {
+			const gateOut = this.gateOutList.find(g => {
 				return (
 					g.pos_id == this.formModel.pos_id &&
 					g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
@@ -268,7 +269,7 @@ export default {
 			if (!gateOut) {
 				this.$message({
 					message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
-					type: "error",
+					type: "error"
 				});
 				return;
 			}
@@ -282,7 +283,7 @@ export default {
 			}
 
 			const tarif = this.jenisKendaraanList.find(
-				(v) => v.nama == this.formModel.jenis_kendaraan
+				v => v.nama == this.formModel.jenis_kendaraan
 			);
 
 			if (!tarif) {
@@ -291,7 +292,7 @@ export default {
 						"Tarif tidak ditemukan untuk jenis kendaraan " +
 						this.formModel.jenis_kendaraan,
 					type: "error",
-					showClose: true,
+					showClose: true
 				});
 
 				this.formModel.tarif = 0;
@@ -302,29 +303,146 @@ export default {
 				document.getElementById("time-in").focus();
 				this.formModel.denda = Number(tarif.denda_tiket_hilang);
 			} else {
-        this.formModel.denda = 0;
-      }
+				this.formModel.denda = 0;
+			}
 
-      axios.post('parkingTransaction/hitungTarif', {
-        time_in: this.formModel.time_in,
-        jenis_kendaraan: this.formModel.jenis_kendaraan,
-        is_member: this.formModel.is_member
-      }).then(r => {
-        this.formModel.tarif = Number(r.data);
-        this.totalBayar = this.formModel.denda + this.formModel.tarif;
-        this.$forceUpdate()
-        if (this.formModel.nomor_barcode.toLowerCase() != "xxxxx") {
-          document.getElementById("submit-btn").focus();
-        }
-      }).catch(e => {
-        this.$message({
-          message: e.response.data.message,
-          type: 'error',
-          duration: 10000
-        })
-      })
+			var timeIn = moment(this.formModel.time_in);
+			var timeOut = this.formModel.time_out
+				? moment(this.formModel.time_out)
+				: moment();
+			var durasiMenit = timeOut.diff(timeIn, "minutes");
 
-      if (this.formModel.id) {
+			var tarifMenitPertama = tarif.tarif_menit_pertama;
+
+			// tak peduli flat atau progressif berlaku seperti ini
+			if (durasiMenit <= tarif.menit_pertama) {
+				this.formModel.tarif = tarifMenitPertama;
+				document.getElementById("submit-btn").focus();
+				return;
+			}
+
+			var durasiReal = durasiMenit - tarif.menit_pertama;
+
+			if (tarif.mode_menginap == 0) {
+				var hariParkir = Math.ceil(durasiMenit / (60 * 24));
+
+				if (hariParkir == 0 && tarif.mode_tarif == 0) {
+					hariParkir = 1;
+				}
+			}
+
+			if (tarif.mode_menginap == 1) {
+				var hariIn = moment(timeIn.format("YYYY-MM-DD"));
+				var hariOut = moment(timeOut.format("YYYY-MM-DD"));
+				var hariParkir = hariOut.diff(hariIn, "days") + 1;
+			}
+
+			var hariMenginap = hariParkir >= 1 ? hariParkir - 1 : 0;
+			var tarifMenginap = hariMenginap * tarif.tarif_menginap;
+
+			// tarif flat per hari, kena tarif menginap, kena tarif maximal
+			if (tarif.mode_tarif == 0) {
+				this.formModel.tarif =
+					tarifMenitPertama + hariParkir * tarif.tarif_flat + tarifMenginap;
+			}
+
+			if (tarif.mode_tarif == 1) {
+				var tarifMaksimum = hariMenginap * tarif.tarif_maksimum;
+
+				if (tarif.mode_menginap == 0) {
+					var tarifHariTerakhir =
+						Math.ceil((durasiMenit % (60 * 24)) / tarif.menit_selanjutnya) *
+						tarif.tarif_menit_selanjutnya;
+
+					if (tarifHariTerakhir > tarif.tarif_maksimum) {
+						tarifHariTerakhir = tarif.tarif_maksimum;
+					}
+
+					this.formModel.tarif =
+						tarifMenitPertama +
+						tarifMaksimum +
+						tarifHariTerakhir +
+						tarifMenginap;
+					document.getElementById("submit-btn").focus();
+					return;
+				}
+
+				if (tarif.mode_menginap == 1) {
+					if (hariParkir > 1) {
+						var menitHariPertama =
+							moment(timeIn.format("YYYY-MM-DD") + " 24:00:00").diff(
+								timeIn,
+								"minutes"
+							) - tarif.menit_pertama;
+
+						var menitHariTerakhir = timeOut.diff(
+							moment(timeOut.format("YYYY-MM-DD") + " 00:00:00"),
+							"minutes"
+						);
+
+						var tarifHariPertama =
+							Math.ceil(menitHariPertama / tarif.menit_selanjutnya) *
+							tarif.tarif_menit_selanjutnya;
+						tarifHariTerakhir =
+							Math.ceil(menitHariTerakhir / tarif.menit_selanjutnya) *
+							tarif.tarif_menit_selanjutnya;
+
+						if (tarifHariPertama > tarif.tarif_maksimum) {
+							tarifHariPertama = tarif.tarif_maksimum;
+						}
+
+						if (tarifHariTerakhir > tarif.tarif_maksimum) {
+							tarifHariTerakhir = tarif.tarif_maksimum;
+						}
+
+						if (hariParkir <= 2) {
+							tarifMaksimum = 0;
+						}
+
+						this.formModel.tarif =
+							tarifMenitPertama +
+							tarifMaksimum +
+							tarifHariPertama +
+							tarifHariTerakhir +
+							tarifMenginap;
+						document.getElementById("submit-btn").focus();
+						return;
+					} else {
+						tarifHariPertama =
+							Math.ceil(durasiReal / tarif.menit_selanjutnya) *
+							tarif.tarif_menit_selanjutnya;
+
+						if (tarifHariPertama > tarif.tarif_maksimum) {
+							tarifHariPertama = tarif.tarif_maksimum;
+						}
+
+						this.formModel.tarif = tarifMenitPertama + tarifHariPertama;
+						document.getElementById("submit-btn").focus();
+						return;
+					}
+				}
+			}
+
+			// axios.post('parkingTransaction/hitungTarif', {
+			//   time_in: this.formModel.time_in,
+			//   jenis_kendaraan: this.formModel.jenis_kendaraan,
+			//   is_member: this.formModel.is_member
+			// }).then(r => {
+			//   this.formModel.tarif = Number(r.data);
+			//   this.totalBayar = this.formModel.denda + this.formModel.tarif;
+			//   this.$forceUpdate()
+			//   if (this.formModel.nomor_barcode.toLowerCase() != "xxxxx") {
+			//     document.getElementById("submit-btn").focus();
+			//   }
+			// }).catch(e => {
+			//   this.$message({
+			//     message: e.response.data.message,
+			//     type: 'error',
+			//     duration: 10000
+			//   })
+			// })
+
+			if (this.formModel.id) {
 				this.takeSnapshot();
 			}
 		},
@@ -333,11 +451,11 @@ export default {
 			let params = { plat_nomor: this.formModel.plat_nomor };
 			axios
 				.get("/member/search", { params: params })
-				.then((r) => {
+				.then(r => {
 					this.formModel.is_member = 1;
 					this.formModel.tarif = 0;
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.formModel.is_member = 0;
 				})
 				.finally(() => {
@@ -348,130 +466,131 @@ export default {
 		},
 
 		cekTiket() {
-      if (this.formModel.nomor_barcode.length < 5) return;
+			if (this.formModel.nomor_barcode.length < 5) return;
 
 			let now = moment().format("YYYY-MM-DD HH:mm:ss");
 
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
 				this.formModel.time_in = moment().format("YYYY-MM-DD");
 				this.formModel.time_out = now;
-        document.getElementById("jenis-kendaraan").focus();
-        return;
-      }
+				document.getElementById("jenis-kendaraan").focus();
+				return;
+			}
 
-      let params = { nomor_barcode: this.formModel.nomor_barcode };
-      axios
-        .get("/parkingTransaction/search", { params })
-        .then((r) => {
-          const data = r.data;
-          this.snapshots = data.snapshots;
-          this.formModel.id = data.id;
-          this.formModel.gate_in_id = data.gate_in_id;
-          this.formModel.time_in = data.time_in;
-          this.formModel.is_member = data.is_member;
-          this.formModel.time_out = now;
-          this.formModel.tarif = 0;
-          this.$forceUpdate();
+			let params = { nomor_barcode: this.formModel.nomor_barcode };
+			axios
+				.get("/parkingTransaction/search", { params })
+				.then(r => {
+					const data = r.data;
+					this.snapshots = data.snapshots;
+					this.formModel.id = data.id;
+					this.formModel.gate_in_id = data.gate_in_id;
+					this.formModel.time_in = data.time_in;
+					this.formModel.is_member = data.is_member;
+					this.formModel.time_out = now;
+					this.formModel.tarif = 0;
+					this.$forceUpdate();
 
-          if (!data.is_member) {
-            document.getElementById("jenis-kendaraan").focus();
-            return false;
-          }
+					if (!data.is_member) {
+						document.getElementById("jenis-kendaraan").focus();
+						return false;
+					}
 
-          if (!!data.member.expired) {
-            this.$alert("Kartu telah habis masa berlaku", "Perhatian", {
-              type: "warning",
-              center: true,
-              roundButton: true,
-              confirmButtonText: "OK",
-              confirmButtonClass: "bg-red",
-            });
-            this.formModel.is_member = 0;
-            return false;
-          }
+					if (!!data.member.expired) {
+						this.$alert("Kartu telah habis masa berlaku", "Perhatian", {
+							type: "warning",
+							center: true,
+							roundButton: true,
+							confirmButtonText: "OK",
+							confirmButtonClass: "bg-red"
+						});
+						this.formModel.is_member = 0;
+						return false;
+					}
 
-          if (!data.member.expired && data.member.expired_in <= 5) {
-            this.$alert(
-              "Kartu akan habis masa berlaku dalam " +
-                data.member.expired_in +
-                " hari",
-              "Perhatian",
-              {
-                type: "warning",
-                center: true,
-                roundButton: true,
-                confirmButtonText: "OK",
-                confirmButtonClass: "bg-red",
-              }
-            );
-          }
+					if (!data.member.expired && data.member.expired_in <= 5) {
+						this.$alert(
+							"Kartu akan habis masa berlaku dalam " +
+								data.member.expired_in +
+								" hari",
+							"Perhatian",
+							{
+								type: "warning",
+								center: true,
+								roundButton: true,
+								confirmButtonText: "OK",
+								confirmButtonClass: "bg-red"
+							}
+						);
+					}
 
-          if (!!this.setting.disable_plat_nomor) {
-              // member auto open sesuai setingan
-            if (!!this.setting.member_auto_open) {
+					if (!!this.setting.disable_plat_nomor) {
+						// member auto open sesuai setingan
+						if (!!this.setting.member_auto_open) {
+							this.formModel.jenis_kendaraan =
+								data.member.vehicles[0].jenis_kendaraan;
 
-              this.formModel.jenis_kendaraan = data.member.vehicles[0].jenis_kendaraan
+							const gateOut = this.gateOutList.find(g => {
+								return (
+									g.pos_id == this.formModel.pos_id &&
+									g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
+								);
+							});
 
-              const gateOut = this.gateOutList.find((g) => {
-                return (
-                  g.pos_id == this.formModel.pos_id &&
-                  g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
-                );
-              });
+							if (!gateOut) {
+								this.$message({
+									message:
+										"Tidak ada gate keluar untuk jenis kendaraan terkait",
+									type: "error"
+								});
+								return;
+							}
 
-              if (!gateOut) {
-                this.$message({
-                  message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
-                  type: "error",
-                });
-                return;
-              }
+							this.formModel.gate_out_id = gateOut.id;
 
-              this.formModel.gate_out_id = gateOut.id;
+							if (this.formModel.id) {
+								this.takeSnapshot();
+							}
 
-              if (this.formModel.id) {
-                this.takeSnapshot();
-              }
+							this.save(false);
+						}
+					} else {
+						let vehicle = data.member.vehicles.find(
+							v => v.plat_nomor == this.formModel.plat_nomor
+						);
 
-              this.save(false);
-            }
-          } else {
-            let vehicle = data.member.vehicles.find(
-              (v) => v.plat_nomor == this.formModel.plat_nomor
-            );
-
-            if (!vehicle) {
-              this.$alert(
-                "Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
-                  data.member.vehicles.map((v) => v.plat_nomor).join(", "),
-                "Perhatian",
-                {
-                  type: "warning",
-                  center: true,
-                  roundButton: true,
-                  confirmButtonText: "OK",
-                  confirmButtonClass: "bg-red",
-                }
-              );
-              document.getElementById("plat-nomor").focus();
-            } else {
-              document.getElementById("jenis-kendaraan").focus();
-            }
-          }
-        })
-        .catch((e) => {
-          this.$message({
-            message: e.response.data.message,
-            type: "error",
-            showClose: true,
-          });
-          document.getElementById("nomor-tiket").focus();
-        });
+						if (!vehicle) {
+							this.$alert(
+								"Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
+									data.member.vehicles.map(v => v.plat_nomor).join(", "),
+								"Perhatian",
+								{
+									type: "warning",
+									center: true,
+									roundButton: true,
+									confirmButtonText: "OK",
+									confirmButtonClass: "bg-red"
+								}
+							);
+							document.getElementById("plat-nomor").focus();
+						} else {
+							document.getElementById("jenis-kendaraan").focus();
+						}
+					}
+				})
+				.catch(e => {
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+						showClose: true
+					});
+					document.getElementById("nomor-tiket").focus();
+				});
 		},
 
 		resetForm() {
-      this.formModel.gate_in_id = null;
-      this.formModel.gate_out_id = null;
+			this.formModel.gate_in_id = null;
+			this.formModel.gate_out_id = null;
 			this.formModel.jenis_kendaraan = null;
 			this.formModel.plat_nomor = this.setting.plat_nomor_default;
 			this.formModel.nomor_barcode = "";
@@ -480,8 +599,8 @@ export default {
 			this.formModel.duration = "";
 			this.formModel.tarif = "";
 
-      this.snapshots = [];
-      this.$forceUpdate();
+			this.snapshots = [];
+			this.$forceUpdate();
 
 			if (this.setting.disable_plat_nomor) {
 				console.log("ke nomor tiket");
@@ -490,7 +609,6 @@ export default {
 				console.log("ke plat nomor");
 				document.getElementById("plat-nomor").focus();
 			}
-
 		},
 
 		submit(ticket) {
@@ -513,7 +631,7 @@ export default {
 				this.$message({
 					message: "MOHON ISI GATE IN",
 					type: "error",
-					showClose: true,
+					showClose: true
 				});
 				return;
 			}
@@ -532,7 +650,7 @@ export default {
 				this.$message({
 					message: "FORMAT TIME IN SALAH",
 					type: "error",
-					showClose: true,
+					showClose: true
 				});
 				return;
 			}
@@ -552,54 +670,54 @@ export default {
 				url: this.formModel.id
 					? `/parkingTransaction/${this.formModel.id}`
 					: "/parkingTransaction",
-				data: this.formModel,
+				data: this.formModel
 			})
-				.then((r) => {
+				.then(r => {
 					this.$message({
 						message: r.data.message,
-						type: "success",
+						type: "success"
 					});
 					this.openGate(this.formModel.gate_out_id);
 					this.resetForm();
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: "DATA GAGAL DISIMPAN",
-						type: "error",
+						type: "error"
 					});
 				});
 		},
 
 		openGate(gate_out_id) {
-			const pos = this.posList.find((p) => p.id == this.formModel.pos_id);
-			const gate = this.gateOutList.find((g) => g.id == gate_out_id);
+			const pos = this.posList.find(p => p.id == this.formModel.pos_id);
+			const gate = this.gateOutList.find(g => g.id == gate_out_id);
 
 			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
 
-			ws.onerror = (event) => {
+			ws.onerror = event => {
 				this.$message({
 					message: "KONEKSI KE POS GAGAL",
-					type: "error",
+					type: "error"
 				});
 			};
 
-			ws.onopen = (event) => {
+			ws.onopen = event => {
 				ws.send(
 					[
 						"open",
 						gate.device,
 						gate.baudrate,
 						gate.open_command,
-						gate.close_command,
+						gate.close_command
 					].join(";")
 				);
 			};
 
-			ws.onmessage = (event) => {
+			ws.onmessage = event => {
 				let data = JSON.parse(event.data);
 				this.$message({
 					message: data.message,
-					type: data.status ? "success" : "error",
+					type: data.status ? "success" : "error"
 				});
 				ws.close();
 			};
@@ -608,20 +726,20 @@ export default {
 		printLastTrx() {
 			axios
 				.post("/parkingTransaction/printLastTransaction", {
-					pos_id: this.formModel.pos_id,
+					pos_id: this.formModel.pos_id
 				})
-				.then((r) => {
+				.then(r => {
 					this.$message({
 						message: r.data.message,
 						type: "success",
-						showClose: true,
+						showClose: true
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				});
 		},
@@ -629,23 +747,23 @@ export default {
 		printReport() {
 			let payload = {
 				pos_id: this.formModel.pos_id,
-				date: moment().format("YYYY-MM-DD"),
+				date: moment().format("YYYY-MM-DD")
 			};
 
 			axios
 				.post("/parkingTransaction/printReport", payload)
-				.then((r) => {
+				.then(r => {
 					this.$message({
 						message: "SILAKAN AMBIL STRUK",
 						type: "success",
-						showClose: true,
+						showClose: true
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				});
 		},
@@ -653,7 +771,7 @@ export default {
 		getSetting(state) {
 			axios
 				.get("/setting")
-				.then((r) => {
+				.then(r => {
 					this.setting = r.data;
 					this.formModel.plat_nomor = r.data.plat_nomor_default;
 
@@ -663,24 +781,24 @@ export default {
 						document.getElementById("plat-nomor").focus();
 					}
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: "BELUM ADA SETTING",
 						type: "error",
 						showClose: true,
-						duration: 10000,
+						duration: 10000
 					});
 				});
 		},
 
 		getPosList() {
-			axios.get("/pos").then((r) => {
+			axios.get("/pos").then(r => {
 				if (r.data.length == 0) {
 					this.$message({
 						message: "BELUM ADA POS",
 						type: "error",
 						showClose: true,
-						duration: 10000,
+						duration: 10000
 					});
 				} else {
 					this.posList = r.data;
@@ -699,19 +817,19 @@ export default {
 		takeSnapshot() {
 			axios
 				.post(`/parkingTransaction/takeSnapshot/${this.formModel.id}`, {
-					gate_out_id: this.formModel.gate_out_id,
+					gate_out_id: this.formModel.gate_out_id
 				})
-				.then((r) => {
-          this.snapshots = r.data;
-          this.$forceUpdate()
+				.then(r => {
+					this.snapshots = r.data;
+					this.$forceUpdate();
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: "error"
 					});
 				});
-		},
+		}
 	},
 
 	mounted() {
@@ -722,7 +840,7 @@ export default {
 		this.$store.commit("getGateOutList");
 		this.$store.commit("getJenisKendaraanList");
 
-		document.getElementById("gate-out-app").onkeydown = (e) => {
+		document.getElementById("gate-out-app").onkeydown = e => {
 			// console.log(e.key)
 			// ke field nomor plat
 			if (e.key == "-") {
@@ -771,7 +889,7 @@ export default {
 				this.printLastTrx();
 			}
 		};
-	},
+	}
 };
 </script>
 
