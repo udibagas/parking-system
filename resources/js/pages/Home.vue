@@ -259,6 +259,10 @@ export default {
 		},
 
 		hitungTarif() {
+			if (this.formModel.id) {
+				this.takeSnapshot();
+			}
+
 			const gateOut = this.gateOutList.find(g => {
 				return (
 					g.pos_id == this.formModel.pos_id &&
@@ -271,7 +275,7 @@ export default {
 					message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
 					type: "error"
 				});
-				return;
+				return 0;
 			}
 
 			this.formModel.gate_out_id = gateOut.id;
@@ -279,7 +283,7 @@ export default {
 			if (this.formModel.is_member) {
 				this.formModel.tarif = 0;
 				document.getElementById("submit-btn").focus();
-				return;
+				return 0;
 			}
 
 			const tarif = this.jenisKendaraanList.find(
@@ -318,7 +322,7 @@ export default {
 			if (durasiMenit <= tarif.menit_pertama) {
 				this.formModel.tarif = tarifMenitPertama;
 				document.getElementById("submit-btn").focus();
-				return;
+				return 0;
 			}
 
 			var durasiReal = durasiMenit - tarif.menit_pertama;
@@ -363,8 +367,6 @@ export default {
 						tarifMaksimum +
 						tarifHariTerakhir +
 						tarifMenginap;
-					document.getElementById("submit-btn").focus();
-					return;
 				}
 
 				if (tarif.mode_menginap == 1) {
@@ -405,8 +407,6 @@ export default {
 							tarifHariPertama +
 							tarifHariTerakhir +
 							tarifMenginap;
-						document.getElementById("submit-btn").focus();
-						return;
 					} else {
 						tarifHariPertama =
 							Math.ceil(durasiReal / tarif.menit_selanjutnya) *
@@ -417,11 +417,11 @@ export default {
 						}
 
 						this.formModel.tarif = tarifMenitPertama + tarifHariPertama;
-						document.getElementById("submit-btn").focus();
-						return;
 					}
 				}
 			}
+
+			document.getElementById("submit-btn").focus();
 
 			// axios.post('parkingTransaction/hitungTarif', {
 			//   time_in: this.formModel.time_in,
@@ -441,10 +441,6 @@ export default {
 			//     duration: 10000
 			//   })
 			// })
-
-			if (this.formModel.id) {
-				this.takeSnapshot();
-			}
 		},
 
 		cekPlatNomor() {
