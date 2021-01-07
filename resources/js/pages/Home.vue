@@ -259,10 +259,6 @@ export default {
 		},
 
 		hitungTarif() {
-			if (this.formModel.id) {
-				this.takeSnapshot();
-			}
-
 			const gateOut = this.gateOutList.find(g => {
 				return (
 					g.pos_id == this.formModel.pos_id &&
@@ -279,6 +275,10 @@ export default {
 			}
 
 			this.formModel.gate_out_id = gateOut.id;
+
+			if (this.formModel.id) {
+				this.takeSnapshot();
+			}
 
 			if (this.formModel.is_member) {
 				this.formModel.tarif = 0;
