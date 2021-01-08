@@ -271,7 +271,7 @@ export default {
 					message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
 					type: "error"
 				});
-				return 0;
+				return;
 			}
 
 			this.formModel.gate_out_id = gateOut.id;
@@ -283,7 +283,7 @@ export default {
 			if (this.formModel.is_member) {
 				this.formModel.tarif = 0;
 				document.getElementById("submit-btn").focus();
-				return 0;
+				return;
 			}
 
 			const tarif = this.jenisKendaraanList.find(
@@ -304,7 +304,6 @@ export default {
 			}
 
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
-				document.getElementById("time-in").focus();
 				this.formModel.denda = Number(tarif.denda_tiket_hilang);
 			} else {
 				this.formModel.denda = 0;
@@ -322,7 +321,7 @@ export default {
 			if (durasiMenit <= tarif.menit_pertama) {
 				this.formModel.tarif = tarifMenitPertama;
 				document.getElementById("submit-btn").focus();
-				return 0;
+				return;
 			}
 
 			var durasiReal = durasiMenit - tarif.menit_pertama;
@@ -421,7 +420,9 @@ export default {
 				}
 			}
 
-			document.getElementById("submit-btn").focus();
+			if (this.formModel.nomor_barcode.toLowerCase() != "xxxxx") {
+				document.getElementById("submit-btn").focus();
+			}
 
 			// axios.post('parkingTransaction/hitungTarif', {
 			//   time_in: this.formModel.time_in,
