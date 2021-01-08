@@ -223,6 +223,9 @@ import FormBukaManual from "../components/FormBukaManual";
 export default {
 	components: { FormBukaManual },
 	computed: {
+		totalBayar() {
+			return Number(this.formModel.tarif) + Number(this.formModel.denda);
+		},
 		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"])
 	},
 
@@ -233,7 +236,7 @@ export default {
 			snapshots: [],
 			setting: {},
 			showManualOpenForm: false,
-			totalBayar: 0,
+			// totalBayar: 0,
 			posList: []
 		};
 	},
@@ -420,7 +423,9 @@ export default {
 				}
 			}
 
-			if (this.formModel.nomor_barcode.toLowerCase() != "xxxxx") {
+			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
+				document.getElementById("time-in").focus();
+			} else {
 				document.getElementById("submit-btn").focus();
 			}
 
