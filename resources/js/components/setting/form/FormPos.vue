@@ -52,6 +52,36 @@
 					{{ formErrors.printer_id[0] }}
 				</div>
 			</el-form-item>
+
+			<el-form-item
+				label="Running Text Device"
+				:class="formErrors.running_text_device ? 'is-error' : ''"
+			>
+				<el-input
+					placeholder="Running Text Device"
+					v-model="formModel.running_text_device"
+				></el-input>
+				<div class="el-form-item__error" v-if="formErrors.running_text_device">
+					{{ formErrors.running_text_device[0] }}
+				</div>
+			</el-form-item>
+
+			<el-form-item
+				label="Running Text Baudrate"
+				:class="formErrors.running_text_baudrate ? 'is-error' : ''"
+			>
+				<el-input
+					type="number"
+					placeholder="Running Text Baudrate"
+					v-model="formModel.running_text_baudrate"
+				></el-input>
+				<div
+					class="el-form-item__error"
+					v-if="formErrors.running_text_baudrate"
+				>
+					{{ formErrors.running_text_baudrate[0] }}
+				</div>
+			</el-form-item>
 		</el-form>
 
 		<div slot="footer">
@@ -77,12 +107,12 @@ export default {
 		formModel() {
 			return this.model;
 		},
-		...mapState(["printerList", "gateOutList"]),
+		...mapState(["printerList", "gateOutList"])
 	},
 	data() {
 		return {
 			formErrors: {},
-			loading: false,
+			loading: false
 		};
 	},
 	methods: {
@@ -90,22 +120,22 @@ export default {
 			this.loading = true;
 			axios
 				.post("/pos", this.formModel)
-				.then((r) => {
+				.then(r => {
 					this.$emit("close");
 					this.$emit("reload");
 					this.$message({
 						message: r.data.message,
-						type: "success",
+						type: "success"
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					if (e.response.status == 422) {
 						this.formErrors = e.response.data.errors;
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: "error"
 					});
 				})
 				.finally(() => {
@@ -116,22 +146,22 @@ export default {
 			this.loading = true;
 			axios
 				.put(`/pos/${this.formModel.id}`, this.formModel)
-				.then((r) => {
+				.then(r => {
 					this.$emit("close");
 					this.$emit("reload");
 					this.$message({
 						message: r.data.message,
-						type: "success",
+						type: "success"
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					if (e.response.status == 422) {
 						this.formErrors = e.response.data.errors;
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: "error"
 					});
 				})
 				.finally(() => {
@@ -141,7 +171,7 @@ export default {
 		closeForm() {
 			this.formErrors = {};
 			this.$emit("close");
-		},
-	},
+		}
+	}
 };
 </script>

@@ -17,16 +17,27 @@
 				label="Nama"
 				prop="nama"
 			></el-table-column>
+
 			<el-table-column
 				min-width="100"
 				label="IP Address"
 				prop="ip_address"
 			></el-table-column>
+
 			<el-table-column
 				min-width="100"
 				label="Printer"
 				prop="printer.nama"
 			></el-table-column>
+
+			<el-table-column min-width="200" label="Running Text Device">
+				<template slot-scope="scope">
+					{{ scope.row.running_text_device }}:{{
+						scope.row.running_text_baudrate
+					}}
+				</template>
+			</el-table-column>
+
 			<el-table-column
 				fixed="right"
 				width="60px"
@@ -80,7 +91,7 @@ export default {
 			tableData: [],
 			selectedData: {},
 			showForm: false,
-			loading: false,
+			loading: false
 		};
 	},
 	methods: {
@@ -88,13 +99,13 @@ export default {
 			this.loading = true;
 			axios
 				.get("/pos")
-				.then((r) => {
+				.then(r => {
 					this.tableData = r.data;
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: "error"
 					});
 				})
 				.finally(() => (this.loading = false));
@@ -111,23 +122,23 @@ export default {
 					this.loading = true;
 					axios
 						.delete(`/pos/${id}`)
-						.then((r) => {
+						.then(r => {
 							this.$message({
 								message: r.data.message,
-								type: "success",
+								type: "success"
 							});
 							this.requestData();
 						})
-						.catch((e) => {
+						.catch(e => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
+								type: "error"
 							});
 						})
 						.finally(() => (this.loading = false));
 				})
-				.catch((e) => console.log(e));
-		},
-	},
+				.catch(e => console.log(e));
+		}
+	}
 };
 </script>
