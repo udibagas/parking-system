@@ -2,6 +2,10 @@
 
 namespace App\Providers;
 
+use App\Events\KendaraanKeluarEvent;
+use App\Events\KendaraanMasukEvent;
+use App\Listeners\KendaraanKeluarListener;
+use App\Listeners\KendaraanMasukListener;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Auth\Listeners\SendEmailVerificationNotification;
@@ -18,6 +22,12 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
+        KendaraanMasukEvent::class => [
+            KendaraanMasukListener::class
+        ],
+        KendaraanKeluarEvent::class => [
+            KendaraanKeluarListener::class
+        ]
     ];
 
     /**

@@ -21,6 +21,7 @@ import Kamera from "../components/setting/Kamera";
 import Pos from "../components/setting/Pos";
 import Printer from "../components/setting/Printer";
 import Shift from "../components/setting/Shift";
+import AreaParkir from "../components/setting/AreaParkir";
 
 export default {
 	data() {
@@ -28,41 +29,45 @@ export default {
 			components: [
 				{
 					label: "Pengaturan Umum",
-					component: GeneralSetting,
+					component: GeneralSetting
 				},
 				{
 					label: "Jenis Kendaraan & Tarif",
-					component: JenisKendaraan,
+					component: JenisKendaraan
 				},
 				{
 					label: "Shift",
-					component: Shift,
+					component: Shift
 				},
 				{
 					label: "Kamera",
-					component: Kamera,
+					component: Kamera
 				},
 				{
 					label: "Printer",
-					component: Printer,
+					component: Printer
 				},
 				{
 					label: "Pos",
-					component: Pos,
+					component: Pos
 				},
 				{
 					label: "Gate Keluar",
-					component: GateOut,
+					component: GateOut
 				},
 				{
 					label: "Gate Masuk",
-					component: GateIn,
+					component: GateIn
+				},
+				{
+					label: "Area Parkir",
+					component: AreaParkir
 				},
 				{
 					label: "Backup & Restore",
-					component: Backup,
-				},
-			],
+					component: Backup
+				}
+			]
 		};
 	},
 	mounted() {
@@ -72,6 +77,6 @@ export default {
 		this.$store.commit("getJenisKendaraanList");
 		this.$store.commit("getPosList");
 		this.$store.commit("getPrinterList");
-	},
+	}
 };
 </script>

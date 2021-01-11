@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\KendaraanKeluarEvent;
+use App\Events\KendaraanMasukEvent;
 use App\GateIn;
 use App\GateOut;
 use Illuminate\Http\Request;
@@ -191,6 +193,8 @@ class ParkingTransactionController extends Controller
             ]);
         }
 
+        event(new KendaraanMasukEvent($request->jenis_kendaraan));
+
         return [
             'message' => 'Data berhasil disimpan',
             'data' => $parkingTransaction,
@@ -350,6 +354,10 @@ class ParkingTransactionController extends Controller
                 'message' => 'SILAKAN AMBIL STRUK PARKIR',
                 'data' => $parkingTransaction->load(['snapshots'])
             ];
+        }
+
+        if (!$request->edit) {
+            event(new KendaraanKeluarEvent($parkingTransaction));
         }
 
         return [

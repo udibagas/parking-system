@@ -62,6 +62,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('memberRenewal/reportDaily', 'MemberRenewalController@reportDaily');
     Route::resource('memberRenewal', 'MemberRenewalController')->except(['create', 'edit']);
     Route::resource('shift', 'ShiftController')->except(['create', 'edit']);
+    Route::resource('areaParkir', 'AreaParkirController')->except(['create', 'edit', 'show']);
 
     Route::get('userLog', 'UserLogController@index');
     Route::delete('userLog', 'UserLogController@clear');
