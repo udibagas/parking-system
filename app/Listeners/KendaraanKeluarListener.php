@@ -28,23 +28,5 @@ class KendaraanKeluarListener implements ShouldQueue
     public function handle($event)
     {
         AreaParkir::whereJsonContains('jenis_kendaraan', $event->parkingTransaction->jenis_kendaraan)->decrement('terisi');
-
-        // TODO: tampilkan tarif di running text
-        try {
-            $serial = new PhpSerial;
-            $serial->deviceSet($running);
-            $serial->confBaudRate(2400);
-            $serial->confParity("none");
-            $serial->confCharacterLength(8);
-            $serial->confStopBits(1);
-            $serial->confFlowControl("none");
-            $serial->deviceOpen();
-            $serial->sendMessage("AZ123");
-        } catch (\Exception $e) {
-            // NOTHING TODO
-            return;
-        } finally {
-            $serial->deviceClose();
-        }
     }
 }

@@ -428,25 +428,6 @@ export default {
 			} else {
 				document.getElementById("submit-btn").focus();
 			}
-
-			// axios.post('parkingTransaction/hitungTarif', {
-			//   time_in: this.formModel.time_in,
-			//   jenis_kendaraan: this.formModel.jenis_kendaraan,
-			//   is_member: this.formModel.is_member
-			// }).then(r => {
-			//   this.formModel.tarif = Number(r.data);
-			//   this.totalBayar = this.formModel.denda + this.formModel.tarif;
-			//   this.$forceUpdate()
-			//   if (this.formModel.nomor_barcode.toLowerCase() != "xxxxx") {
-			//     document.getElementById("submit-btn").focus();
-			//   }
-			// }).catch(e => {
-			//   this.$message({
-			//     message: e.response.data.message,
-			//     type: 'error',
-			//     duration: 10000
-			//   })
-			// })
 		},
 
 		cekPlatNomor() {
@@ -679,6 +660,7 @@ export default {
 						message: r.data.message,
 						type: "success"
 					});
+					this.runningText(this.totalBayar);
 					this.openGate(this.formModel.gate_out_id);
 					this.resetForm();
 				})
@@ -721,6 +703,37 @@ export default {
 					message: data.message,
 					type: data.status ? "success" : "error"
 				});
+				ws.close();
+			};
+		},
+
+		runningText(bayar) {
+			const pos = this.posList.find(p => p.id == this.formModel.pos_id);
+			const gate = this.gateOutList.find(g => g.id == gate_out_id);
+
+			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
+
+			ws.onerror = event => {
+				this.$message({
+					message: "KONEKSI KE RUNNING TEXT GAGAL",
+					type: "error"
+				});
+			};
+
+			ws.onopen = event => {
+				ws.send(
+					[
+						"rt",
+						gate.running_text_device,
+						gate.running_text_baudrate,
+						`Rp. ${bayar}`
+					].join(";")
+				);
+			};
+
+			ws.onmessage = event => {
+				let data = JSON.parse(event.data);
+				console.log(data);
 				ws.close();
 			};
 		},

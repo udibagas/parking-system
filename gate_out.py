@@ -6,6 +6,7 @@ import websockets
 from serial import Serial
 import json
 
+
 async def open_gate(websocket, path):
     while True:
         try:
@@ -18,7 +19,7 @@ async def open_gate(websocket, path):
             try:
                 ser = Serial(cfg[1], int(cfg[2]), timeout=1)
             except Exception as e:
-                await websocket.send(json.dumps({"status" : False, "message": "Gagal membuka gate " + str(e)}))
+                await websocket.send(json.dumps({"status": False, "message": "Gagal membuka gate " + str(e)}))
                 continue
 
             try:
@@ -29,11 +30,25 @@ async def open_gate(websocket, path):
                     ser.write(cfg[4].encode())
 
                 ser.close()
-                await websocket.send(json.dumps({"status" : True, "message": "Gate berhasil dibuka"}))
+                await websocket.send(json.dumps({"status": True, "message": "Gate berhasil dibuka"}))
             except Exception as e:
-                await websocket.send(json.dumps({"status" : False, "message": "Gate gagal dibuka " + str(e)}))
+                await websocket.send(json.dumps({"status": False, "message": "Gate gagal dibuka " + str(e)}))
+        elif (cmd[:2] == 'rt'):
+            cfg = cmd.split(';')
+            try:
+                ser = Serial(cfg[1], int(cfg[2]), timeout=1)
+            except Exception as e:
+                await websocket.send(json.dumps({"status": False, "message": "Display tidak ditemukan " + str(e)}))
+                continue
+
+            try:
+                ser.write(cfg[3].encode())
+                ser.close()
+                await websocket.send(json.dumps({"status": True, "message": "Berhasil menampilkan display"}))
+            except Exception as e:
+                await websocket.send(json.dumps({"status": False, "message": "Gagal menampilkan display " + str(e)}))
         else:
-            await websocket.send(json.dumps({"status" : False, "message": "Perintah tidak dikenal"}))
+            await websocket.send(json.dumps({"status": False, "message": "Perintah tidak dikenal"}))
 
 start_server = websockets.serve(open_gate, None, 5678)
 
