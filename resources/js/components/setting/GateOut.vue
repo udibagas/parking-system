@@ -67,11 +67,29 @@
 				label="Perintah Buka"
 				prop="open_command"
 			></el-table-column>
+
 			<el-table-column
 				min-width="120"
 				label="Perintah Tutup"
 				prop="close_command"
 			></el-table-column>
+
+			<el-table-column min-width="200" label="Running Text Device">
+				<template slot-scope="scope">
+					{{ scope.row.running_text_device }}:{{
+						scope.row.running_text_baudrate
+					}}
+				</template>
+			</el-table-column>
+
+			<el-table-column min-width="200" label="Running Text Device">
+				<template slot-scope="scope">
+					{{ scope.row.running_text_device }}:{{
+						scope.row.running_text_baudrate
+					}}
+				</template>
+			</el-table-column>
+
 			<el-table-column min-width="150" label="Kamera">
 				<template slot-scope="scope">
 					{{
@@ -142,7 +160,7 @@ export default {
 			selectedData: {},
 			showForm: false,
 			loading: false,
-			ws: null,
+			ws: null
 		};
 	},
 	methods: {
@@ -150,13 +168,13 @@ export default {
 			this.loading = true;
 			axios
 				.get("/gateOut")
-				.then((r) => {
+				.then(r => {
 					this.tableData = r.data;
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: "error"
 					});
 				})
 				.finally(() => (this.loading = false));
@@ -171,35 +189,35 @@ export default {
 					this.loading = true;
 					axios
 						.delete(`/gateOut/${id}`)
-						.then((r) => {
+						.then(r => {
 							this.$message({
 								message: r.data.message,
-								type: "success",
+								type: "success"
 							});
 							this.requestData();
 						})
-						.catch((e) => {
+						.catch(e => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
+								type: "error"
 							});
 						})
 						.finally(() => (this.loading = false));
 				})
-				.catch((e) => console.log(e));
+				.catch(e => console.log(e));
 		},
 		testGate(gate) {
 			console.log(`connecting to ${gate.pos.ip_address}:5678`);
 			const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
 
-			ws.onerror = (event) => {
+			ws.onerror = event => {
 				this.$message({
 					message: "KONEKSI KE POS GAGAL",
-					type: "error",
+					type: "error"
 				});
 			};
 
-			ws.onopen = (event) => {
+			ws.onopen = event => {
 				console.log(`connected to ${gate.pos.ip_address}:5678`);
 				ws.send(
 					[
@@ -207,20 +225,20 @@ export default {
 						gate.device,
 						gate.baudrate,
 						gate.open_command,
-						gate.close_command,
+						gate.close_command
 					].join(";")
 				);
 			};
 
-			ws.onmessage = (event) => {
+			ws.onmessage = event => {
 				let data = JSON.parse(event.data);
 				this.$message({
 					message: data.message,
-					type: data.status ? "success" : "error",
+					type: data.status ? "success" : "error"
 				});
 				ws.close();
 			};
-		},
-	},
+		}
+	}
 };
 </script>

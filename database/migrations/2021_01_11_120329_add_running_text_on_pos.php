@@ -13,7 +13,7 @@ class AddRunningTextOnPos extends Migration
      */
     public function up()
     {
-        Schema::table('pos', function (Blueprint $table) {
+        Schema::table('gate_outs', function (Blueprint $table) {
             $table->string('running_text_device')->nullable();
             $table->smallInteger('running_text_baudrate')->nullable();
         });
@@ -26,7 +26,7 @@ class AddRunningTextOnPos extends Migration
      */
     public function down()
     {
-        Schema::table('pos', function (Blueprint $table) {
+        Schema::table('gate_outs', function (Blueprint $table) {
             $table->dropColumn(['running_text_device', 'running_text_baudrate']);
         });
     }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\AreaParkir;
 use App\Events\KendaraanKeluarEvent;
 use App\Events\KendaraanMasukEvent;
 use App\GateIn;
@@ -418,6 +419,7 @@ class ParkingTransactionController extends Controller
         $parkingTransaction->time_out = now();
         $parkingTransaction->operator = auth()->user()->name;
         $parkingTransaction->save();
+        event(new KendaraanKeluarEvent($parkingTransaction));
         return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
     }
 
@@ -436,6 +438,7 @@ class ParkingTransactionController extends Controller
             ':stop' => $request->dateRange[1]
         ]);
 
+        AreaParkir::where('terisi', '>', 0)->update(['terisi' => 0]);
         return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
     }
 

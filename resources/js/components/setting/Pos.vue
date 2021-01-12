@@ -30,14 +30,6 @@
 				prop="printer.nama"
 			></el-table-column>
 
-			<el-table-column min-width="200" label="Running Text Device">
-				<template slot-scope="scope">
-					{{ scope.row.running_text_device }}:{{
-						scope.row.running_text_baudrate
-					}}
-				</template>
-			</el-table-column>
-
 			<el-table-column
 				fixed="right"
 				width="60px"

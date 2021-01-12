@@ -16,7 +16,9 @@ class GateOut extends Model
         'close_command',
         'kamera',
         'pos_id',
-        'status'
+        'status',
+        'running_text_device',
+        'running_text_baudrate'
     ];
 
     protected $casts = ['kamera' => 'json', 'jenis_kendaraan' => 'json'];

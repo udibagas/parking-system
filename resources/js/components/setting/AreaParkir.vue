@@ -4,7 +4,7 @@
 			<el-button
 				type="primary"
 				icon="el-icon-plus"
-				@click="openForm()"
+				@click="openForm({})"
 				size="small"
 				>TAMBAH AREA PARKIR</el-button
 			>
@@ -17,11 +17,6 @@
 				label="Nama"
 				prop="nama"
 			></el-table-column>
-			<el-table-column
-				min-width="100"
-				label="Nama"
-				prop="nama"
-			></el-table-column>
 
 			<el-table-column
 				min-width="100"
@@ -29,16 +24,26 @@
 				prop="keterangan"
 			></el-table-column>
 
+			<el-table-column min-width="100" label="Jenis Kendaraan">
+				<template slot-scope="scope">
+					{{ scope.row.jenis_kendaraan.join(", ") }}
+				</template>
+			</el-table-column>
+
 			<el-table-column
 				min-width="100"
 				label="Kapasitas"
 				prop="kapasitas"
+				header-align="center"
+				align="center"
 			></el-table-column>
 
 			<el-table-column
 				min-width="100"
 				label="Terisi"
 				prop="terisi"
+				header-align="center"
+				align="center"
 			></el-table-column>
 
 			<el-table-column
@@ -80,7 +85,7 @@
 			v-loading="loading"
 			:close-on-click-modal="false"
 		>
-			<el-form label-width="100px" label-position="left">
+			<el-form label-width="150px" label-position="left">
 				<el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
 					<el-input placeholder="Nama" v-model="formModel.nama"></el-input>
 					<div class="el-form-item__error" v-if="formErrors.nama">
@@ -98,6 +103,28 @@
 					></el-input>
 					<div class="el-form-item__error" v-if="formErrors.keterangan">
 						{{ formErrors.keterangan[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Jenis Kendaraan"
+					:class="formErrors.jenis_kendaraan ? 'is-error' : ''"
+				>
+					<el-select
+						v-model="formModel.jenis_kendaraan"
+						placeholder="Jenis Kendaraan"
+						style="width: 100%"
+						multiple
+					>
+						<el-option
+							v-for="k in jenisKendaraanList"
+							:value="k.nama"
+							:label="k.nama"
+							:key="k.id"
+						></el-option>
+					</el-select>
+					<div class="el-form-item__error" v-if="formErrors.jenis_kendaraan">
+						{{ formErrors.jenis_kendaraan[0] }}
 					</div>
 				</el-form-item>
 
@@ -140,12 +167,16 @@
 </template>
 
 <script>
+import { mapState } from "vuex";
 import crud from "../../crud";
 
 export default {
 	mixins: [crud],
 	data() {
 		return { url: "/areaParkir" };
+	},
+	computed: {
+		...mapState(["jenisKendaraanList"])
 	}
 };
 </script>

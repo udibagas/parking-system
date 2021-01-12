@@ -13,7 +13,7 @@ class AreaParkirController extends Controller
         return AreaParkir::when($request->keyword, function ($q) use ($request) {
             $q->where('nama', 'LIKE', "%{$request->keyword}%")
                 ->orWhere('keterangan', 'LIKE', "%{$request->keyword}%");
-        })->orderByNama()->get();
+        })->orderBy('nama', 'asc')->get();
     }
 
     public function store(AreaParkirRequest $request)
