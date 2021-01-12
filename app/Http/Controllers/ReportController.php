@@ -147,4 +147,24 @@ class ReportController extends Controller
             return view('report', $data);
         }
     }
+
+    public function summary()
+    {
+        $today = ParkingTransaction::whereRaw('DATE(time_out) = ?', [date('Y-m-d')])
+            ->whereYear('time_out', date('Y'))
+            ->selectRaw('SUM(tarif + denda) AS total')->first()->total;
+
+        $thisMonth = ParkingTransaction::whereMonth('time_out', date('m'))
+            ->whereYear('time_out', date('Y'))
+            ->selectRaw('SUM(tarif + denda) AS total')->first()->total;
+
+        $total = ParkingTransaction::whereYear('time_out', date('Y'))
+            ->selectRaw('SUM(tarif + denda) AS total')->first()->total;
+
+        return [
+            'today' => $today ?: 0,
+            'this_month' => $thisMonth ?: 0,
+            'total' => $total ?: 0
+        ];
+    }
 }

@@ -82,6 +82,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('getParkedVehicle', 'ReportController@getParkedVehicle');
     Route::get('getVehicleIn', 'ReportController@getVehicleIn');
     Route::get('report', 'ReportController@pendapatan');
+    Route::get('summary', 'ReportController@summary');
 
     Route::get('controller-log', function () {
         $output = shell_exec('tail -n 250 /var/log/parking.log');
