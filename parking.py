@@ -57,6 +57,9 @@ def save_data(gate, data):
 
     return r.json()
 
+def update_running_text(s, line, text):
+    s.sendall(b'\xa6DS515050' + text.encode() + b'\xa9')
+
 def gate_in_thread(gate):
     while True:
         with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:

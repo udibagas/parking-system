@@ -1,13 +1,3 @@
-Belum beres:
-    - backup
-        - zip belum recursive
-    - report
-        - denda belum
-
-Member:
-    - Edit disable field tgl registrasi
-    - Konfirmasi dulu waktu simpan
-
 Protocol PCLess Interface
 header = char 0xA6 / char 166
 Footer = char 0xA9 / char 169
@@ -145,4 +135,54 @@ ACTION=="add", ATTRS{idProduct}=="0042", ATTRS{idVendor}=="2341", DRIVERS=="usb"
 /etc/init.d/udev restart
 
 Press Control-O and then Control-X to save the file and exit.
+
+=====================================================================
+
+Struktur protocol : header - DS - Command+Data - footer
+header = char(166)
+footer = char(169)
+DS = memerintahkan PCLess untuk kirim data ke port External display
+
+Command :
+Dabccddxxxxxx|effggyyyyyyyy = menampilkan text pada baris 1 dan / atau baris 2
+
+a : brightness, nilai antara 0 s.d. 9
+b : mode baris 1
+b = 0, tampilan baris 1 tidak diupdate
+b = 1. text baris 1 tampil normal
+b = 2, text baris 1 blinking
+b = 3, baris 1 menampilkan waktu
+b = 4, baris 1 menampilkan tanggal
+cc = bernilai antara 01 s.d. 99, durasi blinking text baris 1
+dd = bernilai antara 01 s.d. 99, speed running text baris 1
+xxxxxxxx = text baris 1, max 100 karakter
+NB : text baris 1 akan otomatis running jika jumlah karakter melebihi 10
+| = separator
+e : mode baris 2
+e = 0, tampilan baris 2 tidak diupdate
+e = 1. text baris 2 tampil normal
+e = 2, text baris 2 blinking
+e = 3, baris 1 menampilkan waktu
+e = 4, baris 1 menampilkan tanggal
+ff = bernilai antara 01 s.d. 99, durasi blinking text baris 2
+gg = bernilai antara 01 s.d. 99, speed running text baris 2
+yyyyyyyyy = text baris 2, max 100 karakter
+NB : text baris 2 akan otomatis running jika jumlah karakter melebihi 10
+text baris 1 dan baris 2 yang diupdate menggunakan command D, tidak disave pada memory
+
+Command :
+Tabccddxxxxxx|effggyyyyyyyy = menyimpan text baris 1 dan / atau baris 2 pada memory
+command ini sama persis dengan command D, bedanya text disimpan pada memory dan tidak ditampilkan
+
+Command :
+U = menampilkan text yang disimpan pada memory menggunakan command T
+
+Command :
+AhhmmssDDMMYY = mengeset tanggal dan waktu
+hh = 2 digit jam
+mm = 2 digit menit
+ss = 2 digit detik
+DD = 2 digit tanggal
+MM = 2 digit bulan
+YY = 2 digit tahun
 

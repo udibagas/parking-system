@@ -324,6 +324,7 @@ export default {
 			if (durasiMenit <= tarif.menit_pertama) {
 				this.formModel.tarif = tarifMenitPertama;
 				document.getElementById("submit-btn").focus();
+				this.runningText(this.totalBayar);
 				return;
 			}
 
@@ -426,6 +427,7 @@ export default {
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
 				document.getElementById("time-in").focus();
 			} else {
+				this.runningText(this.totalBayar);
 				document.getElementById("submit-btn").focus();
 			}
 		},
@@ -660,7 +662,6 @@ export default {
 						message: r.data.message,
 						type: "success"
 					});
-					this.runningText(this.totalBayar);
 					this.openGate(this.formModel.gate_out_id);
 					this.resetForm();
 				})
