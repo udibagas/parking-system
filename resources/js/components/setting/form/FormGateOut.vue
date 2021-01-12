@@ -54,26 +54,44 @@
 				</div>
 			</el-form-item>
 
-			<el-form-item label="Device" :class="formErrors.device ? 'is-error' : ''">
-				<el-input placeholder="Device" v-model="formModel.device"></el-input>
+			<el-form-item
+				label="Controller"
+				:class="formErrors.device ? 'is-error' : ''"
+			>
+				<div class="flex">
+					<el-input
+						class="mr-2"
+						placeholder="Device"
+						v-model="formModel.device"
+					></el-input>
+					<el-input
+						type="number"
+						placeholder="Baudrate"
+						v-model="formModel.baudrate"
+					></el-input>
+				</div>
 
 				<div class="el-form-item__error" v-if="formErrors.device">
 					{{ formErrors.device[0] }}
 				</div>
-			</el-form-item>
-
-			<el-form-item
-				label="Baudrate"
-				:class="formErrors.baudrate ? 'is-error' : ''"
-			>
-				<el-input
-					type="number"
-					placeholder="Baudrate"
-					v-model="formModel.baudrate"
-				></el-input>
 
 				<div class="el-form-item__error" v-if="formErrors.baudrate">
 					{{ formErrors.baudrate[0] }}
+				</div>
+			</el-form-item>
+
+			<el-form-item label="Running Text">
+				<div class="flex">
+					<el-input
+						class="mr-2"
+						placeholder="Device"
+						v-model="formModel.running_text_device"
+					></el-input>
+					<el-input
+						type="number"
+						placeholder="Baudrate"
+						v-model="formModel.running_text_baudrate"
+					></el-input>
 				</div>
 			</el-form-item>
 
@@ -183,12 +201,12 @@ export default {
 		formModel() {
 			return this.model;
 		},
-		...mapState(["kameraList", "posList", "jenisKendaraanList"]),
+		...mapState(["kameraList", "posList", "jenisKendaraanList"])
 	},
 	data() {
 		return {
 			formErrors: {},
-			loading: false,
+			loading: false
 		};
 	},
 	methods: {
@@ -196,22 +214,22 @@ export default {
 			this.loading = true;
 			axios
 				.post("/gateOut", this.formModel)
-				.then((r) => {
+				.then(r => {
 					this.$emit("close");
 					this.$emit("reload");
 					this.$message({
 						message: r.data.message,
-						type: "success",
+						type: "success"
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					if (e.response.status == 422) {
 						this.formErrors = e.response.data.errors;
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: "error"
 					});
 				})
 				.finally(() => {
@@ -222,22 +240,22 @@ export default {
 			this.loading = true;
 			axios
 				.put(`/gateOut/${this.formModel.id}`, this.formModel)
-				.then((r) => {
+				.then(r => {
 					this.$emit("close");
 					this.$emit("reload");
 					this.$message({
 						message: r.data.message,
-						type: "success",
+						type: "success"
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					if (e.response.status == 422) {
 						this.formErrors = e.response.data.errors;
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: "error"
 					});
 				})
 				.finally(() => {
@@ -247,7 +265,7 @@ export default {
 		closeForm() {
 			this.formErrors = {};
 			this.$emit("close");
-		},
-	},
+		}
+	}
 };
 </script>

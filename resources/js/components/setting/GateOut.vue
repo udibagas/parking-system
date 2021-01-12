@@ -22,23 +22,27 @@
 					>
 				</template>
 			</el-table-column>
+
 			<el-table-column
-				min-width="100"
+				min-width="150"
 				label="Nama"
 				prop="nama"
 			></el-table-column>
+
 			<el-table-column
 				prop="shortcut_key"
 				label="Shortcut"
 				align="center"
 				header-align="center"
-				min-width="100px"
+				min-width="100"
 			></el-table-column>
+
 			<el-table-column
 				min-width="100"
 				label="Pos"
 				prop="pos.nama"
 			></el-table-column>
+
 			<el-table-column
 				min-width="150"
 				label="Jenis Kendaraan"
@@ -52,16 +56,13 @@
 					}}
 				</template>
 			</el-table-column>
-			<el-table-column
-				min-width="100"
-				label="Device"
-				prop="device"
-			></el-table-column>
-			<el-table-column
-				min-width="100"
-				label="Baudrate"
-				prop="baudrate"
-			></el-table-column>
+
+			<el-table-column min-width="150" label="Controller Device">
+				<template slot-scope="scope">
+					{{ scope.row.device }}:{{ scope.row.baudrate }}
+				</template>
+			</el-table-column>
+
 			<el-table-column
 				min-width="120"
 				label="Perintah Buka"
@@ -82,14 +83,6 @@
 				</template>
 			</el-table-column>
 
-			<el-table-column min-width="200" label="Running Text Device">
-				<template slot-scope="scope">
-					{{ scope.row.running_text_device }}:{{
-						scope.row.running_text_baudrate
-					}}
-				</template>
-			</el-table-column>
-
 			<el-table-column min-width="150" label="Kamera">
 				<template slot-scope="scope">
 					{{
@@ -99,6 +92,7 @@
 					}}
 				</template>
 			</el-table-column>
+
 			<el-table-column
 				fixed="right"
 				width="60px"
