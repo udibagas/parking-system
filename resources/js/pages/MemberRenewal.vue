@@ -56,23 +56,33 @@
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
-			<el-table-column prop="created_at" label="Tanggal Trx" sortable="custom">
+			<el-table-column
+				prop="created_at"
+				label="Tanggal Trx"
+				sortable="custom"
+				min-width="150"
+			>
 				<template slot-scope="scope">
 					{{ scope.row.created_at | readableDateTime }}
 				</template>
 			</el-table-column>
+
 			<el-table-column
 				prop="nama_member"
 				label="Nama"
 				sortable="custom"
 				show-overflow-tooltip
+				min-width="120"
 			>
 			</el-table-column>
+
 			<el-table-column
 				prop="nomor_kartu"
 				label="Nomor Kartu"
 				sortable="custom"
+				min-width="120"
 			></el-table-column>
+
 			<el-table-column
 				prop="dari_tanggal"
 				label="Dari Tanggal"
@@ -85,6 +95,7 @@
 					{{ scope.row.dari_tanggal | readableDate }}
 				</template>
 			</el-table-column>
+
 			<el-table-column
 				prop="sampai_tanggal"
 				label="Sampai Tanggal"
@@ -97,21 +108,25 @@
 					{{ scope.row.sampai_tanggal | readableDate }}
 				</template>
 			</el-table-column>
+
 			<el-table-column
 				prop="jumlah"
 				label="Jumlah"
 				sortable="custom"
 				align="right"
 				header-align="right"
+				min-width="120"
 			>
 				<template slot-scope="scope">
 					Rp. {{ scope.row.jumlah | formatNumber }}
 				</template>
 			</el-table-column>
+
 			<el-table-column
 				prop="operator"
 				label="Operator"
 				sortable="custom"
+				min-width="120"
 			></el-table-column>
 
 			<el-table-column
@@ -123,7 +138,6 @@
 				<template slot="header">
 					<el-button
 						type="text"
-						class="text-white"
 						@click="
 							() => {
 								page = 1;
@@ -188,13 +202,13 @@
 				layout="total, sizes, prev, pager, next"
 				:page-size="pageSize"
 				:page-sizes="[10, 25, 50, 100]"
-				:total="tableData.total"
+				:total="tableData.meta.total"
 			>
 			</el-pagination>
 
 			<div class="text-sm">
-				Menampilkan {{ tableData.from }} - {{ tableData.to }} dari
-				{{ tableData.total }}
+				Menampilkan {{ tableData.meta.from }} - {{ tableData.meta.to }} dari
+				{{ tableData.meta.total }}
 			</div>
 		</div>
 
@@ -221,7 +235,7 @@ import PrintDialog from "../components/PrintDialog";
 export default {
 	components: { FormRenewal, PrintDialog },
 	computed: {
-		...mapState(["user"]),
+		...mapState(["user"])
 	},
 	data() {
 		return {
@@ -230,13 +244,13 @@ export default {
 			keyword: "",
 			page: 1,
 			pageSize: 10,
-			tableData: {},
+			tableData: { meta: {} },
 			sort: "created_at",
 			order: "descending",
 			loading: false,
 			dateRange: "",
 			showPrintDialog: false,
-			selectedData: {},
+			selectedData: {}
 		};
 	},
 	methods: {
@@ -253,22 +267,22 @@ export default {
 		},
 		deleteData(id) {
 			this.$confirm("Anda yakin akan menghapus data ini?", "Warning", {
-				type: "warning",
+				type: "warning"
 			})
 				.then(() => {
 					axios
 						.delete("/memberRenewal/" + id)
-						.then((r) => {
+						.then(r => {
 							this.requestData();
 							this.$message({
 								message: r.data.message,
-								type: "success",
+								type: "success"
 							});
 						})
-						.catch((e) => {
+						.catch(e => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
+								type: "error"
 							});
 						});
 				})
@@ -281,20 +295,20 @@ export default {
 				pageSize: this.pageSize,
 				sort: this.sort,
 				order: this.order,
-				dateRange: this.dateRange,
+				dateRange: this.dateRange
 			};
 
 			this.loading = true;
 			axios
 				.get("/memberRenewal", { params: params })
-				.then((r) => {
+				.then(r => {
 					this.tableData = r.data;
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				})
 				.finally(() => {
@@ -304,28 +318,28 @@ export default {
 		printSlip(printer_id) {
 			axios
 				.post(`/memberRenewal/printSlip/${this.selectedData.id}`, {
-					printer_id,
+					printer_id
 				})
-				.then((r) => {
+				.then(r => {
 					this.$message({
 						message: r.data.message,
-						type: "success",
+						type: "success"
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: "error"
 					});
 				})
 				.finally(() => {
 					this.showPrintDialog = false;
 				});
-		},
+		}
 	},
 	mounted() {
 		this.requestData();
 		this.$store.commit("getMemberList");
-	},
+	}
 };
 </script>
