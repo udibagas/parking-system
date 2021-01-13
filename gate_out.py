@@ -42,7 +42,10 @@ async def open_gate(websocket, path):
                 continue
 
             try:
-                ser.write('D15050BAYAR:|15050' + cfg[3].encode())
+                text = cfg[3].split('|')
+
+                ser.write(b'\xa6D15050' + text[0].encode() + b'|15050' +
+                          text[1].encode() + b'\xa9')
                 ser.close()
                 await websocket.send(json.dumps({"status": True, "message": "Berhasil menampilkan display"}))
             except Exception as e:

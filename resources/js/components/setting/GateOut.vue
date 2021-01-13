@@ -255,10 +255,10 @@ export default {
 				console.log(`connected to ${gate.pos.ip_address}:5678`);
 				ws.send(
 					[
-						"open",
+						"rt",
 						gate.running_text_device,
 						gate.running_text_baudrate,
-						"TEST RUNNING TEXT"
+						"TEST|TEST RUNNING TEXT"
 					].join(";")
 				);
 			};

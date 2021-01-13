@@ -727,7 +727,7 @@ export default {
 						"rt",
 						gate.running_text_device,
 						gate.running_text_baudrate,
-						`Rp. ${bayar}`
+						`BAYAR:|Rp. ${bayar}`
 					].join(";")
 				);
 			};
