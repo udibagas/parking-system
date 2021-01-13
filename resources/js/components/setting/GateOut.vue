@@ -115,6 +115,11 @@
 								>Test Gate</el-dropdown-item
 							>
 							<el-dropdown-item
+								icon="el-icon-chat-dot-square"
+								@click.native.prevent="testRunningText(scope.row)"
+								>Test Running Text</el-dropdown-item
+							>
+							<el-dropdown-item
 								icon="el-icon-edit"
 								@click.native.prevent="openForm(scope.row)"
 								>Edit</el-dropdown-item
@@ -200,6 +205,7 @@ export default {
 				})
 				.catch(e => console.log(e));
 		},
+
 		testGate(gate) {
 			console.log(`connecting to ${gate.pos.ip_address}:5678`);
 			const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
@@ -220,6 +226,39 @@ export default {
 						gate.baudrate,
 						gate.open_command,
 						gate.close_command
+					].join(";")
+				);
+			};
+
+			ws.onmessage = event => {
+				let data = JSON.parse(event.data);
+				this.$message({
+					message: data.message,
+					type: data.status ? "success" : "error"
+				});
+				ws.close();
+			};
+		},
+
+		testRunningText(gate) {
+			console.log(`connecting to ${gate.pos.ip_address}:5678`);
+			const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
+
+			ws.onerror = event => {
+				this.$message({
+					message: "KONEKSI KE POS GAGAL",
+					type: "error"
+				});
+			};
+
+			ws.onopen = event => {
+				console.log(`connected to ${gate.pos.ip_address}:5678`);
+				ws.send(
+					[
+						"open",
+						gate.running_text_device,
+						gate.running_text_baudrate,
+						"TEST RUNNING TEXT"
 					].join(";")
 				);
 			};
