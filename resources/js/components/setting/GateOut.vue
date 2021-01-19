@@ -241,6 +241,14 @@ export default {
 		},
 
 		testRunningText(gate) {
+			if (!gate.running_text_device || !gate.running_text_baudrate) {
+				this.$message({
+					message: "RUNNING TEXT TIDAK TERPASANG",
+					type: "error"
+				});
+				return;
+			}
+
 			console.log(`connecting to ${gate.pos.ip_address}:5678`);
 			const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
 
