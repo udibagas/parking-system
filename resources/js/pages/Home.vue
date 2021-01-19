@@ -324,7 +324,7 @@ export default {
 			if (durasiMenit <= tarif.menit_pertama) {
 				this.formModel.tarif = tarifMenitPertama;
 				document.getElementById("submit-btn").focus();
-				this.runningText(this.totalBayar);
+				this.runningText(`BAYAR:|Rp. ${this.totalBayar}`);
 				return;
 			}
 
@@ -427,7 +427,7 @@ export default {
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
 				document.getElementById("time-in").focus();
 			} else {
-				this.runningText(this.totalBayar);
+				this.runningText(`BAYAR:|Rp. ${this.totalBayar}`);
 				document.getElementById("submit-btn").focus();
 			}
 		},
@@ -594,6 +594,9 @@ export default {
 				console.log("ke plat nomor");
 				document.getElementById("plat-nomor").focus();
 			}
+
+			this.runningText("TERIMAKASIH|ATAS KUNJUNGAN ANDA");
+			setTimeout(this.runningText("MOHON TUNGGU|SIAPKAN UANG PAS"), 3000);
 		},
 
 		submit(ticket) {
@@ -708,13 +711,13 @@ export default {
 			};
 		},
 
-		runningText(bayar) {
+		runningText(text) {
 			const pos = this.posList.find(p => p.id == this.formModel.pos_id);
-      const gate = this.gateOutList.find(g => g.id == gate_out_id);
+			const gate = this.gateOutList.find(g => g.id == gate_out_id);
 
-      if (!gate.running_text_device || !gate.running_text_baudrate) {
-        return;
-      }
+			if (!gate.running_text_device || !gate.running_text_baudrate) {
+				return;
+			}
 
 			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
 
@@ -731,7 +734,7 @@ export default {
 						"rt",
 						gate.running_text_device,
 						gate.running_text_baudrate,
-						`BAYAR:|Rp. ${bayar}`
+						text
 					].join(";")
 				);
 			};
