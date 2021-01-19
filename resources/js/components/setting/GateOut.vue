@@ -258,7 +258,7 @@ export default {
 						"rt",
 						gate.running_text_device,
 						gate.running_text_baudrate,
-						"TEST|TEST RUNNING TEXT"
+						`TEST|${gate.nama}`
 					].join(";")
 				);
 			};
