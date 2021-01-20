@@ -713,7 +713,7 @@ export default {
 
 		runningText(text) {
 			const pos = this.posList.find(p => p.id == this.formModel.pos_id);
-			const gate = this.gateOutList.find(g => g.id == gate_out_id);
+			const gate = this.gateOutList.find(g => g.id == this.formModel.gate_out_id);
 
 			if (!gate.running_text_device || !gate.running_text_baudrate) {
 				return;
