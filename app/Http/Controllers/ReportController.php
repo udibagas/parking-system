@@ -108,7 +108,8 @@ class ReportController extends Controller
 
         $perKendaraan = DB::select('
             SELECT jenis_kendaraan,
-                COUNT(id) AS jumlah,
+                SUM(CASE WHEN is_member = 1 THEN 1 ELSE 0 END) AS jumlah_member,
+                SUM(CASE WHEN is_member = 0 THEN 1 ELSE 0 END) AS jumlah_reguler,
                 SUM(tarif) AS `pendapatan`,
                 SUM(denda) AS `denda`
             FROM parking_transactions
@@ -121,7 +122,8 @@ class ReportController extends Controller
 
         $perPetugas = DB::select('
             SELECT operator,
-                COUNT(id) AS jumlah,
+                SUM(CASE WHEN is_member = 1 THEN 1 ELSE 0 END) AS jumlah_member,
+                SUM(CASE WHEN is_member = 0 THEN 1 ELSE 0 END) AS jumlah_reguler,
                 SUM(tarif) AS `pendapatan`,
                 SUM(denda) AS `denda`
             FROM parking_transactions
