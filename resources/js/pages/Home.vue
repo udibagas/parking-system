@@ -240,7 +240,7 @@ export default {
 
 			return `${day}HR ${String(hour % 24).padStart(2, "0")}:${String(
 				minute % 60
-			).padStart(2, "0")}}`;
+			).padStart(2, "0")}`;
 		},
 		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"])
 	},
