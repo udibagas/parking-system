@@ -238,7 +238,7 @@ export default {
 			let minute = time_out.diff(time_in, "minutes");
 			let second = time_out.diff(time_in, "seconds");
 
-			return `${day}H ${String(hour % 24).padStart(2, "0")}:${String(
+			return `${day}:${String(hour % 24).padStart(2, "0")}:${String(
 				minute % 60
 			).padStart(2, "0")}:${String(second % 60).padStart(2, "0")}`;
 		},
@@ -341,7 +341,7 @@ export default {
 				this.formModel.tarif = tarifMenitPertama;
 				document.getElementById("submit-btn").focus();
 				this.runningText(
-					`DUR: ${this.duration}|Rp. ${this.formatNumber(this.totalBayar)},-`
+					`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
 				);
 				return;
 			}
@@ -446,7 +446,7 @@ export default {
 				document.getElementById("time-in").focus();
 			} else {
 				this.runningText(
-					`DUR: ${this.duration}|Rp. ${this.formatNumber(this.totalBayar)},-`
+					`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
 				);
 				document.getElementById("submit-btn").focus();
 			}
