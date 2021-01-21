@@ -50,6 +50,22 @@ async def open_gate(websocket, path):
                 await websocket.send(json.dumps({"status": True, "message": "Berhasil menampilkan display"}))
             except Exception as e:
                 await websocket.send(json.dumps({"status": False, "message": "Gagal menampilkan display " + str(e)}))
+
+        elif (cmd[:3] == 'rrt'):
+            cfg = cmd.split(';')
+            try:
+                ser = Serial(cfg[1], int(cfg[2]), timeout=1)
+            except Exception as e:
+                await websocket.send(json.dumps({"status": False, "message": "Display tidak ditemukan " + str(e)}))
+                continue
+
+            try:
+                ser.write(b'\xa6U\xa9')
+                ser.close()
+                await websocket.send(json.dumps({"status": True, "message": "Berhasil menampilkan display"}))
+            except Exception as e:
+                await websocket.send(json.dumps({"status": False, "message": "Gagal menampilkan display " + str(e)}))
+
         else:
             await websocket.send(json.dumps({"status": False, "message": "Perintah tidak dikenal"}))
 

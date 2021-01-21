@@ -226,6 +226,22 @@ export default {
 		totalBayar() {
 			return Number(this.formModel.tarif) + Number(this.formModel.denda);
 		},
+		duration() {
+			if (!this.formModel.time_in || !this.formModel.time_out) {
+				return "00:00:00";
+			}
+
+			let time_in = moment(this.formModel.time_in);
+			let time_out = moment(this.formModel.time_out);
+			let day = time_out.diff(time_in, "days");
+			let hour = time_out.diff(time_in, "hours");
+			let minute = time_out.diff(time_in, "minutes");
+			let second = time_out.diff(time_in, "seconds");
+
+			return `${day}H ${String(hour % 24).padStart(2, "0")}:${String(
+				minute % 60
+			).padStart(2, "0")}:${String(second % 60).padStart(2, "0")}`;
+		},
 		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"])
 	},
 
@@ -324,7 +340,9 @@ export default {
 			if (durasiMenit <= tarif.menit_pertama) {
 				this.formModel.tarif = tarifMenitPertama;
 				document.getElementById("submit-btn").focus();
-				this.runningText(`BAYAR:|Rp. ${this.totalBayar}`);
+				this.runningText(
+					`DUR: ${this.duration}|Rp. ${this.formatNumber(this.totalBayar)},-`
+				);
 				return;
 			}
 
@@ -427,7 +445,9 @@ export default {
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
 				document.getElementById("time-in").focus();
 			} else {
-				this.runningText(`BAYAR:|Rp. ${this.totalBayar}`);
+				this.runningText(
+					`DUR: ${this.duration}|Rp. ${this.formatNumber(this.totalBayar)},-`
+				);
 				document.getElementById("submit-btn").focus();
 			}
 		},
@@ -574,6 +594,7 @@ export default {
 		},
 
 		resetForm() {
+			this.resetRunningText();
 			this.formModel.gate_in_id = null;
 			this.formModel.gate_out_id = null;
 			this.formModel.jenis_kendaraan = null;
@@ -594,9 +615,6 @@ export default {
 				console.log("ke plat nomor");
 				document.getElementById("plat-nomor").focus();
 			}
-
-			this.runningText("TERIMAKASIH|ATAS KUNJUNGAN ANDA");
-			setTimeout(this.runningText("MOHON TUNGGU|SIAPKAN UANG PAS"), 3000);
 		},
 
 		submit(ticket) {
@@ -676,6 +694,22 @@ export default {
 				});
 		},
 
+		formatNumber(v) {
+			try {
+				v += "";
+				var x = v.split(".");
+				var x1 = x[0];
+				var x2 = x.length > 1 ? "." + x[1] : "";
+				var rgx = /(\d+)(\d{3})/;
+				while (rgx.test(x1)) {
+					x1 = x1.replace(rgx, "$1" + "," + "$2");
+				}
+				return x1 + x2;
+			} catch (error) {
+				return 0;
+			}
+		},
+
 		openGate(gate_out_id) {
 			const pos = this.posList.find(p => p.id == this.formModel.pos_id);
 			const gate = this.gateOutList.find(g => g.id == gate_out_id);
@@ -713,7 +747,9 @@ export default {
 
 		runningText(text) {
 			const pos = this.posList.find(p => p.id == this.formModel.pos_id);
-			const gate = this.gateOutList.find(g => g.id == this.formModel.gate_out_id);
+			const gate = this.gateOutList.find(
+				g => g.id == this.formModel.gate_out_id
+			);
 
 			if (!gate.running_text_device || !gate.running_text_baudrate) {
 				return;
@@ -736,6 +772,40 @@ export default {
 						gate.running_text_baudrate,
 						text
 					].join(";")
+				);
+			};
+
+			ws.onmessage = event => {
+				let data = JSON.parse(event.data);
+				console.log(data);
+				ws.close();
+			};
+		},
+
+		resetRunningText() {
+			const pos = this.posList.find(p => p.id == this.formModel.pos_id);
+			const gate = this.gateOutList.find(
+				g => g.id == this.formModel.gate_out_id
+			);
+
+			if (!gate.running_text_device || !gate.running_text_baudrate) {
+				return;
+			}
+
+			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
+
+			ws.onerror = event => {
+				this.$message({
+					message: "KONEKSI KE RUNNING TEXT GAGAL",
+					type: "error"
+				});
+			};
+
+			ws.onopen = event => {
+				ws.send(
+					["rrt", gate.running_text_device, gate.running_text_baudrate].join(
+						";"
+					)
 				);
 			};
 

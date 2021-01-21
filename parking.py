@@ -67,8 +67,12 @@ def save_data(gate, data):
 
 def running_text(s, text):
     line = text.split('|')
-    s.sendall(b'\xa6DS915050' +
+    s.sendall(b'\xa6DSD915050' +
               line[0].encode() + b'|15050' + line[1].encode() + b'\xa9')
+
+
+def reset_running_text(s):
+    s.sendall(b'\xa6DSU\xa9')
 
 
 def gate_in_thread(gate):
@@ -212,7 +216,7 @@ def gate_in_thread(gate):
                             try:
                                 s.sendall(b'\xa6MT00012\xa9')
                                 running_text(
-                                    s, 'MASA BERLAKU KARTU HABIS DALAM|5 HARI')
+                                    s, 'MASA BERLAKU KARTU HABIS DALAM|1 HARI')
                                 time.sleep(6)
                             except Exception as e:
                                 logging.error(
@@ -358,6 +362,8 @@ def gate_in_thread(gate):
                 if error:
                     # break loop cek kendaraan, sambung ulang controller
                     break
+
+                reset_running_text(s)
 
 
 def start_app():
