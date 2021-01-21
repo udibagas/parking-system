@@ -238,9 +238,9 @@ export default {
 			let minute = time_out.diff(time_in, "minutes");
 			let second = time_out.diff(time_in, "seconds");
 
-			return `${day}:${String(hour % 24).padStart(2, "0")}:${String(
+			return `${day}HR ${String(hour % 24).padStart(2, "0")}:${String(
 				minute % 60
-			).padStart(2, "0")}:${String(second % 60).padStart(2, "0")}`;
+			).padStart(2, "0")}}`;
 		},
 		...mapState(["gateOutList", "gateInList", "jenisKendaraanList"])
 	},
