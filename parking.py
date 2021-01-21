@@ -67,8 +67,8 @@ def save_data(gate, data):
 
 def running_text(s, text):
     line = text.split('|')
-    s.sendall(b'\xa6DSD910909' +
-              line[0].encode() + b'|10909' + line[1].encode() + b'\xa9')
+    s.sendall(b'\xa6DSD913009' +
+              line[0].encode() + b'|13009' + line[1].encode() + b'\xa9')
 
 
 def reset_running_text(s):
