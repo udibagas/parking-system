@@ -267,6 +267,8 @@ export default {
 			} else {
 				document.getElementById("submit-btn").focus();
 			}
+
+			this.runningText(`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`);
 		},
 
 		nextBtn() {
