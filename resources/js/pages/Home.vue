@@ -445,11 +445,10 @@ export default {
 			if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
 				document.getElementById("time-in").focus();
 			} else {
-				this.runningText(
-					`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
-				);
 				document.getElementById("submit-btn").focus();
 			}
+
+			this.runningText(`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`);
 		},
 
 		cekPlatNomor() {
