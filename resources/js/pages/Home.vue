@@ -258,6 +258,7 @@ export default {
 	},
 	methods: {
 		toSubmit() {
+			this.runningText(`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`);
 			document.getElementById("submit-btn").focus();
 		},
 
