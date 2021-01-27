@@ -252,7 +252,6 @@ export default {
 			snapshots: [],
 			setting: {},
 			showManualOpenForm: false,
-			// totalBayar: 0,
 			posList: []
 		};
 	},
