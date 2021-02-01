@@ -11,8 +11,9 @@
     <div id="app"></div>
     <script type="text/javascript">
         const BASE_URL = '{{url("")}}';
-        const APP_LOGO = '{{env('APP_LOGO', 'logo.jpeg')}}'
-        const APP_NAME = '{{config('app.name')}}'
+        const APP_LOGO = '{{env('APP_LOGO', 'logo.jpeg')}}';
+        const APP_NAME = '{{config('app.name')}}';
+        const HIDE_PRINT_REPORT = '{{env('HIDE_PRINT_REPORT', false)}}';
     </script>
     <script src="{{ asset('js/app.js') }}"></script>
 </body>

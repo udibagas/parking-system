@@ -162,7 +162,7 @@
 			</button>
 
 			<el-row :gutter="10">
-				<el-col :span="12">
+				<el-col :span="12" v-if="HIDE_PRINT_REPORT">
 					<button
 						@keydown.enter="printReport"
 						class="my-big-btn"
@@ -171,7 +171,7 @@
 						[F10] PRINT LAPORAN
 					</button>
 				</el-col>
-				<el-col :span="12">
+				<el-col :span="HIDE_PRINT_REPORT ? 24 : 12">
 					<button
 						class="my-big-btn"
 						@keydown.enter="showManualOpenForm = true"
@@ -252,7 +252,8 @@ export default {
 			snapshots: [],
 			setting: {},
 			showManualOpenForm: false,
-			posList: []
+			posList: [],
+      HIDE_PRINT_REPORT: HIDE_PRINT_REPORT
 		};
 	},
 	methods: {
@@ -839,6 +840,10 @@ export default {
 		},
 
 		printReport() {
+      if (this.HIDE_PRINT_REPORT) {
+        return;
+      }
+
 			let payload = {
 				pos_id: this.formModel.pos_id,
 				date: moment().format("YYYY-MM-DD")
