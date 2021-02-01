@@ -162,7 +162,7 @@
 			</button>
 
 			<el-row :gutter="10">
-				<el-col :span="12" v-if="HIDE_PRINT_REPORT">
+				<el-col :span="12" v-if="!HIDE_PRINT_REPORT">
 					<button
 						@keydown.enter="printReport"
 						class="my-big-btn"
