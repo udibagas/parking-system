@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\PrinterRequest;
 use App\Printer;
 use Illuminate\Http\Request;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\Printer as MyPrinter;
 
@@ -68,7 +69,12 @@ class PrinterController extends Controller
     public function test(Printer $printer)
     {
         try {
-            $connector = new NetworkPrintConnector($printer->ip_address, $printer->port ?: 9100);
+            if (filter_var($printer->ip_address, FILTER_VALIDATE_IP)) {
+                $connector = new NetworkPrintConnector($printer->ip_address, $printer->port ?: 9100);
+            } else {
+                $connector = new FilePrintConnector($printer->ip_address);
+            }
+
             $p = new MyPrinter($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);

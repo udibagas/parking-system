@@ -10,6 +10,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\Printer;
 
@@ -54,7 +55,12 @@ class PrintTicketOut implements ShouldQueue
         }
 
         try {
-            $connector = new NetworkPrintConnector($printer->ip_address, $printer->port ?: 9100);
+            if (filter_var($printer->ip_address, FILTER_VALIDATE_IP)) {
+                $connector = new NetworkPrintConnector($printer->ip_address, $printer->port ?: 9100);
+            } else {
+                $connector = new FilePrintConnector($printer->ip_address);
+            }
+
             $p = new Printer($connector);
         } catch (\Exception $e) {
             $printer->notify(new PrintStrukFailedNotification($parkingTransaction, 'Koneksi ke printer gagal'));

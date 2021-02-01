@@ -116,7 +116,12 @@ class MemberRenewalController extends Controller
         $selectedPrinter = AppPrinter::find($request->printer_id);
 
         try {
-            $connector = new NetworkPrintConnector($selectedPrinter->ip_address, $selectedPrinter->port ?: 9100);
+            if (filter_var($selectedPrinter->ip_address, FILTER_VALIDATE_IP)) {
+                $connector = new NetworkPrintConnector($selectedPrinter->ip_address, $selectedPrinter->port ?: 9100);
+            } else {
+                $connector = new FilePrintConnector($selectedPrinter->ip_address);
+            }
+
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
