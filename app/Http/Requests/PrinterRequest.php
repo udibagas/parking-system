@@ -25,7 +25,7 @@ class PrinterRequest extends FormRequest
     {
         return [
             'nama' => 'required',
-            'ip_address' => 'required|ipv4',
+            'ip_address' => 'required',
             'port' => 'required|numeric',
             'status' => 'boolean'
         ];
