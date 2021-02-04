@@ -248,7 +248,7 @@ class ParkingTransactionController extends Controller
             return $data->load(['member', 'snapshots']);
         }
 
-        // member, tapi gak tap in karena rusak gate in
+        // member, tapi gak tap in karena rusak gate in, atau pake kartu gantian
         $member = Member::where('nomor_kartu', $request->nomor_barcode)->first();
 
         if ($member) {
@@ -258,6 +258,11 @@ class ParkingTransactionController extends Controller
 
             if (strtotime($member->expiry_date) < strtotime(date('Y-m-d'))) {
                 return response(['message' => 'KARTU SUDAH KEDALUARSA'], 500);
+            }
+
+            $setting = Setting::first();
+            if ($setting->must_checkout) {
+                return response(['message' => 'KARTU TIDAK MELAKUKAN TAP DI GATE MASUK'], 500);
             }
 
             $timeIn = now();
