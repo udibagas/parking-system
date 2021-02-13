@@ -68,7 +68,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::delete('userLog', 'UserLogController@clear');
 
     Route::get('snapshot', 'SnapshotController@index');
-    Route::delete('snapshot', 'SnapshotController@delete');
+    Route::post('snapshot/delete', 'SnapshotController@destroy');
 
     Route::post('backup', 'BackupController@store');
     Route::get('backup', 'BackupController@index');

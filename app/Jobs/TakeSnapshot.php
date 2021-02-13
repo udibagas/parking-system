@@ -58,7 +58,7 @@ class TakeSnapshot implements ShouldQueue
                 ]);
 
                 $fileName = $this->gate->nama . '-' . $kamera->nama . date('-YmdHis') . '.jpeg';
-                $path = 'public/snapshots/' . date('Y/m/d/H/') . $fileName;
+                $path = 'snapshots/' . date('Y/m/d/H/') . $fileName;
                 Storage::put($path, $response->getBody());
             } catch (\Exception $e) {
                 $kamera->notify(new KameraErrorNotification($kamera));
