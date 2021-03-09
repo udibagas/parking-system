@@ -70,11 +70,12 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('snapshot', 'SnapshotController@index');
     Route::post('snapshot/delete', 'SnapshotController@destroy');
 
-    Route::post('backup', 'BackupController@store');
-    Route::get('backup', 'BackupController@index');
-    Route::delete('backup', 'BackupController@destroy');
-    Route::post('restoreDatabase', 'BackupController@restoreDatabase');
-    Route::post('restoreSnapshot', 'BackupController@restoreSnapshot');
+    Route::prefix('backup')->group(function () {
+        Route::get('', 'BackupController@index');
+        Route::post('', 'BackupController@store');
+        Route::delete('', 'BackupController@destroy');
+        Route::put('', 'BackupController@restore');
+    });
 
     // Report
     Route::get('getIncome', 'ReportController@getIncome');

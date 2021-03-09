@@ -186,3 +186,6 @@ DD = 2 digit tanggal
 MM = 2 digit bulan
 YY = 2 digit tahun
 
+* * * * * cd ~/apps/parking-system && php artisan schedule:run >> /dev/null 2>&1
+
+

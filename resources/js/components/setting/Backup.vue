@@ -1,172 +1,267 @@
 <template>
-    <div v-loading="loading">
-        <el-form :inline="true">
-            <el-form-item>
-                <el-input size="small" v-model="fileName" placeholder="Nama file backup" style="width:300px;display:block;"></el-input>
-                <span v-if="error" class="text-danger">{{error}}</span>
-            </el-form-item>
-            <el-form-item>
-                <el-button size="small" :disabled="isGenerating || !fileName" @click="createBackup" type="primary">{{buttonLabel}}</el-button>
-            </el-form-item>
-        </el-form>
-        <!-- <el-divider style="margin-top:0"></el-divider> -->
-        <el-row :gutter="15">
-            <el-col :span="12">
-                <el-table height="calc(100vh - 360px)" :data="files">
-                    <el-table-column type="index" width="30px" label="#"></el-table-column>
-                    <el-table-column label="Waktu Backup" show-overflow-tooltip>
-                        <template slot-scope="scope">
-                            {{scope.row.modified_at | asDateTime }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="name" label="Backup File Database" show-overflow-tooltip></el-table-column>
-                    <el-table-column label="Ukuran" width="120px" header-align="right" align="right">
-                        <template slot-scope="scope">
-                            {{scope.row.size | formatNumber }} KB
-                        </template>
-                    </el-table-column>
-                    <el-table-column fixed="right" width="80px" align="right">
-                        <template slot-scope="scope">
-                            <a href="#" @click.prevent="restoreDatabase(scope.row)" title="Restore Database"><i class="el-icon-refresh"></i></a>
-                            <a href="#" @click.prevent="downloadFile(scope.row)" title="Download Database"><i class="el-icon-download"></i></a>
-                            <a href="#" @click.prevent="deleteFile(scope.row)" title="Hapus"><i class="el-icon-delete"></i></a>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-col>
-            <el-col :span="12">
-                <el-table height="calc(100vh - 360px)" :data="images">
-                    <el-table-column type="index" width="30px" label="#"></el-table-column>
-                    <el-table-column label="Waktu Backup" show-overflow-tooltip>
-                        <template slot-scope="scope">
-                            {{scope.row.modified_at | asDateTime }}
-                        </template>
-                    </el-table-column>
-                    <el-table-column prop="name" label="Backup File Snapshot" show-overflow-tooltip></el-table-column>
-                    <el-table-column label="Ukuran" width="120px" header-align="right" align="right">
-                        <template slot-scope="scope">
-                            {{scope.row.size | formatNumber }} KB
-                        </template>
-                    </el-table-column>
-                    <el-table-column fixed="right" width="80px" align="right">
-                        <template slot-scope="scope">
-                            <a href="#" @click.prevent="restoreSnapshot(scope.row)" title="Restore Snapshot"><i class="el-icon-refresh"></i></a>
-                            <a href="#" @click.prevent="downloadFile(scope.row)" title="Download Snapshot"><i class="el-icon-download"></i></a>
-                            <a href="#" @click.prevent="deleteFile(scope.row)" title="Hapus"><i class="el-icon-delete"></i></a>
-                        </template>
-                    </el-table-column>
-                </el-table>
-            </el-col>
-        </el-row>
-    </div>
+	<div>
+		<el-form class="text-right" inline @submit.native.prevent>
+			<el-form-item>
+				<el-button
+					:disabled="selectedFiles.length == 0"
+					@click="deleteFiles"
+					type="danger"
+					icon="el-icon-delete"
+					size="small"
+					title="Hapus File Backup"
+					>HAPUS FILE BACKUP</el-button
+				>
+			</el-form-item>
+			<el-form-item>
+				<el-button
+					@click="triggerOpenFile"
+					type="primary"
+					icon="el-icon-upload2"
+					size="small"
+					title="Upload File Backup"
+					>UPLOAD FILE BACKUP</el-button
+				>
+				<input
+					type="file"
+					style="display: none"
+					id="input-file"
+					@change="uploadFile"
+				/>
+			</el-form-item>
+
+			<el-form-item>
+				<el-button
+					@click="backup"
+					type="primary"
+					icon="el-icon-plus"
+					size="small"
+					title="Generate Backup"
+					:loading="processing"
+					>GENERATE BACKUP</el-button
+				>
+			</el-form-item>
+		</el-form>
+
+		<el-table
+			:data="tableData"
+			v-loading="loading"
+			stripe
+			height="calc(100vh - 220px)"
+			@selection-change="handleSelectionChange"
+		>
+			<el-table-column
+				type="selection"
+				width="55"
+				align="center"
+				header-align="center"
+			></el-table-column>
+			<el-table-column type="index" label="#"></el-table-column>
+			<el-table-column
+				prop="tanggal"
+				label="Tanggal"
+				width="200"
+			></el-table-column>
+			<el-table-column prop="file" label="File"></el-table-column>
+			<el-table-column
+				prop="size"
+				label="Ukuran"
+				width="100"
+				align="right"
+				header-align="right"
+			></el-table-column>
+			<el-table-column width="60" align="center" header-align="center">
+				<template slot="header">
+					<el-button
+						type="text"
+						@click="getData"
+						icon="el-icon-refresh"
+					></el-button>
+				</template>
+
+				<template slot-scope="scope">
+					<el-dropdown>
+						<span class="el-dropdown-link">
+							<i class="el-icon-more"></i>
+						</span>
+						<el-dropdown-menu slot="dropdown">
+							<el-dropdown-item
+								icon="el-icon-download"
+								@click.native.prevent="download(scope.row.url)"
+								>Download</el-dropdown-item
+							>
+							<el-dropdown-item
+								icon="el-icon-refresh"
+								@click.native.prevent="restore(scope.row.file)"
+								>Restore</el-dropdown-item
+							>
+							<el-dropdown-item
+								icon="el-icon-delete"
+								@click.native.prevent="deleteData(scope.row.file)"
+								>Hapus</el-dropdown-item
+							>
+						</el-dropdown-menu>
+					</el-dropdown>
+				</template>
+			</el-table-column>
+		</el-table>
+	</div>
 </template>
 
 <script>
 export default {
-    filters: {
-        asDateTime(v) {
-            return moment(v, 'X').format('DD-MMM-YYYY HH:mm:ss')
-        }
-    },
-    data() {
-        return {
-            buttonLabel: 'Lakukan Backup',
-            isGenerating: false,
-            fileName: '',
-            error: '',
-            files: [],
-            images: [],
-            loading: false
-        }
-    },
-    methods: {
-        requestData() {
-            this.loading = true
-            axios.get('/backup')
-                .then(r => {
-                    this.files = r.data.filter(f => f.name.includes('.sql')).sort((a,b) => { return b.modified_at - a.modified_at })
-                    this.images = r.data.filter(f => f.name.includes('.zip')).sort((a,b) => { return b.modified_at - a.modified_at })
-                })
-                .catch(e => console.log(e)).finally(() => {
-                    this.loading = false
-                })
-        },
-        createBackup() {
-            if (!this.fileName) {
-                this.error = 'Nama file harus diisi'
-                return
-            }
-            this.error = ''
-            this.buttonLabel = 'Generating backup file...'
-            this.isGenerating = true
-            this.loading = true
-            axios.post('/backup', { fileName: this.fileName.replace(/ /g, '-') })
-                .then(r => {
-                    this.fileName = ''
-                    this.requestData()
-                })
-                .catch(e => {
-                    this.error = e.data.message
-                }).finally(() => {
-                    this.isGenerating = false
-                    this.loading = false
-                    this.buttonLabel = 'Lakukan Backup'
-                })
-        },
-        downloadFile(file) {
-            window.open('/backup?download=' + file.name + '&token=' + this.$store.state.token);
-        },
-        deleteFile(file) {
-            this.$confirm('Anda yakin akan menghapus file ini?', 'Peringatan', { type: 'warning'}).then(() => {
-                axios.delete('/backup?file=' + file.name)
-                    .then(r => this.requestData())
-                    .catch(e => console.log(e));
-            }).catch(e => console.log(e))
+	data() {
+		return {
+			tableData: [],
+			loading: false,
+			processing: false,
+			selectedFiles: []
+		};
+	},
 
-        },
-        restoreSnapshot(file) {
-            this.$confirm('Anda yakin akan merestore file snapshot ini?', 'Peringatan', { type: 'warning'}).then(() => {
-                this.loading = true
-                axios.post('restoreSnapshot', { file: file.name }).then(r => {
-                    this.$message({
-                        message: r.data.message,
-                        type: 'success',
-                        showClose: true
-                    })
-                }).catch(e => {
-                    this.$message({
-                        message: e.response.data.message,
-                        type: 'error',
-                        showClose: true
-                    })
-                }).finally(() => {
-                    this.loading = false
-                })
-            }).catch(e => console.log(e))
-        },
-        restoreDatabase(file) {
-            this.$confirm('Anda yakin akan merestore file database ini?', 'Peringatan', { type: 'warning'}).then(() => {
-                this.loading = true
-                axios.post('restoreDatabase', { file: file.name }).then(r => {
-                    this.$message({
-                        message: r.data.message,
-                        type: 'success',
-                        showClose: true
-                    })
-                }).catch(e => {
-                    this.$message({
-                        message: e.response.data.message,
-                        type: 'error',
-                        showClose: true
-                    })
-                }).finally(() => {
-                    this.loading = false
-                })
-            }).catch(e => console.log(e))
-        }
-    },
-    mounted() {
-        this.requestData()
-    }
-}
+	mounted() {
+		this.getData();
+	},
+
+	methods: {
+		getData() {
+			this.loading = true;
+			axios
+				.get("/backup")
+				.then(response => {
+					this.tableData = response.data;
+				})
+				.catch(e => {
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+						showClose: true
+					});
+				})
+				.finally(() => (this.loading = false));
+		},
+
+		deleteData(file) {
+			this.$confirm("Anda yakin akan menghapus file ini?", "Konfirmasi", {
+				type: "warning"
+			})
+				.then(() => {
+					const params = { file };
+					axios
+						.delete("/backup", { params })
+						.then(response => {
+							this.$message({
+								message: response.data.message,
+								type: "success",
+								showClose: true
+							});
+							this.getData();
+						})
+						.catch(e => {
+							this.$message({
+								message: e.response.data.message,
+								type: "error",
+								showClose: true
+							});
+						});
+				})
+				.catch(e => console.log(e));
+		},
+
+		backup() {
+			this.processing = true;
+			axios
+				.post("/backup")
+				.then(response => {
+					this.$message({
+						message: response.data.message,
+						type: "success",
+						showClose: true
+					});
+					this.getData();
+				})
+				.catch(e => {
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+						showClose: true
+					});
+				})
+				.finally(() => (this.processing = false));
+		},
+
+		restore(file) {
+			this.$confirm("Anda yakin akan me-restore database?", "Konfirmasi", {
+				type: "warning"
+			})
+				.then(() => {
+					this.loading = true;
+					axios
+						.put("/backup", { file })
+						.then(response => {
+							this.$message({
+								message: response.message,
+								type: "success",
+								showClose: true
+							});
+							this.getData();
+						})
+						.catch(e => {
+							this.$message({
+								message: e.response.data.message,
+								type: "error",
+								showClose: true
+							});
+						})
+						.finally(() => (this.loading = false));
+				})
+				.catch(e => console.log(e));
+		},
+
+		triggerOpenFile() {
+			const f = document.getElementById("input-file");
+			f.click();
+		},
+
+		uploadFile(event) {
+			var formData = new FormData();
+			formData.append("file", event.target.files[0]);
+
+			axios
+				.post("/backup", formData, {
+					headers: { "Content-Type": "multipart/form-data" }
+				})
+				.then(response => {
+					this.$message({
+						message: response.data.message,
+						type: "success",
+						showClose: true
+					});
+					this.getData();
+				})
+				.catch(e => {
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+						showClose: true
+					});
+				})
+				.finally(() => {
+					this.loading = false;
+					document.getElementById("input-file").value = "";
+				});
+		},
+
+		handleSelectionChange(val) {
+			this.selectedFiles = val.map(v => v.file);
+		},
+
+		deleteFiles() {
+			this.deleteData(this.selectedFiles);
+		},
+
+		download(url) {
+			window.open(url, "_blank");
+		}
+	}
+};
 </script>

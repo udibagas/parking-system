@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Ifsnop\Mysqldump as IMysqldump;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class BackupController extends Controller
 {
@@ -13,57 +14,72 @@ class BackupController extends Controller
         $this->middleware('role:1');
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        if ($request->download && file_exists(env('BACKUP_DIR') . $request->download)) {
-            return response()->download(env('BACKUP_DIR') . $request->download);
-        }
-
-        $files = scandir(env('BACKUP_DIR'));
-
-        return array_map(function ($f) {
+        return array_reverse(array_map(function ($file) {
             return [
-                'name' => $f,
-                'size' => round(filesize(env('BACKUP_DIR') . $f) / 1024, 2),
-                'modified_at' => filemtime(env('BACKUP_DIR') . $f)
+                'size' => round(Storage::size($file) / 1024) . 'KB',
+                'tanggal' => date('d-M-Y H:i:s', Storage::lastModified($file)),
+                'file' => $file,
+                'url' => Storage::url($file)
             ];
-        }, $files);
+        }, Storage::files('/backup')));
     }
 
     public function store(Request $request)
     {
-        $request->validate([
-            'fileName' => 'required'
-        ]);
+        if ($file = $request->file('file')) {
+            if ($file->getClientOriginalExtension() != 'sql') {
+                return response(['message' => 'File harus dalam format sql'], 500);
+            }
+
+            $file->storeAs('backup', $file->getClientOriginalName());
+            return response(['message' => 'File backup telah diupload']);
+        }
 
         try {
             $dump = new IMysqldump\Mysqldump(
-                'mysql:host=localhost;dbname=' . env('DB_DATABASE'),
+                'mysql:host=' . env('DB_HOST') . ';dbname=' . env('DB_DATABASE'),
                 env('DB_USERNAME'),
                 env('DB_PASSWORD'),
                 ['add-drop-table' => true]
             );
 
-            $dump->start(env('BACKUP_DIR') . $request->fileName . '.sql');
+            $dump->start(Storage::path('backup/access_gate_backup_' . date('Y-m-d-H-i-s') . '.sql'));
         } catch (\Exception $e) {
             return response(['message' => $e->getMessage()], 500);
         }
 
-        return ['message' => 'OK'];
+        return ['message' => 'Database telah dibackup'];
     }
 
     public function destroy(Request $request)
     {
-        if ($request->file && file_exists(env('BACKUP_DIR') . $request->file)) {
-            unlink(env('BACKUP_DIR') . $request->file);
-        }
-
-        return ['message' => $request->file];
+        $request->validate(['file' => 'required']);
+        Storage::delete($request->file);
+        return ['message' => 'File telah dihapus'];
     }
 
-    public function restoreDatabase(Request $request)
+    public function restore(Request $request)
     {
-        DB::unprepared(file_get_contents(env('BACKUP_DIR') . $request->file));
+        $request->validate(['file' => 'required']);
+
+        if ($file = $request->file('file')) {
+            if ($file->getClientOriginalExtension() != 'sql') {
+                return response(['message' => 'File harus dalam format sql'], 500);
+            }
+
+            $fileContent = $file->getContent();
+        } else {
+            $fileContent = Storage::get($request->file);
+        }
+
+        try {
+            DB::unprepared($fileContent);
+        } catch (\Exception $e) {
+            return response(['message' => 'Gagal me-restore database.' . $e->getMessage()], 500);
+        }
+
         return ['message' => 'Database telah di restore'];
     }
 }
