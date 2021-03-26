@@ -253,23 +253,31 @@ export default {
 			setting: {},
 			showManualOpenForm: false,
 			posList: [],
-      HIDE_PRINT_REPORT: HIDE_PRINT_REPORT
+			HIDE_PRINT_REPORT: HIDE_PRINT_REPORT
 		};
 	},
 	methods: {
 		toSubmit() {
-			this.runningText(`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`);
+			this.runningText(
+				`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
+			);
 			document.getElementById("submit-btn").focus();
 		},
 
 		toGateIn() {
+			if (this.gateInList.length == 1) {
+				this.formModel.gate_in_id = this.gateInList[0].id;
+			}
+
 			if (!this.formModel.gate_in_id) {
 				document.getElementById("gate-in").focus();
 			} else {
 				document.getElementById("submit-btn").focus();
 			}
 
-			this.runningText(`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`);
+			this.runningText(
+				`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
+			);
 		},
 
 		nextBtn() {
@@ -451,7 +459,9 @@ export default {
 				document.getElementById("submit-btn").focus();
 			}
 
-			this.runningText(`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`);
+			this.runningText(
+				`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
+			);
 		},
 
 		cekPlatNomor() {
@@ -840,9 +850,9 @@ export default {
 		},
 
 		printReport() {
-      if (this.HIDE_PRINT_REPORT) {
-        return;
-      }
+			if (this.HIDE_PRINT_REPORT) {
+				return;
+			}
 
 			let payload = {
 				pos_id: this.formModel.pos_id,
