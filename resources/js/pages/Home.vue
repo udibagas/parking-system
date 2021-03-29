@@ -616,6 +616,7 @@ export default {
 			this.formModel.time_in = "";
 			this.formModel.duration = "";
 			this.formModel.tarif = "";
+			this.formModel.denda = 0;
 
 			this.snapshots = [];
 			this.$forceUpdate();
