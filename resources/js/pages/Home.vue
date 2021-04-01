@@ -134,7 +134,7 @@
 				<el-col :span="14">
 					<input
 						disabled
-						v-model="totalBayar"
+						:value="Number(formModel.tarif) + Number(formModel.denda)"
 						class="my-input bg-red-700 text-white"
 					/>
 				</el-col>
@@ -247,7 +247,7 @@ export default {
 
 	data() {
 		return {
-			formModel: { nomor_barcode: "" },
+			formModel: { nomor_barcode: "", tarif: "", denda: "" },
 			formErrors: {},
 			snapshots: [],
 			setting: {},
@@ -607,6 +607,8 @@ export default {
 
 		resetForm() {
 			this.resetRunningText();
+      this.formModel.tarif = "";
+			this.formModel.denda = "";
 			this.formModel.gate_in_id = null;
 			this.formModel.gate_out_id = null;
 			this.formModel.jenis_kendaraan = null;
@@ -615,8 +617,6 @@ export default {
 			this.formModel.time_out = "";
 			this.formModel.time_in = "";
 			this.formModel.duration = "";
-			this.formModel.tarif = "";
-			this.formModel.denda = 0;
 
 			this.snapshots = [];
 			this.$forceUpdate();
