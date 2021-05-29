@@ -6,7 +6,7 @@ use App\AreaParkir;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
-class KendaraanMasukListener
+class KendaraanMasukListener implements ShouldQueue
 {
     /**
      * Create the event listener.

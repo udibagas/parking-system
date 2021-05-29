@@ -370,7 +370,13 @@ export default {
 			if (tarif.mode_menginap == 1) {
 				var hariIn = moment(timeIn.format("YYYY-MM-DD"));
 				var hariOut = moment(timeOut.format("YYYY-MM-DD"));
-				var hariParkir = hariOut.diff(hariIn, "days") + 1;
+				var hariParkir = 0;
+
+				if (durasiMenit >= 60) {
+					hariParkir = hariOut.diff(hariIn, "days") + 1;
+				} else {
+					hariParkir = 1;
+				}
 			}
 
 			var hariMenginap = hariParkir >= 1 ? hariParkir - 1 : 0;
@@ -607,7 +613,7 @@ export default {
 
 		resetForm() {
 			this.resetRunningText();
-      this.formModel.tarif = "";
+			this.formModel.tarif = "";
 			this.formModel.denda = "";
 			this.formModel.gate_in_id = null;
 			this.formModel.gate_out_id = null;
