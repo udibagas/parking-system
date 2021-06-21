@@ -343,7 +343,7 @@ class ParkingTransactionController extends Controller
 
             $printer->cut();
             $printer->close();
-        } catch (\Exeption $e) {
+        } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
         }
     }
