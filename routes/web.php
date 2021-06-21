@@ -49,6 +49,7 @@ Route::group(['middleware' => 'auth'], function () {
 
     Route::post('testPrinter/{pos}', 'PosController@testPrinter');
     Route::post('testCamera/{camera}', 'CameraController@test');
+    Route::get('getPosByIp', 'PosController@getPosByIp');
 
     Route::apiResources([
         'camera' => 'CameraController',
