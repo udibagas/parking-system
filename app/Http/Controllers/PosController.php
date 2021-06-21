@@ -7,7 +7,6 @@ use App\Pos;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
-use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\Printer;
 
 class PosController extends Controller
