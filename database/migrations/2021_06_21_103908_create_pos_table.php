@@ -18,7 +18,11 @@ class CreatePosTable extends Migration
             $table->string('name');
             $table->ipAddress('ip_address');
             $table->string('printer_device')->comment('contoh: /dev/ttyUSB0');
-            $table->json('camera')->nullable();
+            $table->unsignedBigInteger('camera_id')->nullable();
+            $table->string('gate_device_name');
+            $table->smallInteger('gate_device_baudrate');
+            $table->string('gate_command_open');
+            $table->string('gate_command_close')->nullable();
             $table->timestamps();
         });
     }
