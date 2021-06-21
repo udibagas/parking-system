@@ -8,6 +8,7 @@ use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\ParkingMember;
+use App\Pos;
 use App\Setting;
 use App\UserLog;
 use GuzzleHttp\Client;
@@ -64,6 +65,12 @@ class ParkingTransactionController extends Controller
             $input['operator'] = auth()->user()->name;
         }
 
+        $pos = Pos::where('ip_address', $request->ip())->first();
+
+        if ($pos) {
+            $input['pos_id'] = $pos->id;
+        }
+
         if ($request->is_member) {
             ParkingMember::where('id', $request->parking_member_id)->update([
                 'last_transaction' => now()
@@ -75,9 +82,9 @@ class ParkingTransactionController extends Controller
 
     public function takeSnapshot(ParkingTransaction $parkingTransaction)
     {
-        $setting = Setting::first();
+        $camera = $parkingTransaction->pos->camera;
 
-        if (!$setting || !$setting->camera_snapshot_url) {
+        if (!$camera) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
         }
 
@@ -89,11 +96,11 @@ class ParkingTransactionController extends Controller
         }
 
         try {
-            $response = $client->request('GET', $setting->camera_snapshot_url, [
+            $response = $client->request('GET', $camera->url, [
                 'auth' => [
-                    $setting->camera_username,
-                    $setting->camera_password,
-                    $setting->camera_auth_type == 'digest' ? 'digest' : null
+                    $camera->username,
+                    $camera->password,
+                    'digest'
                 ]
             ]);
             file_put_contents($fileName, $response->getBody());
@@ -117,13 +124,14 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'LOKASI BELUM DISET'], 404);
         }
 
+        $pos = $parkingTransaction->pos;
+
+        if (!$pos) {
+            return response(['message' => 'POS TIDAK TERDAFTAR'], 500);
+        }
+
         try {
-            if ($setting->printer_ip_address) {
-                $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
-            }
-            if ($setting->printer_device) {
-                $connector = new FilePrintConnector($setting->printer_device);
-            }
+            $connector = new FilePrintConnector($pos->printer_device);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
@@ -158,26 +166,6 @@ class ParkingTransactionController extends Controller
         return ['message' => 'SILAKAN AMBIL TIKET'];
     }
 
-    public function openGate()
-    {
-        try {
-            $serial = new PhpSerial;
-            $serial->deviceSet(env('SERIAL_DEVICE', '/dev/gate'));
-            $serial->confBaudRate(env('SERIAL_BAUDRATE', 9600));
-            $serial->confParity("none");
-            $serial->confCharacterLength(8);
-            $serial->confStopBits(1);
-            $serial->confFlowControl("none");
-            $serial->deviceOpen();
-            $serial->sendMessage(env('SERIAL_OPEN_CMD', '*TRIG1#'));
-            $serial->deviceClose();
-        } catch (\Exception $e) {
-            return response(['message' => 'GAGAL MEMBUKA GATE. ' . $e->getMessage()], 500);
-        }
-
-        return ['message' => 'GATE BERHASIL DIBUKA'];
-    }
-
     /**
      * Remove the specified resource from storage.
      *
@@ -192,9 +180,7 @@ class ParkingTransactionController extends Controller
 
     public function printReport(Request $request)
     {
-        $request->validate([
-            'date' => 'required|date'
-        ]);
+        $request->validate(['date' => 'required|date']);
 
         $setting = Setting::first();
 
@@ -204,6 +190,12 @@ class ParkingTransactionController extends Controller
 
         if (!$setting->location_name) {
             return response(['message' => 'LOKASI BELUM DISET'], 404);
+        }
+
+        $pos = Pos::where('ip_address', $request->ip())->first();
+
+        if (!$pos) {
+            return response(['message', 'POS TIDAK TERDAFTAR'], 500);
         }
 
         // ambil data transaksi per tanggal, per operator
@@ -275,12 +267,7 @@ class ParkingTransactionController extends Controller
             ->first();
 
         try {
-            if ($setting->printer_ip_address) {
-                $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
-            }
-            if ($setting->printer_device) {
-                $connector = new FilePrintConnector($setting->printer_device);
-            }
+            $connector = new FilePrintConnector($pos->printer_device);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
