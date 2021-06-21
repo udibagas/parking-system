@@ -128,6 +128,7 @@ export default {
 			location: {},
 			vehicleTypeList: [],
 			snapshot_in: null,
+			pos: {},
 		};
 	},
 	computed: {
@@ -336,25 +337,36 @@ export default {
 		},
 
 		openGate() {
-			axios
-				.post("openGate")
-				.then((r) => {
-					this.$message({
-						message: r.data.message,
-						type: "success",
-						showClose: true,
-					});
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: "error",
-						showClose: true,
-					});
-				})
-				.finally(() => {
-					this.resetForm();
+			const pos = this.pos;
+			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
+
+			ws.onerror = (event) => {
+				this.$message({
+					message: "KONEKSI KE POS GAGAL",
+					type: "error",
 				});
+			};
+
+			ws.onopen = (event) => {
+				ws.send(
+					[
+						"open",
+						pos.gate_device,
+						pos.gate_baudrate,
+						pos.gate_command_open,
+						pos.gate_command_close,
+					].join(";")
+				);
+			};
+
+			ws.onmessage = (event) => {
+				let data = JSON.parse(event.data);
+				this.$message({
+					message: data.message,
+					type: data.status ? "success" : "error",
+				});
+				ws.close();
+			};
 		},
 
 		printReport() {
@@ -401,10 +413,25 @@ export default {
 					});
 				});
 		},
+
+		getPos() {
+			axios
+				.get("getPosByIp")
+				.then((r) => (this.pos = r.data))
+				.catch((e) => {
+					this.$message({
+						message: e.response.data.message,
+						type: "error",
+						showClose: true,
+					});
+				});
+		},
 	},
 
 	mounted() {
 		this.$store.commit("getSetting");
+		this.getPos();
+
 		setTimeout(() => {
 			this.formModel.plate_number = this.setting.default_plate_number;
 			this.$forceUpdate();
