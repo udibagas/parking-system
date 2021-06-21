@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Http\Requests\UserRequest;
+use Illuminate\Support\Str;
 
 class UserController extends Controller
 {
@@ -24,13 +25,13 @@ class UserController extends Controller
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
         return User::when($request->keyword, function ($q) use ($request) {
-                return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('email', 'LIKE', '%' . $request->keyword . '%');
-            })->when($request->role, function ($q) use ($request) {
-                return $q->whereIn('role', $request->role);
-            })->when($request->status, function ($q) use ($request) {
-                return $q->whereIn('status', $request->status);
-            })->orderBy($sort, $order)->paginate($request->pageSize);
+            return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
+                ->orWhere('email', 'LIKE', '%' . $request->keyword . '%');
+        })->when($request->role, function ($q) use ($request) {
+            return $q->whereIn('role', $request->role);
+        })->when($request->status, function ($q) use ($request) {
+            return $q->whereIn('status', $request->status);
+        })->orderBy($sort, $order)->paginate($request->pageSize);
     }
 
     /**
@@ -47,9 +48,11 @@ class UserController extends Controller
             $input['password'] = bcrypt($request->password);
         }
 
-        $input['email'] = str_random().'@dummy.com';
+        $input['email'] = Str::random(10) . '@dummy.com';
 
-        return User::create($input);
+        User::create($input);
+
+        return ['message' => 'Data telah disimpan'];
     }
 
     /**
@@ -80,7 +83,7 @@ class UserController extends Controller
 
         $user->update($input);
 
-        return $user;
+        return ['message' => 'Data telah diupdate'];
     }
 
     /**
@@ -96,6 +99,6 @@ class UserController extends Controller
         }
 
         $user->delete();
-        return ['message' => 'User telah dihapus'];
+        return ['message' => 'Data telah dihapus'];
     }
 }
