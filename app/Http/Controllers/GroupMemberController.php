@@ -24,9 +24,9 @@ class GroupMemberController extends Controller
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
         return GroupMember::when($request->keyword, function ($q) use ($request) {
-                return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
-                    ->orWhere('description', 'LIKE', '%' . $request->keyword . '%');
-            })->orderBy($sort, $order)->paginate($request->pageSize);
+            return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
+                ->orWhere('description', 'LIKE', '%' . $request->keyword . '%');
+        })->orderBy($sort, $order)->paginate($request->pageSize);
     }
 
     /**
@@ -37,7 +37,8 @@ class GroupMemberController extends Controller
      */
     public function store(GroupMemberRequest $request)
     {
-        return GroupMember::create($request->all());
+        GroupMember::create($request->all());
+        return ['message' => 'Data telah disimpan'];
     }
 
     /**
@@ -50,7 +51,7 @@ class GroupMemberController extends Controller
     public function update(GroupMemberRequest $request, GroupMember $groupMember)
     {
         $groupMember->update($request->all());
-        return $groupMember;
+        return ['message' => 'Data telah disimpan'];
     }
 
     /**
