@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
 use App\ParkingMember;
+use App\Pos;
 use App\Setting;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
@@ -59,7 +60,7 @@ class MemberRenewalController extends Controller
             'billing_cycle' => $request->billing_cycle,
             'billing_cycle_unit' => $request->billing_cycle_unit,
         ]);
-        return $renewal;
+        return ['message' => 'Data telah disimpan'];
     }
 
     /**
@@ -72,7 +73,7 @@ class MemberRenewalController extends Controller
     public function update(MemberRenewalRequest $request, MemberRenewal $memberRenewal)
     {
         $memberRenewal->update($request->all());
-        return $memberRenewal;
+        return ['message' => 'Data telah disimpan'];
     }
 
     /**
@@ -87,10 +88,15 @@ class MemberRenewalController extends Controller
         return ['message' => 'Data telah dihapus'];
     }
 
-    public function printSlip(MemberRenewal $memberRenewal)
+    public function printSlip(Request $request, MemberRenewal $memberRenewal)
     {
         $setting = Setting::first();
 
+        $pos = Pos::where('ip_address', $request->ip())->first();
+
+        if (!$pos) {
+            return response(['message' => 'POS TIDAK TERDAFTAR'], 500);
+        }
 
         if (!$setting) {
             return response(['message' => 'BELUM ADA SETTING'], 500);
@@ -101,12 +107,7 @@ class MemberRenewalController extends Controller
         }
 
         try {
-            if ($setting->printer_ip_address) {
-                $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
-            }
-            if ($setting->printer_device) {
-                $connector = new FilePrintConnector($setting->printer_device);
-            }
+            $connector = new FilePrintConnector($pos->printer_device);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
