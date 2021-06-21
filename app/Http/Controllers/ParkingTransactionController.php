@@ -82,10 +82,10 @@ class ParkingTransactionController extends Controller
 
     public function takeSnapshot(ParkingTransaction $parkingTransaction)
     {
-        $camera = $parkingTransaction->pos->camera;
+        $pos = $parkingTransaction->pos;
 
-        if (!$camera) {
-            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. TIDAK ADA KAMERA.'], 404);
+        if (!$pos) {
+            return response(['message' => 'POS TIDAK TERDAFTAR'], 404);
         }
 
         $client = new Client(['timeout' => 3]);
@@ -96,10 +96,10 @@ class ParkingTransactionController extends Controller
         }
 
         try {
-            $response = $client->request('GET', $camera->url, [
+            $response = $client->request('GET', $pos->camera_snapshot_url, [
                 'auth' => [
-                    $camera->username,
-                    $camera->password,
+                    $pos->camera_username,
+                    $pos->camera_password,
                     'digest'
                 ]
             ]);
@@ -112,7 +112,7 @@ class ParkingTransactionController extends Controller
         return $parkingTransaction;
     }
 
-    public function printTicket(Request $request, ParkingTransaction $parkingTransaction)
+    public function printTicket(ParkingTransaction $parkingTransaction)
     {
         $setting = Setting::first();
 
