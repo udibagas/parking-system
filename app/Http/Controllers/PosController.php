@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\PosRequest;
 use App\Pos;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
@@ -107,5 +108,31 @@ class PosController extends Controller
         }
 
         return ['message' => 'BERHASIL MENCETAK'];
+    }
+
+    public function testCamera(Pos $pos)
+    {
+        $client = new Client(['timeout' => 3]);
+
+        try {
+            $response = $client->request('GET', $pos->camera_snapshot_url, [
+                'auth' => [
+                    $pos->camera_username,
+                    $pos->camera_password,
+                    'digest'
+                ]
+            ]);
+
+            if ($response->getHeader('Content-Type')[0] != 'image/jpeg') {
+                return response(['message' => 'GAGAL MENGAMBIL GAMBAR. URL SNAPSHOT KAMERA TIDAK SESUAI'], 500);
+            }
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENGAMBIL GAMBAR. ' . $e->getMessage()], 500);
+        }
+
+        return [
+            'message' => 'BERHASIL MENGAMBIL SNAPSHOT',
+            'snapshot' => base64_encode($response->getBody()->getContents())
+        ];
     }
 }

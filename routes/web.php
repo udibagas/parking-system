@@ -48,11 +48,10 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('report', 'ReportController@pendapatan');
 
     Route::post('testPrinter/{pos}', 'PosController@testPrinter');
-    Route::post('testCamera/{camera}', 'CameraController@test');
+    Route::post('testCamera/{pos}', 'PosController@testCamera');
     Route::get('getPosByIp', 'PosController@getPosByIp');
 
     Route::apiResources([
-        'camera' => 'CameraController',
         'pos' => 'PosController',
         'user' => 'UserController',
         'vehicleType' => 'VehicleTypeController',
