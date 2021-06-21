@@ -10,8 +10,11 @@ class Pos extends Model
         'name',
         'ip_address',
         'printer_device',
-        'camera'
+        'camera_id'
     ];
 
-    protected $casts = ['camera' => 'json'];
+    public function camera()
+    {
+        return $this->belongsTo(Camera::class);
+    }
 }
