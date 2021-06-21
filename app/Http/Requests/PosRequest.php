@@ -27,7 +27,7 @@ class PosRequest extends FormRequest
             'name' => 'required',
             'ip_address' => 'required',
             'printer_device' => 'required',
-            'camera' => 'required|array'
+            'camera_id' => 'required|numeric|exists:cameras,id'
         ];
     }
 }
