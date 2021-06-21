@@ -25,7 +25,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('groupMember/getList', 'GroupMemberController@getList');
     Route::get('parkingMember/search', 'ParkingMemberController@search');
     Route::post('parkingTransaction/printReport', 'ParkingTransactionController@printReport');
-    Route::post('openGate', 'ParkingTransactionController@openGate');
     Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');
     Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
     Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
