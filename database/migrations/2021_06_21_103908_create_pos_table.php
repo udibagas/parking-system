@@ -23,6 +23,9 @@ class CreatePosTable extends Migration
             $table->smallInteger('gate_device_baudrate');
             $table->string('gate_command_open');
             $table->string('gate_command_close')->nullable();
+            $table->string('camera_snapshot_url');
+            $table->string('camera_username');
+            $table->string('camera_password');
             $table->timestamps();
         });
     }
