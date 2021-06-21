@@ -27,7 +27,12 @@ class PosRequest extends FormRequest
             'name' => 'required',
             'ip_address' => 'required',
             'printer_device' => 'required',
-            'camera_id' => 'required|numeric|exists:cameras,id'
+            'camera_snapshot_url' => 'required|url',
+            'camera_username' => 'required',
+            'camera_password' => 'required',
+            'gate_device_name' => 'required',
+            'gate_device_baudrate' => 'required|numeric',
+            'gate_command_open' => 'required'
         ];
     }
 }
