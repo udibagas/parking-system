@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\VehicleTypeRequest;
-use App\VehicleType;
+use App\Models\VehicleType;
 
 class VehicleTypeController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:1')->except(['getList']);
+        $this->middleware('role:1')->except(['index']);
     }
 
     /**
@@ -20,11 +20,11 @@ class VehicleTypeController extends Controller
      */
     public function index(Request $request)
     {
-        return VehicleType::when($request->keyword, function ($q) use ($request) {
-                return $q->where('name', 'LIKE', '%' . $request->keyword . '%');
-            })
-            ->orderBy($request->sort, $request->order == 'ascending' ? 'asc' : 'desc')
-            ->paginate($request->pageSize);
+        $data = VehicleType::when($request->keyword, function ($q) use ($request) {
+            return $q->where('name', 'LIKE', '%' . $request->keyword . '%');
+        })->orderBy($request->sort ?: 'name', $request->order == 'ascending' ? 'asc' : 'desc');
+
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**
@@ -69,10 +69,5 @@ class VehicleTypeController extends Controller
     {
         $vehicleType->delete();
         return ['message' => 'Data has been deleted'];
-    }
-
-    public function getList()
-    {
-        return VehicleType::all();
     }
 }

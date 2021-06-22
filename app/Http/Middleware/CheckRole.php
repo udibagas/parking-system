@@ -16,10 +16,7 @@ class CheckRole
     public function handle($request, Closure $next, $role)
     {
         if ($request->user()->role != $role) {
-            return response([
-                'success' => false,
-                'message' => 'You are not allowed to acces this service'
-            ], 403);
+            return response(['message' => 'Anda tidak berhak mengakses halaman ini'], 403);
         }
 
         return $next($request);

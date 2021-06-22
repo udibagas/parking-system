@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Setting;
+use App\Models\Pos;
+use App\Models\Setting;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
@@ -89,13 +90,13 @@ class ReportController extends Controller
         } else if ($request->action == 'export') {
             return $data;
         } else if ($request->action == 'print-struk') {
-            return $this->printStruk($data, $request->dateRange);
+            return $this->printStruk($data, $request->dateRange, $request);
         } else {
             return view('report', $data);
         }
     }
 
-    protected function printStruk($data, $dateRange)
+    protected function printStruk($data, $dateRange, Request $request)
     {
         $setting = Setting::first();
 
@@ -103,13 +104,14 @@ class ReportController extends Controller
             return response(['message' => 'BELUM ADA SETTING'], 500);
         }
 
+        $pos = Pos::where('ip_address', $request->ip())->first();
+
+        if (!$pos) {
+            return response(['message' => 'POS TIDAK TERDAFTAR'], 500);
+        }
+
         try {
-            if ($setting->printer_ip_address) {
-                $connector = new NetworkPrintConnector($setting->printer_ip_address, 9100);
-            }
-            if ($setting->printer_device) {
-                $connector = new FilePrintConnector($setting->printer_device);
-            }
+            $connector = new FilePrintConnector($pos->printer_device);
             $printer = new Printer($connector);
         } catch (\Exception $e) {
             return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
@@ -186,7 +188,7 @@ class ReportController extends Controller
 
             $printer->cut();
             $printer->close();
-        } catch (\Exeption $e) {
+        } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENCETAK STRUK.' . $e->getMessage()], 500);
         }
 

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\GroupMemberRequest;
-use App\GroupMember;
+use App\Models\GroupMember;
 
 class GroupMemberController extends Controller
 {

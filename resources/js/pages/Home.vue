@@ -128,11 +128,11 @@ export default {
 			location: {},
 			vehicleTypeList: [],
 			snapshot_in: null,
-			pos: {},
+			pos: {}
 		};
 	},
 	computed: {
-		...mapState(["setting"]),
+		...mapState(["setting"])
 	},
 	methods: {
 		toVehicleField() {
@@ -159,7 +159,7 @@ export default {
 				this.formModel.fare = 0;
 			} else {
 				let vehicle = this.vehicleTypeList.find(
-					(vt) => vt.name == this.formModel.vehicle_type
+					vt => vt.name == this.formModel.vehicle_type
 				);
 				if (vehicle) {
 					this.formModel.fare = vehicle.tarif_flat;
@@ -174,7 +174,7 @@ export default {
 			const params = { card_number: this.formModel.card_number };
 			axios
 				.get("/parkingMember/search", { params })
-				.then((r) => {
+				.then(r => {
 					this.formModel.is_member = true;
 
 					if (!!r.data.expired) {
@@ -183,7 +183,7 @@ export default {
 							center: true,
 							roundButton: true,
 							confirmButtonText: "OK",
-							confirmButtonClass: "bg-red",
+							confirmButtonClass: "bg-red"
 						});
 						this.formModel.is_member = 0;
 						return;
@@ -200,7 +200,7 @@ export default {
 								center: true,
 								roundButton: true,
 								confirmButtonText: "OK",
-								confirmButtonClass: "bg-red",
+								confirmButtonClass: "bg-red"
 							}
 						);
 					}
@@ -218,20 +218,20 @@ export default {
 					}
 
 					vehicle = r.data.vehicles.find(
-						(v) => v.plate_number == this.formModel.plate_number
+						v => v.plate_number == this.formModel.plate_number
 					);
 
 					if (!vehicle) {
 						this.$alert(
 							"Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
-								r.data.vehicles.map((v) => v.plate_number).join(", "),
+								r.data.vehicles.map(v => v.plate_number).join(", "),
 							"Perhatian",
 							{
 								type: "warning",
 								center: true,
 								roundButton: true,
 								confirmButtonText: "OK",
-								confirmButtonClass: "bg-red",
+								confirmButtonClass: "bg-red"
 							}
 						);
 						document.getElementById("plate-number").focus();
@@ -239,12 +239,12 @@ export default {
 						document.getElementById("vehicle-type").focus();
 					}
 				})
-				.catch((e) => {
+				.catch(e => {
 					document.getElementById("plate-number").focus();
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				});
 		},
@@ -268,12 +268,12 @@ export default {
 			let params = { plate_number: this.formModel.plate_number };
 			axios
 				.get("/parkingMember/search", { params: params })
-				.then((r) => {
+				.then(r => {
 					this.formModel.fare = 0;
 					this.formModel.is_member = 1;
 					this.formModel.parking_member_id = r.data.id;
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.formModel.is_member = 0;
 					this.formModel.parking_member_id = null;
 				})
@@ -283,17 +283,17 @@ export default {
 
 					axios
 						.post("/parkingTransaction", this.formModel)
-						.then((r) => {
+						.then(r => {
 							if (!this.formModel.drive_thru || !this.formModel.is_member) {
 								this.printTicket(r.data.id);
 							}
 							this.takeSnapshot(r.data.id);
 						})
-						.catch((e) => {
+						.catch(e => {
 							this.$message({
 								message: "DATA GAGAL DISIMPAN",
 								type: "error",
-								showClose: true,
+								showClose: true
 							});
 						});
 				});
@@ -302,18 +302,18 @@ export default {
 		printTicket(id) {
 			axios
 				.post("/parkingTransaction/printTicket/" + id)
-				.then((r) => {
+				.then(r => {
 					this.$message({
 						message: r.data.message,
 						type: "success",
-						showClose: true,
+						showClose: true
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				})
 				.finally(() => {
@@ -324,14 +324,14 @@ export default {
 		takeSnapshot(id) {
 			axios
 				.post("/parkingTransaction/takeSnapshot/" + id)
-				.then((r) => {
+				.then(r => {
 					this.snapshot_in = r.data.snapshot_in;
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				});
 		},
@@ -340,30 +340,30 @@ export default {
 			const pos = this.pos;
 			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
 
-			ws.onerror = (event) => {
+			ws.onerror = event => {
 				this.$message({
 					message: "KONEKSI KE POS GAGAL",
-					type: "error",
+					type: "error"
 				});
 			};
 
-			ws.onopen = (event) => {
+			ws.onopen = event => {
 				ws.send(
 					[
 						"open",
 						pos.gate_device,
 						pos.gate_baudrate,
 						pos.gate_command_open,
-						pos.gate_command_close,
+						pos.gate_command_close
 					].join(";")
 				);
 			};
 
-			ws.onmessage = (event) => {
+			ws.onmessage = event => {
 				let data = JSON.parse(event.data);
 				this.$message({
 					message: data.message,
-					type: data.status ? "success" : "error",
+					type: data.status ? "success" : "error"
 				});
 				ws.close();
 			};
@@ -374,42 +374,42 @@ export default {
 
 			axios
 				.post("/parkingTransaction/printReport", payload)
-				.then((r) => {
+				.then(r => {
 					this.$message({
 						message: "SILAKAN AMBIL STRUK",
 						type: "success",
-						showClose: true,
+						showClose: true
 					});
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				});
 		},
 
 		getVehicleTypeList() {
 			axios
-				.get("/vehicleType/getList")
-				.then((r) => {
+				.get("/vehicleType")
+				.then(r => {
 					if (r.data.length == 0) {
 						this.$message({
 							message: "MOHON SET JENIS KENDARAAN",
 							type: "error",
-							showClose: true,
+							showClose: true
 						});
 						return;
 					}
 
 					this.vehicleTypeList = r.data;
 				})
-				.catch((e) => {
+				.catch(e => {
 					this.$message({
 						message: "MOHON SET JENIS KENDARAAN",
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				});
 		},
@@ -417,15 +417,15 @@ export default {
 		getPos() {
 			axios
 				.get("getPosByIp")
-				.then((r) => (this.pos = r.data))
-				.catch((e) => {
+				.then(r => (this.pos = r.data))
+				.catch(e => {
 					this.$message({
 						message: e.response.data.message,
 						type: "error",
-						showClose: true,
+						showClose: true
 					});
 				});
-		},
+		}
 	},
 
 	mounted() {
@@ -439,7 +439,7 @@ export default {
 		this.getVehicleTypeList();
 		document.getElementById("card-number").focus();
 
-		document.getElementById("gate-in-app").onkeypress = (e) => {
+		document.getElementById("gate-in-app").onkeypress = e => {
 			// ke field nomor plat
 			if (e.key == "/") {
 				e.preventDefault();
@@ -476,7 +476,7 @@ export default {
 				this.printReport();
 			}
 		};
-	},
+	}
 };
 </script>
 

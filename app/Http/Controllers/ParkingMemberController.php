@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\ParkingMember;
+use App\Models\ParkingMember;
 use App\Http\Requests\ParkingMemberRequest;
-use App\Setting;
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 
 class ParkingMemberController extends Controller
@@ -42,26 +42,32 @@ class ParkingMemberController extends Controller
             return $q->where('paid', 1);
         })->when($request->paid == ['n'] || $request->paid == 'n', function ($q) {
             return $q->where('paid', 0);
-        })->orderBy($sort, $order)->paginate($request->pageSize);
+        })->orderBy($sort, $order);
 
-        $data = [
-            'from' => $data->firstItem(),
-            'to' => $data->lastItem(),
-            'data' => $data->map(function ($d) {
-                return array_merge($d->toArray(), [
-                    'group' => $d->groupMember->name
-                ]);
-            })
-        ];
+
 
         if ($request->action == 'print') {
             return view('parking_member.print', [
-                'data' => $data,
+                'data' => $data->get(),
                 'setting' => Setting::first()
             ]);
         }
 
-        return $data;
+        if ($request->paginated) {
+            $data = $data->paginate($request->pageSize);
+
+            return [
+                'from' => $data->firstItem(),
+                'to' => $data->lastItem(),
+                'data' => $data->map(function ($d) {
+                    return array_merge($d->toArray(), [
+                        'group' => $d->groupMember->name
+                    ]);
+                })
+            ];
+        }
+
+        return $data->get();
     }
 
     /**
@@ -147,11 +153,5 @@ class ParkingMemberController extends Controller
         });
 
         return ['message' => 'Member telah dihapus'];
-    }
-
-    public function getList()
-    {
-        return ParkingMember::selectRaw('id, name, card_number, paid')
-            ->orderBy('name', 'ASC')->get();
     }
 }

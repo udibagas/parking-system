@@ -19,10 +19,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('checkAuth', 'AppController@checkAuth');
     Route::get('getNavigation', 'AppController@getNavigation');
     Route::post('logout', 'AuthController@logout');
-    // untuk dropdown
-    Route::get('vehicleType/getList', 'VehicleTypeController@getList');
-    Route::get('parkingMember/getList', 'ParkingMemberController@getList');
-    Route::get('groupMember/getList', 'GroupMemberController@getList');
+
     Route::get('parkingMember/search', 'ParkingMemberController@search');
     Route::post('parkingTransaction/printReport', 'ParkingTransactionController@printReport');
     Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');

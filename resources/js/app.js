@@ -1,5 +1,5 @@
 require('./bootstrap');
-window.Vue = require('vue');
+import Vue from 'vue/dist/vue'
 import ElementUI from 'element-ui';
 import locale from 'element-ui/lib/locale/lang/en'
 import router from './router'
@@ -39,9 +39,9 @@ Vue.config.keyCodes.f12 = 123
 Vue.component('App', require('./App').default)
 
 const app = new Vue({
-    el: '#app',
-    store, router,
-    render: function(createElement) {
-        return createElement('App')
-    }
+  el: '#app',
+  store, router,
+  render: function(createElement) {
+    return createElement('App')
+  }
 });

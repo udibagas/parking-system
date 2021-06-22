@@ -3,18 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\ParkingTransaction;
-use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
+use App\Models\ParkingTransaction;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
-use App\ParkingMember;
-use App\Pos;
-use App\Setting;
-use App\UserLog;
+use App\Models\ParkingMember;
+use App\Models\Pos;
+use App\Models\Setting;
+use App\Models\UserLog;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\EscposImage;
-use PhpSerial\PhpSerial;
 
 class ParkingTransactionController extends Controller
 {
