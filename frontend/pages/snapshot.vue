@@ -99,7 +99,7 @@ export default {
 					params.hour
 			}
 
-			axios.get('snapshots', { params: params }).then((r) => {
+			this.$axios.get('snapshots', { params: params }).then((r) => {
 				resolve(
 					r.data
 						.filter((d) => d != '.' && d != '..')
@@ -177,7 +177,7 @@ export default {
 
 			this.$confirm('Anda yakin?', 'Peringatan', { type: 'warning' })
 				.then(() => {
-					axios
+					this.$axios
 						.delete('snapshots', { params: params })
 						.then((r) => {
 							this.$message({

@@ -372,7 +372,7 @@ export default {
 		},
 		store() {
 			this.loading = true
-			axios
+			this.$axios
 				.post('/memberRenewal', this.formModel)
 				.then((r) => {
 					this.showForm = false
@@ -400,7 +400,7 @@ export default {
 		},
 		update() {
 			this.loading = true
-			axios
+			this.$axios
 				.put('/memberRenewal/' + this.formModel.id, this.formModel)
 				.then((r) => {
 					this.showForm = false
@@ -431,7 +431,7 @@ export default {
 				type: 'warning',
 			})
 				.then(() => {
-					axios
+					this.$axios
 						.delete('/memberRenewal/' + id)
 						.then((r) => {
 							this.requestData()
@@ -462,7 +462,7 @@ export default {
 			}
 
 			this.loading = true
-			axios
+			this.$axios
 				.get('/memberRenewal', { params: params })
 				.then((r) => {
 					this.tableData = r.data
@@ -486,7 +486,7 @@ export default {
 				})
 		},
 		printSlip(id) {
-			axios
+			this.$axios
 				.post('/memberRenewal/printSlip/' + id)
 				.then((r) => {
 					this.$message({

@@ -679,7 +679,7 @@ export default {
 				order: this.order,
 			}
 
-			axios
+			this.$axios
 				.get('parkingMember', { params: Object.assign(params, this.filters) })
 				.then((r) => {
 					const data = r.data.data.map((d) => {

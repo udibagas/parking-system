@@ -314,7 +314,7 @@ export default {
 			}
 		},
 		printTicket(id) {
-			axios
+			this.$axios
 				.post('/parkingTransaction/printTicket/' + id, { trx: 'OUT' })
 				.then((r) => {
 					this.$message({
@@ -342,7 +342,7 @@ export default {
 			}
 
 			this.loading = true
-			axios
+			this.$axios
 				.get('/parkingTransaction', {
 					params: Object.assign(params, this.filters),
 				})

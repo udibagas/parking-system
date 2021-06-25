@@ -71,7 +71,7 @@ export default {
 			let params = { date: this.date }
 			this.loading = true
 
-			axios
+			this.$axios
 				.get('/memberRenewal/reportDaily', { params: params })
 				.then((r) => {
 					this.report = r.data
@@ -91,7 +91,7 @@ export default {
 			let params = { date: this.date, action: 'print' }
 			this.loading = true
 
-			axios
+			this.$axios
 				.get('/memberRenewal/reportDaily', { params: params })
 				.then((r) => {
 					this.$message({

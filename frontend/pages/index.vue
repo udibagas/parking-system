@@ -172,7 +172,7 @@ export default {
 
 		checkCard() {
 			const params = { card_number: this.formModel.card_number }
-			axios
+			this.$axios
 				.get('/parkingMember/search', { params })
 				.then((r) => {
 					this.formModel.is_member = true
@@ -266,7 +266,7 @@ export default {
 			}
 
 			let params = { plate_number: this.formModel.plate_number }
-			axios
+			this.$axios
 				.get('/parkingMember/search', { params: params })
 				.then((r) => {
 					this.formModel.fare = 0
@@ -281,7 +281,7 @@ export default {
 					this.formModel.barcode_number = this.generateBarcodeNumber()
 					this.formModel.time_in = this.$moment().format('YYYY-MM-DD HH:mm:ss')
 
-					axios
+					this.$axios
 						.post('/parkingTransaction', this.formModel)
 						.then((r) => {
 							if (!this.formModel.drive_thru || !this.formModel.is_member) {
@@ -300,7 +300,7 @@ export default {
 		},
 
 		printTicket(id) {
-			axios
+			this.$axios
 				.post('/parkingTransaction/printTicket/' + id)
 				.then((r) => {
 					this.$message({
@@ -322,7 +322,7 @@ export default {
 		},
 
 		takeSnapshot(id) {
-			axios
+			this.$axios
 				.post('/parkingTransaction/takeSnapshot/' + id)
 				.then((r) => {
 					this.snapshot_in = r.data.snapshot_in
@@ -372,7 +372,7 @@ export default {
 		printReport() {
 			let payload = { date: this.$moment().format('YYYY-MM-DD') }
 
-			axios
+			this.$axios
 				.post('/parkingTransaction/printReport', payload)
 				.then((r) => {
 					this.$message({
@@ -391,7 +391,7 @@ export default {
 		},
 
 		getVehicleTypeList() {
-			axios
+			this.$axios
 				.get('/vehicleType')
 				.then((r) => {
 					if (r.data.length == 0) {
@@ -415,7 +415,7 @@ export default {
 		},
 
 		getPos() {
-			axios
+			this.$axios
 				.get('getPosByIp')
 				.then((r) => (this.pos = r.data))
 				.catch((e) => {

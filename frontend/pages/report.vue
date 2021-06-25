@@ -167,7 +167,7 @@ export default {
 					dateRange: this.dateRange,
 				}
 
-				axios
+				this.$axios
 					.get('report', { params })
 					.then((r) => {
 						this.$message({
@@ -187,7 +187,7 @@ export default {
 		},
 		getTransaction(group) {
 			const params = { dateRange: this.dateRange, group }
-			axios.get('getTransaction', { params }).then((r) => {
+			this.$axios.get('getTransaction', { params }).then((r) => {
 				this.transaction[group] = r.data.map((d) => {
 					if (group == 'is_member') {
 						d.group = d.is_member ? 'MEMBER' : 'NON-MEMBER'
@@ -211,7 +211,7 @@ export default {
 			})
 		},
 		getIncome() {
-			axios
+			this.$axios
 				.get('getIncome', { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.income = r.data
@@ -222,7 +222,7 @@ export default {
 				})
 		},
 		getReport() {
-			axios
+			this.$axios
 				.get('report', { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.report = r.data

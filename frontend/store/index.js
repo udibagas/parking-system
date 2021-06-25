@@ -14,38 +14,38 @@ export const state = () => ({
   ],
 })
 
-export const mutation = {
+export const mutations = {
   getVehicleTypeList(state) {
     this.$axios
-      .get('/vehicleType')
+      .get('/api/vehicleType')
       .then((r) => (state.vehicleTypeList = r.data))
       .catch((e) => console.log(e))
   },
 
   getGroupMemberList(state) {
     this.$axios
-      .get('/groupMember')
+      .get('/api/groupMember')
       .then((r) => (state.groupMemberList = r.data))
       .catch((e) => console.log(e))
   },
 
   getMemberList(state) {
     this.$axios
-      .get('/parkingMember')
+      .get('/api/parkingMember')
       .then((r) => (state.memberList = r.data))
       .catch((e) => console.log(e))
   },
 
   getNavigationList(state) {
     this.$axios
-      .get('/getNavigation')
+      .get('/api/getNavigation')
       .then((r) => (state.navigationList = r.data))
       .catch((e) => console.log(e))
   },
 
   getSetting(state) {
     this.$axios
-      .get('/setting')
+      .get('/api/setting')
       .then((r) => (state.setting = r.data))
       .catch((e) => {
         Message({

@@ -49,12 +49,12 @@
 							@click.prevent="collapse = !collapse"
 							:icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
 						></el-button>
-						<span class="brand">{{ appName }}</span>
+						<span class="brand">RSVP PARKING SYSTEM</span>
 					</el-col>
 					<el-col :span="12" class="text-right">
 						<el-dropdown @command="handleCommand">
 							<span class="el-dropdown-link" style="cursor: pointer"
-								>Selamat Datang, {{ $store.state.user.name }}!</span
+								>Selamat Datang, {{ $auth.user.name }}!</span
 							>
 							<el-dropdown-menu slot="dropdown">
 								<el-dropdown-item command="profile">
@@ -121,6 +121,11 @@ export default {
 </script>
 
 <style lang="css" scoped>
+* {
+	margin: 0;
+	padding: 0;
+}
+
 .brand {
 	font-size: 22px;
 	margin-left: 20px;

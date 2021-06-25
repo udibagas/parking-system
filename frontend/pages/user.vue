@@ -214,7 +214,7 @@ export default {
 	mixins: [crud],
 	data() {
 		return {
-			url: '/user',
+			url: '/api/user',
 		}
 	},
 }

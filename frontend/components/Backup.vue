@@ -143,7 +143,7 @@ export default {
 	methods: {
 		requestData() {
 			this.loading = true
-			axios
+			this.$axios
 				.get('/backup')
 				.then((r) => {
 					this.files = r.data
@@ -171,7 +171,7 @@ export default {
 			this.buttonLabel = 'Generating backup file...'
 			this.isGenerating = true
 			this.loading = true
-			axios
+			this.$axios
 				.post('/backup', { fileName: this.fileName.replace(/ /g, '-') })
 				.then((r) => {
 					this.fileName = ''
@@ -196,7 +196,7 @@ export default {
 				type: 'warning',
 			})
 				.then(() => {
-					axios
+					this.$axios
 						.delete('/backup?file=' + file.name)
 						.then((r) => this.requestData())
 						.catch((e) => console.log(e))
@@ -211,7 +211,7 @@ export default {
 			)
 				.then(() => {
 					this.loading = true
-					axios
+					this.$axios
 						.post('restoreSnapshot', { file: file.name })
 						.then((r) => {
 							this.$message({
@@ -241,7 +241,7 @@ export default {
 			)
 				.then(() => {
 					this.loading = true
-					axios
+					this.$axios
 						.post('restoreDatabase', { file: file.name })
 						.then((r) => {
 							this.$message({
