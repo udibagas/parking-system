@@ -30,7 +30,7 @@ class AppController extends Controller
     public function getNavigation(Request $request)
     {
         $nav = [
-            ['label' => 'Home', 'icon' => 'el-icon-s-home', 'path' => 'home'],
+            ['label' => 'Home', 'icon' => 'el-icon-s-home', 'path' => '/'],
             ['label' => 'Transaksi', 'icon' => 'el-icon-document-copy', 'path' => 'parking-transaction'],
             ['label' => 'Member', 'icon' => 'el-icon-bank-card', 'path' => 'member'],
         ];

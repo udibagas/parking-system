@@ -24,11 +24,6 @@ class CreateSettingsTable extends Migration
             $table->boolean('member_auto_open')->default(0);
             $table->integer('hapus_snapshot_dalam_hari')->default(0);
             $table->smallInteger('hapus_transaksi_dalam_hari')->default(0);
-            $table->string('camera_snapshot_url');
-            $table->string('camera_username');
-            $table->string('camera_password');
-            $table->string('camera_auth_type');
-            $table->string('printer_ip_address');
             $table->timestamps();
         });
     }

@@ -126,12 +126,11 @@ export default {
 			formModel: {},
 			formErrors: {},
 			location: {},
-			vehicleTypeList: [],
 			snapshot_in: null,
 		}
 	},
 	computed: {
-		...mapState(['setting', 'pos']),
+		...mapState(['setting', 'pos', 'vehicleTypeList']),
 	},
 	methods: {
 		toVehicleField() {
@@ -172,11 +171,11 @@ export default {
 		checkCard() {
 			const params = { card_number: this.formModel.card_number }
 			this.$axios
-				.get('/parkingMember/search', { params })
+				.$get('/api/parkingMember/search', { params })
 				.then((r) => {
 					this.formModel.is_member = true
 
-					if (!!r.data.expired) {
+					if (!!r.expired) {
 						this.$alert('Kartu telah habis masa berlaku', 'Perhatian', {
 							type: 'warning',
 							center: true,
@@ -188,11 +187,9 @@ export default {
 						return
 					}
 
-					if (!r.data.expired && r.data.expired_in <= 5) {
+					if (!r.expired && r.expired_in <= 5) {
 						this.$alert(
-							'Kartu akan habis masa berlaku dalam ' +
-								r.data.expired_in +
-								' hari',
+							'Kartu akan habis masa berlaku dalam ' + r.expired_in + ' hari',
 							'Perhatian',
 							{
 								type: 'warning',
@@ -208,22 +205,22 @@ export default {
 
 					if (this.setting.member_auto_open) {
 						// langsung ambil data yg pertama
-						this.formModel.plate_number = r.data.vehicles[0].plate_number
-						this.formModel.vehicle_type = r.data.vehicles[0].vehicle_type
+						this.formModel.plate_number = r.vehicles[0].plate_number
+						this.formModel.vehicle_type = r.vehicles[0].vehicle_type
 						this.formModel.drive_thru = 0
 						this.submit()
 						this.openGate()
 						return
 					}
 
-					vehicle = r.data.vehicles.find(
+					vehicle = r.vehicles.find(
 						(v) => v.plate_number == this.formModel.plate_number
 					)
 
 					if (!vehicle) {
 						this.$alert(
 							'Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah ' +
-								r.data.vehicles.map((v) => v.plate_number).join(', '),
+								r.vehicles.map((v) => v.plate_number).join(', '),
 							'Perhatian',
 							{
 								type: 'warning',
@@ -266,11 +263,11 @@ export default {
 
 			let params = { plate_number: this.formModel.plate_number }
 			this.$axios
-				.get('/parkingMember/search', { params: params })
+				.$get('/api/parkingMember/search', { params })
 				.then((r) => {
 					this.formModel.fare = 0
 					this.formModel.is_member = 1
-					this.formModel.parking_member_id = r.data.id
+					this.formModel.parking_member_id = r.id
 				})
 				.catch((e) => {
 					this.formModel.is_member = 0
@@ -281,12 +278,12 @@ export default {
 					this.formModel.time_in = this.$moment().format('YYYY-MM-DD HH:mm:ss')
 
 					this.$axios
-						.post('/parkingTransaction', this.formModel)
+						.$post('/api/parkingTransaction', this.formModel)
 						.then((r) => {
 							if (!this.formModel.drive_thru || !this.formModel.is_member) {
-								this.printTicket(r.data.id)
+								this.printTicket(r.id)
 							}
-							this.takeSnapshot(r.data.id)
+							this.takeSnapshot(r.id)
 						})
 						.catch((e) => {
 							this.$message({
@@ -300,10 +297,10 @@ export default {
 
 		printTicket(id) {
 			this.$axios
-				.post('/parkingTransaction/printTicket/' + id)
+				.$post(`/api/printTicket/${id}`)
 				.then((r) => {
 					this.$message({
-						message: r.data.message,
+						message: r.message,
 						type: 'success',
 						showClose: true,
 					})
@@ -315,17 +312,13 @@ export default {
 						showClose: true,
 					})
 				})
-				.finally(() => {
-					setTimeout(this.openGate, 3000)
-				})
+				.finally(() => setTimeout(this.openGate, 3000))
 		},
 
 		takeSnapshot(id) {
 			this.$axios
-				.post('/parkingTransaction/takeSnapshot/' + id)
-				.then((r) => {
-					this.snapshot_in = r.data.snapshot_in
-				})
+				.$post(`/api/takeSnapshot/${id}`)
+				.then((r) => (this.snapshot_in = r.snapshot_in))
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
@@ -372,7 +365,7 @@ export default {
 			let payload = { date: this.$moment().format('YYYY-MM-DD') }
 
 			this.$axios
-				.post('/parkingTransaction/printReport', payload)
+				.$post('/api/printReport', payload)
 				.then((r) => {
 					this.$message({
 						message: 'SILAKAN AMBIL STRUK',
@@ -388,49 +381,10 @@ export default {
 					})
 				})
 		},
-
-		getVehicleTypeList() {
-			this.$axios
-				.get('/vehicleType')
-				.then((r) => {
-					if (r.data.length == 0) {
-						this.$message({
-							message: 'MOHON SET JENIS KENDARAAN',
-							type: 'error',
-							showClose: true,
-						})
-						return
-					}
-
-					this.vehicleTypeList = r.data
-				})
-				.catch((e) => {
-					this.$message({
-						message: 'MOHON SET JENIS KENDARAAN',
-						type: 'error',
-						showClose: true,
-					})
-				})
-		},
-
-		getPos() {
-			this.$axios
-				.get('getPosByIp')
-				.then((r) => (this.pos = r.data))
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
-		},
 	},
 
 	mounted() {
 		this.formModel.plate_number = this.setting.default_plate_number
-
-		this.getVehicleTypeList()
 		document.getElementById('card-number').focus()
 
 		document.getElementById('gate-in-app').onkeypress = (e) => {
