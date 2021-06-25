@@ -60,13 +60,7 @@ export default {
 					this.$router.push('/')
 				})
 				.catch((e) => {
-					if (e.response.status == 403) {
-						this.$message.error(e.response.data.message)
-					} else if (e.response.status == 422) {
-						this.$message.error('Email tidak valid!')
-					}
-
-					this.message = e.response.data.message
+					this.$message.error(e.response.data.message)
 				})
 		},
 	},
