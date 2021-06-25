@@ -52,7 +52,7 @@
 									t.vehicle_type
 								}}</el-col>
 								<el-col :span="12" class="col-value"
-									>: Rp. {{ t.total | formatNumber }}</el-col
+									>: Rp. {{ $decimal(t.total) }}</el-col
 								>
 							</el-row>
 						</el-card>
@@ -70,7 +70,7 @@
 							>
 								<el-col :span="12" class="col-label">{{ t.group }}</el-col>
 								<el-col :span="12" class="col-value"
-									>: {{ t.total | formatNumber }}</el-col
+									>: {{ $decimal(t.total) }}</el-col
 								>
 							</el-row>
 						</el-card>
@@ -91,7 +91,7 @@
 							>
 								<el-col :span="12" class="col-label">{{ t.group }}</el-col>
 								<el-col :span="12" class="col-value"
-									>: {{ t.total | formatNumber }}</el-col
+									>: {{ $decimal(t.total) }}</el-col
 								>
 							</el-row>
 						</el-card>
@@ -109,7 +109,7 @@
 							>
 								<el-col :span="12" class="col-label">{{ t.group }}</el-col>
 								<el-col :span="12" class="col-value"
-									>: {{ t.total | formatNumber }}</el-col
+									>: {{ $decimal(t.total) }}</el-col
 								>
 							</el-row>
 						</el-card>
@@ -146,17 +146,16 @@ export default {
 			report: null,
 		}
 	},
+
 	methods: {
 		handlePrint(command) {
 			if (command == 'a4') {
 				window.open(
-					BASE_URL +
-						'/report?action=print&dateRange[]=' +
+					this.$axios.defaults.baseURL +
+						'/api/report?action=print&dateRange[]=' +
 						this.dateRange[0] +
-						'&dateRange[1]=' +
-						this.dateRange[1] +
-						'&token=' +
-						this.$store.state.token,
+						'&dateRange[]=' +
+						this.dateRange[1],
 					'_blank'
 				)
 			}
@@ -168,10 +167,10 @@ export default {
 				}
 
 				this.$axios
-					.get('report', { params })
+					.$get('/api/report', { params })
 					.then((r) => {
 						this.$message({
-							message: r.data.message,
+							message: r.message,
 							showClose: true,
 							type: 'success',
 						})
@@ -185,9 +184,10 @@ export default {
 					})
 			}
 		},
+
 		getTransaction(group) {
 			const params = { dateRange: this.dateRange, group }
-			this.$axios.get('getTransaction', { params }).then((r) => {
+			this.$axios.get('/api/getTransaction', { params }).then((r) => {
 				this.transaction[group] = r.data.map((d) => {
 					if (group == 'is_member') {
 						d.group = d.is_member ? 'MEMBER' : 'NON-MEMBER'
@@ -210,24 +210,25 @@ export default {
 				this.transaction[group].push({ group: 'TOTAL', total })
 			})
 		},
+
 		getIncome() {
 			this.$axios
-				.get('getIncome', { params: { dateRange: this.dateRange } })
+				.$get('/api/getIncome', { params: { dateRange: this.dateRange } })
 				.then((r) => {
-					this.income = r.data
-					let total = r.data
+					this.income = r
+					let total = r
 						.map((d) => d.total)
 						.reduce((sum, total) => sum + parseInt(total), 0)
 					this.income.push({ vehicle_type: 'TOTAL', total })
 				})
 		},
+
 		getReport() {
 			this.$axios
-				.get('report', { params: { dateRange: this.dateRange } })
-				.then((r) => {
-					this.report = r.data
-				})
+				.$get('/api/report', { params: { dateRange: this.dateRange } })
+				.then((r) => (this.report = r))
 		},
+
 		requestData() {
 			this.getTransaction('vehicle_type')
 			this.getTransaction('drive_thru')

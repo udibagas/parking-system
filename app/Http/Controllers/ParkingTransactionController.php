@@ -98,7 +98,7 @@ class ParkingTransactionController extends Controller
                 ]
             ]);
 
-            $fileName = 'snapshot/' . date('Y/m/d/H/') . $pos->name . '.jpg';
+            $fileName = 'snapshots/' . date('Y/m/d/H/') . $pos->name . date('-YmdHis') . '.jpeg';
             Storage::put($fileName, $response->getBody());
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. ' . $e->getMessage()], 500);

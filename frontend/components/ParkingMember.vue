@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<el-form inline class="text-right" @submit.native.prevent>
-			<el-form-item v-if="$store.state.user.role == 1">
+			<el-form-item v-if="$auth.user.role == 1">
 				<el-button
 					size="small"
 					@click="openForm({ vehicles: [], register_date: now, fare: 0 })"
@@ -17,12 +17,7 @@
 					placeholder="Cari"
 					prefix-icon="el-icon-search"
 					:clearable="true"
-					@change="
-						(v) => {
-							keyword = v
-							requestData()
-						}
-					"
+					@change="searchData"
 				></el-input>
 			</el-form-item>
 			<el-form-item>
@@ -44,18 +39,8 @@
 			<el-form-item>
 				<el-pagination
 					background
-					@current-change="
-						(p) => {
-							page = p
-							requestData()
-						}
-					"
-					@size-change="
-						(s) => {
-							pageSize = s
-							requestData()
-						}
-					"
+					@current-change="currentChange"
+					@size-change="sizeChange"
 					layout="total, sizes, prev, next"
 					:page-size="pageSize"
 					:page-sizes="[10, 25, 50, 100]"
@@ -114,11 +99,7 @@
 			</el-table-column>
 
 			<el-table-column
-				:filters="
-					this.$store.state.groupMemberList.map((g) => {
-						return { value: g.id, text: g.name }
-					})
-				"
+				:filters="groupMemberList.map((g) => ({ value: g.id, text: g.name }))"
 				column-key="group_member_id"
 				prop="group"
 				label="Group"
@@ -151,9 +132,9 @@
 				align="center"
 				header-align="center"
 			>
-				<template slot-scope="scope">{{
-					scope.row.register_date | readableDate
-				}}</template>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.register_date).format('DD-MMM-YYYY') }}
+				</template>
 			</el-table-column>
 			<el-table-column
 				prop="expiry_date"
@@ -163,9 +144,9 @@
 				align="center"
 				header-align="center"
 			>
-				<template slot-scope="scope">{{
-					scope.row.expiry_date | readableDate
-				}}</template>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.expiry_date).format('DD-MMM-YYYY') }}
+				</template>
 			</el-table-column>
 			<el-table-column
 				prop="fare"
@@ -176,7 +157,7 @@
 				align="right"
 			>
 				<template slot-scope="scope"
-					>Rp. {{ scope.row.fare | formatNumber }}</template
+					>Rp. {{ $decimal(scope.row.fare) }}</template
 				>
 			</el-table-column>
 			<el-table-column
@@ -207,9 +188,9 @@
 				sortable="custom"
 				min-width="150px"
 			>
-				<template slot-scope="scope">{{
-					scope.row.last_transaction | readableDate
-				}}</template>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.last_transaction).format('DD-MMM-YYYY') }}
+				</template>
 			</el-table-column>
 			<el-table-column
 				:filters="[
@@ -265,19 +246,13 @@
 				width="40px"
 				align="center"
 				header-align="center"
-				v-if="$store.state.user.role == 1"
+				v-if="$auth.user.role == 1"
 			>
 				<template slot="header">
 					<el-button
 						type="text"
 						class="text-white"
-						@click="
-							() => {
-								page = 1
-								keyword = ''
-								requestData()
-							}
-						"
+						@click="refreshData"
 						icon="el-icon-refresh"
 					></el-button>
 				</template>
@@ -354,7 +329,7 @@
 								style="width: 100%"
 							>
 								<el-option
-									v-for="t in $store.state.groupMemberList"
+									v-for="t in groupMemberList"
 									:value="t.id"
 									:label="t.name"
 									:key="t.id"
@@ -588,7 +563,10 @@
 				<el-table-column width="70px" align="right" header-align="right">
 					<template
 						slot="header"
-						v-if="formModel.vehicles.length < setting.jml_kendaraan_per_kartu"
+						v-if="
+							formModel.vehicles &&
+							formModel.vehicles.length < setting.jml_kendaraan_per_kartu
+						"
 					>
 						<el-button
 							icon="el-icon-plus"
@@ -623,13 +601,12 @@
 
 <script>
 import exportFromJSON from 'export-from-json'
-import ParkingMemberDetail from '../components/ParkingMemberDetail'
 import { mapState } from 'vuex'
 import crud from '~/mixins/crud'
 
 export default {
 	mixins: [crud],
-	components: { ParkingMemberDetail },
+
 	watch: {
 		'formModel.paid'(v) {
 			if (!v) {
@@ -637,6 +614,7 @@ export default {
 			}
 		},
 	},
+
 	computed: {
 		expiry_date() {
 			try {
@@ -647,27 +625,26 @@ export default {
 				return ''
 			}
 		},
-		...mapState(['setting']),
+		...mapState(['setting', 'groupMemberList']),
 	},
+
 	data() {
 		return {
 			selectedData: {},
 			showDetail: false,
 			now: this.$moment().format('YYYY-MM-DD'),
-			url: '/parkingMember',
+			url: '/api/parkingMember',
 		}
 	},
 
 	methods: {
 		print() {
-			const params = Object.assign(
-				{
-					sort: this.sort,
-					order: this.order,
-					action: 'print',
-				},
-				this.filters
-			)
+			const params = {
+				sort: this.sort,
+				order: this.order,
+				action: 'print',
+				...this.filters,
+			}
 
 			const querystring = new URLSearchParams(params).toString()
 			window.open(BASE_URL + '/parkingMember?' + querystring, '_blank')
@@ -677,10 +654,11 @@ export default {
 			const params = {
 				sort: this.sort,
 				order: this.order,
+				...this.filters,
 			}
 
 			this.$axios
-				.get('parkingMember', { params: Object.assign(params, this.filters) })
+				.get('/api/parkingMember', { params })
 				.then((r) => {
 					const data = r.data.data.map((d) => {
 						return {
@@ -705,11 +683,7 @@ export default {
 						}
 					})
 
-					exportFromJSON({
-						data,
-						fileName: 'member-parkir',
-						exportType: 'xls',
-					})
+					exportFromJSON({ data, fileName: 'member-parkir', exportType: 'xls' })
 				})
 				.catch((e) => console.log(e))
 				.finally(() => (this.loading = false))
@@ -747,12 +721,6 @@ export default {
 		deleteVehicle(index) {
 			this.formModel.vehicles.splice(index, 1)
 		},
-	},
-
-	mounted() {
-		this.requestData()
-		this.$store.commit('getGroupMemberList')
-		this.$store.commit('getSetting')
 	},
 }
 </script>

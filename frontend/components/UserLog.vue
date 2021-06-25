@@ -1,14 +1,6 @@
 <template>
 	<div>
-		<el-form
-			inline
-			class="text-right"
-			@submit.native.prevent="
-				() => {
-					return
-				}
-			"
-		>
+		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item>
 				<el-button
 					size="small"
@@ -25,30 +17,15 @@
 					placeholder="Cari"
 					prefix-icon="el-icon-search"
 					clearable
-					@change="
-						(v) => {
-							keyword = v
-							requestData()
-						}
-					"
+					@change="searchData"
 				>
 				</el-input>
 			</el-form-item>
 			<el-form-item>
 				<el-pagination
 					background
-					@current-change="
-						(p) => {
-							page = p
-							requestData()
-						}
-					"
-					@size-change="
-						(s) => {
-							pageSize = s
-							requestData()
-						}
-					"
+					@current-change="currentChange"
+					@size-change="sizeChange"
 					layout="total, sizes, prev, next"
 					:page-size="pageSize"
 					:page-sizes="[10, 25, 50, 100]"
@@ -98,72 +75,36 @@
 </template>
 
 <script>
+import crud from '~/mixins/crud'
+
 export default {
+	mixins: [crud],
 	props: ['range'],
+
 	watch: {
 		range(v) {
 			this.requestData()
 		},
 	},
+
 	data() {
 		return {
-			keyword: '',
-			page: 1,
-			pageSize: 10,
-			tableData: {},
-			sort: 'updated_at',
-			order: 'descending',
-			loading: false,
+			url: '/api/userLog',
 		}
 	},
-	methods: {
-		sortChange(c) {
-			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop
-				this.order = c.order
-				this.requestData()
-			}
-		},
-		requestData() {
-			let params = {
-				page: this.page,
-				keyword: this.keyword,
-				pageSize: this.pageSize,
-				sort: this.sort,
-				order: this.order,
-				dateRange: this.range,
-			}
 
-			this.loading = true
-			this.$axios
-				.get('/userLog', { params: params })
-				.then((r) => {
-					this.tableData = r.data
-				})
-				.catch((e) => {
-					if (e.response.status == 500) {
-						this.$message({
-							message: e.response.data.message,
-							type: 'error',
-							showClose: true,
-						})
-					}
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
+	methods: {
 		clearLog() {
 			this.$confirm('Anda yakin akan menghapus semua log?', 'Peringatan', {
 				type: 'warning',
 			})
 				.then(() => {
 					this.$axios
-						.delete('/userLog')
+						.$delete('/api/userLog')
 						.then((r) => {
 							this.requestData()
 							this.$message({
-								message: r.data.message,
+								message: r.message,
 								type: 'success',
 								showClose: true,
 							})
@@ -178,9 +119,6 @@ export default {
 				})
 				.catch(() => console.log(e))
 		},
-	},
-	mounted() {
-		this.requestData()
 	},
 }
 </script>

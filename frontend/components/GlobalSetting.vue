@@ -133,92 +133,6 @@
 				</div>
 			</el-form-item>
 
-			<el-form-item
-				label="IP Address Printer"
-				:class="formErrors.printer_ip_address ? 'is-error' : ''"
-			>
-				<el-input
-					placeholder="IP Address Printer"
-					v-model="formModel.printer_ip_address"
-				></el-input>
-				<div class="el-form-item__error" v-if="formErrors.printer_ip_address">
-					{{ formErrors.printer_ip_address[0] }}
-				</div>
-			</el-form-item>
-
-			<el-form-item
-				label="Device Printer"
-				:class="formErrors.printer_device ? 'is-error' : ''"
-			>
-				<el-input
-					placeholder="Device Printer"
-					v-model="formModel.printer_device"
-				></el-input>
-				<div class="el-form-item__error" v-if="formErrors.printer_device">
-					{{ formErrors.printer_device[0] }}
-				</div>
-			</el-form-item>
-
-			<el-form-item
-				label="URL Snapshot Kamera"
-				:class="formErrors.camera_snapshot_url ? 'is-error' : ''"
-			>
-				<el-input
-					placeholder="URL Snapshot Kamera"
-					v-model="formModel.camera_snapshot_url"
-				></el-input>
-				<div class="el-form-item__error" v-if="formErrors.camera_snapshot_url">
-					{{ formErrors.camera_snapshot_url[0] }}
-				</div>
-			</el-form-item>
-
-			<el-form-item
-				label="Username Kamera"
-				:class="formErrors.camera_username ? 'is-error' : ''"
-			>
-				<el-input
-					placeholder="Username Kamera"
-					v-model="formModel.camera_username"
-				></el-input>
-				<div class="el-form-item__error" v-if="formErrors.camera_username">
-					{{ formErrors.camera_username[0] }}
-				</div>
-			</el-form-item>
-
-			<el-form-item
-				label="Password Kamera"
-				:class="formErrors.camera_password ? 'is-error' : ''"
-			>
-				<el-input
-					placeholder="Password Kamera"
-					v-model="formModel.camera_password"
-				></el-input>
-				<div class="el-form-item__error" v-if="formErrors.camera_password">
-					{{ formErrors.camera_password[0] }}
-				</div>
-			</el-form-item>
-
-			<el-form-item
-				label="Camera Auth Type"
-				:class="formErrors.camera_auth_type ? 'is-error' : ''"
-			>
-				<el-select
-					placeholder="Camera Auth Type"
-					v-model="formModel.camera_auth_type"
-					style="width: 100%"
-				>
-					<el-option
-						v-for="(l, i) in ['basic', 'digest']"
-						:key="i"
-						:value="l"
-						:label="l"
-					></el-option>
-				</el-select>
-				<div class="el-form-item__error" v-if="formErrors.camera_auth_type">
-					{{ formErrors.camera_auth_type[0] }}
-				</div>
-			</el-form-item>
-
 			<el-form-item>
 				<el-button
 					type="primary"
@@ -247,10 +161,8 @@ export default {
 	methods: {
 		requestData() {
 			this.$axios
-				.get('/setting')
-				.then((r) => {
-					this.formModel = r.data
-				})
+				.$get('/api/setting')
+				.then((r) => (this.formModel = r))
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
@@ -262,7 +174,7 @@ export default {
 		store() {
 			this.loading = true
 			this.$axios
-				.post('/setting', this.formModel)
+				.$post('/api/setting', this.formModel)
 				.then((r) => {
 					this.$message({
 						message: 'Data berhasil disimpan.',
@@ -270,6 +182,7 @@ export default {
 						showClose: true,
 					})
 					this.requestData()
+					this.$store.dispatch('getSetting')
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
@@ -285,14 +198,13 @@ export default {
 						})
 					}
 				})
-				.finally(() => {
-					this.loading = false
-				})
+				.finally(() => (this.loading = false))
 		},
+
 		update() {
 			this.loading = true
 			this.$axios
-				.put('/setting/' + this.formModel.id, this.formModel)
+				.$put('/api/setting/' + this.formModel.id, this.formModel)
 				.then((r) => {
 					this.$message({
 						message: 'Data berhasil disimpan.',
@@ -300,6 +212,7 @@ export default {
 						showClose: true,
 					})
 					this.requestData()
+					this.$store.dispatch('getSetting')
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
@@ -315,9 +228,7 @@ export default {
 						})
 					}
 				})
-				.finally(() => {
-					this.loading = false
-				})
+				.finally(() => (this.loading = false))
 		},
 	},
 	mounted() {

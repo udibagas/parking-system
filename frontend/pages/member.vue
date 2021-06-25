@@ -9,13 +9,13 @@
 			<el-tab-pane lazy label="Group Member"><GroupMember /></el-tab-pane>
 			<el-tab-pane lazy label="Pembayaran"><MemberRenewal /></el-tab-pane>
 			<el-tab-pane
-				v-if="$store.state.user.role == 1"
+				v-if="$auth.user.role == 1"
 				lazy
 				label="Laporan Pendapatan Harian"
 				><MembershipReportDaily
 			/></el-tab-pane>
 			<el-tab-pane
-				v-if="$store.state.user.role == 1"
+				v-if="$auth.user.role == 1"
 				lazy
 				label="Summary Laporan Pendapatan"
 				><MembershipReport

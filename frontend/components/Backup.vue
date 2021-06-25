@@ -46,7 +46,7 @@
 						align="right"
 					>
 						<template slot-scope="scope">
-							{{ scope.row.size | formatNumber }} KB
+							{{ $decimal(scope.row.size) }} KB
 						</template>
 					</el-table-column>
 					<el-table-column fixed="right" width="80px" align="right">
@@ -94,7 +94,7 @@
 						align="right"
 					>
 						<template slot-scope="scope">
-							{{ scope.row.size | formatNumber }} KB
+							{{ $decimal(scope.row.size) }} KB
 						</template>
 					</el-table-column>
 					<el-table-column fixed="right" width="80px" align="right">

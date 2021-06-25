@@ -1,14 +1,6 @@
 <template>
 	<div>
-		<el-form
-			inline
-			class="text-right"
-			@submit.native.prevent="
-				() => {
-					return
-				}
-			"
-		>
+		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item>
 				<el-button size="small" @click="openForm({})" type="primary"
 					><i class="el-icon-plus"></i> INPUT PEMBAYARAN KEANGGOTAAN</el-button
@@ -19,7 +11,7 @@
 				<el-date-picker
 					size="small"
 					@change="requestData"
-					v-model="dateRange"
+					v-model="filters.dateRange"
 					format="dd/MMM/yyyy"
 					value-format="yyyy-MM-dd"
 					type="daterange"
@@ -37,12 +29,7 @@
 					placeholder="Search"
 					prefix-icon="el-icon-search"
 					clearable
-					@change="
-						(v) => {
-							keyword = v
-							requestData()
-						}
-					"
+					@change="searchData"
 				>
 				</el-input>
 			</el-form-item>
@@ -58,7 +45,7 @@
 		>
 			<el-table-column prop="created_at" label="Tanggal Trx" sortable="custom">
 				<template slot-scope="scope">
-					{{ scope.row.created_at | readableDateTime }}
+					{{ $moment(scope.row.created_at).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -72,6 +59,7 @@
 				prop="card_number"
 				label="Nomor Kartu"
 				sortable="custom"
+				width="150"
 			></el-table-column>
 			<el-table-column
 				prop="from_date"
@@ -82,7 +70,7 @@
 				header-align="center"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.from_date | readableDate }}
+					{{ $moment(scope.row.from_date).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -94,7 +82,7 @@
 				header-align="center"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.to_date | readableDate }}
+					{{ $moment(scope.row.to_date).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -105,7 +93,7 @@
 				header-align="right"
 			>
 				<template slot-scope="scope">
-					Rp. {{ scope.row.amount | formatNumber }}
+					Rp. {{ $decimal(scope.row.amount) }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -124,13 +112,7 @@
 					<el-button
 						type="text"
 						class="text-white"
-						@click="
-							() => {
-								page = 1
-								keyword = ''
-								requestData()
-							}
-						"
+						@click="refreshData"
 						icon="el-icon-refresh"
 					>
 					</el-button>
@@ -166,18 +148,8 @@
 
 		<el-pagination
 			background
-			@current-change="
-				(p) => {
-					page = p
-					requestData()
-				}
-			"
-			@size-change="
-				(s) => {
-					pageSize = s
-					requestData()
-				}
-			"
+			@current-change="currentChange"
+			@size-change="sizeChange"
 			layout="total, sizes, prev, next"
 			:page-size="pageSize"
 			:page-sizes="[10, 25, 50, 100]"
@@ -199,7 +171,7 @@
 			<el-alert
 				type="error"
 				title="ERROR"
-				:description="error.message + '\n' + error.file + ':' + error.line"
+				:description="error.message"
 				v-show="error.message"
 				style="margin-bottom: 15px"
 			>
@@ -304,33 +276,28 @@
 				</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
-				<el-button icon="el-icon-success" type="primary" @click="save"
-					>SIMPAN</el-button
-				>
-				<el-button icon="el-icon-error" type="info" @click="showForm = false"
-					>BATAL</el-button
-				>
+				<el-button icon="el-icon-success" type="primary" @click="submit">
+					SIMPAN
+				</el-button>
+				<el-button icon="el-icon-error" type="info" @click="showForm = false">
+					BATAL
+				</el-button>
 			</span>
 		</el-dialog>
 	</div>
 </template>
 
 <script>
+import crud from '~/mixins/crud'
+
 export default {
+	mixins: [crud],
 	data() {
 		return {
-			showForm: false,
-			formErrors: {},
-			error: {},
-			formModel: {},
-			keyword: '',
-			page: 1,
-			pageSize: 10,
-			tableData: {},
+			url: '/api/memberRenewal',
 			sort: 'created_at',
 			order: 'descending',
 			loading: false,
-			dateRange: '',
 		}
 	},
 	computed: {
@@ -345,152 +312,17 @@ export default {
 		},
 	},
 	methods: {
-		sortChange(c) {
-			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop
-				this.order = c.order
-				this.requestData()
-			}
-		},
-		openForm(data) {
-			this.error = {}
-			this.formErrors = {}
-			this.formModel = JSON.parse(JSON.stringify(data))
-			this.showForm = true
-		},
-		save() {
+		submit() {
 			this.formModel.to_date = this.to_date
-			this.$confirm('Anda yakin?', 'Konfirmasi', { type: 'warning' })
-				.then(() => {
-					if (!!this.formModel.id) {
-						this.update()
-					} else {
-						this.store()
-					}
-				})
-				.catch((e) => console.log(e))
+			this.save()
 		},
-		store() {
-			this.loading = true
-			this.$axios
-				.post('/memberRenewal', this.formModel)
-				.then((r) => {
-					this.showForm = false
-					this.$message({
-						message: 'Data berhasil disimpan.',
-						type: 'success',
-						showClose: true,
-					})
-					this.requestData()
-				})
-				.catch((e) => {
-					if (e.response.status == 422) {
-						this.error = {}
-						this.formErrors = e.response.data.errors
-					}
 
-					if (e.response.status == 500) {
-						this.formErrors = {}
-						this.error = e.response.data
-					}
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
-		update() {
-			this.loading = true
-			this.$axios
-				.put('/memberRenewal/' + this.formModel.id, this.formModel)
-				.then((r) => {
-					this.showForm = false
-					this.$message({
-						message: 'Data berhasil disimpan.',
-						type: 'success',
-						showClose: true,
-					})
-					this.requestData()
-				})
-				.catch((e) => {
-					if (e.response.status == 422) {
-						this.error = {}
-						this.formErrors = e.response.data.errors
-					}
-
-					if (e.response.status == 500) {
-						this.formErrors = {}
-						this.error = e.response.data
-					}
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
-		deleteData(id) {
-			this.$confirm('Anda yakin akan menghapus data ini?', 'Warning', {
-				type: 'warning',
-			})
-				.then(() => {
-					this.$axios
-						.delete('/memberRenewal/' + id)
-						.then((r) => {
-							this.requestData()
-							this.$message({
-								message: r.data.message,
-								type: 'success',
-								showClose: true,
-							})
-						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-								showClose: true,
-							})
-						})
-				})
-				.catch(() => console.log(e))
-		},
-		requestData() {
-			let params = {
-				page: this.page,
-				keyword: this.keyword,
-				pageSize: this.pageSize,
-				sort: this.sort,
-				order: this.order,
-				dateRange: this.dateRange,
-			}
-
-			this.loading = true
-			this.$axios
-				.get('/memberRenewal', { params: params })
-				.then((r) => {
-					this.tableData = r.data
-				})
-				.catch((e) => {
-					if (e.response.status == 500) {
-						this.$message({
-							message:
-								e.response.data.message +
-								'\n' +
-								e.response.data.file +
-								':' +
-								e.response.data.line,
-							type: 'error',
-							showClose: true,
-						})
-					}
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
 		printSlip(id) {
 			this.$axios
-				.post('/memberRenewal/printSlip/' + id)
+				.$post(`/api/memberRenewal/printSlip/${id}`)
 				.then((r) => {
 					this.$message({
-						message: r.data.message,
+						message: r.message,
 						type: 'success',
 						showClose: true,
 					})
@@ -503,10 +335,6 @@ export default {
 					})
 				})
 		},
-	},
-	mounted() {
-		this.requestData()
-		this.$store.commit('getMemberList')
 	},
 }
 </script>

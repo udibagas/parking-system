@@ -26,7 +26,7 @@
 		<el-table show-summary stripe :data="report" :summary-method="getSummaries">
 			<el-table-column label="Tanggal" header-align="center" align="center">
 				<template slot-scope="scope">
-					{{ scope.row.created_at | readableDateTime }}
+					{{ $moment(scope.row.created_at).format('DD-MMM-YYYY HH:mm') }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -50,7 +50,7 @@
 			</el-table-column>
 			<el-table-column label="Jumlah" header-align="right" align="right">
 				<template slot-scope="scope">
-					Rp. {{ scope.row.amount | formatNumber }}
+					Rp. {{ $decimal(scope.row.amount) }}
 				</template>
 			</el-table-column>
 		</el-table>
@@ -66,15 +66,16 @@ export default {
 			loading: false,
 		}
 	},
+
 	methods: {
 		requestData() {
 			let params = { date: this.date }
 			this.loading = true
 
 			this.$axios
-				.get('/memberRenewal/reportDaily', { params: params })
+				.$get('/api/memberRenewal/reportDaily', { params })
 				.then((r) => {
-					this.report = r.data
+					this.report = r
 				})
 				.catch((e) => {
 					this.$message({
@@ -87,12 +88,13 @@ export default {
 					this.loading = false
 				})
 		},
+
 		printReport() {
 			let params = { date: this.date, action: 'print' }
 			this.loading = true
 
 			this.$axios
-				.get('/memberRenewal/reportDaily', { params: params })
+				.$get('/api/memberRenewal/reportDaily', { params })
 				.then((r) => {
 					this.$message({
 						message: 'Silakan ambil slip',
@@ -101,7 +103,6 @@ export default {
 					})
 				})
 				.catch((e) => {
-					console.log(e)
 					this.$message({
 						message: e.response.data.message,
 						type: 'error',
@@ -112,21 +113,7 @@ export default {
 					this.loading = false
 				})
 		},
-		formatNumber(v) {
-			try {
-				v += ''
-				var x = v.split('.')
-				var x1 = x[0]
-				var x2 = x.length > 1 ? '.' + x[1] : ''
-				var rgx = /(\d+)(\d{3})/
-				while (rgx.test(x1)) {
-					x1 = x1.replace(rgx, '$1' + ',' + '$2')
-				}
-				return x1 + x2
-			} catch (error) {
-				return 0
-			}
-		},
+
 		getSummaries(param) {
 			const { columns, data } = param
 			const sums = []
@@ -146,18 +133,16 @@ export default {
 					let amount = this.report.reduce((prev, curr) => {
 						return prev + Number(curr.amount)
 					}, 0)
-					sums[index] = 'Rp ' + this.formatNumber(amount)
+					sums[index] = 'Rp ' + this.$decimal(amount)
 				}
 			})
 
 			return sums
 		},
 	},
+
 	mounted() {
 		this.requestData()
 	},
 }
 </script>
-
-<style lang="scss" scoped>
-</style>

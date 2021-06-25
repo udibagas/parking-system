@@ -1,6 +1,5 @@
 <template>
 	<el-container>
-		<Profile :show="showProfile" @close="showProfile = false" />
 		<el-aside width="auto">
 			<div v-show="!collapse" class="brand-box">
 				<img
@@ -74,6 +73,7 @@
 				<el-collapse-transition>
 					<router-view @back="goBack"></router-view>
 				</el-collapse-transition>
+				<Profile :show="showProfile" @close="showProfile = false" />
 			</el-main>
 		</el-container>
 	</el-container>
@@ -115,15 +115,152 @@ export default {
 	},
 
 	mounted() {
-		this.$store.commit('getNavigationList')
+		this.$store.dispatch('getNavigationList')
+		this.$store.dispatch('getSetting')
+		this.$store.dispatch('getPos')
+		this.$store.dispatch('getVehicleTypeList')
+		this.$store.dispatch('getGroupMemberList')
+		this.$store.dispatch('getMemberList')
 	},
 }
 </script>
 
-<style lang="css" scoped>
-* {
+<style lang="css">
+html,
+body {
 	margin: 0;
 	padding: 0;
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+.el-dialog__header {
+	background-color: #324057;
+	padding: 15px;
+}
+
+.el-dialog__title {
+	color: #fff;
+}
+
+.el-icon-more {
+	transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+}
+
+.el-table {
+	width: 100%;
+	border-top: 1px solid #eee;
+}
+
+.no-padding-dialog > .el-dialog__body {
+	padding: 0px;
+}
+
+.pointer {
+	cursor: pointer;
+}
+
+.text-right {
+	text-align: right;
+}
+
+.text-center {
+	text-align: center;
+}
+
+.text-white,
+.text-white:hover,
+.text-white:active,
+.text-white:focus {
+	color: #fff !important;
+}
+
+.el-form-item__label {
+	font-weight: bold;
+}
+
+.bg-blue {
+	background-color: blue !important;
+}
+.bg-indigo {
+	background-color: indigo !important;
+}
+.bg-purple {
+	background-color: purple !important;
+}
+.bg-pink {
+	background-color: pink !important;
+}
+.bg-red {
+	background-color: red !important;
+}
+.bg-orange {
+	background-color: orange !important;
+}
+.bg-yellow {
+	background-color: yellow !important;
+}
+.bg-green {
+	background-color: green !important;
+}
+.bg-teal {
+	background-color: teal !important;
+}
+.bg-cyan {
+	background-color: cyan !important;
+}
+
+.el-table th,
+.el-table thead.is-group th {
+	background-color: #060446;
+	color: #fff;
+	padding: 4px 0;
+}
+
+.el-pagination {
+	margin-top: 4px;
+}
+
+.el-form--inline .el-form-item {
+	margin-bottom: 5px;
+}
+
+.text-red,
+.text-danger {
+	color: red;
+}
+
+.text-green,
+.text-success {
+	color: green;
+}
+
+table {
+	border-spacing: 0px;
+	border-collapse: separate;
+}
+
+.table {
+	width: 100%;
+	border-top: 2px solid #ddd;
+}
+
+.table th,
+.table td {
+	padding: 10px;
+	border-bottom: 1px solid #ddd;
+}
+
+.el-table .inactive-row {
+	background: #ffeff0;
+}
+
+.el-table .cell,
+.el-dialog__body {
+	word-break: normal;
 }
 
 .brand {

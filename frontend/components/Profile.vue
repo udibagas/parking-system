@@ -67,43 +67,42 @@
 
 <script>
 export default {
-	props: ["show"],
+	props: ['show'],
 	data() {
 		return {
-			formModel: this.$store.state.user,
+			formModel: this.$auth.user,
 			loading: false,
 			formErrors: {},
 			error: {},
-		};
+		}
 	},
 	methods: {
 		save() {
-			this.loading = true;
-			axios
-				.put("/user/" + this.formModel.id, this.formModel)
+			this.loading = true
+			this.$axios
+				.$put(`/api/user/${this.formModel.id}`, this.formModel)
 				.then((r) => {
 					this.$message({
-						message: "Data berhasil diupdate",
-						type: "success",
+						message: r.message,
+						type: 'success',
 						showClose: true,
-					});
-					this.$store.state.user = r.data;
+					})
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.error = {};
-						this.formErrors = e.response.data.errors;
+						this.error = {}
+						this.formErrors = e.response.data.errors
 					}
 
 					if (e.response.status == 500) {
-						this.formErrors = {};
-						this.error = e.response.data;
+						this.formErrors = {}
+						this.error = e.response.data
 					}
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 	},
-};
+}
 </script>

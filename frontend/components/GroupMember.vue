@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<el-form inline class="text-right" @submit.native.prevent>
-			<el-form-item v-if="$store.state.user.role == 1">
+			<el-form-item v-if="$auth.user.role == 1">
 				<el-button
 					size="small"
 					@click="openForm({})"
@@ -62,7 +62,7 @@
 				width="40px"
 				header-align="center"
 				align="center"
-				v-if="$store.state.user.role == 1"
+				v-if="$auth.user.role == 1"
 			>
 				<template slot="header">
 					<el-button
@@ -146,8 +146,10 @@ export default {
 	mixins: [crud],
 	data() {
 		return {
-			url: '/groupMember',
+			url: '/api/groupMember',
 		}
 	},
+
+	// TODO: reload data group member
 }
 </script>

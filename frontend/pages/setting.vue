@@ -19,6 +19,7 @@ export default {
 			loading: false,
 			components: [
 				{ label: 'Global Setting', component: 'GlobalSetting' },
+				{ label: 'Pos', component: 'Pos' },
 				{ label: 'Jenis Kendaraan & Tarif', component: 'VehicleType' },
 				{ label: 'Backup & Restore', component: 'Backup' },
 			],

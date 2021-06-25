@@ -44,7 +44,7 @@
 					</tr>
 					<tr>
 						<td class="td-label">Tarif</td>
-						<td class="td-value">Rp {{ member.fare | formatNumber }}</td>
+						<td class="td-value">Rp {{ $decimal(member.fare) }}</td>
 					</tr>
 					<tr>
 						<td class="td-label">Transaksi Terkahir</td>

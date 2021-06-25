@@ -2,42 +2,60 @@
 	<div>
 		<el-page-header @back="$emit('back')" content="SNAPSHOT"> </el-page-header>
 		<br />
+		<el-form inline @submit.native.prevent class="text-right">
+			<el-form-item class="mb-0">
+				<el-button
+					size="small"
+					type="danger"
+					icon="el-icon-delete"
+					@click="deleteSnapshot"
+					:disabled="checkedNodes.length == 0"
+					>HAPUS SNAPSHOT</el-button
+				>
+			</el-form-item>
+			<el-form-item class="mb-0">
+				<el-button
+					icon="el-icon-refresh"
+					type="primary"
+					plain
+					size="small"
+					@click="refresh"
+				></el-button>
+			</el-form-item>
+		</el-form>
 
-		<el-row :gutter="20">
-			<el-col :span="12">
-				<el-card style="height: calc(100vh - 180px); overflow: auto">
-					<el-tree
-						v-if="show"
-						lazy
-						:load="loadData"
-						node-key="id"
-						:expand-on-click-node="false"
-						@node-click="showPreview"
-						:props="{ children: 'children', label: 'label', isLeaf: 'leaf' }"
-					>
-						<span class="custom-tree-node" slot-scope="{ node, data }">
-							<span>{{ node.label }}</span>
-							<span>
-								<el-button
-									type="text"
-									size="mini"
-									icon="el-icon-delete"
-									@click="() => deleteSnapshot(node, data)"
-								>
-								</el-button>
-							</span>
-						</span>
-					</el-tree>
-				</el-card>
-			</el-col>
-			<el-col :span="12">
-				<el-image style="width: 100%; height: 100%" :src="preview" fit="cover">
-					<div slot="error" class="el-image__error">
-						<i class="el-icon-picture-outline"></i>
-					</div>
-				</el-image>
-			</el-col>
-		</el-row>
+		<div class="flex">
+			<div
+				class="p-3 border"
+				style="width: 400px; height: calc(100vh - 220px); overflow: auto"
+			>
+				<el-tree
+					v-if="show"
+					:props="props"
+					:load="loadNode"
+					ref="tree"
+					lazy
+					show-checkbox
+					highlight-current
+					node-key="path"
+					@node-click="({ isFile, url }) => (this.url = isFile ? url : '')"
+					@check="(node, tree) => (checkedNodes = tree.checkedNodes)"
+				>
+				</el-tree>
+			</div>
+
+			<div
+				class="
+					p-3
+					flex-grow flex
+					align-items-center
+					justify-content-center
+					flex-column
+				"
+			>
+				<img :src="url" alt="" style="max-width: 800px" />
+			</div>
+		</div>
 	</div>
 </template>
 
@@ -45,173 +63,50 @@
 export default {
 	data() {
 		return {
-			data: [],
-			preview: null,
-			months: this.$moment.months(),
+			url: '',
 			show: true,
+			checkedNodes: [],
+			expandedNodes: [],
+			props: {
+				label: 'label',
+				isLeaf: 'isFile',
+			},
 		}
 	},
+
 	methods: {
-		reload() {
-			this.show = false
-			this.$nextTick(() => {
-				this.show = true
-			})
+		loadNode(node, resolve) {
+			const params = {
+				directory: node.data === undefined ? 'snapshots' : node.data.path,
+			}
+			this.$axios.$get('/api/snapshot', { params }).then((r) => resolve(r.data))
 		},
-		showPreview(node) {
-			if (node.leaf == true) {
-				this.preview = node.path
-			}
-		},
-		loadData(node, resolve) {
-			let params = { level: node.level }
-			let path = ''
 
-			if (node.level == 1) {
-				params.year = node.data.id
-				path = params.year
-			}
-
-			if (node.level == 2) {
-				;(params.year = node.parent.data.id), (params.month = node.data.id)
-				path = params.year + '/' + params.month
-			}
-
-			if (node.level == 3) {
-				;(params.year = node.parent.parent.data.id),
-					(params.month = node.parent.data.id)
-				params.day = node.data.id
-				path = params.year + '/' + params.month + '/' + params.day
-			}
-
-			if (node.level == 4) {
-				;(params.year = node.parent.parent.parent.data.id),
-					(params.month = node.parent.parent.data.id)
-				params.day = node.parent.data.id
-				params.hour = node.data.id
-				path =
-					params.year +
-					'/' +
-					params.month +
-					'/' +
-					params.day +
-					'/' +
-					params.hour
-			}
-
-			this.$axios.get('snapshots', { params: params }).then((r) => {
-				resolve(
-					r.data
-						.filter((d) => d != '.' && d != '..')
-						.map((d) => {
-							return {
-								id: d,
-								label: node.level == 1 ? this.months[parseInt(d) - 1] : d,
-								leaf: d.includes('.jpg') || d.includes('.png'),
-								path: 'snapshot/' + path + '/' + d,
-							}
-						})
-				)
-			})
-		},
-		deleteSnapshot(node) {
-			let params = null
-
-			// tahun
-			if (node.level == 1) {
-				params = { level: 1, target: node.data.id }
-			}
-
-			// bulan
-			if (node.level == 2) {
-				params = {
-					level: 2,
-					target: node.parent.data.id + '/' + node.data.id,
-				}
-			}
-
-			// tanggal
-			if (node.level == 3) {
-				params = {
-					level: 3,
-					target:
-						node.parent.parent.data.id +
-						'/' +
-						node.parent.data.id +
-						'/' +
-						node.data.id,
-				}
-			}
-
-			// jam
-			if (node.level == 4) {
-				params = {
-					level: 4,
-					target:
-						node.parent.parent.parent.data.id +
-						'/' +
-						node.parent.parent.data.id +
-						'/' +
-						node.parent.data.id +
-						'/' +
-						node.data.id,
-				}
-			}
-
-			// file
-			if (node.level == 5) {
-				params = {
-					level: 5,
-					target:
-						node.parent.parent.parent.parent.data.id +
-						'/' +
-						node.parent.parent.parent.data.id +
-						'/' +
-						node.parent.parent.data.id +
-						'/' +
-						node.parent.data.id +
-						'/' +
-						node.data.id,
-				}
-			}
-
-			this.$confirm('Anda yakin?', 'Peringatan', { type: 'warning' })
+		deleteSnapshot() {
+			this.$confirm('Anda yakin?', 'Konfirmasi', { type: 'warning' })
 				.then(() => {
 					this.$axios
-						.delete('snapshots', { params: params })
+						.$post('/api/snapshot/delete', { checkedNodes: this.checkedNodes })
 						.then((r) => {
-							this.$message({
-								message: r.data.message,
-								type: 'success',
-								showClose: true,
-							})
+							this.url = ''
+							this.$message({ message: r.message, type: 'success' })
+							this.checkedNodes.forEach((node) => this.$refs.tree.remove(node))
+							this.checkedNodes = []
 						})
 						.catch((e) => {
-							console.log(e)
-							// this.$message({
-							//     message: e.response.data.message,
-							//     type: 'error',
-							//     showClose: true
-							// });
-						})
-						.finally(() => {
-							this.preview = null
-							this.reload()
+							this.$message({
+								message: e.response.data.message,
+								type: 'error',
+							})
 						})
 				})
 				.catch((e) => console.log(e))
 		},
+
+		refresh() {
+			this.show = false
+			this.$nextTick(() => (this.show = true))
+		},
 	},
 }
 </script>
-
-<style lang="css" scoped>
-.custom-tree-node {
-	flex: 1;
-	display: flex;
-	align-items: center;
-	justify-content: space-between;
-	font-size: 14px;
-	padding-right: 8px;
-}
-</style>

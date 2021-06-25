@@ -34,6 +34,10 @@ export default {
       this.requestData()
     },
 
+    filterChange(v) {
+      console.log(v)
+    },
+
     openForm(data) {
       this.error = {}
       this.formErrors = {}

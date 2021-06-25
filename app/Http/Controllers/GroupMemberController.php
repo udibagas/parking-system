@@ -23,10 +23,12 @@ class GroupMemberController extends Controller
         $sort = $request->sort ? $request->sort : 'name';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
-        return GroupMember::when($request->keyword, function ($q) use ($request) {
+        $data = GroupMember::when($request->keyword, function ($q) use ($request) {
             return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
                 ->orWhere('description', 'LIKE', '%' . $request->keyword . '%');
-        })->orderBy($sort, $order)->paginate($request->pageSize);
+        })->orderBy($sort, $order);
+
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**

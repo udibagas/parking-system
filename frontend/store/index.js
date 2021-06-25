@@ -6,6 +6,7 @@ export const state = () => ({
   memberList: [],
   navigationList: [],
   setting: {},
+  pos: {},
   siklus: [
     { value: 'days', label: 'hari' },
     { value: 'weeks', label: 'minggu' },
@@ -15,45 +16,77 @@ export const state = () => ({
 })
 
 export const mutations = {
-  getVehicleTypeList(state) {
-    this.$axios
-      .get('/api/vehicleType')
-      .then((r) => (state.vehicleTypeList = r.data))
-      .catch((e) => console.log(e))
+  setVehicleTypeList(state, data) {
+    state.vehicleTypeList = data
   },
 
-  getGroupMemberList(state) {
-    this.$axios
-      .get('/api/groupMember')
-      .then((r) => (state.groupMemberList = r.data))
-      .catch((e) => console.log(e))
+  setGroupMemberList(state, data) {
+    state.groupMemberList = data
   },
 
-  getMemberList(state) {
-    this.$axios
-      .get('/api/parkingMember')
-      .then((r) => (state.memberList = r.data))
-      .catch((e) => console.log(e))
+  setMemberList(state, data) {
+    state.memberList = data
   },
 
-  getNavigationList(state) {
-    this.$axios
-      .get('/api/getNavigation')
-      .then((r) => (state.navigationList = r.data))
-      .catch((e) => console.log(e))
+  setNavigationList(state, data) {
+    state.navigationList = data
   },
 
-  getSetting(state) {
-    this.$axios
-      .get('/api/setting')
-      .then((r) => (state.setting = r.data))
-      .catch((e) => {
-        Message({
-          message: 'BELUM ADA SETTING',
-          type: 'error',
-          showClose: true,
-          duration: 10000,
-        })
+  setSetting(state, data) {
+    state.setting = data
+  },
+
+  setPos(state, data) {
+    state.pos = data
+  },
+}
+
+export const actions = {
+  async getVehicleTypeList({ commit }) {
+    const data = await this.$axios.$get('/api/vehicleType')
+    commit('setVehicleTypeList', data)
+  },
+
+  async getGroupMemberList({ commit }) {
+    const data = await this.$axios.$get('/api/groupMember')
+    commit('setGroupMemberList', data)
+  },
+
+  async getMemberList({ commit }) {
+    const data = await this.$axios.$get('/api/parkingMember')
+    commit('setMemberList', data)
+  },
+
+  async getNavigationList({ commit }) {
+    const data = await this.$axios.$get('/api/getNavigation')
+    commit('setNavigationList', data)
+  },
+
+  async getSetting({ commit }) {
+    try {
+      const data = await this.$axios.$get('/api/setting')
+      commit('setSetting', data)
+    } catch (error) {
+      Message({
+        message: 'BELUM ADA SETTING',
+        type: 'error',
+        showClose: true,
+        duration: 10000,
       })
+    }
+  },
+
+  async getPos({ commit }) {
+    try {
+      const data = await this.$axios.$get('/api/getPosByIp')
+      commit('setPos', data)
+    } catch (error) {
+      Message({
+        message: 'POS TIDAK TERDAFTAR',
+        type: 'error',
+        showClose: true,
+        duration: 10000,
+      })
+    }
   },
 }

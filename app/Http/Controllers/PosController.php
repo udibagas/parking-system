@@ -16,9 +16,13 @@ class PosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Pos::orderBy('name', 'asc')->get();
+        $data = Pos::when($request->keyword, function ($q) use ($request) {
+            return $q->where('name', 'LIKE', '%' . $request->keyword . '%');
+        })->orderBy($request->sort ?: 'name', $request->order == 'ascending' ? 'asc' : 'desc');
+
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**

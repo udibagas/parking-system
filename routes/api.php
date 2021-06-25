@@ -11,6 +11,7 @@ use App\Http\Controllers\ParkingTransactionController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
+use App\Http\Controllers\SnapshotController;
 use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserLogController;
@@ -69,6 +70,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('testPrinter/{pos}', [PosController::class, 'testPrinter']);
     Route::post('testCamera/{pos}', [PosController::class, 'testCamera']);
     Route::get('getPosByIp', [PosController::class, 'getPosByIp']);
+
+    Route::get('snapshot', [SnapshotController::class, 'index']);
+    Route::post('snapshot/delete', [SnapshotController::class, 'destroy']);
 
     Route::apiResources([
         'pos' => PosController::class,

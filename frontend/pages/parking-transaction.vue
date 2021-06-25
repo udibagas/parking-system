@@ -33,12 +33,7 @@
 					placeholder="Cari"
 					prefix-icon="el-icon-search"
 					:clearable="true"
-					@change="
-						(v) => {
-							keyword = v
-							requestData()
-						}
-					"
+					@change="searchData"
 				></el-input>
 			</el-form-item>
 		</el-form>
@@ -52,14 +47,7 @@
 					showTrxDetail = true
 				}
 			"
-			@filter-change="
-				(f) => {
-					let c = Object.keys(f)[0]
-					filters[c] = Object.values(f[c])
-					page = 1
-					requestData()
-				}
-			"
+			@filter-change="filterChange"
 			:default-sort="{ prop: sort, order: order }"
 			height="calc(100vh - 250px)"
 			v-loading="loading"
@@ -136,7 +124,7 @@
 				min-width="150px"
 			></el-table-column>
 			<el-table-column
-				v-if="$store.state.user.role == 1"
+				v-if="$auth.user.role == 1"
 				prop="fare"
 				label="Tarif"
 				sortable="custom"
@@ -145,7 +133,7 @@
 				min-width="100px"
 			>
 				<template slot-scope="scope"
-					>Rp. {{ scope.row.fare | formatNumber }}</template
+					>Rp. {{ $decimal(scope.row.fare) }}</template
 				>
 			</el-table-column>
 
@@ -199,18 +187,8 @@
 
 		<el-pagination
 			background
-			@current-change="
-				(p) => {
-					page = p
-					requestData()
-				}
-			"
-			@size-change="
-				(s) => {
-					pageSize = s
-					requestData()
-				}
-			"
+			@current-change="currentChange"
+			@size-change="sizeChange"
 			layout="prev, pager, next, sizes, total"
 			:page-size="pageSize"
 			:page-sizes="[10, 25, 50, 100]"
@@ -255,9 +233,9 @@
 						<td class="td-label">Waktu Masuk</td>
 						<td class="td-value">{{ trx.time_in }}</td>
 					</tr>
-					<tr v-if="$store.state.user.role == 1">
+					<tr v-if="$auth.user.role == 1">
 						<td class="td-label">Tarif</td>
-						<td class="td-value">Rp {{ trx.fare | formatNumber }}</td>
+						<td class="td-value">Rp {{ $decimal(trx.fare) }}</td>
 					</tr>
 					<tr>
 						<td class="td-label">Operator</td>
@@ -283,42 +261,36 @@
 
 <script>
 import { mapState } from 'vuex'
+import crud from '~/mixins/crud'
+
 export default {
+	mixins: [crud],
+
 	computed: {
 		...mapState(['vehicleTypeList']),
 	},
+
 	data() {
 		return {
-			keyword: '',
-			page: 1,
-			pageSize: 10,
-			tableData: {},
+			url: '/api/parkingTransaction',
 			sort: 'updated_at',
 			order: 'descending',
-			loading: false,
 			trx: null,
 			showTrxDetail: false,
 			dateRange: [
 				this.$moment().format('YYYY-MM-DD 00:00:00'),
 				this.$moment().format('YYYY-MM-DD HH:mm:ss'),
 			],
-			filters: {},
 		}
 	},
+
 	methods: {
-		sortChange(c) {
-			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop
-				this.order = c.order
-				this.requestData()
-			}
-		},
 		printTicket(id) {
 			this.$axios
-				.post('/parkingTransaction/printTicket/' + id, { trx: 'OUT' })
+				.$post(`/api/parkingTransaction/printTicket/${id}`, { trx: 'OUT' })
 				.then((r) => {
 					this.$message({
-						message: r.data.message,
+						message: r.message,
 						type: 'success',
 						showClose: true,
 					})
@@ -331,41 +303,6 @@ export default {
 					})
 				})
 		},
-		requestData() {
-			let params = {
-				page: this.page,
-				keyword: this.keyword,
-				pageSize: this.pageSize,
-				sort: this.sort,
-				order: this.order,
-				dateRange: this.dateRange,
-			}
-
-			this.loading = true
-			this.$axios
-				.get('/parkingTransaction', {
-					params: Object.assign(params, this.filters),
-				})
-				.then((r) => {
-					this.tableData = r.data
-				})
-				.catch((e) => {
-					if (e.response.status == 500) {
-						this.$message({
-							message: e.response.data.message,
-							type: 'error',
-							showClose: true,
-						})
-					}
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
-	},
-	mounted() {
-		this.requestData()
-		this.$store.commit('getVehicleTypeList')
 	},
 }
 </script>

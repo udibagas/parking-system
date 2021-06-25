@@ -64,7 +64,7 @@
 				min-width="120px"
 			>
 				<template slot-scope="scope"
-					>Rp {{ scope.row.tarif_flat | formatNumber }}</template
+					>Rp {{ $decimal(scope.row.tarif_flat) }}</template
 				>
 			</el-table-column>
 			<el-table-column width="40px" align="center" header-align="center">
@@ -170,7 +170,7 @@ export default {
 	mixins: [crud],
 	data() {
 		return {
-			url: '/vehicleType',
+			url: '/api/vehicleType',
 		}
 	},
 }

@@ -128,11 +128,10 @@ export default {
 			location: {},
 			vehicleTypeList: [],
 			snapshot_in: null,
-			pos: {},
 		}
 	},
 	computed: {
-		...mapState(['setting']),
+		...mapState(['setting', 'pos']),
 	},
 	methods: {
 		toVehicleField() {
@@ -429,13 +428,8 @@ export default {
 	},
 
 	mounted() {
-		this.$store.commit('getSetting')
-		this.getPos()
+		this.formModel.plate_number = this.setting.default_plate_number
 
-		setTimeout(() => {
-			this.formModel.plate_number = this.setting.default_plate_number
-			this.$forceUpdate()
-		}, 100)
 		this.getVehicleTypeList()
 		document.getElementById('card-number').focus()
 
