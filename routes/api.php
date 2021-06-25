@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BackupController;
 use App\Http\Controllers\GroupMemberController;
 use App\Http\Controllers\MemberRenewalController;
+use App\Http\Controllers\MemberVehicleController;
 use App\Http\Controllers\ParkingMemberController;
 use App\Http\Controllers\ParkingTransactionController;
 use App\Http\Controllers\PosController;
@@ -36,15 +37,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('getNavigation', [AppController::class, 'getNavigation']);
     Route::post('logout', [AuthController::class, 'logout']);
 
-    Route::get('parkingMember/search', 'ParkingMemberController@search');
-    Route::post('parkingTransaction/printReport', 'ParkingTransactionController@printReport');
-    Route::post('parkingTransaction/takeSnapshot/{parkingTransaction}', 'ParkingTransactionController@takeSnapshot');
-    Route::post('parkingTransaction/printTicket/{parkingTransaction}', 'ParkingTransactionController@printTicket');
-    Route::get('parkingTransaction/search', 'ParkingTransactionController@search');
-    Route::delete('memberVehicle/{memberVehicle}', 'MemberVehicleController@destroy');
-    Route::post('memberRenewal/printSlip/{memberRenewal}', 'MemberRenewalController@printSlip');
-    Route::get('memberRenewal/report', 'MemberRenewalController@report');
-    Route::get('memberRenewal/reportDaily', 'MemberRenewalController@reportDaily');
+    Route::get('parkingMember/search', [ParkingMemberController::class, 'search']);
+    Route::post('printReport', [ParkingTransactionController::class, 'printReport']);
+    Route::post('takeSnapshot/{parkingTransaction}', [ParkingTransactionController::class,  'takeSnapshot']);
+    Route::post('printTicket/{parkingTransaction}', [ParkingTransactionController::class, 'printTicket']);
+    Route::get('parkingTransaction/search', [ParkingTransactionController::class, 'search']);
+    Route::delete('memberVehicle/{memberVehicle}', [MemberVehicleController::class, 'destroy']);
+
+    Route::prefix('memberRenewal')->group(function () {
+        Route::post('printSlip/{memberRenewal}', [MemberRenewalController::class, 'printSlip']);
+        Route::get('report', [MemberRenewalController::class, 'report']);
+        Route::get('reportDaily', [MemberRenewalController::class, 'reportDaily']);
+    });
+
     Route::get('userLog', [UserLogController::class, 'index']);
     Route::delete('userLog', [UserLogController::class, 'clear']);
     Route::get('snapshots', [SnapshotsController::class, 'index']);
