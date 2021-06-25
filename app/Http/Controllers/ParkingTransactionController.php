@@ -12,6 +12,7 @@ use App\Models\Setting;
 use App\Models\UserLog;
 use GuzzleHttp\Client;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Mike42\Escpos\EscposImage;
 
 class ParkingTransactionController extends Controller
@@ -87,11 +88,6 @@ class ParkingTransactionController extends Controller
         }
 
         $client = new Client(['timeout' => 3]);
-        $fileName = 'snapshot/' . date('Y/m/d/H/') . date('YmdHis') . '.jpg';
-
-        if (!is_dir('snapshot/' . date('Y/m/d/H'))) {
-            mkdir('snapshot/' . date('Y/m/d/H'), 0777, true);
-        }
 
         try {
             $response = $client->request('GET', $pos->camera_snapshot_url, [
@@ -101,7 +97,9 @@ class ParkingTransactionController extends Controller
                     'digest'
                 ]
             ]);
-            file_put_contents($fileName, $response->getBody());
+
+            $fileName = 'snapshot/' . date('Y/m/d/H/') . $pos->name . '.jpg';
+            Storage::put($fileName, $response->getBody());
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. ' . $e->getMessage()], 500);
         }
