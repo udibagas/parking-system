@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -23,6 +24,8 @@ class AuthController extends Controller
                 'action' => 'LOGIN'
             ]);
 
+            Auth::login($user);
+
             return response()->json([
                 'token' => $user->createToken($request->device_name ?: 'web')->plainTextToken,
                 'user' => $user
@@ -31,7 +34,7 @@ class AuthController extends Controller
 
         return response()->json([
             'message' => 'Username atau password salah',
-        ], 401);
+        ], 403);
     }
 
     public function logout()
