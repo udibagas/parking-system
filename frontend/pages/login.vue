@@ -50,7 +50,7 @@ export default {
 	methods: {
 		login() {
 			this.$auth
-				.loginWith('laravelSanctum', {
+				.loginWith('local', {
 					data: {
 						email: this.email,
 						password: this.password,

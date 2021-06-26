@@ -44,9 +44,11 @@ export default {
   auth: {
     strategies: {
       localStorage: false,
-      laravelSanctum: {
-        provider: 'laravel/sanctum',
-        url: '/',
+      local: {
+        // provider: 'laravel/sanctum',
+        // url: '',
+        tokenType: false,
+        tokenRequired: false,
         endpoints: {
           login: {
             url: '/api/login',
