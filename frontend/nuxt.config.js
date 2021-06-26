@@ -37,6 +37,10 @@ export default {
     '@nuxtjs/pwa',
   ],
 
+  router: {
+    mode: 'hash',
+  },
+
   auth: {
     strategies: {
       localStorage: false,

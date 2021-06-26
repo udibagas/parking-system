@@ -146,3 +146,8 @@ ACTION=="add", ATTRS{idProduct}=="0042", ATTRS{idVendor}=="2341", DRIVERS=="usb"
 
 Press Control-O and then Control-X to save the file and exit.
 
+
+======================
+Print pake python
+profile
+

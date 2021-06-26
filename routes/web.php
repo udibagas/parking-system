@@ -14,5 +14,5 @@
 use Illuminate\Support\Facades\Route;
 
 Route::get('/{any}', function () {
-    return 'NOTHING HERE';
+    return file_get_contents('index.html');
 })->where('any', '.*');
