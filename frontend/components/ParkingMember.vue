@@ -36,17 +36,6 @@
 					></el-button>
 				</el-button-group>
 			</el-form-item>
-			<el-form-item>
-				<el-pagination
-					background
-					@current-change="currentChange"
-					@size-change="sizeChange"
-					layout="total, sizes, prev, next"
-					:page-size="pageSize"
-					:page-sizes="[10, 25, 50, 100]"
-					:total="tableData.total"
-				></el-pagination>
-			</el-form-item>
 		</el-form>
 
 		<el-table
@@ -59,15 +48,7 @@
 				}
 			"
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 255px)"
-			@filter-change="
-				(f) => {
-					let c = Object.keys(f)[0]
-					filters[c] = Object.values(f[c])
-					page = 1
-					requestData()
-				}
-			"
+			@filter-change="filterChange"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -101,7 +82,7 @@
 			<el-table-column
 				:filters="groupMemberList.map((g) => ({ value: g.id, text: g.name }))"
 				column-key="group_member_id"
-				prop="group"
+				prop="group.name"
 				label="Group"
 				sortable="custom"
 				show-overflow-tooltip
@@ -251,7 +232,6 @@
 				<template slot="header">
 					<el-button
 						type="text"
-						class="text-white"
 						@click="refreshData"
 						icon="el-icon-refresh"
 					></el-button>
@@ -289,6 +269,19 @@
 				</template>
 			</el-table-column>
 		</el-table>
+
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
 
 		<el-dialog
 			v-if="!!selectedData"
@@ -587,12 +580,12 @@
 				</el-table-column>
 			</el-table>
 
-			<span slot="footer" class="dialog-footer">
+			<span slot="footer">
+				<el-button icon="el-icon-error" @click="showForm = false">
+					BATAL
+				</el-button>
 				<el-button type="primary" icon="el-icon-success" @click="submit">
 					SIMPAN
-				</el-button>
-				<el-button type="info" icon="el-icon-error" @click="showForm = false">
-					BATAL
 				</el-button>
 			</span>
 		</el-dialog>
@@ -658,13 +651,13 @@ export default {
 			}
 
 			this.$axios
-				.get('/api/parkingMember', { params })
+				.$get('/api/parkingMember', { params })
 				.then((r) => {
-					const data = r.data.data.map((d) => {
+					const data = r.data.map((d) => {
 						return {
 							Nama: d.name,
 							Jenis: d.paid ? 'BERBAYAR' : 'GRATIS',
-							Group: d.group,
+							Group: d.group.name,
 							'Nomor Kartu': d.card_number,
 							'Plat Nomor': d.vehicles.map((v) => v.plate_number).join(', '),
 							'Tanggal Daftar': d.register_date,

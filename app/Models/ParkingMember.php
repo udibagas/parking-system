@@ -24,9 +24,9 @@ class ParkingMember extends Model
         return $this->hasMany(MemberVehicle::class);
     }
 
-    public function groupMember()
+    public function group()
     {
-        return $this->belongsTo(GroupMember::class);
+        return $this->belongsTo(GroupMember::class, 'group_member_id');
     }
 
     public function getExpiredInAttribute()

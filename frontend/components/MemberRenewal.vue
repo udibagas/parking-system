@@ -39,7 +39,6 @@
 			:data="tableData.data"
 			stripe
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 300px)"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -109,12 +108,7 @@
 				header-align="center"
 			>
 				<template slot="header">
-					<el-button
-						type="text"
-						class="text-white"
-						@click="refreshData"
-						icon="el-icon-refresh"
-					>
+					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
 					</el-button>
 				</template>
 				<template slot-scope="scope">
@@ -275,12 +269,12 @@
 					</div>
 				</el-form-item>
 			</el-form>
-			<span slot="footer" class="dialog-footer">
+			<span slot="footer">
+				<el-button icon="el-icon-error" @click="showForm = false">
+					BATAL
+				</el-button>
 				<el-button icon="el-icon-success" type="primary" @click="submit">
 					SIMPAN
-				</el-button>
-				<el-button icon="el-icon-error" type="info" @click="showForm = false">
-					BATAL
 				</el-button>
 			</span>
 		</el-dialog>

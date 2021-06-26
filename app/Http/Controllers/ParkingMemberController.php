@@ -25,7 +25,7 @@ class ParkingMemberController extends Controller
         $sort = $request->sort ? $request->sort : 'name';
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
-        $data = ParkingMember::when($request->keyword, function ($q) use ($request) {
+        $data = ParkingMember::with('group')->when($request->keyword, function ($q) use ($request) {
             return $q->where(function ($qq) use ($request) {
                 return $qq->where('name', 'LIKE', '%' . $request->keyword . '%')
                     ->orWhere('card_number', 'LIKE', '%' . $request->keyword . '%');
@@ -53,21 +53,7 @@ class ParkingMemberController extends Controller
             ]);
         }
 
-        if ($request->paginated) {
-            $data = $data->paginate($request->pageSize);
-
-            return [
-                'from' => $data->firstItem(),
-                'to' => $data->lastItem(),
-                'data' => $data->map(function ($d) {
-                    return array_merge($d->toArray(), [
-                        'group' => $d->groupMember->name
-                    ]);
-                })
-            ];
-        }
-
-        return $data->get();
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**

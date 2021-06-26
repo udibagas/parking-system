@@ -20,24 +20,12 @@
 					@change="searchData"
 				></el-input>
 			</el-form-item>
-			<el-form-item>
-				<el-pagination
-					background
-					@current-change="currentChange"
-					@size-change="sizeChange"
-					layout="total, sizes, prev, next"
-					:page-size="pageSize"
-					:page-sizes="[10, 25, 50, 100]"
-					:total="tableData.total"
-				></el-pagination>
-			</el-form-item>
 		</el-form>
 
 		<el-table
 			:data="tableData.data"
 			stripe
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 260px)"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -71,7 +59,6 @@
 				<template slot="header">
 					<el-button
 						type="text"
-						class="text-white"
 						@click="refreshData"
 						icon="el-icon-refresh"
 					></el-button>
@@ -95,6 +82,19 @@
 				</template>
 			</el-table-column>
 		</el-table>
+
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
 
 		<el-dialog
 			top="60px"
@@ -151,12 +151,12 @@
 					</div>
 				</el-form-item>
 			</el-form>
-			<span slot="footer" class="dialog-footer">
+			<span slot="footer">
+				<el-button icon="el-icon-error" @click="showForm = false">
+					BATAL
+				</el-button>
 				<el-button icon="el-icon-success" type="primary" @click="save">
 					SIMPAN
-				</el-button>
-				<el-button icon="el-icon-error" type="info" @click="showForm = false">
-					BATAL
 				</el-button>
 			</span>
 		</el-dialog>

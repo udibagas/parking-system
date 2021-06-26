@@ -52,7 +52,7 @@
 					</el-col>
 					<el-col :span="12" class="text-right">
 						<el-dropdown @command="handleCommand">
-							<span class="el-dropdown-link" style="cursor: pointer"
+							<span class="el-dropdown-link text-white" style="cursor: pointer"
 								>Selamat Datang, {{ $auth.user.name }}!</span
 							>
 							<el-dropdown-menu slot="dropdown">
@@ -131,15 +131,6 @@ body {
 	font-family: Arial, Helvetica, sans-serif;
 }
 
-.el-dialog__header {
-	background-color: #324057;
-	padding: 15px;
-}
-
-.el-dialog__title {
-	color: #fff;
-}
-
 .el-icon-more {
 	transform: rotate(90deg);
 	-webkit-transform: rotate(90deg);
@@ -176,54 +167,48 @@ body {
 	color: #fff !important;
 }
 
-.el-form-item__label {
-	font-weight: bold;
-}
-
 .bg-blue {
 	background-color: blue !important;
 }
+
 .bg-indigo {
 	background-color: indigo !important;
 }
+
 .bg-purple {
 	background-color: purple !important;
 }
+
 .bg-pink {
 	background-color: pink !important;
 }
 .bg-red {
 	background-color: red !important;
 }
+
 .bg-orange {
 	background-color: orange !important;
 }
+
 .bg-yellow {
 	background-color: yellow !important;
 }
+
 .bg-green {
 	background-color: green !important;
 }
+
 .bg-teal {
 	background-color: teal !important;
 }
+
 .bg-cyan {
 	background-color: cyan !important;
 }
 
 .el-table th,
 .el-table thead.is-group th {
-	background-color: #060446;
-	color: #fff;
 	padding: 4px 0;
-}
-
-.el-pagination {
-	margin-top: 4px;
-}
-
-.el-form--inline .el-form-item {
-	margin-bottom: 5px;
 }
 
 .text-red,
@@ -300,10 +285,6 @@ table {
 }
 
 .el-main {
-	background-color: #fff;
-}
-
-.el-dropdown-link {
-	color: #fff;
+	background-color: #efefef;
 }
 </style>

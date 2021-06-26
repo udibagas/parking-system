@@ -55,12 +55,10 @@
 			</el-form-item>
 		</el-form>
 		<span slot="footer">
-			<el-button type="primary" @click="save" icon="el-icon-success"
-				>SIMPAN</el-button
-			>
-			<el-button type="info" @click="$emit('close')" icon="el-icon-error"
-				>TUTUP</el-button
-			>
+			<el-button @click="$emit('close')" icon="el-icon-error">TUTUP</el-button>
+			<el-button type="primary" @click="save" icon="el-icon-success">
+				SIMPAN
+			</el-button>
 		</span>
 	</el-dialog>
 </template>

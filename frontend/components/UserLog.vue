@@ -21,18 +21,6 @@
 				>
 				</el-input>
 			</el-form-item>
-			<el-form-item>
-				<el-pagination
-					background
-					@current-change="currentChange"
-					@size-change="sizeChange"
-					layout="total, sizes, prev, next"
-					:page-size="pageSize"
-					:page-sizes="[10, 25, 50, 100]"
-					:total="tableData.total"
-				>
-				</el-pagination>
-			</el-form-item>
 		</el-form>
 
 		<el-table
@@ -45,7 +33,6 @@
 				}
 			"
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 280px)"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -71,6 +58,19 @@
 				min-width="150px"
 			></el-table-column>
 		</el-table>
+
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
 	</div>
 </template>
 

@@ -2,7 +2,7 @@
 	<div>
 		<el-page-header @back="$emit('back')" content="SETTING"></el-page-header>
 		<br />
-		<el-tabs type="card">
+		<el-tabs type="border-card">
 			<el-tab-pane v-for="(c, i) in components" :key="i" lazy :label="c.label">
 				<component :is="c.component" />
 			</el-tab-pane>

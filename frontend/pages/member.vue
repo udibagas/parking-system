@@ -4,7 +4,7 @@
 
 		<br />
 
-		<el-tabs type="card">
+		<el-tabs type="border-card">
 			<el-tab-pane lazy label="Member"><ParkingMember /></el-tab-pane>
 			<el-tab-pane lazy label="Group Member"><GroupMember /></el-tab-pane>
 			<el-tab-pane lazy label="Pembayaran"><MemberRenewal /></el-tab-pane>

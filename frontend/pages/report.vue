@@ -8,37 +8,43 @@
 				></el-page-header>
 			</el-col>
 			<el-col :span="16" style="text-align: right">
-				Pilih Tanggal :
-				<el-date-picker
-					size="small"
-					@change="requestData"
-					v-model="dateRange"
-					format="dd/MMM/yyyy"
-					value-format="yyyy-MM-dd"
-					type="daterange"
-					range-separator="To"
-					start-placeholder="Start date"
-					end-placeholder="End date"
-				></el-date-picker>
+				<el-form inline>
+					<el-form-item style="margin-bottom: 0">
+						<el-date-picker
+							style="margin-top: 5px"
+							size="small"
+							@change="requestData"
+							v-model="dateRange"
+							format="dd/MMM/yyyy"
+							value-format="yyyy-MM-dd"
+							type="daterange"
+							range-separator="To"
+							start-placeholder="Start date"
+							end-placeholder="End date"
+						></el-date-picker>
+					</el-form-item>
 
-				<el-dropdown
-					size="small"
-					split-button
-					type="primary"
-					@command="handlePrint"
-				>
-					PRINT LAPORAN
-					<el-dropdown-menu slot="dropdown">
-						<el-dropdown-item command="struk">STRUK</el-dropdown-item>
-						<el-dropdown-item command="a4">A4</el-dropdown-item>
-					</el-dropdown-menu>
-				</el-dropdown>
+					<el-form-item style="margin-bottom: 0">
+						<el-dropdown
+							size="small"
+							split-button
+							type="primary"
+							@command="handlePrint"
+						>
+							PRINT LAPORAN
+							<el-dropdown-menu slot="dropdown">
+								<el-dropdown-item command="struk">STRUK</el-dropdown-item>
+								<el-dropdown-item command="a4">A4</el-dropdown-item>
+							</el-dropdown-menu>
+						</el-dropdown>
+					</el-form-item>
+				</el-form>
 			</el-col>
 		</el-row>
 
 		<br />
 
-		<el-tabs type="card">
+		<el-tabs type="border-card">
 			<el-tab-pane lazy label="RANGKUMAN">
 				<el-row :gutter="10">
 					<el-col :span="12">

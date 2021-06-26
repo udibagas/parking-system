@@ -21,25 +21,12 @@
 					@change="searchData"
 				></el-input>
 			</el-form-item>
-
-			<el-form-item>
-				<el-pagination
-					background
-					@current-change="currentChange"
-					@size-change="sizeChange"
-					layout="total, sizes, prev, next"
-					:page-size="pageSize"
-					:page-sizes="[10, 25, 50, 100]"
-					:total="tableData.total"
-				></el-pagination>
-			</el-form-item>
 		</el-form>
 
 		<el-table
 			:data="tableData.data"
 			stripe
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 255px)"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -66,7 +53,6 @@
 			>
 				<template slot="header">
 					<el-button
-						class="text-white"
 						type="text"
 						@click="refreshData"
 						icon="el-icon-refresh"
@@ -92,10 +78,24 @@
 			</el-table-column>
 		</el-table>
 
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
+
 		<el-dialog
 			:visible.sync="showForm"
 			:title="!!formModel.id ? 'EDIT GROUP MEMBER' : 'TAMBAH GROUP MEMBER'"
 			v-loading="loading"
+			width="500px"
 			:close-on-click-modal="false"
 		>
 			<el-alert
@@ -106,7 +106,11 @@
 				style="margin-bottom: 15px"
 			></el-alert>
 
-			<el-form label-width="150px" label-position="left">
+			<el-form
+				label-width="120px"
+				label-position="left"
+				@submit.native.prevent="save"
+			>
 				<el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
 					<el-input placeholder="Nama" v-model="formModel.name"></el-input>
 					<div class="el-form-item__error" v-if="formErrors.name">
@@ -127,12 +131,17 @@
 					</div>
 				</el-form-item>
 			</el-form>
-			<span slot="footer" class="dialog-footer">
-				<el-button type="primary" icon="el-icon-success" @click="save">
-					SIMPAN
-				</el-button>
-				<el-button type="info" icon="el-icon-error" @click="showForm = false">
+			<span slot="footer">
+				<el-button icon="el-icon-error" @click="showForm = false">
 					BATAL
+				</el-button>
+				<el-button
+					type="primary"
+					native-type="submit"
+					icon="el-icon-success"
+					@click="save"
+				>
+					SIMPAN
 				</el-button>
 			</span>
 		</el-dialog>

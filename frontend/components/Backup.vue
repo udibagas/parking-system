@@ -23,7 +23,7 @@
 		<!-- <el-divider style="margin-top:0"></el-divider> -->
 		<el-row :gutter="15">
 			<el-col :span="12">
-				<el-table height="calc(100vh - 360px)" :data="files">
+				<el-table :data="files">
 					<el-table-column
 						type="index"
 						width="30px"
@@ -71,7 +71,7 @@
 				</el-table>
 			</el-col>
 			<el-col :span="12">
-				<el-table height="calc(100vh - 360px)" :data="images">
+				<el-table :data="images">
 					<el-table-column
 						type="index"
 						width="30px"
