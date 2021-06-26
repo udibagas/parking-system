@@ -43,26 +43,11 @@ export default {
 
   auth: {
     strategies: {
-      localStorage: false,
       local: {
-        // provider: 'laravel/sanctum',
-        // url: '',
-        tokenType: false,
-        tokenRequired: false,
         endpoints: {
-          login: {
-            url: '/api/login',
-            method: 'post',
-          },
-          logout: {
-            url: '/api/logout',
-            method: 'post',
-          },
-          user: {
-            url: '/api/me',
-            method: 'get',
-            propertyName: false,
-          },
+          login: { url: '/api/login' },
+          logout: { url: '/api/logout' },
+          user: { url: '/api/me' },
         },
       },
     },

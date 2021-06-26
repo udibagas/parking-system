@@ -49,19 +49,21 @@ export default {
 	},
 	methods: {
 		login() {
-			this.$auth
-				.loginWith('local', {
-					data: {
-						email: this.email,
-						password: this.password,
-					},
-				})
-				.then((r) => {
-					this.$router.push('/')
-				})
-				.catch((e) => {
-					this.$message.error(e.response.data.message)
-				})
+			this.$axios.$get('/sanctum/csrf-cookie').then(() => {
+				this.$auth
+					.loginWith('local', {
+						data: {
+							email: this.email,
+							password: this.password,
+						},
+					})
+					.then((r) => {
+						this.$router.push('/')
+					})
+					.catch((e) => {
+						this.$message.error(e.response.data.message)
+					})
+			})
 		},
 	},
 }

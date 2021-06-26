@@ -70,9 +70,7 @@
 			<el-main
 				style="padding: 20px; height: calc(100vh - 60px); overflow: auto"
 			>
-				<el-collapse-transition>
-					<router-view @back="goBack"></router-view>
-				</el-collapse-transition>
+				<router-view @back="goBack"></router-view>
 				<Profile :show="showProfile" @close="showProfile = false" />
 			</el-main>
 		</el-container>
