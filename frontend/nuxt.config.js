@@ -46,7 +46,7 @@ export default {
       localStorage: false,
       laravelSanctum: {
         provider: 'laravel/sanctum',
-        url: process.env.API_URL || 'http://localhost:8000',
+        url: process.env.API_URL || '/',
         endpoints: {
           login: {
             url: '/api/login',
