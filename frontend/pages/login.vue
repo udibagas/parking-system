@@ -1,6 +1,6 @@
 <template>
 	<el-container>
-		<el-main style="text-align: center">
+		<el-main style="text-align: center; background: #fff">
 			<img
 				src="/images/logo.jpeg"
 				style="width: 70px; margin-top: 80px; border-radius: 5px"
