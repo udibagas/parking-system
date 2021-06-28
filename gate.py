@@ -5,7 +5,6 @@ import asyncio
 import websockets
 from serial import Serial
 import json
-import datetime
 from escpos.printer import Usb
 
 
