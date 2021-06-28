@@ -31,15 +31,7 @@
 
 		<el-row :gutter="20">
 			<el-col :span="8">
-				<div
-					style="
-						width: 375px;
-						height: calc(100vh - 260px);
-						overflow: auto;
-						padding: 10px;
-						border: 1px solid #ddd;
-					"
-				>
+				<div style="width: 370px; height: calc(100vh - 250px); overflow: auto">
 					<el-tree
 						v-if="show"
 						:props="props"
