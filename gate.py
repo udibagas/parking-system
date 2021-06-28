@@ -5,7 +5,7 @@ import asyncio
 import websockets
 from serial import Serial
 import json
-from escpos.printer import Serial as SerialPrinter
+from escpos.printer import Usb
 
 
 async def open_gate(websocket, path):
@@ -38,12 +38,7 @@ async def open_gate(websocket, path):
 
         elif cfg[0] == 'test_printer' or cfg[0] == 'print_ticket':
             try:
-                p = SerialPrinter(devfile=cfg[1], baudrate=9600,
-                                  bytesize=8,
-                                  parity='N',
-                                  stopbits=1,
-                                  timeout=1.00,
-                                  dsrdtr=True)
+                p = Usb(0x1fc9, 0x2016)
             except Exception as e:
                 await websocket.send(json.dumps({"status": False, "message": "Koneksi ke printer gagal " + str(e)}))
                 return
