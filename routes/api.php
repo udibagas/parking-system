@@ -68,7 +68,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('report', [ReportController::class, 'pendapatan']);
 
     Route::post('testPrinter/{pos}', [PosController::class, 'testPrinter']);
-    Route::post('testCamera/{pos}', [PosController::class, 'testCamera']);
+    Route::get('testCamera/{pos}', [PosController::class, 'testCamera']);
     Route::get('getPosByIp', [PosController::class, 'getPosByIp']);
 
     Route::get('snapshot', [SnapshotController::class, 'index']);
