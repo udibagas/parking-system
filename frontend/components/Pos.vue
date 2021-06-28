@@ -49,7 +49,7 @@
 			></el-table-column>
 
 			<el-table-column
-				prop="ip_address"
+				prop="printer_device"
 				label="Device Printer"
 				min-width="120"
 			></el-table-column>
@@ -112,13 +112,13 @@
 							</el-dropdown-item>
 							<el-dropdown-item
 								icon="el-icon-printer"
-								@click.native.prevent="testPrinter(scope.row)"
+								@click.native.prevent="test(scope.row, 'printer')"
 							>
 								Test Printer
 							</el-dropdown-item>
 							<el-dropdown-item
 								icon="el-icon-setting"
-								@click.native.prevent="testGate(scope.row)"
+								@click.native.prevent="test(scope.row, 'gate')"
 							>
 								Test Gate
 							</el-dropdown-item>
@@ -334,6 +334,52 @@ export default {
 		return {
 			url: '/api/pos',
 		}
+	},
+
+	methods: {
+		test(pos, device) {
+			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`)
+
+			ws.onerror = (event) => {
+				this.$message({
+					message: 'KONEKSI KE POS GAGAL',
+					type: 'error',
+				})
+			}
+
+			ws.onopen = (event) => {
+				if (device == 'printer') {
+					ws.send(
+						[
+							'test_printer',
+							pos.printer_device,
+							`TEST PRINTER ${pos.name}`,
+						].join(';')
+					)
+				}
+
+				if (device == 'gate') {
+					ws.send(
+						[
+							'open',
+							pos.gate_device_name,
+							pos.gate_device_baudrate,
+							pos.gate_command_open,
+							pos.gate_command_close,
+						].join(';')
+					)
+				}
+			}
+
+			ws.onmessage = (event) => {
+				let data = JSON.parse(event.data)
+				this.$message({
+					message: data.message,
+					type: data.status ? 'success' : 'error',
+				})
+				ws.close()
+			}
+		},
 	},
 }
 </script>
