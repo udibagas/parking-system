@@ -309,7 +309,9 @@ export default {
 				})
 		},
 
-		connectPos() {
+		async connectPos() {
+			await this.$store.dispatch('getSetting')
+			await this.$store.dispatch('getPos')
 			this.ws = new WebSocket(`ws://${this.pos.ip_address}:5678/`)
 
 			this.ws.onerror = (event) => {
@@ -373,15 +375,10 @@ export default {
 		},
 	},
 
-	created() {
-		this.$store.dispatch('getSetting')
-		this.$store.dispatch('getPos')
-	},
-
 	mounted() {
+		this.connectPos()
 		this.formModel.plate_number = this.setting.default_plate_number
 		document.getElementById('card-number').focus()
-		this.connectPos()
 
 		document.getElementById('gate-in-app').onkeypress = (e) => {
 			// ke field nomor plat
