@@ -29,9 +29,11 @@ class ParkingTransactionController extends Controller
 
         return ParkingTransaction::selectRaw('
                 parking_transactions.*,
-                parking_members.name as `member`
+                parking_members.name as `member`,
+                pos.name as `pos`
             ')
             ->join('parking_members', 'parking_members.id', '=', 'parking_transactions.parking_member_id', 'LEFT')
+            ->join('pos', 'pos.id', '=', 'parking_transactions.pos_id')
             ->when($request->dateRange, function ($q) use ($request) {
                 return $q->whereBetween('parking_transactions.time_in', $request->dateRange);
             })->when($request->keyword, function ($q) use ($request) {

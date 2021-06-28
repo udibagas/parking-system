@@ -112,7 +112,7 @@ export default {
 		},
 	},
 
-	mounted() {
+	created() {
 		this.$store.dispatch('getNavigationList')
 		this.$store.dispatch('getSetting')
 		this.$store.dispatch('getPos')

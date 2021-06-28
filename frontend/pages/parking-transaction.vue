@@ -48,6 +48,7 @@
 			@sort-change="sortChange"
 		>
 			<el-table-column type="index" label="#"></el-table-column>
+			<el-table-column label="Pos" prop="pos" min-width="150"></el-table-column>
 			<el-table-column
 				prop="barcode_number"
 				label="No. Tiket"
