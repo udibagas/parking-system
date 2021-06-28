@@ -1,32 +1,38 @@
 <template>
 	<el-card>
-		<el-page-header slot="header" @back="$emit('back')" content="SNAPSHOT">
-		</el-page-header>
-		<el-form inline @submit.native.prevent class="text-right">
-			<el-form-item class="mb-0">
-				<el-button
-					size="small"
-					type="danger"
-					icon="el-icon-delete"
-					@click="deleteSnapshot"
-					:disabled="checkedNodes.length == 0"
-					>HAPUS SNAPSHOT</el-button
-				>
-			</el-form-item>
-			<el-form-item class="mb-0">
-				<el-button
-					icon="el-icon-refresh"
-					type="primary"
-					size="small"
-					@click="refresh"
-				></el-button>
-			</el-form-item>
-		</el-form>
+		<el-row slot="header">
+			<el-col :span="6">
+				<el-page-header slot="header" @back="$emit('back')" content="SNAPSHOT">
+				</el-page-header>
+			</el-col>
+			<el-col :span="18">
+				<el-form inline @submit.native.prevent class="text-right">
+					<el-form-item style="margin-bottom: 0">
+						<el-button
+							size="small"
+							type="danger"
+							icon="el-icon-delete"
+							@click="deleteSnapshot"
+							:disabled="checkedNodes.length == 0"
+							>HAPUS SNAPSHOT</el-button
+						>
+					</el-form-item>
+					<el-form-item style="margin-bottom: 0">
+						<el-button
+							icon="el-icon-refresh"
+							type="primary"
+							size="small"
+							@click="refresh"
+						></el-button>
+					</el-form-item>
+				</el-form>
+			</el-col>
+		</el-row>
 
 		<div class="flex">
 			<div
 				class="p-3 border"
-				style="width: 400px; height: calc(100vh - 290px); overflow: auto"
+				style="width: 400px; height: calc(100vh - 270px); overflow: auto"
 			>
 				<el-tree
 					v-if="show"
