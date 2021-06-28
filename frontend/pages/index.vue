@@ -368,6 +368,7 @@ export default {
 					p.name,
 					m.time_in,
 					this.$auth.user.name,
+					s.additional_info_ticket,
 				].join(';')
 			)
 		},
