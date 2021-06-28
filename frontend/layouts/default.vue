@@ -114,8 +114,6 @@ export default {
 
 	created() {
 		this.$store.dispatch('getNavigationList')
-		this.$store.dispatch('getSetting')
-		this.$store.dispatch('getPos')
 		this.$store.dispatch('getVehicleTypeList')
 		this.$store.dispatch('getGroupMemberList')
 		this.$store.dispatch('getMemberList')

@@ -107,6 +107,7 @@ class ParkingTransactionController extends Controller
         }
 
         $parkingTransaction->update(['snapshot_in' => $fileName]);
+        $parkingTransaction->refresh();
         return $parkingTransaction;
     }
 

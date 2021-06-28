@@ -105,7 +105,7 @@
 			</el-col>
 			<el-col :span="12">
 				<el-image
-					:src="snapshot_in"
+					:src="snapshot_url"
 					style="width: 100%; height: 100%"
 					fit="cover"
 				>
@@ -126,7 +126,7 @@ export default {
 			formModel: {},
 			formErrors: {},
 			location: {},
-			snapshot_in: null,
+			snapshot_url: null,
 			ws: null,
 		}
 	},
@@ -252,7 +252,7 @@ export default {
 			this.formModel.vehicle_type = ''
 			this.formModel.fare = ''
 			this.formModel.drive_thru = ''
-			this.snapshot_in = null
+			this.snapshot_url = null
 			this.$forceUpdate()
 			document.getElementById('card-number').focus()
 		},
@@ -299,7 +299,7 @@ export default {
 		takeSnapshot(id) {
 			this.$axios
 				.$post(`/api/takeSnapshot/${id}`)
-				.then((r) => (this.snapshot_in = r.snapshot_in))
+				.then((r) => (this.snapshot_url = r.snapshot_url))
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
@@ -371,6 +371,11 @@ export default {
 					})
 				})
 		},
+	},
+
+	created() {
+		this.$store.dispatch('getSetting')
+		this.$store.dispatch('getPos')
 	},
 
 	mounted() {
