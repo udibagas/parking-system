@@ -127,6 +127,7 @@ export default {
 			formErrors: {},
 			location: {},
 			snapshot_in: null,
+			ws: null,
 		}
 	},
 	computed: {
@@ -295,26 +296,6 @@ export default {
 				})
 		},
 
-		printTicket(id) {
-			this.$axios
-				.$post(`/api/printTicket/${id}`)
-				.then((r) => {
-					this.$message({
-						message: r.message,
-						type: 'success',
-						showClose: true,
-					})
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
-				.finally(() => setTimeout(this.openGate, 3000))
-		},
-
 		takeSnapshot(id) {
 			this.$axios
 				.$post(`/api/takeSnapshot/${id}`)
@@ -328,30 +309,21 @@ export default {
 				})
 		},
 
-		openGate() {
-			const pos = this.pos
-			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`)
+		connectPos() {
+			this.ws = new WebSocket(`ws://${this.pos.ip_address}:5678/`)
 
-			ws.onerror = (event) => {
+			this.ws.onerror = (event) => {
 				this.$message({
 					message: 'KONEKSI KE POS GAGAL',
 					type: 'error',
 				})
 			}
 
-			ws.onopen = (event) => {
-				ws.send(
-					[
-						'open',
-						pos.gate_device,
-						pos.gate_baudrate,
-						pos.gate_command_open,
-						pos.gate_command_close,
-					].join(';')
-				)
+			this.ws.onopen = (event) => {
+				console.log('POS TEKNONEKSI')
 			}
 
-			ws.onmessage = (event) => {
+			this.ws.onmessage = (event) => {
 				let data = JSON.parse(event.data)
 				this.$message({
 					message: data.message,
@@ -359,6 +331,24 @@ export default {
 				})
 				ws.close()
 			}
+		},
+
+		openGate() {
+			const pos = this.pos
+
+			this.ws.send(
+				[
+					'open',
+					pos.gate_device,
+					pos.gate_baudrate,
+					pos.gate_command_open,
+					pos.gate_command_close,
+				].join(';')
+			)
+		},
+
+		printTicket() {
+			this.ws.send(['print_ticket', `TIKET ${this.pos.name}`].join(';'))
 		},
 
 		printReport() {
@@ -386,6 +376,7 @@ export default {
 	mounted() {
 		this.formModel.plate_number = this.setting.default_plate_number
 		document.getElementById('card-number').focus()
+		this.connectPos()
 
 		document.getElementById('gate-in-app').onkeypress = (e) => {
 			// ke field nomor plat
@@ -424,6 +415,10 @@ export default {
 				this.printReport()
 			}
 		}
+	},
+
+	destroyed() {
+		this.ws.close()
 	},
 }
 </script>

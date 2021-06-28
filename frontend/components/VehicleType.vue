@@ -63,7 +63,12 @@
 					>Rp {{ $decimal(scope.row.tarif_flat) }}</template
 				>
 			</el-table-column>
-			<el-table-column width="40px" align="center" header-align="center">
+			<el-table-column
+				width="40px"
+				align="center"
+				header-align="center"
+				fixed="right"
+			>
 				<template slot="header">
 					<el-button
 						type="text"

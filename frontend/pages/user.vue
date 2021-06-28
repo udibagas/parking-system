@@ -62,7 +62,12 @@
 				</template>
 			</el-table-column>
 
-			<el-table-column width="40px" align="center" header-align="center">
+			<el-table-column
+				width="40px"
+				align="center"
+				header-align="center"
+				fixed="right"
+			>
 				<template slot="header">
 					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
 					</el-button>

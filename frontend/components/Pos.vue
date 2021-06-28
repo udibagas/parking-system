@@ -84,7 +84,12 @@
 				</template>
 			</el-table-column>
 
-			<el-table-column width="40px" align="center" header-align="center">
+			<el-table-column
+				width="40px"
+				align="center"
+				header-align="center"
+				fixed="right"
+			>
 				<template slot="header">
 					<el-button
 						type="text"
@@ -112,7 +117,7 @@
 							</el-dropdown-item>
 
 							<el-dropdown-item
-								icon="el-icon-printer"
+								icon="el-icon-camera"
 								@click.native.prevent="testCamera(scope.row)"
 							>
 								Test Kamera
