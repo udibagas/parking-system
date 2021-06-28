@@ -17,7 +17,7 @@ async def open_gate(websocket, path):
 
         cfg = cmd.split(';')
 
-        if (cfg[0] == 'open'):
+        if cfg[0] == 'open':
             try:
                 ser = Serial(cfg[1], int(cfg[2]), timeout=1)
             except Exception as e:
@@ -36,30 +36,22 @@ async def open_gate(websocket, path):
             except Exception as e:
                 await websocket.send(json.dumps({"status": False, "message": "Gate gagal dibuka " + str(e)}))
 
-        elif (cfg[0] == 'test_printer'):
-            cfg = cmd.split(';')
+        elif cfg[0] == 'test_printer' or cfg[0] == 'print_ticket':
             try:
-                p = SerialPrinter(devfile=cfg[1])
+                p = SerialPrinter(devfile=cfg[1], baudrate=9600,
+                                  bytesize=8,
+                                  parity='N',
+                                  stopbits=1,
+                                  timeout=1.00,
+                                  dsrdtr=True)
             except Exception as e:
                 await websocket.send(json.dumps({"status": False, "message": "Koneksi ke printer gagal " + str(e)}))
                 return
 
-            try:
-                p.set(align='center')
-                p.text(cfg[2])
-                p.cut()
-            except Exception as e:
-                await websocket.send(json.dumps({"status": True, "message": "Test printer berhasil."}))
-                return
+        else:
+            await websocket.send(json.dumps({"status": False, "message": "Perintah tidak dikenal"}))
 
-        elif (cfg[0] == 'print_ticket'):
-            cfg = cmd.split(';')
-            try:
-                p = SerialPrinter(devfile=cfg[1])
-            except Exception as e:
-                await websocket.send(json.dumps({"status": False, "message": "Koneksi ke printer gagal " + str(e)}))
-                return
-
+        if cfg[0] == 'test_printer':
             try:
                 p.set(align='center')
                 p.text(cfg[2])
@@ -68,8 +60,15 @@ async def open_gate(websocket, path):
                 await websocket.send(json.dumps({"status": True, "message": "Silakan ambil tiket."}))
                 return
 
-        else:
-            await websocket.send(json.dumps({"status": False, "message": "Perintah tidak dikenal"}))
+        if cfg[0] == 'print_ticket':
+            try:
+                p.set(align='center')
+                p.text(cfg[2])
+                p.cut()
+            except Exception as e:
+                await websocket.send(json.dumps({"status": True, "message": "Test printer berhasil."}))
+                return
+
 
 start_server = websockets.serve(open_gate, None, 5678)
 
