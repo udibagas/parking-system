@@ -43,9 +43,9 @@ class PosController extends Controller
      * @param  \App\Pos  $pos
      * @return \Illuminate\Http\Response
      */
-    public function show(Pos $pos)
+    public function show(Pos $po)
     {
-        return $pos;
+        return $po;
     }
 
     /**
@@ -55,9 +55,9 @@ class PosController extends Controller
      * @param  \App\Pos  $pos
      * @return \Illuminate\Http\Response
      */
-    public function update(PosRequest $request, Pos $pos)
+    public function update(PosRequest $request, Pos $po)
     {
-        $pos->update($request->all());
+        $po->update($request->all());
         return ['message' => 'Data telah diupdate'];
     }
 
@@ -67,9 +67,9 @@ class PosController extends Controller
      * @param  \App\Pos  $pos
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Pos $pos)
+    public function destroy(Pos $po)
     {
-        $pos->delete();
+        $po->delete();
         return ['message' => 'Data telah dihapus'];
     }
 

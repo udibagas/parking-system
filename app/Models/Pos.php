@@ -16,6 +16,6 @@ class Pos extends Model
         'gate_device_name',
         'gate_device_baudrate',
         'gate_command_open',
-        'gate_command_close'
+        'gate_command_close',
     ];
 }

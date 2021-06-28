@@ -16,7 +16,6 @@ class CreateSettingsTable extends Migration
         Schema::create('settings', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->integer('jml_kendaraan_per_kartu')->default(0);
-            $table->boolean('masa_aktif_member')->default(0)->comment('0 = 24 jam, 1 = lewat jam 00.00');
             $table->string('location_name')->nullable();
             $table->string('location_address')->nullable();
             $table->text('additional_info_ticket')->nullable();

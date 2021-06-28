@@ -36,7 +36,7 @@ async def open_gate(websocket, path):
             except Exception as e:
                 await websocket.send(json.dumps({"status": False, "message": "Gate gagal dibuka " + str(e)}))
 
-        elif (cfg[1] == 'test_printer'):
+        elif (cfg[0] == 'test_printer'):
             cfg = cmd.split(';')
             try:
                 p = SerialPrinter(devfile=cfg[1])
@@ -50,6 +50,22 @@ async def open_gate(websocket, path):
                 p.cut()
             except Exception as e:
                 await websocket.send(json.dumps({"status": True, "message": "Test printer berhasil."}))
+                return
+
+        elif (cfg[0] == 'print_ticket'):
+            cfg = cmd.split(';')
+            try:
+                p = SerialPrinter(devfile=cfg[1])
+            except Exception as e:
+                await websocket.send(json.dumps({"status": False, "message": "Koneksi ke printer gagal " + str(e)}))
+                return
+
+            try:
+                p.set(align='center')
+                p.text(cfg[2])
+                p.cut()
+            except Exception as e:
+                await websocket.send(json.dumps({"status": True, "message": "Silakan ambil tiket."}))
                 return
 
         else:
