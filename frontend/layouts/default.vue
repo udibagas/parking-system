@@ -20,19 +20,15 @@
 				</div>
 			</div>
 			<el-menu
+				router
 				:collapse="collapse"
-				default-active="1"
+				:default-active="$route.path"
 				background-color="#060446"
 				text-color="#fff"
 				class="sidebar"
 				active-text-color="#cc0000"
 			>
-				<el-menu-item
-					v-for="(m, i) in navigationList"
-					:index="(++i).toString()"
-					:key="i"
-					@click="$router.push(m.path)"
-				>
+				<el-menu-item v-for="(m, i) in navigationList" :index="m.path" :key="i">
 					<i :class="m.icon"></i>
 					<span slot="title">{{ m.label }}</span>
 				</el-menu-item>
