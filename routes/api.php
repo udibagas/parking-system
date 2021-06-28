@@ -12,11 +12,9 @@ use App\Http\Controllers\PosController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SnapshotController;
-use App\Http\Controllers\SnapshotsController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserLogController;
 use App\Http\Controllers\VehicleTypeController;
-use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -53,8 +51,8 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::get('userLog', [UserLogController::class, 'index']);
     Route::delete('userLog', [UserLogController::class, 'clear']);
-    Route::get('snapshots', [SnapshotsController::class, 'index']);
-    Route::delete('snapshots', [SnapshotsController::class, 'delete']);
+    Route::get('snapshots', [SnapshotController::class, 'index']);
+    Route::delete('snapshots', [SnapshotController::class, 'delete']);
     Route::post('backup', [BackupController::class, 'store']);
     Route::get('backup', [BackupController::class, 'index']);
     Route::delete('backup', [BackupController::class, 'destroy']);
