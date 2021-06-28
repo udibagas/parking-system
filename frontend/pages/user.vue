@@ -1,31 +1,37 @@
 <template>
-	<el-card>
-		<el-page-header slot="header" @back="$emit('back')" content="USER">
-		</el-page-header>
-		<el-form inline class="text-right" @submit.native.prevent>
-			<el-form-item>
-				<el-button
-					size="small"
-					@click="openForm({ role: 0, password: '' })"
-					type="primary"
-					icon="el-icon-plus"
-					>TAMBAH USER</el-button
-				>
-			</el-form-item>
-			<el-form-item>
-				<el-input
-					size="small"
-					v-model="keyword"
-					placeholder="Cari"
-					prefix-icon="el-icon-search"
-					:clearable="true"
-					@change="searchData"
-				>
-				</el-input>
-			</el-form-item>
-		</el-form>
+	<el-card :body-style="{ padding: '0 0 15px 0' }">
+		<el-row slot="header">
+			<el-col :span="8">
+				<el-page-header @back="$emit('back')" content="USER"> </el-page-header>
+			</el-col>
+			<el-col :span="16">
+				<el-form inline class="text-right" @submit.native.prevent>
+					<el-form-item style="margin-bottom: 0">
+						<el-button
+							size="small"
+							@click="openForm({ role: 0, password: '' })"
+							type="primary"
+							icon="el-icon-plus"
+							>TAMBAH USER</el-button
+						>
+					</el-form-item>
+					<el-form-item style="margin-bottom: 0">
+						<el-input
+							size="small"
+							v-model="keyword"
+							placeholder="Cari"
+							prefix-icon="el-icon-search"
+							:clearable="true"
+							@change="searchData"
+						>
+						</el-input>
+					</el-form-item>
+				</el-form>
+			</el-col>
+		</el-row>
 
 		<el-table
+			height="calc(100vh - 245px)"
 			:data="tableData.data"
 			stripe
 			:default-sort="{ prop: sort, order: order }"

@@ -39,6 +39,7 @@
 		</el-form>
 
 		<el-table
+			height="calc(100vh - 350px)"
 			:data="tableData.data"
 			stripe
 			@row-dblclick="
@@ -646,7 +647,10 @@ export default {
 			}
 
 			const querystring = new URLSearchParams(params).toString()
-			window.open(BASE_URL + '/parkingMember?' + querystring, '_blank')
+			window.open(
+				`${this.$axios.defaults.baseURL}/api/parkingMember?${querystring}`,
+				'_blank'
+			)
 		},
 
 		download() {

@@ -152,9 +152,11 @@ Print pake python
     - test
     - ticket
     - laporan
+    - member
 
 profile
-
 filter data
-
-
+session sering expired
+enter after login
+member otomatis buka
+field nomor kendaraan dan kartu jadi 1

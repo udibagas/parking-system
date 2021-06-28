@@ -34,7 +34,7 @@
 				<div
 					style="
 						width: 370px;
-						height: calc(100vh - 230px);
+						height: calc(100vh - 220px);
 						overflow: auto;
 						border-right: 1px solid #eee;
 					"

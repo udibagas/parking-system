@@ -23,6 +23,7 @@
 		</el-form>
 
 		<el-table
+			height="calc(100vh - 350px)"
 			:data="tableData.data"
 			stripe
 			:default-sort="{ prop: sort, order: order }"

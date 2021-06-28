@@ -24,6 +24,7 @@
 		</el-form>
 
 		<el-table
+			height="calc(100vh - 370px)"
 			:data="tableData.data"
 			stripe
 			@row-dblclick="

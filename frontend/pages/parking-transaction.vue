@@ -1,47 +1,52 @@
 <template>
-	<el-card>
-		<el-page-header
-			slot="header"
-			@back="$emit('back')"
-			content="TRANSAKSI"
-		></el-page-header>
-
-		<el-form inline class="text-right" @submit.native.prevent>
-			<el-form-item>
-				<el-date-picker
-					style="margin-top: 5px"
-					size="small"
-					@change="requestData"
-					v-model="dateRange"
-					format="dd-MMM-yyyy HH:mm:ss"
-					value-format="yyyy-MM-dd HH:mm:ss"
-					type="datetimerange"
-					range-separator="-"
-					start-placeholder="Start date"
-					end-placeholder="End date"
-				></el-date-picker>
-			</el-form-item>
-			<el-form-item>
-				<el-input
-					size="small"
-					v-model="keyword"
-					placeholder="Cari"
-					prefix-icon="el-icon-search"
-					:clearable="true"
-					@change="searchData"
-				></el-input>
-			</el-form-item>
-			<el-form-item>
-				<el-button
-					icon="el-icon-refresh"
-					type="primary"
-					size="small"
-					@click="refreshData"
-				></el-button>
-			</el-form-item>
-		</el-form>
+	<el-card :body-style="{ padding: '0 0 15px 0' }">
+		<el-row slot="header">
+			<el-col :span="6">
+				<el-page-header
+					@back="$emit('back')"
+					content="TRANSAKSI"
+				></el-page-header>
+			</el-col>
+			<el-col :span="18">
+				<el-form inline class="text-right" @submit.native.prevent>
+					<el-form-item style="margin-bottom: 0">
+						<el-date-picker
+							style="margin-top: 4px"
+							size="small"
+							@change="requestData"
+							v-model="dateRange"
+							format="dd-MMM-yyyy HH:mm:ss"
+							value-format="yyyy-MM-dd HH:mm:ss"
+							type="datetimerange"
+							range-separator="-"
+							start-placeholder="Start date"
+							end-placeholder="End date"
+						></el-date-picker>
+					</el-form-item>
+					<el-form-item style="margin-bottom: 0">
+						<el-input
+							size="small"
+							v-model="keyword"
+							placeholder="Cari"
+							prefix-icon="el-icon-search"
+							:clearable="true"
+							@change="searchData"
+						></el-input>
+					</el-form-item>
+					<el-form-item style="margin-bottom: 0">
+						<el-button
+							icon="el-icon-refresh"
+							type="primary"
+							size="small"
+							@click="refreshData"
+						></el-button>
+					</el-form-item>
+				</el-form>
+			</el-col>
+		</el-row>
 
 		<el-table
+			height="calc(100vh - 245px)"
 			:data="tableData.data"
 			stripe
 			@row-dblclick="
@@ -56,23 +61,23 @@
 			@sort-change="sortChange"
 		>
 			<el-table-column type="index" label="#"></el-table-column>
-			<el-table-column label="Pos" prop="pos" min-width="150"></el-table-column>
+			<el-table-column label="Pos" prop="pos" min-width="120"></el-table-column>
 			<el-table-column
 				prop="barcode_number"
 				label="No. Tiket"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="150px"
+				min-width="120px"
 			></el-table-column>
 
 			<el-table-column
 				prop="vehicle_type"
-				label="Jenis Kendaraan"
+				label="Jns Kendaraan"
 				sortable="custom"
 				show-overflow-tooltip
 				:filters="vehicleTypeList.map((v) => ({ value: v.name, text: v.name }))"
 				column-key="vehicle_type"
-				min-width="180px"
+				min-width="170px"
 			></el-table-column>
 
 			<el-table-column
@@ -80,7 +85,7 @@
 				label="Plat Nomor"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="150px"
+				min-width="120px"
 			></el-table-column>
 
 			<el-table-column
@@ -98,6 +103,20 @@
 				<template slot-scope="scope">{{
 					scope.row.drive_thru ? 'Ya' : 'Tidak'
 				}}</template>
+			</el-table-column>
+
+			<el-table-column
+				v-if="$auth.user.role == 1"
+				prop="fare"
+				label="Tarif"
+				sortable="custom"
+				align="right"
+				header-align="right"
+				min-width="120px"
+			>
+				<template slot-scope="scope"
+					>Rp. {{ $decimal(scope.row.fare) }}</template
+				>
 			</el-table-column>
 
 			<el-table-column
@@ -122,19 +141,6 @@
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
-			<el-table-column
-				v-if="$auth.user.role == 1"
-				prop="fare"
-				label="Tarif"
-				sortable="custom"
-				align="right"
-				header-align="right"
-				min-width="100px"
-			>
-				<template slot-scope="scope"
-					>Rp. {{ $decimal(scope.row.fare) }}</template
-				>
-			</el-table-column>
 
 			<el-table-column
 				prop="operator"
