@@ -30,11 +30,18 @@
 			@sort-change="sortChange"
 		>
 			<el-table-column
+				type="index"
+				label="#"
+				:index="tableData.from"
+			></el-table-column>
+
+			<el-table-column
 				prop="name"
 				label="Nama"
 				sortable="custom"
 				min-width="100px"
 			></el-table-column>
+
 			<el-table-column
 				prop="shortcut_key"
 				label="Shortcut"
@@ -43,6 +50,7 @@
 				header-align="center"
 				min-width="100px"
 			></el-table-column>
+
 			<el-table-column
 				prop="tarif_flat"
 				label="Tarif Flat"

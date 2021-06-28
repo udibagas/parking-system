@@ -1,6 +1,6 @@
 <template>
-	<div>
-		<el-row>
+	<el-card :body-style="{ padding: '0px' }">
+		<el-row slot="header">
 			<el-col :span="8">
 				<el-page-header
 					@back="$emit('back')"
@@ -41,8 +41,6 @@
 				</el-form>
 			</el-col>
 		</el-row>
-
-		<br />
 
 		<el-tabs type="border-card">
 			<el-tab-pane lazy label="RANGKUMAN">
@@ -132,7 +130,7 @@
 				<UserLog :range="dateRange" />
 			</el-tab-pane>
 		</el-tabs>
-	</div>
+	</el-card>
 </template>
 
 <script>

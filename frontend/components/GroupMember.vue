@@ -31,6 +31,12 @@
 			@sort-change="sortChange"
 		>
 			<el-table-column
+				type="index"
+				label="#"
+				:index="tableData.from"
+			></el-table-column>
+
+			<el-table-column
 				prop="name"
 				label="Nama"
 				sortable="custom"

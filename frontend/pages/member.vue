@@ -1,8 +1,7 @@
 <template>
-	<div>
-		<el-page-header @back="$emit('back')" content="MEMBER"> </el-page-header>
-
-		<br />
+	<el-card :body-style="{ padding: '0px' }">
+		<el-page-header slot="header" @back="$emit('back')" content="MEMBER">
+		</el-page-header>
 
 		<el-tabs type="border-card">
 			<el-tab-pane lazy label="Member"><ParkingMember /></el-tab-pane>
@@ -21,7 +20,7 @@
 				><MembershipReport
 			/></el-tab-pane>
 		</el-tabs>
-	</div>
+	</el-card>
 </template>
 
 <script>

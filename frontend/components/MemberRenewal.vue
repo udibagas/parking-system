@@ -9,6 +9,7 @@
 
 			<el-form-item>
 				<el-date-picker
+					style="margin-top: 5px"
 					size="small"
 					@change="requestData"
 					v-model="filters.dateRange"
@@ -42,11 +43,18 @@
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
+			<el-table-column
+				type="index"
+				label="#"
+				:index="tableData.from"
+			></el-table-column>
+
 			<el-table-column prop="created_at" label="Tanggal Trx" sortable="custom">
 				<template slot-scope="scope">
 					{{ $moment(scope.row.created_at).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
+
 			<el-table-column
 				prop="member_name"
 				label="Nama"
@@ -141,10 +149,11 @@
 		<br />
 
 		<el-pagination
+			class="text-right"
 			background
 			@current-change="currentChange"
 			@size-change="sizeChange"
-			layout="total, sizes, prev, next"
+			layout="total, sizes, prev, pager, next"
 			:page-size="pageSize"
 			:page-sizes="[10, 25, 50, 100]"
 			:total="tableData.total"

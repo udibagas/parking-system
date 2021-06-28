@@ -1,5 +1,5 @@
 <template>
-	<div id="gate-in-app">
+	<el-card id="gate-in-app">
 		<!-- <h1 style="text-align:center;font-size:26px;">{{setting.location_name}}</h1>
     <div style="text-align:center">{{setting.location_address}}</div>
     <el-divider></el-divider>-->
@@ -115,7 +115,7 @@
 				</el-image>
 			</el-col>
 		</el-row>
-	</div>
+	</el-card>
 </template>
 
 <script>

@@ -30,37 +30,57 @@
 			@sort-change="sortChange"
 		>
 			<el-table-column
+				type="index"
+				label="#"
+				:index="tableData.from"
+			></el-table-column>
+
+			<el-table-column
 				prop="name"
 				label="Nama"
 				sortable="custom"
-				min-width="100px"
+				min-width="120"
 			></el-table-column>
 
 			<el-table-column
 				prop="ip_address"
-				label="IP Address Komputer"
-				min-width="100px"
+				label="IP Address"
+				min-width="120"
 			></el-table-column>
 
 			<el-table-column
 				prop="ip_address"
 				label="Device Printer"
-				min-width="100px"
+				min-width="120"
 			></el-table-column>
 
 			<el-table-column
 				prop="camera_snapshot_url"
 				label="URL Kamera"
-				min-width="100px"
+				min-width="200px"
 			></el-table-column>
 
 			<el-table-column
 				prop="camera_snapshot_url"
 				label="User/Pass Kamera"
-				min-width="100px"
+				min-width="180"
 			>
 				<template slot-scope="scope">
 					{{ scope.row.camera_username }}/{{ scope.row.camera_password }}
+				</template>
+			</el-table-column>
+
+			<el-table-column label="Gate Device:Baudrate" min-width="180px">
+				<template slot-scope="scope">
+					{{ scope.row.gate_device_name }}:{{ scope.row.gate_device_baudrate }}
+				</template>
+			</el-table-column>
+
+			<el-table-column label="Perintah Buka/Tutup" min-width="200px">
+				<template slot-scope="scope">
+					{{ scope.row.gate_command_open }}/{{
+						scope.row.gate_command_close || '-'
+					}}
 				</template>
 			</el-table-column>
 
@@ -78,13 +98,29 @@
 							<i class="el-icon-more"></i>
 						</span>
 						<el-dropdown-menu slot="dropdown">
-							<el-dropdown-item @click.native.prevent="openForm(scope.row)">
-								<i class="el-icon-edit-outline"></i> Edit
+							<el-dropdown-item
+								icon="el-icon-edit-outline"
+								@click.native.prevent="openForm(scope.row)"
+							>
+								Edit
 							</el-dropdown-item>
 							<el-dropdown-item
+								icon="el-icon-delete"
 								@click.native.prevent="deleteData(scope.row.id)"
 							>
-								<i class="el-icon-delete"></i> Hapus
+								Hapus
+							</el-dropdown-item>
+							<el-dropdown-item
+								icon="el-icon-printer"
+								@click.native.prevent="testPrinter(scope.row)"
+							>
+								Test Printer
+							</el-dropdown-item>
+							<el-dropdown-item
+								icon="el-icon-setting"
+								@click.native.prevent="testGate(scope.row)"
+							>
+								Test Gate
 							</el-dropdown-item>
 						</el-dropdown-menu>
 					</el-dropdown>
