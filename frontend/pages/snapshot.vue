@@ -78,7 +78,7 @@ export default {
 			const params = {
 				directory: node.data === undefined ? 'snapshots' : node.data.path,
 			}
-			this.$axios.$get('/api/snapshot', { params }).then((r) => resolve(r.data))
+			this.$axios.$get('/api/snapshot', { params }).then((r) => resolve(r))
 		},
 
 		deleteSnapshot() {
