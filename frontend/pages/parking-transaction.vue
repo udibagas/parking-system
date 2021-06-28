@@ -21,7 +21,7 @@
 					end-placeholder="End date"
 				></el-date-picker>
 			</el-form-item>
-			<el-form-item style="margin-right: 0">
+			<el-form-item>
 				<el-input
 					size="small"
 					v-model="keyword"
@@ -31,7 +31,7 @@
 					@change="searchData"
 				></el-input>
 			</el-form-item>
-			<el-form-item style="margin-bottom: 0">
+			<el-form-item>
 				<el-button
 					icon="el-icon-refresh"
 					type="primary"
