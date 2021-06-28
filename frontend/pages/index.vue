@@ -378,6 +378,7 @@ export default {
 	mounted() {
 		this.connectPos()
 		this.formModel.plate_number = this.setting.default_plate_number
+		this.$forceUpdate()
 		document.getElementById('card-number').focus()
 
 		document.getElementById('gate-in-app').onkeypress = (e) => {
