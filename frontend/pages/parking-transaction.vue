@@ -31,6 +31,14 @@
 					@change="searchData"
 				></el-input>
 			</el-form-item>
+			<el-form-item style="margin-bottom: 0">
+				<el-button
+					icon="el-icon-refresh"
+					type="primary"
+					size="small"
+					@click="refreshData"
+				></el-button>
+			</el-form-item>
 		</el-form>
 
 		<el-table
@@ -135,36 +143,6 @@
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
-
-			<el-table-column
-				fixed="right"
-				width="40px"
-				align="center"
-				header-align="center"
-			>
-				<template slot="header">
-					<el-button
-						type="text"
-						@click="refreshData"
-						icon="el-icon-refresh"
-					></el-button>
-				</template>
-				<template slot-scope="scope">
-					<el-dropdown>
-						<span class="el-dropdown-link">
-							<i class="el-icon-more"></i>
-						</span>
-						<el-dropdown-menu slot="dropdown">
-							<el-dropdown-item
-								icon="el-icon-printer"
-								v-if="!scope.row.is_member"
-								@click.native.prevent="printTicket(scope.row.id)"
-								>Print Ticket Keluar</el-dropdown-item
-							>
-						</el-dropdown-menu>
-					</el-dropdown>
-				</template>
-			</el-table-column>
 		</el-table>
 
 		<br />
@@ -271,27 +249,6 @@ export default {
 				this.$moment().format('YYYY-MM-DD HH:mm:ss'),
 			],
 		}
-	},
-
-	methods: {
-		printTicket(id) {
-			this.$axios
-				.$post(`/api/parkingTransaction/printTicket/${id}`, { trx: 'OUT' })
-				.then((r) => {
-					this.$message({
-						message: r.message,
-						type: 'success',
-						showClose: true,
-					})
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
-		},
 	},
 }
 </script>
