@@ -285,6 +285,7 @@ export default {
 								this.printTicket(r.id)
 							}
 							this.takeSnapshot(r.id)
+							this.openGate()
 						})
 						.catch((e) => {
 							this.$message({
@@ -346,12 +347,32 @@ export default {
 					pos.gate_command_close,
 				].join(';')
 			)
+
+			setTimeout(this.resetForm, 3000)
 		},
 
 		printTicket() {
-			this.ws.send(['print_ticket', `TIKET ${this.pos.name}`].join(';'))
+			const p = this.pos
+			const s = this.setting
+			const m = this.formModel
+
+			this.ws.send(
+				[
+					'print_ticket',
+					p.printer_device,
+					s.location_name,
+					s.location_address,
+					m.fare,
+					m.plate_number,
+					m.vehicle_type,
+					p.name,
+					m.time_in,
+					this.$auth.user.name,
+				].join(';')
+			)
 		},
 
+		// TODO: beresin ini
 		printReport() {
 			let payload = { date: this.$moment().format('YYYY-MM-DD') }
 
