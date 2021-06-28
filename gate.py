@@ -64,7 +64,7 @@ async def open_gate(websocket, path):
 
             try:
                 p.set(align='center')
-                p.image("./public/images/logo.jpeg")
+                # p.image("./public/images/logo.jpeg")
                 p.text("TIKET PARKIR\n")
                 p.text(cfg[2] + "\n")  # location
                 p.text(cfg[3] + "\n\n")  # address
