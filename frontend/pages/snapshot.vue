@@ -2,7 +2,7 @@
 	<el-card>
 		<el-row slot="header">
 			<el-col :span="6">
-				<el-page-header slot="header" @back="$emit('back')" content="SNAPSHOT">
+				<el-page-header @back="$emit('back')" content="SNAPSHOTS">
 				</el-page-header>
 			</el-col>
 			<el-col :span="18">
@@ -29,38 +29,30 @@
 			</el-col>
 		</el-row>
 
-		<div class="flex">
-			<div
-				class="p-3 border"
-				style="width: 400px; height: calc(100vh - 270px); overflow: auto"
-			>
-				<el-tree
-					v-if="show"
-					:props="props"
-					:load="loadNode"
-					ref="tree"
-					lazy
-					show-checkbox
-					highlight-current
-					node-key="path"
-					@node-click="({ isFile, url }) => (this.url = isFile ? url : '')"
-					@check="(node, tree) => (checkedNodes = tree.checkedNodes)"
+		<el-row :gutter="20">
+			<el-col :span="8">
+				<div
+					style="width: 400px; height: calc(100vh - 260px); overflow: auto;padding:10px border:1px solid #ddd"
 				>
-				</el-tree>
-			</div>
-
-			<div
-				class="
-					p-3
-					flex-grow flex
-					align-items-center
-					justify-content-center
-					flex-column
-				"
-			>
-				<img :src="url" alt="" style="max-width: 800px" />
-			</div>
-		</div>
+					<el-tree
+						v-if="show"
+						:props="props"
+						:load="loadNode"
+						ref="tree"
+						lazy
+						show-checkbox
+						highlight-current
+						node-key="path"
+						@node-click="({ isFile, url }) => (this.url = isFile ? url : '')"
+						@check="(node, tree) => (checkedNodes = tree.checkedNodes)"
+					>
+					</el-tree>
+				</div>
+			</el-col>
+			<el-col :span="16">
+				<img :src="url" alt="" style="width: 100%" />
+			</el-col>
+		</el-row>
 	</el-card>
 </template>
 
