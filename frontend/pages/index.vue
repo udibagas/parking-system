@@ -336,15 +336,15 @@ export default {
 		},
 
 		openGate() {
-			const pos = this.pos
+			const p = this.pos
 
 			this.ws.send(
 				[
 					'open',
-					pos.gate_device,
-					pos.gate_baudrate,
-					pos.gate_command_open,
-					pos.gate_command_close,
+					p.gate_device_name,
+					p.gate_device_baudrate,
+					p.gate_command_open,
+					p.gate_command_close,
 				].join(';')
 			)
 
