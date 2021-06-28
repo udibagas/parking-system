@@ -110,12 +110,21 @@
 							>
 								Hapus
 							</el-dropdown-item>
+
+							<el-dropdown-item
+								icon="el-icon-printer"
+								@click.native.prevent="testCamera(scope.row)"
+							>
+								Test Kamera
+							</el-dropdown-item>
+
 							<el-dropdown-item
 								icon="el-icon-printer"
 								@click.native.prevent="test(scope.row, 'printer')"
 							>
 								Test Printer
 							</el-dropdown-item>
+
 							<el-dropdown-item
 								icon="el-icon-setting"
 								@click.native.prevent="test(scope.row, 'gate')"
@@ -322,6 +331,10 @@
 				</el-button>
 			</span>
 		</el-dialog>
+
+		<el-dialog title="SNAPSHOT KAMERA" center :visible.sync="showSnapshot">
+			<img :src="snapshot" alt="" style="width: 100%" />
+		</el-dialog>
 	</div>
 </template>
 
@@ -333,10 +346,27 @@ export default {
 	data() {
 		return {
 			url: '/api/pos',
+			showSnapshot: false,
+			snapshot: null,
 		}
 	},
 
 	methods: {
+		testCamera(id) {
+			this.$axios
+				.$get(`/api/testCamera/${id}`)
+				.then((r) => {
+					this.snapshot = 'data:image/jpeg;base64,' + r.snapshot
+					this.showSnapshot = true
+				})
+				.catch((e) => {
+					this.$message({
+						message: e.response.data.message,
+						type: 'error',
+					})
+				})
+		},
+
 		test(pos, device) {
 			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`)
 
