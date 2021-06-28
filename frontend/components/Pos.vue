@@ -118,7 +118,7 @@
 
 							<el-dropdown-item
 								icon="el-icon-camera"
-								@click.native.prevent="testCamera(scope.row)"
+								@click.native.prevent="testCamera(scope.row.id)"
 							>
 								Test Kamera
 							</el-dropdown-item>
