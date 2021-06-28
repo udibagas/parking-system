@@ -57,7 +57,7 @@ async def open_gate(websocket, path):
                 p.close()
                 await websocket.send(json.dumps({"status": True, "message": "TEST PRINTER BERHASIL"}))
             except Exception as e:
-                await websocket.send(json.dumps({"status": True, "message": "TEST PRINTER GAGAL. " + str(e)}))
+                await websocket.send(json.dumps({"status": False, "message": "TEST PRINTER GAGAL. " + str(e)}))
 
         # print ticket
         if cfg[0] == 'print_ticket':
@@ -82,7 +82,7 @@ async def open_gate(websocket, path):
                 await websocket.send(json.dumps({"status": True, "message": "SILAKAN AMBIL TIKET"}))
 
             except Exception as e:
-                await websocket.send(json.dumps({"status": True, "message": "PRINT TIKET GAGAL. " + str(e)}))
+                await websocket.send(json.dumps({"status": False, "message": "PRINT TIKET GAGAL. " + str(e)}))
 
 
 start_server = websockets.serve(open_gate, None, 5678)
