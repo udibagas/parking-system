@@ -331,7 +331,6 @@ export default {
 					message: data.message,
 					type: data.status ? 'success' : 'error',
 				})
-				ws.close()
 			}
 		},
 
