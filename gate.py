@@ -5,6 +5,7 @@ import asyncio
 import websockets
 from serial import Serial
 import json
+from escpos.printer import Serial as SerialPrinter
 
 
 async def open_gate(websocket, path):
@@ -14,8 +15,9 @@ async def open_gate(websocket, path):
         except Exception as e:
             continue
 
-        if (cmd[:4] == 'open'):
-            cfg = cmd.split(';')
+        cfg = cmd.split(';')
+
+        if (cfg[0] == 'open'):
             try:
                 ser = Serial(cfg[1], int(cfg[2]), timeout=1)
             except Exception as e:
@@ -33,9 +35,22 @@ async def open_gate(websocket, path):
                 await websocket.send(json.dumps({"status": True, "message": "Gate berhasil dibuka"}))
             except Exception as e:
                 await websocket.send(json.dumps({"status": False, "message": "Gate gagal dibuka " + str(e)}))
-        elif (cmd[:2] == 'print'):
+
+        elif (cfg[1] == 'test_printer'):
             cfg = cmd.split(';')
-            # TODO: print ticket
+            try:
+                p = SerialPrinter(devfile=cfg[1])
+            except Exception as e:
+                await websocket.send(json.dumps({"status": False, "message": "Koneksi ke printer gagal " + str(e)}))
+                return
+
+            try:
+                p.set(align='center')
+                p.text(cfg[2])
+                p.cut()
+            except Exception as e:
+                await websocket.send(json.dumps({"status": True, "message": "Test printer berhasil."}))
+                return
 
         else:
             await websocket.send(json.dumps({"status": False, "message": "Perintah tidak dikenal"}))
