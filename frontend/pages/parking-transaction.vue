@@ -139,7 +139,7 @@
 				label="Waktu Masuk"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="150px"
+				min-width="170px"
 			></el-table-column>
 
 			<el-table-column

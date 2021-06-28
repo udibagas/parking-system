@@ -25,7 +25,11 @@
 					></el-input>
 				</el-form-item>
 				<el-form-item>
-					<el-button type="primary" @click="login" style="width: 100%"
+					<el-button
+						type="primary"
+						native-type="submit"
+						@click="login"
+						style="width: 100%"
 						>LOGIN</el-button
 					>
 				</el-form-item>
