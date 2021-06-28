@@ -195,6 +195,10 @@
 						<td class="td-value">{{ trx.barcode_number }}</td>
 					</tr>
 					<tr>
+						<td class="td-label">Pos</td>
+						<td class="td-value">{{ trx.pos }}</td>
+					</tr>
+					<tr>
 						<td class="td-label">Jenis Kendaraan</td>
 						<td class="td-value">{{ trx.vehicle_type }}</td>
 					</tr>
@@ -232,7 +236,7 @@
 			<br />
 
 			<el-image
-				:src="trx.snapshot_in"
+				:src="trx.snapshot_url"
 				style="width: 100%; height: 100%"
 				fit="cover"
 			>

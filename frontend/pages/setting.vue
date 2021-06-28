@@ -6,7 +6,12 @@
 			content="SETTING"
 		></el-page-header>
 		<el-tabs type="border-card">
-			<el-tab-pane v-for="(c, i) in components" :key="i" lazy :label="c.label">
+			<el-tab-pane
+				v-for="(c, i) in components"
+				:key="i"
+				lazy
+				:label="c.label.toUpperCase()"
+			>
 				<component :is="c.component" />
 			</el-tab-pane>
 		</el-tabs>
