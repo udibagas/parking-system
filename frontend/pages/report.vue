@@ -121,10 +121,7 @@
 				</el-row>
 			</el-tab-pane>
 			<el-tab-pane lazy label="PENDAPATAN">
-				<div
-					style="height: calc(100vh - 300px); overflow: auto"
-					v-html="report"
-				></div>
+				<div v-html="report"></div>
 			</el-tab-pane>
 			<el-tab-pane lazy label="LOG USER">
 				<UserLog :range="dateRange" />
