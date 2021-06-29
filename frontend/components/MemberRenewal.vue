@@ -292,18 +292,22 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 import crud from '~/mixins/crud'
 
 export default {
 	mixins: [crud],
+
 	data() {
 		return {
 			url: '/api/memberRenewal',
 			sort: 'created_at',
 			order: 'descending',
 			loading: false,
+			ws: null,
 		}
 	},
+
 	computed: {
 		to_date() {
 			try {
@@ -314,22 +318,44 @@ export default {
 				return ''
 			}
 		},
+		...mapState(['pos']),
 	},
+
 	methods: {
 		submit() {
 			this.formModel.to_date = this.to_date
 			this.save()
 		},
 
+		async connectPos() {
+			await this.$store.dispatch('getPos')
+			this.ws = new WebSocket(`ws://${this.pos.ip_address}:5678/`)
+
+			this.ws.onerror = (event) => {
+				this.$message({
+					message: 'KONEKSI KE POS GAGAL',
+					type: 'error',
+				})
+			}
+
+			this.ws.onopen = (event) => {
+				console.log('POS TEKNONEKSI')
+			}
+
+			this.ws.onmessage = (event) => {
+				let data = JSON.parse(event.data)
+				this.$message({
+					message: data.message,
+					type: data.status ? 'success' : 'error',
+				})
+			}
+		},
+
 		printSlip(id) {
 			this.$axios
 				.$post(`/api/memberRenewal/printSlip/${id}`)
 				.then((r) => {
-					this.$message({
-						message: r.message,
-						type: 'success',
-						showClose: true,
-					})
+					this.ws.send(['print_report', r].join(';'))
 				})
 				.catch((e) => {
 					this.$message({
@@ -339,6 +365,14 @@ export default {
 					})
 				})
 		},
+	},
+
+	created() {
+		this.connectPos()
+	},
+
+	destroyed() {
+		this.ws.close()
 	},
 }
 </script>

@@ -330,9 +330,7 @@ export default {
 			this.$axios
 				.$post('/api/printReport', payload)
 				.then((r) => {
-					this.ws.send(
-						['print_report', this.setting.location_name, r].join(';')
-					)
+					this.ws.send(['print_report', r].join(';'))
 				})
 				.catch((e) => {
 					this.$message({

@@ -92,8 +92,7 @@ async def gate(websocket, path):
         if cfg[0] == 'print_report':
             try:
                 p.set(align='center')
-                p.text("LAPORAN PENDAPATAN PARKIR\n")
-                p.text(cfg[1] + "\n\n")  # location
+                p.text(cfg[1])  # header
                 p.set(align='left')
                 p.text(cfg[2] + "\n")  # body laporan
                 p.cut()

@@ -44,7 +44,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('memberVehicle/{memberVehicle}', [MemberVehicleController::class, 'destroy']);
 
     Route::prefix('memberRenewal')->group(function () {
-        Route::post('printSlip/{memberRenewal}', [MemberRenewalController::class, 'printSlip']);
+        Route::post('printSlip/{memberRenewal}', [PrintController::class, 'slip']);
         Route::get('report', [MemberRenewalController::class, 'report']);
         Route::get('reportDaily', [MemberRenewalController::class, 'reportDaily']);
     });

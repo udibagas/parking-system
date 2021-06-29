@@ -128,6 +128,7 @@ export default {
         .finally(() => (this.loading = false))
     }
   },
+
   mounted() {
     this.requestData();
   }
