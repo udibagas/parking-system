@@ -52,7 +52,8 @@ async def gate(websocket, path):
         if cfg[0] == 'test_printer':
             try:
                 p.set(align='center')
-                p.text(cfg[2])
+                p.image("http://localhost/images/logo.jpeg")
+                p.text("\n" + cfg[2])
                 p.cut()
                 await websocket.send(json.dumps({"status": True, "message": "TEST PRINTER BERHASIL"}))
             except Exception as e:
