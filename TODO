@@ -149,14 +149,13 @@ Press Control-O and then Control-X to save the file and exit.
 
 ======================
 Print pake python
-    - test
-    - ticket
     - laporan
-    - member
+        - summary
+        - pos
+    - slip pembayaran
 
 profile
 filter data
 session sering expired
-enter after login
 member otomatis buka
 field nomor kendaraan dan kartu jadi 1

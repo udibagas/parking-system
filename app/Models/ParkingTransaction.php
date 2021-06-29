@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class ParkingTransaction extends Model
 {
@@ -29,5 +30,21 @@ class ParkingTransaction extends Model
     public function getSnapshotUrlAttribute()
     {
         return url(Storage::url($this->snapshot_in));
+    }
+
+    protected static function booted()
+    {
+        static::creating(function ($model) {
+            $model->time_in = now();
+            $model->barcode_number = strtoupper(Str::random(5));
+        });
+
+        static::created(function ($model) {
+            if ($model->is_member) {
+                ParkingMember::where('id', $model->parking_member_id)->update([
+                    'last_transaction' => now()
+                ]);
+            }
+        });
     }
 }

@@ -72,12 +72,6 @@ class ParkingTransactionController extends Controller
             $input['pos_id'] = $pos->id;
         }
 
-        if ($request->is_member) {
-            ParkingMember::where('id', $request->parking_member_id)->update([
-                'last_transaction' => now()
-            ]);
-        }
-
         return ParkingTransaction::create($input);
     }
 

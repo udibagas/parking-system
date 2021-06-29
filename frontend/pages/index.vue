@@ -16,25 +16,8 @@
 							autocomplete="off"
 							@keyup.enter="checkCard"
 							type="text"
-							placeholder="NO. KARTU"
+							placeholder="NO. KARTU/NO. PLAT"
 							v-model="formModel.card_number"
-							class="my-input"
-						/>
-					</el-col>
-				</el-row>
-
-				<el-row :gutter="10" style="margin-bottom: 10px">
-					<el-col :span="10">
-						<div class="label-big">[-] NO. PLAT</div>
-					</el-col>
-					<el-col :span="14">
-						<input
-							id="plate-number"
-							autocomplete="off"
-							@keyup.enter="toVehicleField"
-							type="text"
-							placeholder="NO. PLAT"
-							v-model="formModel.plate_number"
 							class="my-input"
 						/>
 					</el-col>
@@ -134,23 +117,8 @@ export default {
 		...mapState(['setting', 'pos', 'vehicleTypeList']),
 	},
 	methods: {
-		toVehicleField() {
-			document.getElementById('vehicle-type').focus()
-		},
-
 		toDriveThruField() {
 			document.getElementById('drive-thru').focus()
-		},
-
-		generateBarcodeNumber() {
-			let result = ''
-			let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-			for (let i = 0; i < 5; i++) {
-				result += characters.charAt(
-					Math.floor(Math.random() * characters.length)
-				)
-			}
-			return result
 		},
 
 		setFare() {
@@ -170,6 +138,13 @@ export default {
 		},
 
 		checkCard() {
+			// kalau panjang karakter bukan 11 anggap isi sebagai nomor
+			if (this.formModel.card_number.length != 11) {
+				this.formModel.plate_number = this.formModel.card_number
+				document.getElementById('vehicle-type').focus()
+				return
+			}
+
 			const params = { card_number: this.formModel.card_number }
 			this.$axios
 				.$get('/api/parkingMember/search', { params })
@@ -202,47 +177,25 @@ export default {
 						)
 					}
 
-					let vehicle = null
+					this.formModel.plate_number = r.vehicles[0].plate_number
+					this.formModel.vehicle_type = r.vehicles[0].vehicle_type
 
 					if (this.setting.member_auto_open) {
-						// langsung ambil data yg pertama
-						this.formModel.plate_number = r.vehicles[0].plate_number
-						this.formModel.vehicle_type = r.vehicles[0].vehicle_type
 						this.formModel.drive_thru = 0
 						this.submit()
 						this.openGate()
 						return
 					}
-
-					vehicle = r.vehicles.find(
-						(v) => v.plate_number == this.formModel.plate_number
-					)
-
-					if (!vehicle) {
-						this.$alert(
-							'Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah ' +
-								r.vehicles.map((v) => v.plate_number).join(', '),
-							'Perhatian',
-							{
-								type: 'warning',
-								center: true,
-								roundButton: true,
-								confirmButtonText: 'OK',
-								confirmButtonClass: 'bg-red',
-							}
-						)
-						document.getElementById('plate-number').focus()
-					} else {
-						document.getElementById('vehicle-type').focus()
-					}
 				})
 				.catch((e) => {
-					document.getElementById('plate-number').focus()
 					this.$message({
 						message: e.response.data.message,
 						type: 'error',
 						showClose: true,
 					})
+				})
+				.finally(() => {
+					document.getElementById('vehicle-type').focus()
 				})
 		},
 
@@ -275,9 +228,6 @@ export default {
 					this.formModel.parking_member_id = null
 				})
 				.finally(() => {
-					this.formModel.barcode_number = this.generateBarcodeNumber()
-					this.formModel.time_in = this.$moment().format('YYYY-MM-DD HH:mm:ss')
-
 					this.$axios
 						.$post('/api/parkingTransaction', this.formModel)
 						.then((r) => {
