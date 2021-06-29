@@ -327,35 +327,11 @@ export default {
 			this.save()
 		},
 
-		async connectPos() {
-			await this.$store.dispatch('getPos')
-			this.ws = new WebSocket(`ws://${this.pos.ip_address}:5678/`)
-
-			this.ws.onerror = (event) => {
-				this.$message({
-					message: 'KONEKSI KE POS GAGAL',
-					type: 'error',
-				})
-			}
-
-			this.ws.onopen = (event) => {
-				console.log('POS TEKNONEKSI')
-			}
-
-			this.ws.onmessage = (event) => {
-				let data = JSON.parse(event.data)
-				this.$message({
-					message: data.message,
-					type: data.status ? 'success' : 'error',
-				})
-			}
-		},
-
 		printSlip(id) {
 			this.$axios
 				.$post(`/api/memberRenewal/printSlip/${id}`)
 				.then((r) => {
-					this.ws.send(['print_report', r].join(';'))
+					this.$emit('print', r)
 				})
 				.catch((e) => {
 					this.$message({
@@ -365,14 +341,6 @@ export default {
 					})
 				})
 		},
-	},
-
-	created() {
-		this.connectPos()
-	},
-
-	destroyed() {
-		this.ws.close()
 	},
 }
 </script>

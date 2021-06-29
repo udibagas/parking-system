@@ -82,6 +82,7 @@ export default {
 				})
 				.finally(() => (this.loading = false))
 		},
+
 		printReport() {
 			let params = { dateRange: this.dateRange, action: 'print' }
 			this.loading = true
@@ -89,11 +90,7 @@ export default {
 			this.$axios
 				.$get('/api/memberRenewal/report', { params })
 				.then((r) => {
-					this.$message({
-						message: 'Silakan ambil slip',
-						type: 'success',
-						showClose: false,
-					})
+					this.$emit('print', r)
 				})
 				.catch((e) => {
 					this.$message({
@@ -132,6 +129,7 @@ export default {
 			return sums
 		},
 	},
+
 	mounted() {
 		this.requestData()
 	},

@@ -102,11 +102,7 @@ export default {
 			this.$axios
 				.$get('/api/memberRenewal/reportDaily', { params })
 				.then((r) => {
-					this.$message({
-						message: 'Silakan ambil slip',
-						type: 'success',
-						showClose: false,
-					})
+					this.$emit('print', r)
 				})
 				.catch((e) => {
 					this.$message({

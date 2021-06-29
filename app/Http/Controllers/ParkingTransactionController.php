@@ -4,16 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ParkingTransaction;
-use Mike42\Escpos\PrintConnectors\FilePrintConnector;
-use Mike42\Escpos\Printer;
-use App\Models\ParkingMember;
 use App\Models\Pos;
-use App\Models\Setting;
-use App\Models\UserLog;
 use GuzzleHttp\Client;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-use Mike42\Escpos\EscposImage;
 
 class ParkingTransactionController extends Controller
 {
