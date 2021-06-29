@@ -183,8 +183,6 @@ export default {
 					if (this.setting.member_auto_open) {
 						this.formModel.drive_thru = 0
 						this.submit()
-						this.openGate()
-						return
 					}
 				})
 				.catch((e) => {
@@ -232,6 +230,7 @@ export default {
 						.$post('/api/parkingTransaction', this.formModel)
 						.then((r) => {
 							if (!this.formModel.drive_thru || !this.formModel.is_member) {
+								this.formModel.time_in = r.time_in
 								this.printTicket(r.id)
 							}
 							this.takeSnapshot(r.id)
