@@ -97,10 +97,10 @@ async def gate(websocket, path):
                 p.set(align='left')
                 p.text(cfg[2] + "\n")  # body laporan
                 p.cut()
-                await websocket.send(json.dumps({"status": True, "message": "SILAKAN AMBIL TIKET"}))
+                await websocket.send(json.dumps({"status": True, "message": "SILAKAN AMBIL STRUK"}))
 
             except Exception as e:
-                await websocket.send(json.dumps({"status": False, "message": "PRINT TIKET GAGAL. " + str(e)}))
+                await websocket.send(json.dumps({"status": False, "message": "PRINT LAPORAN GAGAL. " + str(e)}))
 
             p.close()
 
