@@ -146,11 +146,7 @@ class MemberRenewalController extends Controller
             ':end' => $request->dateRange[1]
         ]);
 
-        if ($request->action == 'print') {
-            $this->printReport($data);
-        }
-
-        return $data;
+        return $request->action == 'print' ? $this->printReport($data) : $data;
     }
 
     public function reportDaily(Request $request)
@@ -160,11 +156,7 @@ class MemberRenewalController extends Controller
             ->orderBy('member_renewals.created_at', 'ASC')
             ->get();
 
-        if ($request->action == 'print') {
-            $this->printReportDaily($request->date, $data);
-        }
-
-        return $data;
+        return $request->action == 'print' ? $this->printReportDaily($request->date, $data) : $data;
     }
 
     protected function printReport($data)
