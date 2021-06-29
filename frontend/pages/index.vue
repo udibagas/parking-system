@@ -348,7 +348,7 @@ export default {
 		this.$forceUpdate()
 		document.getElementById('card-number').focus()
 
-		document.getElementById('gate-in-app').onkeypress = (e) => {
+		document.getElementById('gate-in-app').addEventListener('keydown', (e) => {
 			// ke field nomor plat
 			if (e.key == '/') {
 				e.preventDefault()
@@ -381,10 +381,11 @@ export default {
 
 			// print report
 			if (e.key == 'F10') {
+				console.log(e)
 				e.preventDefault()
 				this.printReport()
 			}
-		}
+		})
 	},
 
 	destroyed() {
