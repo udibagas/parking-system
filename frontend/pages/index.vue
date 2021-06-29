@@ -230,7 +230,9 @@ export default {
 						.$post('/api/parkingTransaction', this.formModel)
 						.then((r) => {
 							if (!this.formModel.drive_thru || !this.formModel.is_member) {
-								this.formModel.time_in = r.time_in
+								this.formModel.time_in = this.$moment(r.time_in).format(
+									'DD-MMM-YYYY HH:mm'
+								)
 								this.printTicket(r.id)
 							}
 							this.takeSnapshot(r.id)
