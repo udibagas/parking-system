@@ -43,7 +43,12 @@
 				sortable="custom"
 				show-overflow-tooltip
 				min-width="150px"
-			></el-table-column>
+			>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.created_at).format('DD-MMM-YYYY HH:mm') }}
+				</template>
+			</el-table-column>
+
 			<el-table-column
 				prop="user"
 				label="User"
