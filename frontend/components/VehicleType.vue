@@ -187,5 +187,11 @@ export default {
 			url: '/api/vehicleType',
 		}
 	},
+
+	methods: {
+		afterSave() {
+			this.$store.dispatch('getVehicleTypeList')
+		},
+	},
 }
 </script>

@@ -61,6 +61,7 @@ export default {
             showClose: true,
           })
           this.requestData()
+          this.afterSave()
         })
         .catch((e) => {
           if (e.response.status == 422) {
@@ -76,6 +77,10 @@ export default {
         .finally(() => {
           this.loading = false
         })
+    },
+
+    afterSave() {
+      // pleade override
     },
 
     deleteData(id) {

@@ -697,6 +697,10 @@ export default {
 			this.save()
 		},
 
+		afterSave() {
+			this.$store.dispatch('getMemberList')
+		},
+
 		addVehicle() {
 			if (
 				this.formModel.vehicles.length < this.setting.jml_kendaraan_per_kartu ||

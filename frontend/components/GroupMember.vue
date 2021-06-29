@@ -166,6 +166,10 @@ export default {
 		}
 	},
 
-	// TODO: reload data group member
+	methods: {
+		afterSave() {
+			this.$store.dispatch('getGroupMemberList')
+		},
+	},
 }
 </script>
