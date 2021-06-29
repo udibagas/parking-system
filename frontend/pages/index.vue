@@ -138,8 +138,8 @@ export default {
 		},
 
 		checkCard() {
-			// kalau panjang karakter bukan 11 anggap isi sebagai nomor
-			if (this.formModel.card_number.length != 11) {
+			// kalau panjang karakter bukan 10 anggap isi sebagai nomor
+			if (this.formModel.card_number.length != 10) {
 				this.formModel.plate_number = this.formModel.card_number
 				document.getElementById('vehicle-type').focus()
 				return
