@@ -145,10 +145,39 @@ export default {
 				this.$moment().format('YYYY-MM-DD'),
 			],
 			report: null,
+			ws: null,
 		}
 	},
 
+	computed: {
+		...mapState(['pos']),
+	},
+
 	methods: {
+		async connectPos() {
+			await this.$store.dispatch('getPos')
+			this.ws = new WebSocket(`ws://${this.pos.ip_address}:5678/`)
+
+			this.ws.onerror = (event) => {
+				this.$message({
+					message: 'KONEKSI KE POS GAGAL',
+					type: 'error',
+				})
+			}
+
+			this.ws.onopen = (event) => {
+				console.log('POS TEKNONEKSI')
+			}
+
+			this.ws.onmessage = (event) => {
+				let data = JSON.parse(event.data)
+				this.$message({
+					message: data.message,
+					type: data.status ? 'success' : 'error',
+				})
+			}
+		},
+
 		handlePrint(command) {
 			if (command == 'a4') {
 				window.open(
@@ -170,11 +199,7 @@ export default {
 				this.$axios
 					.$get('/api/report', { params })
 					.then((r) => {
-						this.$message({
-							message: r.message,
-							showClose: true,
-							type: 'success',
-						})
+						this.ws.send(['print_report', r].join(';'))
 					})
 					.catch((e) => {
 						this.$message({
@@ -238,6 +263,15 @@ export default {
 			this.getReport()
 		},
 	},
+
+	created() {
+		this.connectPos()
+	},
+
+	destroyed() {
+		this.ws.close()
+	},
+
 	mounted() {
 		this.requestData()
 	},
