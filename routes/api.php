@@ -9,6 +9,7 @@ use App\Http\Controllers\MemberVehicleController;
 use App\Http\Controllers\ParkingMemberController;
 use App\Http\Controllers\ParkingTransactionController;
 use App\Http\Controllers\PosController;
+use App\Http\Controllers\PrintController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\SnapshotController;
@@ -37,9 +38,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('logout', [AuthController::class, 'logout']);
 
     Route::get('parkingMember/search', [ParkingMemberController::class, 'search']);
-    Route::post('printReport', [ParkingTransactionController::class, 'printReport']);
+    Route::post('printReport', [PrintController::class, 'report']);
     Route::post('takeSnapshot/{parkingTransaction}', [ParkingTransactionController::class,  'takeSnapshot']);
-    Route::post('printTicket/{parkingTransaction}', [ParkingTransactionController::class, 'printTicket']);
     Route::get('parkingTransaction/search', [ParkingTransactionController::class, 'search']);
     Route::delete('memberVehicle/{memberVehicle}', [MemberVehicleController::class, 'destroy']);
 

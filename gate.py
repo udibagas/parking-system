@@ -38,11 +38,11 @@ async def gate(websocket, path):
                 await websocket.send(json.dumps({"status": False, "message": "Gate gagal dibuka " + str(e)}))
 
         # initialize printer
-        elif cfg[0] == 'test_printer' or cfg[0] == 'print_ticket':
+        elif cfg[0] == 'test_printer' or cfg[0] == 'print_ticket' or cfg[0] == 'print_report':
             try:
                 p = Usb(0x1fc9, 0x2016)
             except Exception as e:
-                await websocket.send(json.dumps({"status": False, "message": "Koneksi ke printer gagal " + str(e)}))
+                await websocket.send(json.dumps({"status": False, "message": "KONEKSI KE PRINTER GAGAL " + str(e)}))
                 return
 
         else:
@@ -81,6 +81,21 @@ async def gate(websocket, path):
                 p.text('PETUGAS     : ' + cfg[9] + "\n")
                 p.set(align='center')
                 p.text("\n" + cfg[10] + "\n")
+                p.cut()
+                await websocket.send(json.dumps({"status": True, "message": "SILAKAN AMBIL TIKET"}))
+
+            except Exception as e:
+                await websocket.send(json.dumps({"status": False, "message": "PRINT TIKET GAGAL. " + str(e)}))
+
+            p.close()
+
+        if cfg[0] == 'print_report':
+            try:
+                p.set(align='center')
+                p.text("LAPORAN PENDAPATAN PARKIR\n")
+                p.text(cfg[1] + "\n\n")  # location
+                p.set(align='left')
+                p.text(cfg[2] + "\n")  # body laporan
                 p.cut()
                 await websocket.send(json.dumps({"status": True, "message": "SILAKAN AMBIL TIKET"}))
 

@@ -324,18 +324,15 @@ export default {
 			)
 		},
 
-		// TODO: beresin ini
 		printReport() {
 			let payload = { date: this.$moment().format('YYYY-MM-DD') }
 
 			this.$axios
 				.$post('/api/printReport', payload)
 				.then((r) => {
-					this.$message({
-						message: 'SILAKAN AMBIL STRUK',
-						type: 'success',
-						showClose: true,
-					})
+					this.ws.send(
+						['print_report', this.setting.location_name, r].join(';')
+					)
 				})
 				.catch((e) => {
 					this.$message({
