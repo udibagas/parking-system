@@ -28,7 +28,7 @@
 					<el-button
 						type="primary"
 						native-type="submit"
-						@click="login"
+						@click.prevent="login"
 						style="width: 100%"
 						>LOGIN</el-button
 					>

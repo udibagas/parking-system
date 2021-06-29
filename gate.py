@@ -8,7 +8,7 @@ import json
 from escpos.printer import Usb
 
 
-async def open_gate(websocket, path):
+async def gate(websocket, path):
     while True:
         try:
             cmd = await websocket.recv()
@@ -54,17 +54,18 @@ async def open_gate(websocket, path):
                 p.set(align='center')
                 p.text(cfg[2])
                 p.cut()
-                p.close()
                 await websocket.send(json.dumps({"status": True, "message": "TEST PRINTER BERHASIL"}))
             except Exception as e:
                 await websocket.send(json.dumps({"status": False, "message": "TEST PRINTER GAGAL. " + str(e)}))
+
+            p.close()
 
         # print ticket
         if cfg[0] == 'print_ticket':
 
             try:
                 p.set(align='center')
-                # p.image("./public/images/logo.jpeg")
+                p.image("http://localhost/images/logo.jpeg")
                 p.text("TIKET PARKIR\n")
                 p.text(cfg[2] + "\n")  # location
                 p.text(cfg[3] + "\n\n")  # address
@@ -78,14 +79,15 @@ async def open_gate(websocket, path):
                 p.set(align='center')
                 p.text("\n" + cfg[10] + "\n")
                 p.cut()
-                p.close()
                 await websocket.send(json.dumps({"status": True, "message": "SILAKAN AMBIL TIKET"}))
 
             except Exception as e:
                 await websocket.send(json.dumps({"status": False, "message": "PRINT TIKET GAGAL. " + str(e)}))
 
+            p.close()
 
-start_server = websockets.serve(open_gate, None, 5678)
+
+start_server = websockets.serve(gate, None, 5678)
 
 asyncio.get_event_loop().run_until_complete(start_server)
 asyncio.get_event_loop().run_forever()
