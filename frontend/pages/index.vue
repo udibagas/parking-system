@@ -8,7 +8,7 @@
 			<el-col :span="12">
 				<el-row :gutter="10" style="margin-bottom: 10px">
 					<el-col :span="10">
-						<div class="label-big">[/] NO. KARTU</div>
+						<div class="label-big">[/] NO. KARTU/PLAT</div>
 					</el-col>
 					<el-col :span="14">
 						<input
@@ -16,7 +16,7 @@
 							autocomplete="off"
 							@keyup.enter="checkCard"
 							type="text"
-							placeholder="NO. KARTU/NO. PLAT"
+							placeholder="NO. KARTU/PLAT"
 							v-model="formModel.card_number"
 							class="my-input"
 						/>

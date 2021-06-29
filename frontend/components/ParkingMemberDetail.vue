@@ -5,7 +5,7 @@
 				<tbody>
 					<tr>
 						<td class="td-label">Group</td>
-						<td class="td-value">{{ member.group }}</td>
+						<td class="td-value">{{ member.group.name }}</td>
 					</tr>
 					<tr>
 						<td class="td-label">Nama</td>
