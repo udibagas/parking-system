@@ -52,7 +52,8 @@ async def gate(websocket, path):
         if cfg[0] == 'test_printer':
             try:
                 p.set(align='center')
-                p.image("http://localhost/images/logo.jpeg")
+                p.image(
+                    "/home/rsvp-motor/apps/parking-system/public/images/logo.jpeg")
                 p.text("\n" + cfg[2])
                 p.cut()
                 await websocket.send(json.dumps({"status": True, "message": "TEST PRINTER BERHASIL"}))
@@ -66,7 +67,8 @@ async def gate(websocket, path):
 
             try:
                 p.set(align='center')
-                p.image("http://localhost/images/logo.jpeg")
+                p.image(
+                    "/home/rsvp-motor/apps/parking-system/public/images/logo.jpeg")
                 p.text("TIKET PARKIR\n")
                 p.text(cfg[2] + "\n")  # location
                 p.text(cfg[3] + "\n\n")  # address
