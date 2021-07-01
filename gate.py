@@ -70,17 +70,17 @@ async def gate(websocket, path):
                 p.image(
                     "/home/rsvp-motor/apps/parking-system/public/images/logo.jpeg")
                 p.text("TIKET PARKIR\n")
-                p.text(cfg[2] + "\n")  # location
-                p.text(cfg[3] + "\n\n")  # address
-                p.text('Rp. ' + cfg[4] + "\n")  # tarif
-                # nomor plat / jenis kendaraan
-                p.text(cfg[5] + '/' + cfg[6] + "\n\n")
+                # p.text(cfg[2] + "\n")  # location
+                # p.text(cfg[3] + "\n\n")  # address
                 p.set(align='left')
-                p.text('POS         : ' + cfg[7] + "\n")
+                p.text('TARIF       : Rp. ' + cfg[4] + "\n")  # tarif
+                # nomor plat / jenis kendaraan
+                p.text('NO. PLAT    : ' + cfg[5] + '/' + cfg[6] + "\n")
+                #p.text('POS         : ' + cfg[7] + "\n")
                 p.text('WAKTU MASUK : ' + cfg[8] + "\n")
                 p.text('PETUGAS     : ' + cfg[9] + "\n")
                 p.set(align='center')
-                p.text("\n" + cfg[10] + "\n")
+                p.text("\n" + cfg[10])
                 p.cut()
                 await websocket.send(json.dumps({"status": True, "message": "SILAKAN AMBIL TIKET"}))
 
