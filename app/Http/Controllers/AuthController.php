@@ -24,7 +24,7 @@ class AuthController extends Controller
                 'action' => 'LOGIN'
             ]);
 
-            Auth::login($user);
+            Auth::login($user, true);
 
             return response()->json([
                 'token' => $user->createToken($request->device_name ?: 'web')->plainTextToken,
