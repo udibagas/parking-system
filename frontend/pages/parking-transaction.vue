@@ -13,7 +13,7 @@
 						<el-date-picker
 							style="margin-top: 4px"
 							size="small"
-							@change="requestData"
+							@change="filterData"
 							v-model="dateRange"
 							format="dd-MMM-yyyy HH:mm:ss"
 							value-format="yyyy-MM-dd HH:mm:ss"
@@ -255,6 +255,14 @@ export default {
 				this.$moment().format('YYYY-MM-DD HH:mm:ss'),
 			],
 		}
+	},
+
+	methods: {
+		filterData() {
+			this.filters.dateRange = this.dateRange
+			this.page = 1
+			this.requestData()
+		},
 	},
 }
 </script>

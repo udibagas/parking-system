@@ -34,8 +34,10 @@ export default {
       this.requestData()
     },
 
-    filterChange(v) {
-      console.log(v)
+    filterChange(filter) {
+      this.filters = { ...this.filters, ...filter }
+      this.page = 1
+      this.requestData()
     },
 
     openForm(data) {
@@ -129,11 +131,12 @@ export default {
         sort: this.sort,
         order: this.order,
         paginated: true,
+        ...this.filters,
       }
 
       this.loading = true
       this.$axios
-        .$get(this.url, { params: params })
+        .$get(this.url, { params })
         .then((r) => {
           this.loading = false
           this.tableData = r
