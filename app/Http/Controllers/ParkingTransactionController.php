@@ -152,7 +152,7 @@ class ParkingTransactionController extends Controller
 
         // kalau bukan member dan harus print ticket atau kalau tiket hilang
         if ((!$parkingTransaction->is_member && $request->ticket) || $request->nomor_barcode == 'xxxxx') {
-            PrintTicketOut::dispatchNow($parkingTransaction);
+            PrintTicketOut::dispatchSync($parkingTransaction);
             return [
                 'message' => 'SILAKAN AMBIL STRUK PARKIR',
                 'data' => $parkingTransaction->load(['snapshots'])
@@ -355,7 +355,7 @@ class ParkingTransactionController extends Controller
         $parkingTransaction->update($input);
 
         if (!$parkingTransaction->is_member && $request->ticket) {
-            PrintTicketOut::dispatchNow($parkingTransaction);
+            PrintTicketOut::dispatchSync($parkingTransaction);
             return [
                 'message' => 'SILAKAN AMBIL STRUK PARKIR',
                 'data' => $parkingTransaction->load(['snapshots'])
@@ -378,7 +378,7 @@ class ParkingTransactionController extends Controller
             'gate_out_id' => 'required|exists:gate_outs,id'
         ]);
 
-        TakeSnapshot::dispatchNow(GateOut::find($request->gate_out_id), $parkingTransaction);
+        TakeSnapshot::dispatchSync(GateOut::find($request->gate_out_id), $parkingTransaction);
         return $parkingTransaction->snapshots;
     }
 
@@ -395,14 +395,14 @@ class ParkingTransactionController extends Controller
             return response(['message' => 'BELUM ADA TRANSAKSI'], 404);
         }
 
-        PrintTicketOut::dispatchNow($parkingTransaction);
+        PrintTicketOut::dispatchSync($parkingTransaction);
 
         return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
     }
 
     public function printTicketOut(ParkingTransaction $parkingTransaction)
     {
-        PrintTicketOut::dispatchNow($parkingTransaction);
+        PrintTicketOut::dispatchSync($parkingTransaction);
         return ['message' => 'SILAKAN AMBIL STRUK PARKIR'];
     }
 
