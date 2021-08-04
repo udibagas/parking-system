@@ -43,6 +43,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('checkAuth', [AppController::class, 'checkAuth']);
     Route::get('getNavigation', [AppController::class, 'getNavigation']);
     Route::post('logout', [AuthController::class, 'logout']);
+    Route::post('me', [AuthController::class, 'me']);
 
     Route::get('printer/test/{printer}', [PrinterController::class, 'test']);
     Route::get('kamera/test/{kamera}', [KameraController::class, 'test']);
