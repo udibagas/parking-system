@@ -4,7 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Kamera;
 use App\Notifications\KameraErrorNotification;
-use App\ParkingTransaction;
+use App\Models\ParkingTransaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
