@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Kamera;
+use App\Models\Kamera;
 use App\Notifications\KameraErrorNotification;
 use App\ParkingTransaction;
 use Illuminate\Bus\Queueable;

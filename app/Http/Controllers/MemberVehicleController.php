@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\MemberVehicle;
+use App\Models\MemberVehicle;
 
 class MemberVehicleController extends Controller
 {

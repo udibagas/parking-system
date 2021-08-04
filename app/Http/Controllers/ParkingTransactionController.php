@@ -2,25 +2,25 @@
 
 namespace App\Http\Controllers;
 
-use App\AreaParkir;
+use App\Models\AreaParkir;
 use App\Events\KendaraanKeluarEvent;
 use App\Events\KendaraanMasukEvent;
-use App\GateIn;
-use App\GateOut;
+use App\Models\GateIn;
+use App\Models\GateOut;
 use Illuminate\Http\Request;
-use App\ParkingTransaction;
+use App\Models\ParkingTransaction;
 use App\Http\Requests\ParkingTransactionRequest;
-use App\JenisKendaraan;
+use App\Models\JenisKendaraan;
 use App\Jobs\PrintTicketIn;
 use App\Jobs\PrintTicketOut;
 use App\Jobs\TakeSnapshot;
-use App\Member;
-use App\Pos;
+use App\Models\Member;
+use App\Models\Pos;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\Printer;
-use App\Setting;
-use App\User;
-use App\UserLog;
+use App\Models\Setting;
+use App\Models\User;
+use App\Models\UserLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;

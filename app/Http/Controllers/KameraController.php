@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\KameraRequest;
-use App\Kamera;
+use App\Models\Kamera;
 use Illuminate\Http\Request;
 use GuzzleHttp\Client;
 

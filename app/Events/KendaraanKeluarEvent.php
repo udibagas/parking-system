@@ -2,7 +2,7 @@
 
 namespace App\Events;
 
-use App\ParkingTransaction;
+use App\Models\ParkingTransaction;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;

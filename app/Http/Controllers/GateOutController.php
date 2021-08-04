@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\GateOut;
+use App\Models\GateOut;
 use App\Http\Requests\GateOutRequest;
 use Illuminate\Http\Request;
 

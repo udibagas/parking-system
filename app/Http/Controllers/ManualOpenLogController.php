@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\GateOut;
 use App\Jobs\TakeSnapshotManualOpen;
-use App\ManualOpenLog;
-use App\User;
+use App\Models\ManualOpenLog;
+use App\Models\User;
 use Illuminate\Http\Request;
-use GuzzleHttp\Client;
 
 class ManualOpenLogController extends Controller
 {

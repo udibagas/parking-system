@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\GateInRequest;
-use App\GateIn;
+use App\Models\GateIn;
 use App\Notifications\GateInNotification;
 
 class GateInController extends Controller

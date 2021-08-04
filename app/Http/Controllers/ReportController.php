@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\JenisKendaraan;
-use App\ParkingTransaction;
-use App\Setting;
-use App\Shift;
+use App\Models\JenisKendaraan;
+use App\Models\ParkingTransaction;
+use App\Models\Setting;
+use App\Models\Shift;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

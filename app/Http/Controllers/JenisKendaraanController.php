@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\JenisKendaraanRequest;
-use App\JenisKendaraan;
+use App\Models\JenisKendaraan;
 
 class JenisKendaraanController extends Controller
 {

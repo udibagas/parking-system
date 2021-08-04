@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Kamera;
+use App\Models\Kamera;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;

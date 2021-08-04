@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\AreaParkir;
+use App\Models\AreaParkir;
 use App\Http\Requests\AreaParkirRequest;
 use Illuminate\Http\Request;
 

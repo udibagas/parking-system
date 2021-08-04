@@ -3,12 +3,12 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\MemberRenewal;
+use App\Models\MemberRenewal;
 use App\Http\Requests\MemberRenewalRequest;
 use App\Http\Resources\MemberRenewalCollection;
-use App\Member;
-use App\Printer as AppPrinter;
-use App\Setting;
+use App\Models\Member;
+use App\Models\Printer as AppPrinter;
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
 use Mike42\Escpos\PrintConnectors\FilePrintConnector;

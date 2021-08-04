@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Snapshot;
+use App\Models\Snapshot;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;

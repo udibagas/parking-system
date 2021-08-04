@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\ParkingTransaction;
+use App\Models\ParkingTransaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;

@@ -2,10 +2,9 @@
 
 namespace App\Listeners;
 
-use App\AreaParkir;
+use App\Models\AreaParkir;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use PhpSerial\PhpSerial;
 
 class KendaraanKeluarListener implements ShouldQueue
 {

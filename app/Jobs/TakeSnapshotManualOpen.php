@@ -2,8 +2,8 @@
 
 namespace App\Jobs;
 
-use App\Kamera;
-use App\ManualOpenLog;
+use App\Models\Kamera;
+use App\Models\ManualOpenLog;
 use App\Notifications\KameraErrorNotification;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;

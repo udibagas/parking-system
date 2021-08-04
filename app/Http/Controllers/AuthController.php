@@ -2,11 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\User;
-use App\UserLog;
+use App\Models\User;
+use App\Models\UserLog;
 use Illuminate\Http\Request;
-use JWTAuth;
-use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -25,17 +24,17 @@ class AuthController extends Controller
                 'action' => 'LOGIN'
             ]);
 
+            Auth::login($user, true);
+
             return response()->json([
-                'success' => true,
-                'token' => auth()->login($user),
+                'token' => $user->createToken($request->device_name ?: 'web')->plainTextToken,
                 'user' => $user
             ]);
         }
 
         return response()->json([
-            'success' => false,
             'message' => 'Username atau password salah',
-        ], 401);
+        ], 403);
     }
 
     public function logout()
@@ -45,18 +44,11 @@ class AuthController extends Controller
             'action' => 'LOGOUT'
         ]);
 
-        auth()->logout();
-        return response()->json(['message' => 'Successfully logged out']);
+        return response('', 204);
     }
 
-    public function getAuthUser(Request $request)
+    public function me()
     {
-        $this->validate($request, [
-            'token' => 'required'
-        ]);
-
-        $user = JWTAuth::authenticate($request->token);
-
-        return response()->json(['user' => $user]);
+        return ['user' => auth()->user()];
     }
 }

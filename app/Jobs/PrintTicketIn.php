@@ -3,8 +3,8 @@
 namespace App\Jobs;
 
 use App\Notifications\PrintTicketFailedNotification;
-use App\ParkingTransaction;
-use App\Setting;
+use App\Models\ParkingTransaction;
+use App\Models\Setting;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;

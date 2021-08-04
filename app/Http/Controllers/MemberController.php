@@ -3,10 +3,10 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Member;
+use App\Models\Member;
 use App\Http\Requests\MemberRequest;
-use App\ParkingTransaction;
-use App\Setting;
+use App\Models\ParkingTransaction;
+use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
 
 class MemberController extends Controller
