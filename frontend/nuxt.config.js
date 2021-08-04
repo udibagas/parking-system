@@ -7,7 +7,7 @@ export default {
 
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'frontend',
+    title: 'MITRATEKNIK PARKING SYSTEM',
     htmlAttrs: {
       lang: 'en',
     },
