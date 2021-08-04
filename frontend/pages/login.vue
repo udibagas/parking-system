@@ -5,7 +5,7 @@
 				src="/images/logo.jpeg"
 				style="width: 70px; margin-top: 80px; border-radius: 5px"
 			/>
-			<h2>RSVP PARKING</h2>
+			<h2>MITRATEKNIK PARKING</h2>
 			<el-form
 				@submit.native.prevent="login"
 				style="width: 300px; margin: 20px auto 0; text-align: center"

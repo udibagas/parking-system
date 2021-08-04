@@ -26,7 +26,7 @@
 
 			<el-table-column min-width="100" label="Jenis Kendaraan">
 				<template slot-scope="scope">
-					{{ scope.row.jenis_kendaraan.join(", ") }}
+					{{ scope.row.jenis_kendaraan.join(', ') }}
 				</template>
 			</el-table-column>
 
@@ -167,16 +167,16 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import crud from "../../crud";
+import { mapState } from 'vuex'
+import crud from '@/mixins/crud'
 
 export default {
 	mixins: [crud],
 	data() {
-		return { url: "/areaParkir" };
+		return { url: '/areaParkir' }
 	},
 	computed: {
-		...mapState(["jenisKendaraanList"])
-	}
-};
+		...mapState(['jenisKendaraanList']),
+	},
+}
 </script>
