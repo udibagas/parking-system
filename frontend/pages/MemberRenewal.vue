@@ -5,7 +5,7 @@
 			class="text-right"
 			@submit.native.prevent="
 				() => {
-					return;
+					return
 				}
 			"
 		>
@@ -39,8 +39,8 @@
 					clearable
 					@change="
 						(v) => {
-							keyword = v;
-							requestData();
+							keyword = v
+							requestData()
 						}
 					"
 				>
@@ -118,7 +118,7 @@
 				min-width="120"
 			>
 				<template slot-scope="scope">
-					Rp. {{ scope.row.jumlah | formatNumber }}
+					Rp. {{ $decimal(scope.row.jumlah) }}
 				</template>
 			</el-table-column>
 
@@ -140,9 +140,9 @@
 						type="text"
 						@click="
 							() => {
-								page = 1;
-								keyword = '';
-								requestData();
+								page = 1
+								keyword = ''
+								requestData()
 							}
 						"
 						icon="el-icon-refresh"
@@ -159,8 +159,8 @@
 								icon="el-icon-printer"
 								@click.native.prevent="
 									() => {
-										selectedData = scope.row;
-										showPrintDialog = true;
+										selectedData = scope.row
+										showPrintDialog = true
 									}
 								"
 								>Print Slip</el-dropdown-item
@@ -189,14 +189,14 @@
 				background
 				@current-change="
 					(p) => {
-						page = p;
-						requestData();
+						page = p
+						requestData()
 					}
 				"
 				@size-change="
 					(s) => {
-						pageSize = s;
-						requestData();
+						pageSize = s
+						requestData()
 					}
 				"
 				layout="total, sizes, prev, pager, next"
@@ -228,65 +228,65 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import FormRenewal from "../components/FormRenewal";
-import PrintDialog from "../components/PrintDialog";
+import { mapState } from 'vuex'
+import FormRenewal from '../components/FormRenewal'
+import PrintDialog from '../components/PrintDialog'
 
 export default {
 	components: { FormRenewal, PrintDialog },
 	computed: {
-		...mapState(["user"])
+		...mapState(['user']),
 	},
 	data() {
 		return {
 			showForm: false,
 			formModel: {},
-			keyword: "",
+			keyword: '',
 			page: 1,
 			pageSize: 10,
 			tableData: { meta: {} },
-			sort: "created_at",
-			order: "descending",
+			sort: 'created_at',
+			order: 'descending',
 			loading: false,
-			dateRange: "",
+			dateRange: '',
 			showPrintDialog: false,
-			selectedData: {}
-		};
+			selectedData: {},
+		}
 	},
 	methods: {
 		sortChange(c) {
 			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop;
-				this.order = c.order;
-				this.requestData();
+				this.sort = c.prop
+				this.order = c.order
+				this.requestData()
 			}
 		},
 		openForm(data) {
-			this.formModel = JSON.parse(JSON.stringify(data));
-			this.showForm = true;
+			this.formModel = JSON.parse(JSON.stringify(data))
+			this.showForm = true
 		},
 		deleteData(id) {
-			this.$confirm("Anda yakin akan menghapus data ini?", "Warning", {
-				type: "warning"
+			this.$confirm('Anda yakin akan menghapus data ini?', 'Warning', {
+				type: 'warning',
 			})
 				.then(() => {
 					axios
-						.delete("/memberRenewal/" + id)
-						.then(r => {
-							this.requestData();
+						.delete('/memberRenewal/' + id)
+						.then((r) => {
+							this.requestData()
 							this.$message({
 								message: r.data.message,
-								type: "success"
-							});
+								type: 'success',
+							})
 						})
-						.catch(e => {
+						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error"
-							});
-						});
+								type: 'error',
+							})
+						})
 				})
-				.catch(() => console.log(e));
+				.catch(() => console.log(e))
 		},
 		requestData() {
 			let params = {
@@ -295,51 +295,51 @@ export default {
 				pageSize: this.pageSize,
 				sort: this.sort,
 				order: this.order,
-				dateRange: this.dateRange
-			};
+				dateRange: this.dateRange,
+			}
 
-			this.loading = true;
+			this.loading = true
 			axios
-				.get("/memberRenewal", { params: params })
-				.then(r => {
-					this.tableData = r.data;
+				.get('/memberRenewal', { params: params })
+				.then((r) => {
+					this.tableData = r.data
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-						showClose: true
-					});
+						type: 'error',
+						showClose: true,
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 		printSlip(printer_id) {
 			axios
 				.post(`/memberRenewal/printSlip/${this.selectedData.id}`, {
-					printer_id
+					printer_id,
 				})
-				.then(r => {
+				.then((r) => {
 					this.$message({
 						message: r.data.message,
-						type: "success"
-					});
+						type: 'success',
+					})
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error"
-					});
+						type: 'error',
+					})
 				})
 				.finally(() => {
-					this.showPrintDialog = false;
-				});
-		}
+					this.showPrintDialog = false
+				})
+		},
 	},
 	mounted() {
-		this.requestData();
-		this.$store.commit("getMemberList");
-	}
-};
+		this.requestData()
+		this.$store.commit('getMemberList')
+	},
+}
 </script>

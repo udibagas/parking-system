@@ -8,7 +8,7 @@
 		:close-on-click-modal="false"
 		:before-close="
 			(done) => {
-				closeForm();
+				closeForm()
 			}
 		"
 	>
@@ -298,116 +298,116 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 
 export default {
-	props: ["model", "show"],
+	props: ['model', 'show'],
 	watch: {
-		"formModel.berbayar"(v) {
+		'formModel.berbayar'(v) {
 			if (!v) {
-				this.formModel.tarif = 0;
+				this.formModel.tarif = 0
 			}
 		},
 	},
 	computed: {
 		formModel() {
-			return this.model;
+			return this.model
 		},
 		expiry_date() {
 			try {
-				return moment(this.formModel.register_date, "YYYY-MM-DD")
+				return this.$moment(this.formModel.register_date, 'YYYY-MM-DD')
 					.add(
 						this.formModel.siklus_pembayaran,
 						this.formModel.siklus_pembayaran_unit
 					)
-					.format("YYYY-MM-DD");
+					.format('YYYY-MM-DD')
 			} catch (error) {
-				return "";
+				return ''
 			}
 		},
 		...mapState([
-			"user",
-			"groupMemberList",
-			"setting",
-			"siklus",
-			"jenisKendaraanList",
+			'user',
+			'groupMemberList',
+			'setting',
+			'siklus',
+			'jenisKendaraanList',
 		]),
 	},
 	data() {
 		return {
 			formErrors: {},
 			loading: false,
-		};
+		}
 	},
 	methods: {
 		closeForm() {
-			this.formErrors = {};
-			this.$emit("close");
+			this.formErrors = {}
+			this.$emit('close')
 		},
 		store() {
-			this.loading = true;
-			this.formModel.expiry_date = this.expiry_date;
+			this.loading = true
+			this.formModel.expiry_date = this.expiry_date
 			axios
-				.post("/member", this.formModel)
+				.post('/member', this.formModel)
 				.then((r) => {
-					this.$emit("close");
+					this.$emit('close')
 					this.$message({
-						message: "Data berhasil disimpan.",
-						type: "success",
-					});
-					this.$emit("reload");
-					this.$store.commit("getMemberList");
+						message: 'Data berhasil disimpan.',
+						type: 'success',
+					})
+					this.$emit('reload')
+					this.$store.commit('getMemberList')
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors;
+						this.formErrors = e.response.data.errors
 					}
 
 					if (e.response.status == 500) {
-						this.formErrors = {};
+						this.formErrors = {}
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
+						type: 'error',
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 		update() {
-			this.loading = true;
-			this.formModel.expiry_date = this.expiry_date;
+			this.loading = true
+			this.formModel.expiry_date = this.expiry_date
 			axios
 				.put(`/member/${this.formModel.id}`, this.formModel)
 				.then((r) => {
-					this.$emit("close");
+					this.$emit('close')
 					this.$message({
-						message: "Data berhasil disimpan.",
-						type: "success",
+						message: 'Data berhasil disimpan.',
+						type: 'success',
 						showClose: true,
-					});
-					this.$emit("reload");
-					this.$store.commit("getMemberList");
+					})
+					this.$emit('reload')
+					this.$store.commit('getMemberList')
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors;
+						this.formErrors = e.response.data.errors
 					}
 
 					if (e.response.status == 500) {
-						this.formErrors = {};
+						this.formErrors = {}
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
+						type: 'error',
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 		addVehicle() {
 			if (
@@ -415,37 +415,37 @@ export default {
 				this.setting.jml_kendaraan_per_kartu == 0
 			) {
 				this.formModel.vehicles.push({
-					plat_nomor: "",
-					jenis_kendaraan: "",
-					tipe: "",
-					merk: "",
-					tahun: "",
-					warna: "",
-				});
+					plat_nomor: '',
+					jenis_kendaraan: '',
+					tipe: '',
+					merk: '',
+					tahun: '',
+					warna: '',
+				})
 			} else {
 				this.$message({
 					message: `Jumlah maksimal kendaraan per kartu adalah ${this.setting.jml_kendaraan_per_kartu}`,
-					type: "error",
-				});
+					type: 'error',
+				})
 			}
 		},
 		deleteVehicle(index, id) {
 			if (!id) {
-				this.formModel.vehicles.splice(index, 1);
+				this.formModel.vehicles.splice(index, 1)
 			} else {
 				axios
 					.delete(`/memberVehicle/${id}`)
 					.then((r) => {
-						this.formModel.vehicles.splice(index, 1);
+						this.formModel.vehicles.splice(index, 1)
 					})
 					.catch((e) => {
 						this.$message({
 							message: e.response.data.message,
-							type: "error",
-						});
-					});
+							type: 'error',
+						})
+					})
 			}
 		},
 	},
-};
+}
 </script>

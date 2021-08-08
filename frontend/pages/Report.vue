@@ -4,19 +4,19 @@
 			<div class="border shadow rounded-md p-3">
 				Hari Ini
 				<div class="text-5xl text-purple-700">
-					Rp. {{ summary.today | formatNumber }}
+					Rp. {{ $decimal(summary.today) }}
 				</div>
 			</div>
 			<div class="border shadow rounded-md p-3">
 				Bulan Ini
 				<div class="text-5xl text-blue-700">
-					Rp. {{ summary.this_month | formatNumber }}
+					Rp. {{ $decimal(summary.this_month) }}
 				</div>
 			</div>
 			<div class="border shadow rounded-md p-3">
 				Total
 				<div class="text-5xl text-orange-700">
-					Rp. {{ summary.total | formatNumber }}
+					Rp. {{ $decimal(summary.total) }}
 				</div>
 			</div>
 		</div>
@@ -129,7 +129,7 @@
 							<tr v-for="(t, id) in vehicleIn" :key="id">
 								<td class="border-b px-3 py-1">{{ t.gate }}</td>
 								<td class="border-b px-3 py-1 text-right">
-									{{ t.total | formatNumber }}
+									{{ $decimal(t.total) }}
 								</td>
 							</tr>
 						</tbody>
@@ -146,7 +146,7 @@
 							<tr v-for="(t, id) in transaction" :key="id">
 								<td class="border-b px-3 py-1">{{ t.jenis_kendaraan }}</td>
 								<td class="border-b px-3 py-1 text-right">
-									{{ t.total | formatNumber }}
+									{{ $decimal(t.total) }}
 								</td>
 							</tr>
 						</tbody>
@@ -163,7 +163,7 @@
 							<tr v-for="(t, id) in income" :key="id">
 								<td class="border-b px-3 py-1">{{ t.jenis_kendaraan }}</td>
 								<td class="border-b px-3 py-1 text-right">
-									Rp. {{ (Number(t.total) + Number(t.denda)) | formatNumber }}
+									Rp. {{ $decimal(Number(t.total) + Number(t.denda)) }}
 								</td>
 							</tr>
 						</tbody>
@@ -220,107 +220,112 @@ export default {
 			income: [],
 			parkedVehicle: [],
 			vehicleIn: [],
-			dateRange: [moment().format("YYYY-MM-01"), moment().format("YYYY-MM-DD")],
+			dateRange: [
+				this.$moment().format('YYYY-MM-01'),
+				this.$moment().format('YYYY-MM-DD'),
+			],
 			report: null,
 			areaParkir: [],
-			summary: {}
-		};
+			summary: {},
+		}
 	},
 
 	methods: {
 		printReport() {
 			window.open(
 				BASE_URL +
-					"/report?action=print&dateRange[]=" +
+					'/report?action=print&dateRange[]=' +
 					this.dateRange[0] +
-					"&dateRange[1]=" +
+					'&dateRange[1]=' +
 					this.dateRange[1] +
-					"&token=" +
+					'&token=' +
 					this.$store.state.token,
-				"_blank"
-			);
+				'_blank'
+			)
 		},
 
 		getTransaction() {
 			axios
-				.get("getTransaction", { params: { dateRange: this.dateRange } })
-				.then(r => {
-					this.transaction = r.data;
+				.get('getTransaction', { params: { dateRange: this.dateRange } })
+				.then((r) => {
+					this.transaction = r.data
 					let total = r.data
-						.map(d => d.total)
-						.reduce((sum, total) => sum + parseInt(total), 0);
-					this.transaction.push({ jenis_kendaraan: "TOTAL", total });
-				});
+						.map((d) => d.total)
+						.reduce((sum, total) => sum + parseInt(total), 0)
+					this.transaction.push({ jenis_kendaraan: 'TOTAL', total })
+				})
 		},
 
 		getIncome() {
 			axios
-				.get("getIncome", { params: { dateRange: this.dateRange } })
-				.then(r => {
-					this.income = r.data;
+				.get('getIncome', { params: { dateRange: this.dateRange } })
+				.then((r) => {
+					this.income = r.data
 
 					let total = r.data
-						.map(d => Number(d.total))
-						.reduce((sum, total) => sum + Number(total), 0);
+						.map((d) => Number(d.total))
+						.reduce((sum, total) => sum + Number(total), 0)
 
 					let denda = r.data
-						.map(d => Number(d.denda))
-						.reduce((sum, denda) => sum + Number(denda), 0);
+						.map((d) => Number(d.denda))
+						.reduce((sum, denda) => sum + Number(denda), 0)
 
-					this.income.push({ jenis_kendaraan: "TOTAL", total, denda });
-				});
+					this.income.push({ jenis_kendaraan: 'TOTAL', total, denda })
+				})
 		},
 
 		getParkedVehicle() {
 			axios
-				.get("getParkedVehicle", { params: { dateRange: this.dateRange } })
-				.then(r => {
-					this.parkedVehicle = r.data;
-				});
+				.get('getParkedVehicle', { params: { dateRange: this.dateRange } })
+				.then((r) => {
+					this.parkedVehicle = r.data
+				})
 		},
 
 		getVehicleIn() {
 			axios
-				.get("getVehicleIn", { params: { dateRange: this.dateRange } })
-				.then(r => {
-					this.vehicleIn = r.data;
+				.get('getVehicleIn', { params: { dateRange: this.dateRange } })
+				.then((r) => {
+					this.vehicleIn = r.data
 					let total = r.data
-						.map(d => d.total)
-						.reduce((sum, total) => sum + parseInt(total), 0);
-					this.vehicleIn.push({ gate: "TOTAL", total });
-				});
+						.map((d) => d.total)
+						.reduce((sum, total) => sum + parseInt(total), 0)
+					this.vehicleIn.push({ gate: 'TOTAL', total })
+				})
 		},
 
 		getReport() {
-			axios.get("report", { params: { dateRange: this.dateRange } }).then(r => {
-				this.report = r.data;
-			});
+			axios
+				.get('report', { params: { dateRange: this.dateRange } })
+				.then((r) => {
+					this.report = r.data
+				})
 		},
 
 		getAreaParkir() {
-			axios.get("areaParkir").then(r => {
-				this.areaParkir = r.data;
-			});
+			axios.get('areaParkir').then((r) => {
+				this.areaParkir = r.data
+			})
 		},
 
 		getSummary() {
-			axios.get("summary").then(r => {
-				this.summary = r.data;
-			});
+			axios.get('summary').then((r) => {
+				this.summary = r.data
+			})
 		},
 
 		requestData() {
-			this.getSummary();
-			this.getAreaParkir();
-			this.getTransaction();
-			this.getIncome();
-			this.getParkedVehicle();
-			this.getVehicleIn();
-			this.getReport();
-		}
+			this.getSummary()
+			this.getAreaParkir()
+			this.getTransaction()
+			this.getIncome()
+			this.getParkedVehicle()
+			this.getVehicleIn()
+			this.getReport()
+		},
 	},
 	mounted() {
-		this.requestData();
-	}
-};
+		this.requestData()
+	},
+}
 </script>

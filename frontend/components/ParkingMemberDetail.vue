@@ -39,7 +39,7 @@
 					<tr>
 						<td class="border bg-blue-600 text-white py-1 px-3">Jenis</td>
 						<td class="border bg-blue-100 py-1 px-3">
-							{{ member.berbayar ? "Berbayar" : "Gratis" }}
+							{{ member.berbayar ? 'Berbayar' : 'Gratis' }}
 						</td>
 					</tr>
 					<tr>
@@ -74,7 +74,7 @@
 					<tr>
 						<td class="border bg-blue-600 text-white py-1 px-3">Tarif</td>
 						<td class="border bg-blue-100 py-1 px-3">
-							Rp {{ member.tarif | formatNumber }}
+							Rp {{ $decimal(member.tarif) }}
 						</td>
 					</tr>
 					<tr>
@@ -88,7 +88,7 @@
 					<tr>
 						<td class="border bg-blue-600 text-white py-1 px-3">Status</td>
 						<td class="border bg-blue-100 py-1 px-3">
-							{{ member.status ? "Aktif" : "Nonaktif" }}
+							{{ member.status ? 'Aktif' : 'Nonaktif' }}
 						</td>
 					</tr>
 				</tbody>
@@ -129,18 +129,18 @@
 
 <script>
 export default {
-	props: ["member"],
+	props: ['member'],
 	filters: {
 		getSiklus(v) {
 			const siklus = [
-				{ days: "hari" },
-				{ weeks: "minggu" },
-				{ months: "bulan" },
-				{ years: "tahun" },
-			];
+				{ days: 'hari' },
+				{ weeks: 'minggu' },
+				{ months: 'bulan' },
+				{ years: 'tahun' },
+			]
 
-			return siklus[v];
+			return siklus[v]
 		},
 	},
-};
+}
 </script>

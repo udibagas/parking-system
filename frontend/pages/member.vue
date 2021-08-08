@@ -17,23 +17,11 @@
 </template>
 
 <script>
-import ParkingMember from "./ParkingMember";
-import MemberRenewal from "./MemberRenewal";
-import GroupMember from "./GroupMember";
-import MembershipReport from "./MembershipReport";
-import MembershipReportDaily from "./MembershipReportDaily";
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 
 export default {
-	components: {
-		ParkingMember,
-		MemberRenewal,
-		GroupMember,
-		MembershipReport,
-		MembershipReportDaily,
-	},
 	computed: {
-		...mapState(["user"]),
+		...mapState(['user']),
 	},
-};
+}
 </script>

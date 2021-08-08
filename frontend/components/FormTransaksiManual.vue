@@ -192,126 +192,126 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 export default {
-	props: ["show", "model"],
+	props: ['show', 'model'],
 	computed: {
 		formModel() {
-			return this.model;
+			return this.model
 		},
 		durasi() {
-			var date1 = moment(this.formModel.time_in);
-			var date2 = moment(this.formModel.time_out);
-			var duration = moment.duration(date2.diff(date1));
-			return moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+			var date1 = this.$moment(this.formModel.time_in)
+			var date2 = this.$moment(this.formModel.time_out)
+			var duration = this.$moment.duration(date2.diff(date1))
+			return this.$moment.utc(duration.asMilliseconds()).format('HH:mm:ss')
 		},
-		...mapState(["posList", "gateOutList", "gateInList", "jenisKendaraanList"]),
+		...mapState(['posList', 'gateOutList', 'gateInList', 'jenisKendaraanList']),
 	},
 	data() {
 		return {
 			formErrors: {},
 			loading: false,
-		};
+		}
 	},
 	methods: {
 		closeForm() {
-			this.formErrors = {};
-			this.$emit("close");
+			this.formErrors = {}
+			this.$emit('close')
 		},
 		store() {
-			this.loading = true;
-			this.formModel.manual = 1;
+			this.loading = true
+			this.formModel.manual = 1
 			axios
-				.post("/parkingTransaction", this.formModel)
+				.post('/parkingTransaction', this.formModel)
 				.then((r) => {
 					this.$message({
-						message: "Data berhasil disimpan",
-						type: "success",
+						message: 'Data berhasil disimpan',
+						type: 'success',
 						showClose: true,
-					});
+					})
 
-					this.closeForm();
-					this.$emit("reload");
-					this.openGate(this.formModel.gate_out_id);
+					this.closeForm()
+					this.$emit('reload')
+					this.openGate(this.formModel.gate_out_id)
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors;
+						this.formErrors = e.response.data.errors
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: 'error',
 						showClose: true,
-					});
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 		update() {
-			this.loading = true;
-			this.formModel.edit = 1;
+			this.loading = true
+			this.formModel.edit = 1
 			axios
 				.put(`/parkingTransaction/${this.formModel.id}`, this.formModel)
 				.then((r) => {
 					this.$message({
-						message: "Data berhasil disimpan",
-						type: "success",
+						message: 'Data berhasil disimpan',
+						type: 'success',
 						showClose: true,
-					});
+					})
 
-					this.closeForm();
-					this.$emit("reload");
+					this.closeForm()
+					this.$emit('reload')
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors;
+						this.formErrors = e.response.data.errors
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
+						type: 'error',
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 		openGate(gate_out_id) {
-			const pos = this.posList.find((p) => p.id == this.formModel.pos_id);
-			const gate = this.gateOutList.find((g) => g.id == gate_out_id);
+			const pos = this.posList.find((p) => p.id == this.formModel.pos_id)
+			const gate = this.gateOutList.find((g) => g.id == gate_out_id)
 
-			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
+			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`)
 
 			ws.onerror = (event) => {
 				this.$message({
-					message: "KONEKSI KE POS GAGAL",
-					type: "error",
-				});
-			};
+					message: 'KONEKSI KE POS GAGAL',
+					type: 'error',
+				})
+			}
 
 			ws.onopen = (event) => {
 				ws.send(
 					[
-						"open",
+						'open',
 						gate.device,
 						gate.baudrate,
 						gate.open_command,
 						gate.close_command,
-					].join(";")
-				);
-			};
+					].join(';')
+				)
+			}
 
 			ws.onmessage = (event) => {
-				let data = JSON.parse(event.data);
+				let data = JSON.parse(event.data)
 				this.$message({
 					message: data.message,
-					type: data.status ? "success" : "error",
-				});
-				ws.close();
-			};
+					type: data.status ? 'success' : 'error',
+				})
+				ws.close()
+			}
 		},
 	},
-};
+}
 </script>

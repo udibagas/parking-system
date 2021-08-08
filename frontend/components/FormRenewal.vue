@@ -11,7 +11,7 @@
 		:close-on-click-modal="false"
 		:before-close="
 			(done) => {
-				closeForm();
+				closeForm()
 			}
 		"
 	>
@@ -122,110 +122,110 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 export default {
-	props: ["model", "show"],
+	props: ['model', 'show'],
 	data() {
 		return {
 			formErrors: {},
 			loading: false,
-		};
+		}
 	},
 	computed: {
 		formModel() {
-			return this.model;
+			return this.model
 		},
 		sampai_tanggal() {
 			try {
-				return moment(this.formModel.dari_tanggal, "YYYY-MM-DD")
+				return this.$moment(this.formModel.dari_tanggal, 'YYYY-MM-DD')
 					.add(
 						this.formModel.siklus_pembayaran,
 						this.formModel.siklus_pembayaran_unit
 					)
-					.format("YYYY-MM-DD");
+					.format('YYYY-MM-DD')
 			} catch (error) {
-				return "";
+				return ''
 			}
 		},
-		...mapState(["memberList"]),
+		...mapState(['memberList']),
 	},
 	methods: {
 		closeForm() {
-			this.formErrors = {};
-			this.$emit("close");
+			this.formErrors = {}
+			this.$emit('close')
 		},
 		save() {
-			this.formModel.sampai_tanggal = this.sampai_tanggal;
-			this.$confirm("Anda yakin?", "Konfirmasi", { type: "warning" })
+			this.formModel.sampai_tanggal = this.sampai_tanggal
+			this.$confirm('Anda yakin?', 'Konfirmasi', { type: 'warning' })
 				.then(() => {
 					if (!!this.formModel.id) {
-						this.update();
+						this.update()
 					} else {
-						this.store();
+						this.store()
 					}
 				})
-				.catch((e) => console.log(e));
+				.catch((e) => console.log(e))
 		},
 		store() {
-			this.loading = true;
+			this.loading = true
 			axios
-				.post("/memberRenewal", this.formModel)
+				.post('/memberRenewal', this.formModel)
 				.then((r) => {
-					this.closeForm();
-					this.$emit("reload");
+					this.closeForm()
+					this.$emit('reload')
 					this.$message({
 						message: r.data.message,
-						type: "success",
-					});
+						type: 'success',
+					})
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors;
+						this.formErrors = e.response.data.errors
 					}
 
 					if (e.response.status == 500) {
-						this.formErrors = {};
+						this.formErrors = {}
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
+						type: 'error',
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 		update() {
-			this.loading = true;
+			this.loading = true
 			axios
-				.put("/memberRenewal/" + this.formModel.id, this.formModel)
+				.put('/memberRenewal/' + this.formModel.id, this.formModel)
 				.then((r) => {
-					this.closeForm();
-					this.$emit("reload");
+					this.closeForm()
+					this.$emit('reload')
 					this.$message({
 						message: r.data.message,
-						type: "success",
-					});
+						type: 'success',
+					})
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors;
+						this.formErrors = e.response.data.errors
 					}
 
 					if (e.response.status == 500) {
-						this.formErrors = {};
+						this.formErrors = {}
 					}
 
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
+						type: 'error',
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 	},
-};
+}
 </script>

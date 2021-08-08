@@ -5,7 +5,7 @@
 			class="text-right"
 			@submit.native.prevent="
 				() => {
-					return;
+					return
 				}
 			"
 		>
@@ -27,8 +27,8 @@
 					:clearable="true"
 					@change="
 						(v) => {
-							keyword = v;
-							requestData();
+							keyword = v
+							requestData()
 						}
 					"
 				>
@@ -57,18 +57,18 @@
 			stripe
 			@row-dblclick="
 				(row, column, event) => {
-					selectedData = row;
-					showDetail = true;
+					selectedData = row
+					showDetail = true
 				}
 			"
 			:default-sort="{ prop: sort, order: order }"
 			height="calc(100vh - 260px)"
 			@filter-change="
 				(f) => {
-					let c = Object.keys(f)[0];
-					filters[c] = Object.values(f[c]);
-					page = 1;
-					requestData();
+					let c = Object.keys(f)[0]
+					filters[c] = Object.values(f[c])
+					page = 1
+					requestData()
 				}
 			"
 			v-loading="loading"
@@ -94,7 +94,7 @@
 						effect="dark"
 						style="width: 100%"
 						:type="scope.row.status ? 'success' : 'info'"
-						>{{ scope.row.status ? "Aktif" : "Nonaktif" }}</el-tag
+						>{{ scope.row.status ? 'Aktif' : 'Nonaktif' }}</el-tag
 					>
 				</template>
 			</el-table-column>
@@ -121,14 +121,14 @@
 				header-align="center"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.berbayar ? "BERBAYAR" : "GRATIS" }}
+					{{ scope.row.berbayar ? 'BERBAYAR' : 'GRATIS' }}
 				</template>
 			</el-table-column>
 
 			<el-table-column
 				:filters="
 					this.groupMemberList.map((g) => {
-						return { value: g.id, text: g.nama };
+						return { value: g.id, text: g.nama }
 					})
 				"
 				column-key="group_member_id"
@@ -153,7 +153,7 @@
 				min-width="150px"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.vehicles.map((v) => v.plat_nomor).join(", ") }}
+					{{ scope.row.vehicles.map((v) => v.plat_nomor).join(', ') }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -189,7 +189,7 @@
 				align="right"
 			>
 				<template slot-scope="scope">
-					Rp. {{ scope.row.tarif | formatNumber }}
+					Rp. {{ $decimal(scope.row.tarif) }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -245,7 +245,7 @@
 						effect="dark"
 						style="width: 100%"
 						:type="scope.row.expired ? 'danger' : 'success'"
-						>{{ scope.row.expired ? "Ya" : "Tidak" }}</el-tag
+						>{{ scope.row.expired ? 'Ya' : 'Tidak' }}</el-tag
 					>
 				</template>
 			</el-table-column>
@@ -261,9 +261,9 @@
 						type="text"
 						@click="
 							() => {
-								page = 1;
-								keyword = '';
-								requestData();
+								page = 1
+								keyword = ''
+								requestData()
 							}
 						"
 						icon="el-icon-refresh"
@@ -280,8 +280,8 @@
 								icon="el-icon-zoom-in"
 								@click.native.prevent="
 									() => {
-										selectedData = scope.row;
-										showDetail = true;
+										selectedData = scope.row
+										showDetail = true
 									}
 								"
 								>Lihat Detail</el-dropdown-item
@@ -308,14 +308,14 @@
 				background
 				@current-change="
 					(p) => {
-						page = p;
-						requestData();
+						page = p
+						requestData()
 					}
 				"
 				@size-change="
 					(s) => {
-						pageSize = s;
-						requestData();
+						pageSize = s
+						requestData()
 					}
 				"
 				layout="total, sizes, prev, pager, next"
@@ -351,31 +351,31 @@
 </template>
 
 <script>
-import exportFromJSON from "export-from-json";
-import ParkingMemberDetail from "../components/ParkingMemberDetail";
-import { mapState } from "vuex";
-import FormMember from "../components/FormMember";
+import exportFromJSON from 'export-from-json'
+import ParkingMemberDetail from '../components/ParkingMemberDetail'
+import { mapState } from 'vuex'
+import FormMember from '../components/FormMember'
 
 export default {
 	components: { ParkingMemberDetail, FormMember },
 	computed: {
-		...mapState(["user", "groupMemberList", "siklus"]),
+		...mapState(['user', 'groupMemberList', 'siklus']),
 	},
 	data() {
 		return {
 			showForm: false,
-			keyword: "",
+			keyword: '',
 			page: 1,
 			pageSize: 10,
 			tableData: {},
-			sort: "nama",
-			order: "ascending",
+			sort: 'nama',
+			order: 'ascending',
 			loading: false,
 			selectedData: { vehicles: [] },
 			showDetail: false,
-			now: moment().format("YYYY-MM-DD"),
+			now: this.$moment().format('YYYY-MM-DD'),
 			filters: {},
-		};
+		}
 	},
 	methods: {
 		print() {
@@ -384,94 +384,94 @@ export default {
 					pageSize: 1000000,
 					sort: this.sort,
 					order: this.order,
-					action: "print",
+					action: 'print',
 					token: this.$store.state.token,
 				},
 				this.filters
-			);
+			)
 
 			const querystring = Object.keys(params)
-				.map((key) => key + "=" + params[key])
-				.join("&");
-			window.open(BASE_URL + "/member?" + querystring, "_blank");
+				.map((key) => key + '=' + params[key])
+				.join('&')
+			window.open(BASE_URL + '/member?' + querystring, '_blank')
 		},
 		download() {
 			const params = {
 				pageSize: 1000000,
 				sort: this.sort,
 				order: this.order,
-			};
+			}
 
 			axios
-				.get("member", { params: Object.assign(params, this.filters) })
+				.get('member', { params: Object.assign(params, this.filters) })
 				.then((r) => {
 					const data = r.data.data.map((d, i) => {
 						return {
 							No: i + 1,
 							Nama: d.nama,
-							Jenis: d.berbayar ? "BERBAYAR" : "GRATIS",
+							Jenis: d.berbayar ? 'BERBAYAR' : 'GRATIS',
 							Group: d.group.nama,
-							"Nomor Kartu": d.nomor_kartu,
-							"Plat Nomor": d.vehicles.map((v) => v.plat_nomor).join(", "),
-							"Tanggal Daftar": d.register_date,
-							"Tanggal Kedaluarsa": d.expiry_date,
+							'Nomor Kartu': d.nomor_kartu,
+							'Plat Nomor': d.vehicles.map((v) => v.plat_nomor).join(', '),
+							'Tanggal Daftar': d.register_date,
+							'Tanggal Kedaluarsa': d.expiry_date,
 							Tarif: d.tarif,
-							"Siklus Bayar":
+							'Siklus Bayar':
 								d.siklus_pembayaran +
-								" " +
+								' ' +
 								this.siklus.find((s) => s.value == d.siklus_pembayaran_unit)
 									.label,
-							"Nomor HP": d.phone_number,
+							'Nomor HP': d.phone_number,
 							// "Alamat Email": d.email,
-							"Transaksi Terakhir": d.last_transaction || "",
-							"Status Kartu": d.expired ? "KEDALUARSA" : "BERLAKU",
-							"Status Anggota": d.status ? "AKTIF" : "NONAKTIF",
-						};
-					});
+							'Transaksi Terakhir': d.last_transaction || '',
+							'Status Kartu': d.expired ? 'KEDALUARSA' : 'BERLAKU',
+							'Status Anggota': d.status ? 'AKTIF' : 'NONAKTIF',
+						}
+					})
 
 					exportFromJSON({
 						data,
-						fileName: "member-parkir",
-						exportType: "xls",
-					});
+						fileName: 'member-parkir',
+						exportType: 'xls',
+					})
 				})
 				.catch((e) => console.log(e))
-				.finally(() => (this.loading = false));
+				.finally(() => (this.loading = false))
 		},
 		sortChange(c) {
 			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop;
-				this.order = c.order;
-				this.requestData();
+				this.sort = c.prop
+				this.order = c.order
+				this.requestData()
 			}
 		},
 		openForm(data) {
-			this.selectedData = JSON.parse(JSON.stringify(data));
-			this.showForm = true;
+			this.selectedData = JSON.parse(JSON.stringify(data))
+			this.showForm = true
 		},
 		deleteData(id) {
-			this.$confirm("Anda yakin akan menghapus data ini?", "Warning", {
-				type: "warning",
+			this.$confirm('Anda yakin akan menghapus data ini?', 'Warning', {
+				type: 'warning',
 			})
 				.then(() => {
 					axios
 						.delete(`/member/${id}`)
 						.then((r) => {
-							this.requestData();
-							this.$store.commit("getMemberList");
+							this.requestData()
+							this.$store.commit('getMemberList')
 							this.$message({
 								message: r.data.message,
-								type: "success",
-							});
+								type: 'success',
+							})
 						})
 						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
-							});
-						});
+								type: 'error',
+							})
+						})
 				})
-				.catch(() => console.log(e));
+				.catch(() => console.log(e))
 		},
 		requestData() {
 			let params = {
@@ -480,28 +480,28 @@ export default {
 				pageSize: this.pageSize,
 				sort: this.sort,
 				order: this.order,
-			};
+			}
 
-			this.loading = true;
+			this.loading = true
 			axios
-				.get("/member", { params: Object.assign(params, this.filters) })
+				.get('/member', { params: Object.assign(params, this.filters) })
 				.then((r) => {
-					this.tableData = r.data;
+					this.tableData = r.data
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
+						type: 'error',
+					})
 				})
-				.finally(() => (this.loading = false));
+				.finally(() => (this.loading = false))
 		},
 	},
 	mounted() {
-		this.requestData();
-		this.$store.commit("getGroupMemberList");
-		this.$store.commit("getSetting");
+		this.requestData()
+		this.$store.commit('getGroupMemberList')
+		this.$store.commit('getSetting')
 	},
-};
+}
 </script>
 

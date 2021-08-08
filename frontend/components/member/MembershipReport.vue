@@ -34,12 +34,12 @@
 			</el-table-column>
 			<el-table-column label="Jumlah" header-align="center" align="center">
 				<template slot-scope="scope">
-					{{ scope.row.jumlah | formatNumber }}
+					{{ $decimal(scope.row.jumlah) }}
 				</template>
 			</el-table-column>
 			<el-table-column label="Pendapatan" header-align="right" align="right">
 				<template slot-scope="scope">
-					Rp. {{ scope.row.pendapatan | formatNumber }}
+					Rp. {{ $decimal(scope.row.pendapatan) }}
 				</template>
 			</el-table-column>
 		</el-table>
@@ -53,111 +53,93 @@
 </template>
 
 <script>
-import PrintDialog from "../components/PrintDialog";
-
 export default {
-	components: { PrintDialog },
 	data() {
 		return {
-			dateRange: [moment().format("YYYY-MM-01"), moment().format("YYYY-MM-DD")],
+			dateRange: [
+				this.$moment().format('YYYY-MM-01'),
+				this.$moment().format('YYYY-MM-DD'),
+			],
 			report: [],
 			loading: false,
 			showPrintDialog: false,
-		};
+		}
 	},
 	methods: {
 		requestData() {
-			let params = { dateRange: this.dateRange };
-			this.loading = true;
+			let params = { dateRange: this.dateRange }
+			this.loading = true
 
 			axios
-				.get("/memberRenewal/report", { params: params })
+				.get('/api/memberRenewal/report', { params: params })
 				.then((r) => {
-					this.report = r.data;
+					this.report = r.data
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: 'error',
 						showClose: false,
-					});
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 		printReport(printer_id) {
-			let params = { dateRange: this.dateRange, action: "print", printer_id };
-			this.loading = true;
+			let params = { dateRange: this.dateRange, action: 'print', printer_id }
+			this.loading = true
 
 			axios
-				.get("/memberRenewal/report", { params: params })
+				.get('/api/memberRenewal/report', { params: params })
 				.then((r) => {
 					this.$message({
-						message: "Silakan ambil slip",
-						type: "success",
+						message: 'Silakan ambil slip',
+						type: 'success',
 						showClose: false,
-					});
+					})
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: 'error',
 						showClose: false,
-					});
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-					this.showPrintDialog = false;
-				});
-		},
-		formatNumber(v) {
-			try {
-				v += "";
-				var x = v.split(".");
-				var x1 = x[0];
-				var x2 = x.length > 1 ? "." + x[1] : "";
-				var rgx = /(\d+)(\d{3})/;
-				while (rgx.test(x1)) {
-					x1 = x1.replace(rgx, "$1" + "," + "$2");
-				}
-				return x1 + x2;
-			} catch (error) {
-				return 0;
-			}
+					this.loading = false
+					this.showPrintDialog = false
+				})
 		},
 		getSummaries(param) {
-			const { columns, data } = param;
-			const sums = [];
+			const { columns, data } = param
+			const sums = []
 
 			columns.forEach((column, index) => {
 				if (index === 0) {
-					sums[index] = "TOTAL";
-					return;
+					sums[index] = 'TOTAL'
+					return
 				}
 
 				if (index === 1) {
 					sums[index] = this.report.reduce((prev, curr) => {
-						return prev + Number(curr.jumlah);
-					}, 0);
+						return prev + Number(curr.jumlah)
+					}, 0)
 				}
 
 				if (index === 2) {
 					let pendapatan = this.report.reduce((prev, curr) => {
-						return prev + Number(curr.pendapatan);
-					}, 0);
-					sums[index] = "Rp " + this.formatNumber(pendapatan);
+						return prev + Number(curr.pendapatan)
+					}, 0)
+					sums[index] = 'Rp ' + this.$decimal(pendapatan)
 				}
-			});
+			})
 
-			return sums;
+			return sums
 		},
 	},
 	mounted() {
-		this.requestData();
+		this.requestData()
 	},
-};
+}
 </script>
-
-<style lang="scss" scoped>
-</style>

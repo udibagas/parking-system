@@ -4,7 +4,7 @@
 		:visible.sync="show"
 		:before-close="
 			(done) => {
-				$emit('close');
+				$emit('close')
 			}
 		"
 	>
@@ -37,7 +37,7 @@
 					<tr>
 						<td class="border bg-blue-700 text-white px-4 py-1">Member</td>
 						<td class="border bg-blue-100 px-4 py-1">
-							{{ trx.is_member ? "Ya" : "Tidak" }}
+							{{ trx.is_member ? 'Ya' : 'Tidak' }}
 						</td>
 					</tr>
 					<tr>
@@ -49,13 +49,13 @@
 					<tr>
 						<td class="border bg-blue-700 text-white px-4 py-1">Gate Masuk</td>
 						<td class="border bg-blue-100 px-4 py-1">
-							{{ trx.gate_in ? trx.gate_in.nama : "" }}
+							{{ trx.gate_in ? trx.gate_in.nama : '' }}
 						</td>
 					</tr>
 					<tr>
 						<td class="border bg-blue-700 text-white px-4 py-1">Gate Keluar</td>
 						<td class="border bg-blue-100 px-4 py-1">
-							{{ trx.gate_out ? trx.gate_out.nama : "" }}
+							{{ trx.gate_out ? trx.gate_out.nama : '' }}
 						</td>
 					</tr>
 					<tr>
@@ -75,13 +75,13 @@
 					<tr v-if="user.role == 1">
 						<td class="border bg-blue-700 text-white px-4 py-1">Tarif</td>
 						<td class="border bg-blue-100 px-4 py-1">
-							Rp {{ trx.tarif | formatNumber }}
+							Rp {{ $decimal(trx.tarif) }}
 						</td>
 					</tr>
 					<tr v-if="user.role == 1">
 						<td class="border bg-blue-700 text-white px-4 py-1">Denda</td>
 						<td class="border bg-blue-100 px-4 py-1">
-							Rp {{ trx.denda | formatNumber }}
+							Rp {{ $decimal(trx.denda) }}
 						</td>
 					</tr>
 					<tr>
@@ -104,11 +104,11 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 export default {
-	props: ["trx", "show"],
+	props: ['trx', 'show'],
 	computed: {
-		...mapState(["user"]),
+		...mapState(['user']),
 	},
-};
+}
 </script>

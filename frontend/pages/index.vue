@@ -216,12 +216,9 @@
 </template>
 
 <script>
-import moment from 'moment'
 import { mapState } from 'vuex'
-import FormBukaManual from '../components/FormBukaManual'
 
 export default {
-	components: { FormBukaManual },
 	computed: {
 		totalBayar() {
 			return Number(this.formModel.tarif) + Number(this.formModel.denda)
@@ -231,8 +228,8 @@ export default {
 				return '00:00:00'
 			}
 
-			let time_in = moment(this.formModel.time_in)
-			let time_out = moment(this.formModel.time_out)
+			let time_in = this.$moment(this.formModel.time_in)
+			let time_out = this.$moment(this.formModel.time_out)
 			let day = time_out.diff(time_in, 'days')
 			let hour = time_out.diff(time_in, 'hours')
 			let minute = time_out.diff(time_in, 'minutes')
@@ -258,9 +255,7 @@ export default {
 	},
 	methods: {
 		toSubmit() {
-			this.runningText(
-				`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
-			)
+			this.runningText(`${this.duration}|Rp${this.$decimal(this.totalBayar)}`)
 			document.getElementById('submit-btn').focus()
 		},
 
@@ -275,9 +270,7 @@ export default {
 				document.getElementById('submit-btn').focus()
 			}
 
-			this.runningText(
-				`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
-			)
+			this.runningText(`${this.duration}|Rp${this.$decimal(this.totalBayar)}`)
 		},
 
 		nextBtn() {
@@ -339,10 +332,10 @@ export default {
 				this.formModel.denda = 0
 			}
 
-			var timeIn = moment(this.formModel.time_in)
+			var timeIn = this.$moment(this.formModel.time_in)
 			var timeOut = this.formModel.time_out
-				? moment(this.formModel.time_out)
-				: moment()
+				? this.$moment(this.formModel.time_out)
+				: this.$moment()
 			var durasiMenit = timeOut.diff(timeIn, 'minutes')
 
 			var tarifMenitPertama = tarif.tarif_menit_pertama
@@ -351,9 +344,7 @@ export default {
 			if (durasiMenit <= tarif.menit_pertama) {
 				this.formModel.tarif = tarifMenitPertama
 				document.getElementById('submit-btn').focus()
-				this.runningText(
-					`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
-				)
+				this.runningText(`${this.duration}|Rp${this.$decimal(this.totalBayar)}`)
 				return
 			}
 
@@ -368,8 +359,8 @@ export default {
 			}
 
 			if (tarif.mode_menginap == 1) {
-				var hariIn = moment(timeIn.format('YYYY-MM-DD'))
-				var hariOut = moment(timeOut.format('YYYY-MM-DD'))
+				var hariIn = this.$moment(timeIn.format('YYYY-MM-DD'))
+				var hariOut = this.$moment(timeOut.format('YYYY-MM-DD'))
 				var hariParkir = 0
 
 				if (durasiMenit >= 60) {
@@ -410,13 +401,13 @@ export default {
 				if (tarif.mode_menginap == 1) {
 					if (hariParkir > 1) {
 						var menitHariPertama =
-							moment(timeIn.format('YYYY-MM-DD') + ' 24:00:00').diff(
+							this.$moment(timeIn.format('YYYY-MM-DD') + ' 24:00:00').diff(
 								timeIn,
 								'minutes'
 							) - tarif.menit_pertama
 
 						var menitHariTerakhir = timeOut.diff(
-							moment(timeOut.format('YYYY-MM-DD') + ' 00:00:00'),
+							this.$moment(timeOut.format('YYYY-MM-DD') + ' 00:00:00'),
 							'minutes'
 						)
 
@@ -465,9 +456,7 @@ export default {
 				document.getElementById('submit-btn').focus()
 			}
 
-			this.runningText(
-				`${this.duration}|Rp${this.formatNumber(this.totalBayar)}`
-			)
+			this.runningText(`${this.duration}|Rp${this.$decimal(this.totalBayar)}`)
 		},
 
 		cekPlatNomor() {
@@ -491,10 +480,10 @@ export default {
 		cekTiket() {
 			if (this.formModel.nomor_barcode.length < 5) return
 
-			let now = moment().format('YYYY-MM-DD HH:mm:ss')
+			let now = this.$moment().format('YYYY-MM-DD HH:mm:ss')
 
 			if (this.formModel.nomor_barcode.toLowerCase() == 'xxxxx') {
-				this.formModel.time_in = moment().format('YYYY-MM-DD')
+				this.formModel.time_in = this.$moment().format('YYYY-MM-DD')
 				this.formModel.time_out = now
 				document.getElementById('jenis-kendaraan').focus()
 				return
@@ -713,22 +702,6 @@ export default {
 				})
 		},
 
-		formatNumber(v) {
-			try {
-				v += ''
-				var x = v.split('.')
-				var x1 = x[0]
-				var x2 = x.length > 1 ? '.' + x[1] : ''
-				var rgx = /(\d+)(\d{3})/
-				while (rgx.test(x1)) {
-					x1 = x1.replace(rgx, '$1' + ',' + '$2')
-				}
-				return x1 + x2
-			} catch (error) {
-				return 0
-			}
-		},
-
 		openGate(gate_out_id) {
 			const pos = this.posList.find((p) => p.id == this.formModel.pos_id)
 			const gate = this.gateOutList.find((g) => g.id == gate_out_id)
@@ -863,7 +836,7 @@ export default {
 
 			let payload = {
 				pos_id: this.formModel.pos_id,
-				date: moment().format('YYYY-MM-DD'),
+				date: this.$moment().format('YYYY-MM-DD'),
 			}
 
 			axios

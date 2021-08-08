@@ -5,7 +5,7 @@
 			class="text-right"
 			@submit.native.prevent="
 				() => {
-					return;
+					return
 				}
 			"
 		>
@@ -16,9 +16,9 @@
 					icon="el-icon-plus"
 					@click="
 						() => {
-							formModel = {};
-							formErrors = {};
-							showForm = true;
+							formModel = {}
+							formErrors = {}
+							showForm = true
 						}
 					"
 					>TRANSAKSI MANUAL</el-button
@@ -56,8 +56,8 @@
 					:clearable="true"
 					@change="
 						(v) => {
-							keyword = v;
-							requestData();
+							keyword = v
+							requestData()
 						}
 					"
 				>
@@ -70,16 +70,16 @@
 			stripe
 			@row-dblclick="
 				(row, column, event) => {
-					trx = row;
-					showTrxDetail = true;
+					trx = row
+					showTrxDetail = true
 				}
 			"
 			@filter-change="
 				(f) => {
-					let c = Object.keys(f)[0];
-					filters[c] = Object.values(f[c]);
-					page = 1;
-					requestData();
+					let c = Object.keys(f)[0]
+					filters[c] = Object.values(f[c])
+					page = 1
+					requestData()
 				}
 			"
 			:default-sort="{ prop: sort, order: order }"
@@ -95,22 +95,27 @@
 				min-width="100px"
 			></el-table-column>
 
-      <el-table-column
-        label="Shift"
-        prop="shift.nama"
-        column-key="shift_id"
-        min-width="80px"
-        :filters="shiftList.map(s => { return { value: s.id, text: s.nama } })">
-      </el-table-column>
+			<el-table-column
+				label="Shift"
+				prop="shift.nama"
+				column-key="shift_id"
+				min-width="80px"
+				:filters="
+					shiftList.map((s) => {
+						return { value: s.id, text: s.nama }
+					})
+				"
+			>
+			</el-table-column>
 
-      <el-table-column
+			<el-table-column
 				prop="jenis_kendaraan"
 				label="Jenis Kendaraan"
 				sortable="custom"
 				show-overflow-tooltip
 				:filters="
 					jenisKendaraanList.map((v) => {
-						return { value: v.nama, text: v.nama };
+						return { value: v.nama, text: v.nama }
 					})
 				"
 				column-key="jenis_kendaraan"
@@ -139,7 +144,7 @@
 				min-width="100px"
 			></el-table-column>
 
-      <el-table-column
+			<el-table-column
 				prop="gate_in.nama"
 				label="Gate Masuk"
 				show-overflow-tooltip
@@ -147,7 +152,7 @@
 				column-key="gate_in_id"
 				:filters="
 					gateInList.map((g) => {
-						return { value: g.id, text: g.nama };
+						return { value: g.id, text: g.nama }
 					})
 				"
 			>
@@ -161,7 +166,7 @@
 				column-key="gate_out_id"
 				:filters="
 					gateOutList.map((g) => {
-						return { value: g.id, text: g.nama };
+						return { value: g.id, text: g.nama }
 					})
 				"
 			>
@@ -177,7 +182,7 @@
 				min-width="100px"
 			>
 				<template slot-scope="scope">
-					Rp. {{ scope.row.tarif | formatNumber }}
+					Rp. {{ $decimal(scope.row.tarif) }}
 				</template>
 			</el-table-column>
 
@@ -197,7 +202,7 @@
 				min-width="120px"
 			>
 				<template slot-scope="scope">
-					Rp. {{ scope.row.denda | formatNumber }}
+					Rp. {{ $decimal(scope.row.denda) }}
 				</template>
 			</el-table-column>
 
@@ -250,7 +255,7 @@
 				min-width="100px"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.edit ? "YA" : "TIDAK" }}
+					{{ scope.row.edit ? 'YA' : 'TIDAK' }}
 				</template>
 			</el-table-column>
 
@@ -268,7 +273,7 @@
 				min-width="120px"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.manual ? "YA" : "TIDAK" }}
+					{{ scope.row.manual ? 'YA' : 'TIDAK' }}
 				</template>
 			</el-table-column>
 
@@ -291,9 +296,9 @@
 						type="text"
 						@click="
 							() => {
-								page = 1;
-								keyword = '';
-								requestData();
+								page = 1
+								keyword = ''
+								requestData()
 							}
 						"
 						icon="el-icon-refresh"
@@ -310,8 +315,8 @@
 								icon="el-icon-zoom-in"
 								@click.native.prevent="
 									() => {
-										trx = scope.row;
-										showTrxDetail = true;
+										trx = scope.row
+										showTrxDetail = true
 									}
 								"
 								>Lihat Detail</el-dropdown-item
@@ -330,9 +335,9 @@
 								"
 								@click.native.prevent="
 									() => {
-										formModel = scope.row;
-										formErrors = {};
-										showForm = true;
+										formModel = scope.row
+										formErrors = {}
+										showForm = true
 									}
 								"
 							>
@@ -356,14 +361,14 @@
 			background
 			@current-change="
 				(p) => {
-					page = p;
-					requestData();
+					page = p
+					requestData()
 				}
 			"
 			@size-change="
 				(s) => {
-					pageSize = s;
-					requestData();
+					pageSize = s
+					requestData()
 				}
 			"
 			layout="prev, pager, next, sizes, total"
@@ -391,94 +396,94 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
-import DetailTransaksi from "../components/DetailTransaksi";
-import FormTransaksiManual from "../components/FormTransaksiManual";
+import { mapState } from 'vuex'
+import DetailTransaksi from '../components/DetailTransaksi'
+import FormTransaksiManual from '../components/FormTransaksiManual'
 
 export default {
 	components: { DetailTransaksi, FormTransaksiManual },
 	computed: {
 		...mapState([
-      "jenisKendaraanList",
-      "gateInList",
-      "gateOutList",
-      "user",
-      "shiftList"
-    ]),
+			'jenisKendaraanList',
+			'gateInList',
+			'gateOutList',
+			'user',
+			'shiftList',
+		]),
 	},
 	data() {
 		return {
-			keyword: "",
+			keyword: '',
 			page: 1,
 			pageSize: 10,
 			tableData: {},
-			sort: "updated_at",
-			order: "descending",
+			sort: 'updated_at',
+			order: 'descending',
 			loading: false,
 			trx: null,
 			showTrxDetail: false,
-			date: moment().format("YYYY-MM-DD"),
+			date: this.$moment().format('YYYY-MM-DD'),
 			dateRange: [
-				moment().format("YYYY-MM-DD 00:00:00"),
-				moment().format("YYYY-MM-DD HH:mm:ss"),
+				this.$moment().format('YYYY-MM-DD 00:00:00'),
+				this.$moment().format('YYYY-MM-DD HH:mm:ss'),
 			],
 			formModel: {},
 			formErrors: {},
 			showForm: false,
 			filters: {},
-		};
+		}
 	},
 	methods: {
 		sortChange(c) {
 			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop;
-				this.order = c.order;
-				this.requestData();
+				this.sort = c.prop
+				this.order = c.order
+				this.requestData()
 			}
 		},
 		setSudahKeluar(id) {
-			this.$confirm("Anda yakin?", "Confirm", { type: "warning" })
+			this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' })
 				.then(() => {
 					axios
-						.put("parkingTransaction/setSudahKeluar/" + id)
+						.put('parkingTransaction/setSudahKeluar/' + id)
 						.then((r) => {
 							this.$message({
 								message: r.data.message,
-								type: "success",
-							});
-							this.requestData();
+								type: 'success',
+							})
+							this.requestData()
 						})
 						.catch((e) => {
 							this.$message({
 								message: r.response.data.message,
-								type: "error",
-							});
-						});
+								type: 'error',
+							})
+						})
 				})
-				.catch(() => console.log(e));
+				.catch(() => console.log(e))
 		},
 		setSudahKeluarSemua() {
-			this.$confirm("Anda yakin?", "Confirm", { type: "warning" })
+			this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' })
 				.then(() => {
 					axios
-						.put("parkingTransaction/setSudahKeluarSemua", {
+						.put('parkingTransaction/setSudahKeluarSemua', {
 							dateRange: this.dateRange,
 						})
 						.then((r) => {
 							this.$message({
 								message: r.data.message,
-								type: "success",
-							});
-							this.requestData();
+								type: 'success',
+							})
+							this.requestData()
 						})
 						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
-							});
-						});
+								type: 'error',
+							})
+						})
 				})
-				.catch(() => console.log(e));
+				.catch(() => console.log(e))
 		},
 		printTicket(id) {
 			axios
@@ -486,15 +491,15 @@ export default {
 				.then((r) => {
 					this.$message({
 						message: r.data.message,
-						type: "success",
-					});
+						type: 'success',
+					})
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
-				});
+						type: 'error',
+					})
+				})
 		},
 		requestData() {
 			let params = {
@@ -504,35 +509,35 @@ export default {
 				sort: this.sort,
 				order: this.order,
 				dateRange: this.dateRange,
-			};
+			}
 
-			this.loading = true;
+			this.loading = true
 			axios
-				.get("/parkingTransaction", {
+				.get('/parkingTransaction', {
 					params: Object.assign(params, this.filters),
 				})
 				.then((r) => {
-					this.tableData = r.data;
+					this.tableData = r.data
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
+						type: 'error',
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-				});
+					this.loading = false
+				})
 		},
 	},
 	mounted() {
-		this.requestData();
-		this.$store.commit("getGateInList");
-		this.$store.commit("getGateOutList");
-		this.$store.commit("getJenisKendaraanList");
-		this.$store.commit("getShiftList");
+		this.requestData()
+		this.$store.commit('getGateInList')
+		this.$store.commit('getGateOutList')
+		this.$store.commit('getJenisKendaraanList')
+		this.$store.commit('getShiftList')
 	},
-};
+}
 </script>
 
 <style scoped>

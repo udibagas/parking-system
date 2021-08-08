@@ -36,7 +36,7 @@
 				min-width="120px"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.mode_tarif ? "PROGRESIF" : "FLAT" }}
+					{{ scope.row.mode_tarif ? 'PROGRESIF' : 'FLAT' }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -48,8 +48,8 @@
 				<template slot-scope="scope">
 					{{
 						scope.row.mode_menginap
-							? "LEWAT TENGAH MALAM"
-							: "24 JAM DARI CHECK IN"
+							? 'LEWAT TENGAH MALAM'
+							: '24 JAM DARI CHECK IN'
 					}}
 				</template>
 			</el-table-column>
@@ -61,19 +61,19 @@
 				min-width="120px"
 			>
 				<template slot-scope="scope">
-					Rp {{ scope.row.tarif_flat | formatNumber }}
+					Rp {{ $decimal(scope.row.tarif_flat) }}
 				</template>
 			</el-table-column>
 			<el-table-column label="Tarif Non Flat" min-width="250px">
 				<template slot-scope="scope">
 					Tarif {{ scope.row.menit_pertama }} menit pertama = Rp
-					{{ scope.row.tarif_menit_pertama | formatNumber }} <br />
+					{{ $decimal(scope.row.tarif_menit_pertama) }} <br />
 					Tarif {{ scope.row.menit_selanjutnya }} menit selanjutnya = Rp
-					{{ scope.row.tarif_menit_selanjutnya | formatNumber }} <br />
+					{{ $decimal(scope.row.tarif_menit_selanjutnya) }} <br />
 					Tarif maksimal per hari = Rp
-					{{ scope.row.tarif_maksimum | formatNumber }} <br />
+					{{ $decimal(scope.row.tarif_maksimum) }} <br />
 					Tarif menginap per hari = Rp
-					{{ scope.row.tarif_menginap | formatNumber }} <br />
+					{{ $decimal(scope.row.tarif_menginap) }} <br />
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -84,7 +84,7 @@
 				min-width="150px"
 			>
 				<template slot-scope="scope">
-					Rp {{ scope.row.denda_tiket_hilang | formatNumber }}
+					Rp {{ $decimal(scope.row.denda_tiket_hilang) }}
 				</template>
 			</el-table-column>
 			<el-table-column width="40px" align="center" header-align="center">
@@ -120,7 +120,7 @@
 </template>
 
 <script>
-import FormJenisKendaraan from "../setting/form/FormJenisKendaraan";
+import FormJenisKendaraan from '../setting/form/FormJenisKendaraan'
 export default {
 	components: { FormJenisKendaraan },
 	data() {
@@ -129,57 +129,57 @@ export default {
 			tableData: [],
 			loading: false,
 			selectedData: {},
-		};
+		}
 	},
 	methods: {
 		openForm(data = null) {
-			this.selectedData = data ? JSON.parse(JSON.stringify(data)) : {};
-			this.showForm = true;
+			this.selectedData = data ? JSON.parse(JSON.stringify(data)) : {}
+			this.showForm = true
 		},
 		deleteData(id) {
-			this.$confirm("Anda yakin?", "Konfirmasi", {
-				type: "warning",
+			this.$confirm('Anda yakin?', 'Konfirmasi', {
+				type: 'warning',
 			})
 				.then(() => {
 					axios
-						.delete("/jenisKendaraan/" + id)
+						.delete('/jenisKendaraan/' + id)
 						.then((r) => {
-							this.requestData();
+							this.requestData()
 							this.$message({
 								message: r.data.message,
-								type: "success",
-							});
+								type: 'success',
+							})
 						})
 						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
-							});
-						});
+								type: 'error',
+							})
+						})
 				})
-				.catch(() => console.log(e));
+				.catch(() => console.log(e))
 		},
 		requestData() {
-			this.loading = true;
+			this.loading = true
 			axios
-				.get("/jenisKendaraan")
+				.get('/jenisKendaraan')
 				.then((r) => {
-					this.tableData = r.data;
+					this.tableData = r.data
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: 'error',
 						showClose: true,
-					});
+					})
 				})
-				.finally(() => (this.loading = false));
+				.finally(() => (this.loading = false))
 
-			this.$store.commit("getJenisKendaraanList");
+			this.$store.commit('getJenisKendaraanList')
 		},
 	},
 	mounted() {
-		this.requestData();
+		this.requestData()
 	},
-};
+}
 </script>
