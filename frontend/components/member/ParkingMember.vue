@@ -352,12 +352,9 @@
 
 <script>
 import exportFromJSON from 'export-from-json'
-import ParkingMemberDetail from '../components/ParkingMemberDetail'
 import { mapState } from 'vuex'
-import FormMember from '../components/FormMember'
 
 export default {
-	components: { ParkingMemberDetail, FormMember },
 	computed: {
 		...mapState(['user', 'groupMemberList', 'siklus']),
 	},

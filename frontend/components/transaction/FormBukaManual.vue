@@ -69,54 +69,59 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
+
 export default {
-	props: ["show"],
+	props: ['show'],
+
 	computed: {
-		...mapState(["gateOutList"]),
+		...mapState(['gateOutList']),
 	},
+
 	data() {
 		return {
 			formModel: {},
 			formErrors: {},
-		};
+		}
 	},
+
 	methods: {
 		closeForm() {
-			this.formModel = {};
-			this.formErrors = {};
-			this.$emit("close");
+			this.formModel = {}
+			this.formErrors = {}
+			this.$emit('close')
 		},
+
 		save() {
 			this.$confirm(
-				"Aksi ini akan dicatat oleh sistem. Anda yakin?",
-				"Peringatan",
-				{ type: "warning" }
+				'Aksi ini akan dicatat oleh sistem. Anda yakin?',
+				'Peringatan',
+				{ type: 'warning' }
 			)
 				.then(() => {
 					axios
-						.post("/manualOpenLog", this.formModel)
+						.post('/manualOpenLog', this.formModel)
 						.then((r) => {
 							this.$message({
 								message: r.data.message,
-								type: "success",
-							});
-							this.$emit("open-gate", this.formModel.gate_out_id);
-							this.closeForm();
+								type: 'success',
+							})
+							this.$emit('open-gate', this.formModel.gate_out_id)
+							this.closeForm()
 						})
 						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
-							});
+								type: 'error',
+							})
 
 							if (e.response.status == 422) {
-								this.formErrors = e.response.data.errors;
+								this.formErrors = e.response.data.errors
 							}
-						});
+						})
 				})
-				.catch((e) => console.log(e));
+				.catch((e) => console.log(e))
 		},
 	},
-};
+}
 </script>

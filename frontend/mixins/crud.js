@@ -43,7 +43,7 @@ export default {
     openForm(data) {
       this.error = {}
       this.formErrors = {}
-      this.formModel = Object.assign({}, data)
+      this.formModel = {...data}
       this.showForm = true
     },
 

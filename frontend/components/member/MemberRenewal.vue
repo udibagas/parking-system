@@ -166,13 +166,13 @@
 								>Print Slip</el-dropdown-item
 							>
 							<el-dropdown-item
-								v-if="user.role == 1"
+								v-if="$auth.user.role == 1"
 								icon="el-icon-edit-outline"
 								@click.native.prevent="openForm(scope.row)"
 								>Edit</el-dropdown-item
 							>
 							<el-dropdown-item
-								v-if="user.role == 1"
+								v-if="$auth.user.role == 1"
 								icon="el-icon-delete"
 								@click.native.prevent="deleteData(scope.row.id)"
 								>Hapus</el-dropdown-item
@@ -228,17 +228,14 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-import FormRenewal from '../components/FormRenewal'
-import PrintDialog from '../components/PrintDialog'
+import crud from '@/mixins/crud'
 
 export default {
-	components: { FormRenewal, PrintDialog },
-	computed: {
-		...mapState(['user']),
-	},
+	mixins: [crud],
+
 	data() {
 		return {
+			url: '/api/memberRenewal',
 			showForm: false,
 			formModel: {},
 			keyword: '',
@@ -253,71 +250,11 @@ export default {
 			selectedData: {},
 		}
 	},
-	methods: {
-		sortChange(c) {
-			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop
-				this.order = c.order
-				this.requestData()
-			}
-		},
-		openForm(data) {
-			this.formModel = JSON.parse(JSON.stringify(data))
-			this.showForm = true
-		},
-		deleteData(id) {
-			this.$confirm('Anda yakin akan menghapus data ini?', 'Warning', {
-				type: 'warning',
-			})
-				.then(() => {
-					axios
-						.delete('/memberRenewal/' + id)
-						.then((r) => {
-							this.requestData()
-							this.$message({
-								message: r.data.message,
-								type: 'success',
-							})
-						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-							})
-						})
-				})
-				.catch(() => console.log(e))
-		},
-		requestData() {
-			let params = {
-				page: this.page,
-				keyword: this.keyword,
-				pageSize: this.pageSize,
-				sort: this.sort,
-				order: this.order,
-				dateRange: this.dateRange,
-			}
 
-			this.loading = true
-			axios
-				.get('/memberRenewal', { params: params })
-				.then((r) => {
-					this.tableData = r.data
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
+	methods: {
 		printSlip(printer_id) {
 			axios
-				.post(`/memberRenewal/printSlip/${this.selectedData.id}`, {
+				.post(`${this.url}/printSlip/${this.selectedData.id}`, {
 					printer_id,
 				})
 				.then((r) => {
@@ -337,6 +274,7 @@ export default {
 				})
 		},
 	},
+
 	mounted() {
 		this.requestData()
 		this.$store.commit('getMemberList')

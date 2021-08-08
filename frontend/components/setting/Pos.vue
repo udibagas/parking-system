@@ -61,76 +61,81 @@
 				</template>
 			</el-table-column>
 		</el-table>
-		<FormPos
-			:model="selectedData"
-			:show="showForm"
-			@close="showForm = false"
-			@reload="requestData"
-		/>
+
+		<el-dialog
+			v-loading="loading"
+			title="POS"
+			:close-on-click-modal="false"
+			:visible.sync="show"
+			:before-close="
+				(done) => {
+					closeForm()
+					done()
+				}
+			"
+		>
+			<el-form label-position="left" label-width="150px">
+				<el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+					<el-input placeholder="Nama" v-model="formModel.nama"></el-input>
+					<div class="el-form-item__error" v-if="formErrors.nama">
+						{{ formErrors.nama[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Alamat IP"
+					:class="formErrors.ip_address ? 'is-error' : ''"
+				>
+					<el-input
+						placeholder="Alamat IP"
+						v-model="formModel.ip_address"
+					></el-input>
+					<div class="el-form-item__error" v-if="formErrors.ip_address">
+						{{ formErrors.ip_address[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Printer"
+					:class="formErrors.printer_id ? 'is-error' : ''"
+				>
+					<el-select
+						v-model="formModel.printer_id"
+						placeholder="Printer"
+						style="width: 100%"
+					>
+						<el-option
+							v-for="printer in printerList"
+							:value="printer.id"
+							:label="printer.nama"
+							:key="printer.id"
+						></el-option>
+					</el-select>
+					<div class="el-form-item__error" v-if="formErrors.printer_id">
+						{{ formErrors.printer_id[0] }}
+					</div>
+				</el-form-item>
+			</el-form>
+
+			<div slot="footer">
+				<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
+				<el-button type="primary" icon="el-icon-success" @click="save">
+					SIMPAN
+				</el-button>
+			</div>
+		</el-dialog>
 	</div>
 </template>
 
 <script>
-import FormPos from "./form/FormPos";
+import crud from '@/mixins/crud'
 
 export default {
-	components: { FormPos },
-	mounted() {
-		this.requestData();
-	},
+	mixins: [crud],
 	data() {
 		return {
-			tableData: [],
-			selectedData: {},
-			showForm: false,
-			loading: false
-		};
-	},
-	methods: {
-		requestData() {
-			this.loading = true;
-			axios
-				.get("/pos")
-				.then(r => {
-					this.tableData = r.data;
-				})
-				.catch(e => {
-					this.$message({
-						message: e.response.data.message,
-						type: "error"
-					});
-				})
-				.finally(() => (this.loading = false));
-
-			this.$store.commit("getPosList");
-		},
-		openForm(data = null) {
-			this.selectedData = data ? JSON.parse(JSON.stringify(data)) : {};
-			this.showForm = true;
-		},
-		deleteData(id) {
-			this.$confirm("Anda yakin?", "Konfirmasi", { type: "warning" })
-				.then(() => {
-					this.loading = true;
-					axios
-						.delete(`/pos/${id}`)
-						.then(r => {
-							this.$message({
-								message: r.data.message,
-								type: "success"
-							});
-							this.requestData();
-						})
-						.catch(e => {
-							this.$message({
-								message: e.response.data.message,
-								type: "error"
-							});
-						})
-						.finally(() => (this.loading = false));
-				})
-				.catch(e => console.log(e));
+			url: '/api/pos',
 		}
-	}
-};
+	},
+}
 </script>

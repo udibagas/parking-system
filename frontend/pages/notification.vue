@@ -139,12 +139,7 @@
 </template>
 
 <script>
-import ControllerLog from './ControllerLog'
-import UserLog from './UserLog'
-import Snapshot from './Snapshot'
-
 export default {
-	components: { ControllerLog, UserLog, Snapshot },
 	data() {
 		return {
 			keyword: '',

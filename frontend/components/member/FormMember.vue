@@ -325,13 +325,7 @@ export default {
 				return ''
 			}
 		},
-		...mapState([
-			'user',
-			'groupMemberList',
-			'setting',
-			'siklus',
-			'jenisKendaraanList',
-		]),
+		...mapState(['groupMemberList', 'setting', 'siklus', 'jenisKendaraanList']),
 	},
 	data() {
 		return {
@@ -339,6 +333,7 @@ export default {
 			loading: false,
 		}
 	},
+
 	methods: {
 		closeForm() {
 			this.formErrors = {}

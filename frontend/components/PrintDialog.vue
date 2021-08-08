@@ -6,7 +6,7 @@
 		width="500px"
 		:before-close="
 			(done) => {
-				$emit('close');
+				$emit('close')
 			}
 		"
 	>
@@ -44,19 +44,19 @@
 </template>
 
 <script>
-import { mapState } from "vuex";
+import { mapState } from 'vuex'
 export default {
-	props: ["show"],
+	props: ['show'],
 	computed: {
-		...mapState(["printerList"]),
+		...mapState(['printerList']),
 	},
 	data() {
 		return {
 			printer_id: null,
-		};
+		}
 	},
 	mounted() {
-		this.$store.commit("getPrinterList");
+		this.$store.commit('getPrinterList')
 	},
-};
+}
 </script>

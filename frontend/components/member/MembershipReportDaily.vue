@@ -57,10 +57,7 @@
 </template>
 
 <script>
-import PrintDialog from '../components/PrintDialog'
-
 export default {
-	components: { PrintDialog },
 	data() {
 		return {
 			date: this.$moment().format('YYYY-MM-DD'),

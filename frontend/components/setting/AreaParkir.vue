@@ -157,10 +157,12 @@
 				</el-form-item>
 			</el-form>
 			<span slot="footer">
-				<el-button icon="el-icon-error" @click="closeForm">BATAL</el-button>
-				<el-button type="primary" icon="el-icon-success" @click="save"
-					>SIMPAN</el-button
-				>
+				<el-button icon="el-icon-error" type="plain" @click="closeForm">
+					BATAL
+				</el-button>
+				<el-button type="primary" icon="el-icon-success" @click="save">
+					SIMPAN
+				</el-button>
 			</span>
 		</el-dialog>
 	</div>
@@ -173,7 +175,7 @@ import crud from '@/mixins/crud'
 export default {
 	mixins: [crud],
 	data() {
-		return { url: '/areaParkir' }
+		return { url: '/api/areaParkir' }
 	},
 	computed: {
 		...mapState(['jenisKendaraanList']),

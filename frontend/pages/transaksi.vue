@@ -10,10 +10,5 @@
 </template>
 
 <script>
-import ParkingTransaction from "./ParkingTransaction";
-import ManualOpenLog from "./ManualOpenLog";
-
-export default {
-	components: { ParkingTransaction, ManualOpenLog },
-};
+export default {}
 </script>

@@ -72,13 +72,13 @@
 						<td class="border bg-blue-700 text-white px-4 py-1">Durasi</td>
 						<td class="border bg-blue-100 px-4 py-1">{{ trx.durasi }}</td>
 					</tr>
-					<tr v-if="user.role == 1">
+					<tr v-if="$auth.user.role == 1">
 						<td class="border bg-blue-700 text-white px-4 py-1">Tarif</td>
 						<td class="border bg-blue-100 px-4 py-1">
 							Rp {{ $decimal(trx.tarif) }}
 						</td>
 					</tr>
-					<tr v-if="user.role == 1">
+					<tr v-if="$auth.user.role == 1">
 						<td class="border bg-blue-700 text-white px-4 py-1">Denda</td>
 						<td class="border bg-blue-100 px-4 py-1">
 							Rp {{ $decimal(trx.denda) }}
@@ -104,11 +104,7 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
 export default {
 	props: ['trx', 'show'],
-	computed: {
-		...mapState(['user']),
-	},
 }
 </script>

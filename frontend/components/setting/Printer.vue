@@ -18,7 +18,7 @@
 						effect="dark"
 						:type="scope.row.status ? 'success' : 'info'"
 						size="mini"
-						>{{ scope.row.status ? "Aktif" : "Tidak Aktif" }}</el-tag
+						>{{ scope.row.status ? 'Aktif' : 'Tidak Aktif' }}</el-tag
 					>
 				</template>
 			</el-table-column>
@@ -73,92 +73,102 @@
 				</template>
 			</el-table-column>
 		</el-table>
-		<FormPrinter
-			:model="selectedData"
-			:show="showForm"
-			@close="showForm = false"
-			@reload="requestData"
-		/>
+
+		<el-dialog
+			v-loading="loading"
+			title="PRINTER"
+			:close-on-click-modal="false"
+			:visible.sync="showForm"
+		>
+			<el-form label-position="left" label-width="150px">
+				<el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+					<el-input placeholder="Nama" v-model="formModel.nama"></el-input>
+					<div class="el-form-item__error" v-if="formErrors.nama">
+						{{ formErrors.nama[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Alamat IP"
+					:class="formErrors.ip_address ? 'is-error' : ''"
+				>
+					<el-input
+						placeholder="Alamat IP"
+						v-model="formModel.ip_address"
+					></el-input>
+					<div class="el-form-item__error" v-if="formErrors.ip_address">
+						{{ formErrors.ip_address[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item label="Port" :class="formErrors.port ? 'is-error' : ''">
+					<el-input placeholder="Port" v-model="formModel.port"></el-input>
+
+					<div class="el-form-item__error" v-if="formErrors.port">
+						{{ formErrors.port[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Status"
+					:class="formErrors.status ? 'is-error' : ''"
+				>
+					<el-select
+						v-model="formModel.status"
+						placeholder="Status"
+						style="width: 100%"
+					>
+						<el-option
+							v-for="(t, i) in ['Tidak Aktif', 'Aktif']"
+							:value="i"
+							:label="t"
+							:key="i"
+						></el-option>
+					</el-select>
+					<div class="el-form-item__error" v-if="formErrors.status">
+						{{ formErrors.status[0] }}
+					</div>
+				</el-form-item>
+			</el-form>
+
+			<div slot="footer">
+				<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
+				<el-button type="primary" icon="el-icon-success" @click="save">
+					SIMPAN
+				</el-button>
+			</div>
+		</el-dialog>
 	</div>
 </template>
 
 <script>
-import FormPrinter from "./form/FormPrinter";
+import crud from '@/mixins/crud'
 
 export default {
-	components: { FormPrinter },
-	mounted() {
-		this.requestData();
-	},
+	mixins: [crud],
 	data() {
 		return {
-			tableData: [],
-			selectedData: {},
-			showForm: false,
-			loading: false,
-		};
+			url: '/api/printer',
+		}
 	},
-	methods: {
-		requestData() {
-			this.loading = true;
-			axios
-				.get("/printer")
-				.then((r) => {
-					this.tableData = r.data;
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: "error",
-					});
-				})
-				.finally(() => (this.loading = false));
 
-			this.$store.commit("getPrinterList");
-		},
-		openForm(data = null) {
-			this.selectedData = data ? JSON.parse(JSON.stringify(data)) : {};
-			this.showForm = true;
-		},
-		deleteData(id) {
-			this.$confirm("Anda yakin?", "Konfirmasi", { type: "warning" })
-				.then(() => {
-					this.loading = true;
-					axios
-						.delete(`/printer/${id}`)
-						.then((r) => {
-							this.$message({
-								message: r.data.message,
-								type: "success",
-							});
-							this.requestData();
-						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: "error",
-							});
-						})
-						.finally(() => (this.loading = false));
-				})
-				.catch((e) => console.log(e));
-		},
+	methods: {
 		testPrinter(id) {
 			axios
 				.get(`/printer/test/${id}`)
 				.then((r) => {
 					this.$message({
 						message: r.data.message,
-						type: "success",
-					});
+						type: 'success',
+					})
 				})
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-					});
-				});
+						type: 'error',
+					})
+				})
 		},
 	},
-};
+}
 </script>

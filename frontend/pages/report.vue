@@ -233,20 +233,14 @@ export default {
 	methods: {
 		printReport() {
 			window.open(
-				BASE_URL +
-					'/report?action=print&dateRange[]=' +
-					this.dateRange[0] +
-					'&dateRange[1]=' +
-					this.dateRange[1] +
-					'&token=' +
-					this.$store.state.token,
+				`/api/report?action=print&dateRange[]=${this.dateRange[0]}&${dateRange[1]}=${this.dateRange[1]}`,
 				'_blank'
 			)
 		},
 
 		getTransaction() {
 			axios
-				.get('getTransaction', { params: { dateRange: this.dateRange } })
+				.get('/api/getTransaction', { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.transaction = r.data
 					let total = r.data
@@ -258,7 +252,7 @@ export default {
 
 		getIncome() {
 			axios
-				.get('getIncome', { params: { dateRange: this.dateRange } })
+				.get('/api/getIncome', { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.income = r.data
 
@@ -276,7 +270,7 @@ export default {
 
 		getParkedVehicle() {
 			axios
-				.get('getParkedVehicle', { params: { dateRange: this.dateRange } })
+				.get('/api/getParkedVehicle', { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.parkedVehicle = r.data
 				})
@@ -284,7 +278,7 @@ export default {
 
 		getVehicleIn() {
 			axios
-				.get('getVehicleIn', { params: { dateRange: this.dateRange } })
+				.get('/api/getVehicleIn', { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.vehicleIn = r.data
 					let total = r.data
@@ -296,20 +290,20 @@ export default {
 
 		getReport() {
 			axios
-				.get('report', { params: { dateRange: this.dateRange } })
+				.get('/api/report', { params: { dateRange: this.dateRange } })
 				.then((r) => {
 					this.report = r.data
 				})
 		},
 
 		getAreaParkir() {
-			axios.get('areaParkir').then((r) => {
+			axios.get('/api/areaParkir').then((r) => {
 				this.areaParkir = r.data
 			})
 		},
 
 		getSummary() {
-			axios.get('summary').then((r) => {
+			axios.get('/api/summary').then((r) => {
 				this.summary = r.data
 			})
 		},

@@ -397,11 +397,10 @@
 
 <script>
 import { mapState } from 'vuex'
-import DetailTransaksi from '../components/DetailTransaksi'
-import FormTransaksiManual from '../components/FormTransaksiManual'
+import crud from '@/mixins/crud'
 
 export default {
-	components: { DetailTransaksi, FormTransaksiManual },
+	mixins: [crud],
 	computed: {
 		...mapState([
 			'jenisKendaraanList',
@@ -411,15 +410,12 @@ export default {
 			'shiftList',
 		]),
 	},
+
 	data() {
 		return {
-			keyword: '',
-			page: 1,
-			pageSize: 10,
-			tableData: {},
+			url: '/api/parkingTransaction',
 			sort: 'updated_at',
 			order: 'descending',
-			loading: false,
 			trx: null,
 			showTrxDetail: false,
 			date: this.$moment().format('YYYY-MM-DD'),
@@ -430,17 +426,10 @@ export default {
 			formModel: {},
 			formErrors: {},
 			showForm: false,
-			filters: {},
 		}
 	},
+
 	methods: {
-		sortChange(c) {
-			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop
-				this.order = c.order
-				this.requestData()
-			}
-		},
 		setSudahKeluar(id) {
 			this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' })
 				.then(() => {
@@ -462,6 +451,7 @@ export default {
 				})
 				.catch(() => console.log(e))
 		},
+
 		setSudahKeluarSemua() {
 			this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' })
 				.then(() => {
@@ -485,6 +475,7 @@ export default {
 				})
 				.catch(() => console.log(e))
 		},
+
 		printTicket(id) {
 			axios
 				.post(`/parkingTransaction/printTicketOut/${id}`)
@@ -501,35 +492,8 @@ export default {
 					})
 				})
 		},
-		requestData() {
-			let params = {
-				page: this.page,
-				keyword: this.keyword,
-				pageSize: this.pageSize,
-				sort: this.sort,
-				order: this.order,
-				dateRange: this.dateRange,
-			}
-
-			this.loading = true
-			axios
-				.get('/parkingTransaction', {
-					params: Object.assign(params, this.filters),
-				})
-				.then((r) => {
-					this.tableData = r.data
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-					})
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
 	},
+
 	mounted() {
 		this.requestData()
 		this.$store.commit('getGateInList')

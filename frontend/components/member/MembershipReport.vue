@@ -86,6 +86,7 @@ export default {
 					this.loading = false
 				})
 		},
+
 		printReport(printer_id) {
 			let params = { dateRange: this.dateRange, action: 'print', printer_id }
 			this.loading = true
@@ -111,6 +112,7 @@ export default {
 					this.showPrintDialog = false
 				})
 		},
+
 		getSummaries(param) {
 			const { columns, data } = param
 			const sums = []
