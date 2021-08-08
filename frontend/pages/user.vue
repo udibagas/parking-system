@@ -2,15 +2,7 @@
 	<div>
 		<div class="flex flex-row">
 			<div class="text-lg text-blue-700 flex-grow">KELOLA USER</div>
-			<el-form
-				inline
-				class="text-right"
-				@submit.native.prevent="
-					() => {
-						return
-					}
-				"
-			>
+			<el-form inline class="text-right" @submit.native.prevent>
 				<el-form-item>
 					<el-button
 						size="small"
@@ -27,12 +19,7 @@
 						placeholder="Cari"
 						prefix-icon="el-icon-search"
 						:clearable="true"
-						@change="
-							(v) => {
-								keyword = v
-								requestData()
-							}
-						"
+						@change="searchData"
 					>
 					</el-input>
 				</el-form-item>
@@ -40,10 +27,12 @@
 		</div>
 
 		<el-table
-			:data="tableData"
 			stripe
 			height="calc(100vh - 165px)"
 			v-loading="loading"
+			:data="tableData"
+			:default-sort="{ prop: sort, order: order }"
+			@sort-change="sortChange"
 		>
 			<el-table-column
 				prop="name"
@@ -105,6 +94,19 @@
 				</template>
 			</el-table-column>
 		</el-table>
+
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
 
 		<el-dialog
 			:visible.sync="showForm"
@@ -191,16 +193,14 @@
 					</div>
 				</el-form-item>
 			</el-form>
+
 			<span slot="footer" class="dialog-footer">
-				<el-button
-					type="primary"
-					icon="el-icon-success"
-					@click="() => (!!formModel.id ? update() : store())"
-					>SIMPAN</el-button
-				>
-				<el-button type="info" icon="el-icon-error" @click="showForm = false"
+				<el-button icon="el-icon-error" @click="showForm = false"
 					>BATAL</el-button
 				>
+				<el-button type="primary" icon="el-icon-success" @click="save">
+					SIMPAN
+				</el-button>
 			</span>
 		</el-dialog>
 	</div>

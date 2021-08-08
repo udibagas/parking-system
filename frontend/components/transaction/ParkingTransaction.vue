@@ -38,7 +38,7 @@
 				>
 				</el-date-picker>
 			</el-form-item>
-			<el-form-item v-if="user.role == 1">
+			<el-form-item v-if="$auth.user.role == 1">
 				<el-button
 					size="small"
 					type="primary"
@@ -173,7 +173,7 @@
 			</el-table-column>
 
 			<el-table-column
-				v-if="user.role == 1"
+				v-if="$auth.user.role == 1"
 				prop="tarif"
 				label="Tarif"
 				sortable="custom"
@@ -187,7 +187,7 @@
 			</el-table-column>
 
 			<el-table-column
-				v-if="user.role == 1"
+				v-if="$auth.user.role == 1"
 				prop="denda"
 				label="Denda"
 				sortable="custom"
@@ -323,7 +323,7 @@
 							>
 							<el-dropdown-item
 								icon="el-icon-check"
-								v-if="!scope.row.time_out && user.role == 1"
+								v-if="!scope.row.time_out && $auth.user.role == 1"
 								@click.native.prevent="setSudahKeluar(scope.row.id)"
 								>Set Sudah Keluar</el-dropdown-item
 							>
