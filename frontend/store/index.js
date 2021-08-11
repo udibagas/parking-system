@@ -43,7 +43,7 @@ export const mutations = {
 
 export const actions = {
   async getVehicleTypeList({ commit }) {
-    const data = await this.$axios.$get('/api/vehicleType')
+    const data = await this.$axios.$get('/api/jenisKendaraan')
     commit('setVehicleTypeList', data)
   },
 
@@ -53,7 +53,7 @@ export const actions = {
   },
 
   async getMemberList({ commit }) {
-    const data = await this.$axios.$get('/api/parkingMember')
+    const data = await this.$axios.$get('/api/member')
     commit('setMemberList', data)
   },
 
