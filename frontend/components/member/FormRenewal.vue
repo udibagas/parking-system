@@ -168,13 +168,13 @@ export default {
 		},
 		store() {
 			this.loading = true
-			axios
-				.post('/memberRenewal', this.formModel)
-				.then((r) => {
+			this.$axios
+				.$post('/api/memberRenewal', this.formModel)
+				.then((response) => {
 					this.closeForm()
 					this.$emit('reload')
 					this.$message({
-						message: r.data.message,
+						message: response.message,
 						type: 'success',
 					})
 				})
@@ -198,7 +198,7 @@ export default {
 		},
 		update() {
 			this.loading = true
-			axios
+			this.$axios
 				.put('/memberRenewal/' + this.formModel.id, this.formModel)
 				.then((r) => {
 					this.closeForm()

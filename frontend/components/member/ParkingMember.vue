@@ -644,11 +644,35 @@
 <script>
 import exportFromJSON from 'export-from-json'
 import { mapState } from 'vuex'
+import crud from '@/mixins/crud'
 
 export default {
+	mixins: [crud],
+
 	computed: {
-		...mapState(['user', 'groupMemberList', 'siklus']),
+		expiry_date() {
+			try {
+				return this.$moment(this.formModel.register_date, 'YYYY-MM-DD')
+					.add(
+						this.formModel.siklus_pembayaran,
+						this.formModel.siklus_pembayaran_unit
+					)
+					.format('YYYY-MM-DD')
+			} catch (error) {
+				return ''
+			}
+		},
+		...mapState(['groupMemberList', 'siklus']),
 	},
+
+	watch: {
+		'formModel.berbayar'(v) {
+			if (!v) {
+				this.formModel.tarif = 0
+			}
+		},
+	},
+
 	data() {
 		return {
 			sort: 'nama',
@@ -658,6 +682,7 @@ export default {
 			now: this.$moment().format('YYYY-MM-DD'),
 		}
 	},
+
 	methods: {
 		print() {
 			const params = Object.assign(
@@ -678,17 +703,17 @@ export default {
 		},
 
 		download() {
-      // TODO: harusnya pindah ke backend
+			// TODO: harusnya pindah ke backend
 			const params = {
 				pageSize: 1000000,
 				sort: this.sort,
 				order: this.order,
 			}
 
-			axios
-				.get('member', { params: Object.assign(params, this.filters) })
-				.then((r) => {
-					const data = r.data.data.map((d, i) => {
+			this.$axios
+				.$get('member', { params: Object.assign(params, this.filters) })
+				.then((response) => {
+					const data = response.data.map((d, i) => {
 						return {
 							No: i + 1,
 							Nama: d.nama,
@@ -760,11 +785,16 @@ export default {
 					})
 			}
 		},
+
+    afterSave() {
+      this.$store.dispatch('getMemberList')
+    },
 	},
+
 	mounted() {
 		this.requestData()
-		this.$store.commit('getGroupMemberList')
-		this.$store.commit('getSetting')
+		this.$store.dispatch('getGroupMemberList')
+		this.$store.dispatch('getSetting')
 	},
 }
 </script>

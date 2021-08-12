@@ -43,7 +43,13 @@
 			</div>
 
 			<div
-				class="p-3 flex-grow flex align-items-center justify-content-center flex-column"
+				class="
+					p-3
+					flex-grow flex
+					align-items-center
+					justify-content-center
+					flex-column
+				"
 			>
 				<img :src="url" alt="" style="max-width: 800px" />
 			</div>
@@ -53,45 +59,52 @@
 
 <script>
 export default {
-  data() {
-    return {
-      url: '',
-      show: true,
-      checkedNodes: [],
-      expandedNodes: [],
-      props: {
-        label: 'label',
-        isLeaf: 'isFile',
-      }
-    }
-  },
+	data() {
+		return {
+			url: '',
+			show: true,
+			checkedNodes: [],
+			expandedNodes: [],
+			props: {
+				label: 'label',
+				isLeaf: 'isFile',
+			},
+		}
+	},
 
-  methods: {
-    loadNode(node, resolve) {
-      const params = { directory: node.data === undefined ? 'snapshots' : node.data.path };
-      axios.get('snapshot', { params }).then(r => resolve(r.data));
-    },
+	methods: {
+		loadNode(node, resolve) {
+			const params = {
+				directory: node.data === undefined ? 'snapshots' : node.data.path,
+			}
+			axios.get('snapshot', { params }).then((r) => resolve(r.data))
+		},
 
-    deleteSnapshot() {
-      this.$confirm('Anda yakin?', 'Konfirmasi', { type: 'warning' }).then(() => {
-        axios.post('snapshot/delete', { checkedNodes: this.checkedNodes }).then(r => {
-          this.url = '';
-          this.$message({ message: r.data.message, type: 'success' });
-          this.checkedNodes.forEach(node => this.$refs.tree.remove(node));
-          this.checkedNodes = [];
-        }).catch(e => {
-          this.$message({
-            message: e.response.data.message,
-            type: 'error'
-          });
-        });
-      }).catch(e => console.log(e));
-    },
+		deleteSnapshot() {
+			this.$confirm('Anda yakin?', 'Konfirmasi', { type: 'warning' })
+				.then(() => {
+					axios
+						.post('snapshot/delete', { checkedNodes: this.checkedNodes })
+						.then((r) => {
+							this.url = ''
+							this.$message({ message: r.data.message, type: 'success' })
+							this.checkedNodes.forEach((node) => this.$refs.tree.remove(node))
+							this.checkedNodes = []
+						})
+						.catch((e) => {
+							this.$message({
+								message: e.response.data.message,
+								type: 'error',
+							})
+						})
+				})
+				.catch((e) => console.log(e))
+		},
 
-    refresh() {
-      this.show = false;
-      this.$nextTick(() => this.show = true);
-    }
-  }
+		refresh() {
+			this.show = false
+			this.$nextTick(() => (this.show = true))
+		},
+	},
 }
 </script>

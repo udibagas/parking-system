@@ -43,7 +43,7 @@ export default {
     openForm(data) {
       this.error = {}
       this.formErrors = {}
-      this.formModel = {...data}
+      this.formModel = { ...data }
       this.showForm = true
     },
 
@@ -129,7 +129,7 @@ export default {
         keyword: this.keyword,
         pageSize: this.pageSize,
         sort: this.sort,
-        order: this.order,
+        order: this.order == 'descending' ? 'desc' : 'asc',
         paginated: true,
         ...this.filters,
       }
@@ -137,9 +137,9 @@ export default {
       this.loading = true
       this.$axios
         .$get(this.url, { params })
-        .then((r) => {
+        .then((response) => {
           this.loading = false
-          this.tableData = r
+          this.tableData = response
         })
         .catch((e) => {
           this.$message({

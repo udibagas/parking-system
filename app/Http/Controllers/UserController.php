@@ -21,14 +21,16 @@ class UserController extends Controller
      */
     public function index(Request $request)
     {
-        return User::when($request->keyword, function ($q) use ($request) {
+        $data = User::when($request->keyword, function ($q) use ($request) {
             return $q->where('name', 'LIKE', '%' . $request->keyword . '%')
                 ->orWhere('email', 'LIKE', '%' . $request->keyword . '%');
         })->when($request->role, function ($q) use ($request) {
             return $q->whereIn('role', $request->role);
         })->when($request->status, function ($q) use ($request) {
             return $q->whereIn('status', $request->status);
-        })->orderBy('name', 'asc')->get();
+        })->orderBy($request->sort ?: 'name', $request->order ?: 'asc');
+
+        return $request->paginated ? $data->paginate($request->pageSize) : $data;
     }
 
     /**

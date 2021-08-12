@@ -187,37 +187,134 @@
 			<el-pagination
 				class="flex-grow"
 				background
-				@current-change="
-					(p) => {
-						page = p
-						requestData()
-					}
-				"
-				@size-change="
-					(s) => {
-						pageSize = s
-						requestData()
-					}
-				"
+				@current-change="currentChange"
+				@size-change="sizeChange"
 				layout="total, sizes, prev, pager, next"
 				:page-size="pageSize"
 				:page-sizes="[10, 25, 50, 100]"
-				:total="tableData.meta.total"
+				:total="tableData.total"
 			>
 			</el-pagination>
-
-			<div class="text-sm">
-				Menampilkan {{ tableData.meta.from }} - {{ tableData.meta.to }} dari
-				{{ tableData.meta.total }}
-			</div>
 		</div>
 
-		<FormRenewal
-			:model="formModel"
-			:show="showForm"
-			@close="showForm = false"
-			@reload="requestData"
-		/>
+		<el-dialog
+			:visible.sync="showForm"
+			:title="
+				!!formModel.id
+					? 'EDIT PEMBAYARAN KEANGGOTAAN'
+					: 'INPUT PEMBAYARAN KEANGGOTAAN'
+			"
+			width="500px"
+			v-loading="loading"
+			:close-on-click-modal="false"
+		>
+			<el-form label-width="180px" label-position="left">
+				<el-form-item
+					label="Member"
+					:class="formErrors.member_id ? 'is-error' : ''"
+				>
+					<el-select
+						filterable
+						default-first-option
+						clearable
+						v-model="formModel.member_id"
+						placeholder="Member"
+						style="width: 100%"
+					>
+						<el-option
+							v-for="(m, i) in memberList.filter((m) => m.berbayar)"
+							:value="m.id"
+							:label="m.nomor_kartu + ' - ' + m.nama"
+							:key="i"
+						></el-option>
+					</el-select>
+					<div class="el-form-item__error" v-if="formErrors.member_id">
+						{{ formErrors.member_id[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Siklus Pembayaran"
+					:class="formErrors.siklus_pembayaran ? 'is-error' : ''"
+				>
+					<el-input
+						type="number"
+						v-model="formModel.siklus_pembayaran"
+						style="width: 30%"
+					></el-input>
+					<el-select
+						placeholder="Pilih"
+						v-model="formModel.siklus_pembayaran_unit"
+						style="width: 66%; float: right; clear: right"
+					>
+						<el-option
+							v-for="(s, i) in $store.state.siklus"
+							:value="s.value"
+							:label="s.label"
+							:key="i"
+						></el-option>
+					</el-select>
+					<div class="el-form-item__error" v-if="formErrors.siklus_pembayaran">
+						{{ formErrors.siklus_pembayaran[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Dari Tanggal"
+					:class="formErrors.dari_tanggal ? 'is-error' : ''"
+				>
+					<el-date-picker
+						format="dd-MMM-yyyy"
+						value-format="yyyy-MM-dd"
+						placeholder="Dari Tanggal"
+						v-model="formModel.dari_tanggal"
+						style="width: 100%"
+					></el-date-picker>
+					<div class="el-form-item__error" v-if="formErrors.dari_tanggal">
+						{{ formErrors.dari_tanggal[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Sampai Tanggal"
+					:class="formErrors.sampai_tanggal ? 'is-error' : ''"
+				>
+					<el-date-picker
+						disabled
+						format="dd-MMM-yyyy"
+						value-format="yyyy-MM-dd"
+						placeholder="Sampai Tanggal"
+						v-model="sampai_tanggal"
+						style="width: 100%"
+					></el-date-picker>
+					<div class="el-form-item__error" v-if="formErrors.sampai_tanggal">
+						{{ formErrors.sampai_tanggal[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Jumlah"
+					:class="formErrors.jumlah ? 'is-error' : ''"
+				>
+					<el-input
+						type="number"
+						placeholder="Jumlah"
+						v-model="formModel.jumlah"
+					></el-input>
+					<div class="el-form-item__error" v-if="formErrors.jumlah">
+						{{ formErrors.jumlah[0] }}
+					</div>
+				</el-form-item>
+			</el-form>
+			<span slot="footer" class="dialog-footer">
+				<el-button icon="el-icon-success" type="primary" @click="save"
+					>SIMPAN</el-button
+				>
+				<el-button icon="el-icon-error" type="info" @click="closeForm"
+					>BATAL</el-button
+				>
+			</span>
+		</el-dialog>
 
 		<PrintDialog
 			:show="showPrintDialog"
@@ -236,15 +333,8 @@ export default {
 	data() {
 		return {
 			url: '/api/memberRenewal',
-			showForm: false,
-			formModel: {},
-			keyword: '',
-			page: 1,
-			pageSize: 10,
-			tableData: { meta: {} },
 			sort: 'created_at',
 			order: 'descending',
-			loading: false,
 			dateRange: '',
 			showPrintDialog: false,
 			selectedData: {},
@@ -277,7 +367,7 @@ export default {
 
 	mounted() {
 		this.requestData()
-		this.$store.commit('getMemberList')
+		this.$store.dispatch('getMemberList')
 	},
 }
 </script>

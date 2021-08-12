@@ -110,7 +110,7 @@ export default {
 
 	created() {
 		this.$store.dispatch('getNavigationList')
-		this.$store.dispatch('getVehicleTypeList')
+		this.$store.dispatch('getJenisKendaraanList')
 		this.$store.dispatch('getGroupMemberList')
 		this.$store.dispatch('getMemberList')
 	},

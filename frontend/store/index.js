@@ -1,10 +1,16 @@
 import { Message } from 'element-ui'
 
 export const state = () => ({
-  vehicleTypeList: [],
+  jenisKendaraanList: [],
   groupMemberList: [],
   memberList: [],
   navigationList: [],
+  gateInLIst: [],
+  gateOutList: [],
+  kameraList: [],
+  posList: [],
+  printerList: [],
+  shiftList: [],
   setting: {},
   pos: {},
   siklus: [
@@ -16,8 +22,32 @@ export const state = () => ({
 })
 
 export const mutations = {
-  setVehicleTypeList(state, data) {
-    state.vehicleTypeList = data
+  setJenisKendaraanList(state, data) {
+    state.jenisKendaraanList = data
+  },
+
+  setGateInList(state, data) {
+    state.gateInList = data
+  },
+
+  setGateOutList(state, data) {
+    state.gateOutList = data
+  },
+
+  setKameraList(state, data) {
+    state.kameraList = data
+  },
+
+  setPosList(state, data) {
+    state.posList = data
+  },
+
+  setPrinterList(state, data) {
+    state.printerList = data
+  },
+
+  setShiftList(state, data) {
+    state.shiftList = data
   },
 
   setGroupMemberList(state, data) {
@@ -42,9 +72,39 @@ export const mutations = {
 }
 
 export const actions = {
-  async getVehicleTypeList({ commit }) {
+  async getJenisKendaraanList({ commit }) {
     const data = await this.$axios.$get('/api/jenisKendaraan')
-    commit('setVehicleTypeList', data)
+    commit('setJenisKendaraanList', data)
+  },
+
+  async getGateInList({ commit }) {
+    const data = await this.$axios.$get('/api/gateIn')
+    commit('setGateInList', data)
+  },
+
+  async getGateOutList({ commit }) {
+    const data = await this.$axios.$get('/api/gateOut')
+    commit('setGateOutList', data)
+  },
+
+  async getKameraList({ commit }) {
+    const data = await this.$axios.$get('/api/kamera')
+    commit('setKameraList', data)
+  },
+
+  async getPosList({ commit }) {
+    const data = await this.$axios.$get('/api/pos')
+    commit('setPosList', data)
+  },
+
+  async getPrinterList({ commit }) {
+    const data = await this.$axios.$get('/api/Printer')
+    commit('setPrinterList', data)
+  },
+
+  async getShiftList({ commit }) {
+    const data = await this.$axios.$get('/api/shift')
+    commit('setShiftList', data)
   },
 
   async getGroupMemberList({ commit }) {

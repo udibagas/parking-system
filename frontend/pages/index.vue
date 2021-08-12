@@ -250,7 +250,7 @@ export default {
 			setting: {},
 			showManualOpenForm: false,
 			posList: [],
-			HIDE_PRINT_REPORT: HIDE_PRINT_REPORT,
+			HIDE_PRINT_REPORT: false,
 		}
 	},
 	methods: {
@@ -922,12 +922,12 @@ export default {
 	},
 
 	mounted() {
-		this.$store.commit('getNavigationList')
+		this.$store.dispatch('getNavigationList')
 		this.getSetting()
 		this.getPosList()
-		this.$store.commit('getGateInList')
-		this.$store.commit('getGateOutList')
-		this.$store.commit('getJenisKendaraanList')
+		this.$store.dispatch('getGateInList')
+		this.$store.dispatch('getGateOutList')
+		this.$store.dispatch('getJenisKendaraanList')
 
 		document.getElementById('gate-out-app').onkeydown = (e) => {
 			// console.log(e.key)

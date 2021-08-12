@@ -177,7 +177,7 @@
 			type="primary"
 			@click="
 				() => {
-					!!formModel.id ? update() : store();
+					!!formModel.id ? update() : store()
 				}
 			"
 			icon="el-icon-success"
@@ -188,91 +188,92 @@
 
 <script>
 export default {
+	name: 'GeneralSetting',
+
 	data() {
 		return {
 			formModel: {},
 			formErrors: {},
 			loading: false,
-		};
+		}
 	},
+
 	methods: {
 		requestData() {
-			axios
-				.get("/setting")
-				.then((r) => {
-					this.formModel = r.data;
-				})
+			this.$axios
+				.$get('/api/setting')
+				.then((r) => (this.formModel = r))
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
+						type: 'error',
 						showClose: true,
-					});
-				});
+					})
+				})
 		},
 		store() {
-			this.loading = true;
-			axios
-				.post("/setting", this.formModel)
+			this.loading = true
+			this.$axios
+				.$post('/api/setting', this.formModel)
 				.then((r) => {
 					this.$message({
-						message: "Data berhasil disimpan.",
-						type: "success",
+						message: 'Data berhasil disimpan.',
+						type: 'success',
 						showClose: true,
-					});
-					this.requestData();
+					})
+					this.requestData()
+					this.$store.dispatch('getSetting')
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors;
+						this.formErrors = e.response.data.errors
 					}
 
 					if (e.response.status == 500) {
-						this.formErrors = {};
+						this.formErrors = {}
 						this.$message({
 							message: e.response.data.message,
-							type: "error",
+							type: 'error',
 							showClose: true,
-						});
+						})
 					}
 				})
-				.finally(() => {
-					this.loading = false;
-				});
+				.finally(() => (this.loading = false))
 		},
+
 		update() {
-			this.loading = true;
-			axios
-				.put("/setting/" + this.formModel.id, this.formModel)
+			this.loading = true
+			this.$axios
+				.$put('/api/setting/' + this.formModel.id, this.formModel)
 				.then((r) => {
 					this.$message({
-						message: "Data berhasil disimpan.",
-						type: "success",
+						message: 'Data berhasil disimpan.',
+						type: 'success',
 						showClose: true,
-					});
-					this.requestData();
+					})
+					this.requestData()
+					this.$store.dispatch('getSetting')
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors;
+						this.formErrors = e.response.data.errors
 					}
 
 					if (e.response.status == 500) {
-						this.formErrors = {};
+						this.formErrors = {}
 						this.$message({
 							message: e.response.data.message,
-							type: "error",
+							type: 'error',
 							showClose: true,
-						});
+						})
 					}
 				})
-				.finally(() => {
-					this.loading = false;
-				});
+				.finally(() => (this.loading = false))
 		},
 	},
+
 	mounted() {
-		this.requestData();
+		this.requestData()
 	},
-};
+}
 </script>

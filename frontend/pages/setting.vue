@@ -1,14 +1,16 @@
 <template>
-	<el-tabs>
-		<el-tab-pane
-			lazy
-			v-for="(c, i) in components"
-			:key="i"
-			:label="c.label.toUpperCase()"
-		>
-			<component :is="c.component"></component>
-		</el-tab-pane>
-	</el-tabs>
+	<el-card>
+		<el-tabs>
+			<el-tab-pane
+				lazy
+				v-for="(c, i) in components"
+				:key="i"
+				:label="c.label.toUpperCase()"
+			>
+				<component :is="c.component"></component>
+			</el-tab-pane>
+		</el-tabs>
+	</el-card>
 </template>
 
 <script>
@@ -18,55 +20,55 @@ export default {
 			components: [
 				{
 					label: 'Pengaturan Umum',
-					component: 'GeneralSetting',
+					component: 'SettingGeneralSetting',
 				},
 				{
 					label: 'Jenis Kendaraan & Tarif',
-					component: 'JenisKendaraan',
+					component: 'SettingJenisKendaraan',
 				},
 				{
 					label: 'Shift',
-					component: 'Shift',
+					component: 'SettingShift',
 				},
 				{
 					label: 'Kamera',
-					component: 'Kamera',
+					component: 'SettingKamera',
 				},
 				{
 					label: 'Printer',
-					component: 'Printer',
+					component: 'SettingPrinter',
 				},
 				{
 					label: 'Pos',
-					component: 'Pos',
+					component: 'SettingPos',
 				},
 				{
 					label: 'Gate Keluar',
-					component: 'GateOut',
+					component: 'SettingGateOut',
 				},
 				{
 					label: 'Gate Masuk',
-					component: 'GateIn',
+					component: 'SettingGateIn',
 				},
 				{
 					label: 'Area Parkir',
-					component: 'AreaParkir',
+					component: 'SettingAreaParkir',
 				},
 				{
 					label: 'Backup & Restore',
-					component: 'Backup',
+					component: 'SettingBackup',
 				},
 			],
 		}
 	},
 
 	mounted() {
-		this.$store.commit('getKameraList')
-		this.$store.commit('getGateInList')
-		this.$store.commit('getGateOutList')
-		this.$store.commit('getJenisKendaraanList')
-		this.$store.commit('getPosList')
-		this.$store.commit('getPrinterList')
+		this.$store.dispatch('getKameraList')
+		this.$store.dispatch('getGateInList')
+		this.$store.dispatch('getGateOutList')
+		this.$store.dispatch('getJenisKendaraanList')
+		this.$store.dispatch('getPosList')
+		this.$store.dispatch('getPrinterList')
 	},
 }
 </script>

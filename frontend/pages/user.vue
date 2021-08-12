@@ -1,9 +1,9 @@
 <template>
-	<div>
-		<div class="flex flex-row">
-			<div class="text-lg text-blue-700 flex-grow">KELOLA USER</div>
+	<el-card>
+		<div style="display: flex; justify-content: space-between">
+			<div style="font-size: 1.3em; line-height: 41px">KELOLA USER</div>
 			<el-form inline class="text-right" @submit.native.prevent>
-				<el-form-item>
+				<el-form-item style="margin-bottom: 0">
 					<el-button
 						size="small"
 						@click="openForm({ role: 0, password: '' })"
@@ -12,7 +12,7 @@
 						>TAMBAH USER</el-button
 					>
 				</el-form-item>
-				<el-form-item>
+				<el-form-item style="margin-bottom: 0">
 					<el-input
 						size="small"
 						v-model="keyword"
@@ -26,14 +26,21 @@
 			</el-form>
 		</div>
 
+		<br />
+
 		<el-table
 			stripe
-			height="calc(100vh - 165px)"
+			height="calc(100vh - 255px)"
 			v-loading="loading"
-			:data="tableData"
+			:data="tableData.data"
 			:default-sort="{ prop: sort, order: order }"
 			@sort-change="sortChange"
 		>
+			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
 			<el-table-column
 				prop="name"
 				label="Nama"
@@ -50,27 +57,23 @@
 				sortable="custom"
 				align="center"
 				header-align="center"
+				width="100"
 			>
 				<template slot-scope="scope">
-					<el-tag size="mini" :type="scope.row.status ? 'success' : 'info'">{{
-						scope.row.status ? 'Aktif' : 'Nonaktif'
-					}}</el-tag>
+					<el-tag
+						:type="scope.row.status ? 'success' : 'info'"
+						size="mini"
+						style="width: 100%"
+						effect="dark"
+					>
+						{{ scope.row.status ? 'Aktif' : 'Nonaktif' }}
+					</el-tag>
 				</template>
 			</el-table-column>
 
 			<el-table-column width="40px" align="center" header-align="center">
 				<template slot="header">
-					<el-button
-						type="text"
-						class="text-white"
-						@click="
-							() => {
-								keyword = ''
-								requestData()
-							}
-						"
-						icon="el-icon-refresh"
-					>
+					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
 					</el-button>
 				</template>
 				<template slot-scope="scope">
@@ -203,7 +206,7 @@
 				</el-button>
 			</span>
 		</el-dialog>
-	</div>
+	</el-card>
 </template>
 
 <script>
