@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="text-right mb-4">
+		<div class="text-right">
 			<el-button
 				type="primary"
 				icon="el-icon-plus"
@@ -10,8 +10,15 @@
 			>
 		</div>
 
-		<el-table :data="tableData" stripe height="calc(100vh - 205px)">
-			<el-table-column type="index"></el-table-column>
+		<br />
+
+		<el-table :data="tableData.data" stripe height="calc(100vh - 300px)">
+			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
+
 			<el-table-column min-width="100" label="Status" prop="status">
 				<template slot-scope="scope">
 					<el-tag
@@ -73,6 +80,19 @@
 				</template>
 			</el-table-column>
 		</el-table>
+
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
 
 		<el-dialog
 			v-loading="loading"
@@ -154,11 +174,11 @@ export default {
 
 	methods: {
 		testPrinter(id) {
-			axios
-				.get(`/printer/test/${id}`)
-				.then((r) => {
+			this.$axios
+				.$get(`/api/printer/test/${id}`)
+				.then((response) => {
 					this.$message({
-						message: r.data.message,
+						message: response.message,
 						type: 'success',
 					})
 				})

@@ -21,7 +21,8 @@ class KameraController extends Controller
      */
     public function index(Request $request)
     {
-        return Kamera::orderBy('nama', 'asc')->get();
+        $data = Kamera::orderBy('nama', 'asc');
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**

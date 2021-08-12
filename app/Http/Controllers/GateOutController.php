@@ -18,9 +18,10 @@ class GateOutController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return GateOut::orderBy('nama', 'asc')->with(['pos'])->get();
+        $data = GateOut::orderBy('nama', 'asc')->with(['pos']);
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**

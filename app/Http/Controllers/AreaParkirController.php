@@ -10,10 +10,12 @@ class AreaParkirController extends Controller
 {
     public function index(Request $request)
     {
-        return AreaParkir::when($request->keyword, function ($q) use ($request) {
+        $data = AreaParkir::when($request->keyword, function ($q) use ($request) {
             $q->where('nama', 'LIKE', "%{$request->keyword}%")
                 ->orWhere('keterangan', 'LIKE', "%{$request->keyword}%");
-        })->orderBy('nama', 'asc')->get();
+        })->orderBy('nama', 'asc');
+
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     public function store(AreaParkirRequest $request)

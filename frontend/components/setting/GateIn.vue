@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="text-right mb-4">
+		<div class="text-right">
 			<el-button
 				type="primary"
 				icon="el-icon-plus"
@@ -10,9 +10,11 @@
 			>
 		</div>
 
+		<br />
+
 		<el-table
-			:data="tableData"
-			height="calc(100vh - 260px)"
+			:data="tableData.data"
+			height="calc(100vh - 300px)"
 			v-loading="loading"
 		>
 			<el-table-column
@@ -108,11 +110,24 @@
 			</el-table-column>
 		</el-table>
 
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
+
 		<el-dialog
 			v-loading="loading"
 			title="GATE MASUK"
 			:close-on-click-modal="false"
-			:visible.sync="show"
+			:visible.sync="showForm"
 		>
 			<el-form label-position="left" label-width="150px">
 				<el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
@@ -259,63 +274,15 @@
 </template>
 
 <script>
+import crud from '@/mixins/crud'
+
 export default {
+	mixins: [crud],
+
 	data() {
 		return {
-			showForm: false,
-			tableData: [],
-			loading: false,
-			selectedData: {},
+			url: '/api/gateIn',
 		}
-	},
-	methods: {
-		openForm(data = null) {
-			this.selectedData = data ? JSON.parse(JSON.stringify(data)) : {}
-			this.showForm = true
-		},
-		deleteData(id) {
-			this.$confirm('Anda yakin?', 'Konfirmasi', {
-				type: 'warning',
-			})
-				.then(() => {
-					axios
-						.delete(`/gateIn/${id}`)
-						.then((r) => {
-							this.requestData()
-							this.$message({
-								message: r.data.message,
-								type: 'success',
-							})
-						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-							})
-						})
-				})
-				.catch(() => console.log(e))
-		},
-		requestData() {
-			this.loading = true
-			axios
-				.get('/gateIn')
-				.then((r) => {
-					this.tableData = r.data
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-					})
-				})
-				.finally(() => {
-					this.loading = false
-				})
-		},
-	},
-	mounted() {
-		this.requestData()
 	},
 }
 </script>

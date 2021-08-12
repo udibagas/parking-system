@@ -20,10 +20,12 @@ class GroupMemberController extends Controller
      */
     public function index(Request $request)
     {
-        return GroupMember::when($request->keyword, function ($q) use ($request) {
+        $data = GroupMember::when($request->keyword, function ($q) use ($request) {
             return $q->where('nama', 'LIKE', "%{$request->keyword}%")
                 ->orWhere('keterangan', 'LIKE', "%{$request->keyword}%");
-        })->orderBy('nama', 'asc')->get();
+        })->orderBy('nama', 'asc');
+
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**

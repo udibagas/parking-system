@@ -18,9 +18,10 @@ class PosController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Pos::with(['gateOuts'])->orderBy('nama', 'asc')->get();
+        $data = Pos::with(['gateOuts'])->orderBy('nama', 'asc');
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**

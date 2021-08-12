@@ -1,6 +1,6 @@
 <template>
 	<div>
-		<div class="text-right mb-3">
+		<div class="text-right">
 			<el-button
 				size="small"
 				icon="el-icon-plus"
@@ -10,13 +10,20 @@
 			>
 		</div>
 
+		<br />
+
 		<el-table
-			:data="tableData"
+			:data="tableData.data"
 			stripe
-			height="calc(100vh - 205px)"
+			height="calc(100vh - 300px)"
 			v-loading="loading"
 		>
-			<el-table-column type="index"></el-table-column>
+			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
+
 			<el-table-column
 				prop="nama"
 				label="Nama"
@@ -110,20 +117,25 @@
 			</el-table-column>
 		</el-table>
 
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
+
 		<el-dialog
 			width="650px"
 			v-loading="loading"
-			:visible.sync="show"
-			:title="
-				!!formModel.id ? 'EDIT JENIS KENDARAAN' : 'TAMBAH JENIS KENDARAAN'
-			"
+			:visible.sync="showForm"
+			title="JENIS KENDARAAN"
 			:close-on-click-modal="false"
-			:before-close="
-				(done) => {
-					closeForm()
-					done()
-				}
-			"
 		>
 			<el-form label-width="180px" label-position="left">
 				<el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
@@ -265,7 +277,7 @@
 				</el-form-item>
 			</el-form>
 			<div slot="footer">
-				<el-button icon="el-icon-error" @click="closeForm">BATAL</el-button>
+				<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
 				<el-button icon="el-icon-success" type="primary" @click="save">
 					SIMPAN
 				</el-button>

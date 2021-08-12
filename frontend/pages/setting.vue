@@ -66,7 +66,6 @@ export default {
 		this.$store.dispatch('getKameraList')
 		this.$store.dispatch('getGateInList')
 		this.$store.dispatch('getGateOutList')
-		this.$store.dispatch('getJenisKendaraanList')
 		this.$store.dispatch('getPosList')
 		this.$store.dispatch('getPrinterList')
 	},

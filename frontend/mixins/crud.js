@@ -123,6 +123,12 @@ export default {
       this.requestData()
     },
 
+    closeForm() {
+      this.showForm = false
+      this.formModel = {}
+      this.formErrors = {}
+    },
+
     requestData() {
       let params = {
         page: this.page,

@@ -1,24 +1,29 @@
 <template>
 	<div>
-		<el-form inline class="text-right" @submit.native.prevent="requestData">
-			<el-form-item>
-				<el-button
-					size="small"
-					@click="openForm({})"
-					type="primary"
-					icon="el-icon-plus"
-					>TAMBAH SHIFT</el-button
-				>
-			</el-form-item>
-		</el-form>
+		<div class="text-right">
+			<el-button
+				size="small"
+				icon="el-icon-plus"
+				@click="openForm()"
+				type="primary"
+				>TAMBAH JENIS KENDARAAN</el-button
+			>
+		</div>
+
+		<br />
 
 		<el-table
-			:data="tableData"
+			:data="tableData.data"
 			stripe
-			height="calc(100vh - 220px)"
+			height="calc(100vh - 300px)"
 			v-loading="loading"
 		>
-			<el-table-column type="index" label="#"></el-table-column>
+			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
+
 			<el-table-column prop="nama" label="Nama"></el-table-column>
 			<el-table-column prop="mulai" label="Mulai"></el-table-column>
 			<el-table-column prop="selesai" label="Selesai"></el-table-column>
@@ -51,9 +56,22 @@
 			</el-table-column>
 		</el-table>
 
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
+
 		<el-dialog
 			:visible.sync="showForm"
-			:title="!!formModel.id ? 'EDIT SHIFT' : 'TAMBAH SHIFT'"
+			title="SHIFT"
 			width="500px"
 			v-loading="loading"
 			:close-on-click-modal="false"

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\JenisKendaraanRequest;
 use App\Models\JenisKendaraan;
+use Illuminate\Http\Request;
 
 class JenisKendaraanController extends Controller
 {
@@ -17,9 +18,10 @@ class JenisKendaraanController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return JenisKendaraan::orderBy('shortcut_key', 'asc')->get();
+        $data = JenisKendaraan::orderBy('shortcut_key', 'asc');
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**

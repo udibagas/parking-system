@@ -21,9 +21,10 @@ class PrinterController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        return Printer::orderBy('nama', 'asc')->get();
+        $data = Printer::orderBy('nama', 'asc');
+        return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
     /**
