@@ -22,11 +22,8 @@
 			</el-form-item>
 		</el-form>
 
-		<div class="flex">
-			<div
-				class="p-3 border"
-				style="width: 400px; height: calc(100vh - 200px); overflow: auto"
-			>
+		<div style="display: flex">
+			<div class="file-browser">
 				<el-tree
 					v-if="show"
 					:props="props"
@@ -42,15 +39,7 @@
 				</el-tree>
 			</div>
 
-			<div
-				class="
-					p-3
-					flex-grow flex
-					align-items-center
-					justify-content-center
-					flex-column
-				"
-			>
+			<div class="img-container">
 				<img :src="url" alt="" style="max-width: 800px" />
 			</div>
 		</div>
@@ -77,17 +66,19 @@ export default {
 			const params = {
 				directory: node.data === undefined ? 'snapshots' : node.data.path,
 			}
-			axios.get('snapshot', { params }).then((r) => resolve(r.data))
+			this.$axios
+				.$get('/api/snapshot', { params })
+				.then((response) => resolve(response))
 		},
 
 		deleteSnapshot() {
 			this.$confirm('Anda yakin?', 'Konfirmasi', { type: 'warning' })
 				.then(() => {
-					axios
-						.post('snapshot/delete', { checkedNodes: this.checkedNodes })
+					this.$axios
+						.$post('/api/snapshot/delete', { checkedNodes: this.checkedNodes })
 						.then((r) => {
 							this.url = ''
-							this.$message({ message: r.data.message, type: 'success' })
+							this.$message({ message: r.message, type: 'success' })
 							this.checkedNodes.forEach((node) => this.$refs.tree.remove(node))
 							this.checkedNodes = []
 						})
@@ -108,3 +99,22 @@ export default {
 	},
 }
 </script>
+
+<style scoped>
+.file-browser {
+	padding: 15px;
+	border: 1px solid #ddd;
+	width: 400px;
+	height: calc(100vh - 300px);
+	overflow: auto;
+}
+
+.img-container {
+	padding: 15px;
+	flex-grow: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+}
+</style>
