@@ -4,7 +4,6 @@
 		v-loading="loading"
 		:visible="show"
 		:show-close="false"
-		width="500px"
 	>
 		<el-alert
 			type="error"
@@ -14,18 +13,13 @@
 			style="margin-bottom: 15px"
 		>
 		</el-alert>
-		<el-form label-width="160px" label-position="left">
+		<el-form label-width="180px" label-position="left">
 			<el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
 				<el-input placeholder="Nama" v-model="formModel.name"></el-input>
 				<div class="el-form-item__error" v-if="formErrors.name">
 					{{ formErrors.name[0] }}
 				</div>
 			</el-form-item>
-
-			<!-- <el-form-item label="Alamat Email" :class="formErrors.email ? 'is-error' : ''">
-                <el-input placeholder="Alamat Email" v-model="formModel.email"></el-input>
-                <div class="el-form-item__error" v-if="formErrors.email">{{formErrors.email[0]}}</div>
-            </el-form-item> -->
 
 			<el-form-item label="Level">
 				<el-input
@@ -60,12 +54,10 @@
 			</el-form-item>
 		</el-form>
 		<span slot="footer">
-			<el-button type="info" @click="$emit('close')" icon="el-icon-error"
-				>TUTUP</el-button
-			>
-			<el-button type="primary" @click="save" icon="el-icon-success"
-				>SIMPAN</el-button
-			>
+			<el-button @click="$emit('close')" icon="el-icon-error">TUTUP</el-button>
+			<el-button type="primary" @click="save" icon="el-icon-success">
+				SIMPAN
+			</el-button>
 		</span>
 	</el-dialog>
 </template>

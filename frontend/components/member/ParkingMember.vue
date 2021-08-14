@@ -633,6 +633,12 @@ export default {
 	},
 
 	methods: {
+		closeForm() {
+			this.showForm = false
+			this.formModel = { vehicles: [] }
+			this.formErrors = {}
+		},
+
 		print() {
 			const params = {
 				sort: this.sort,

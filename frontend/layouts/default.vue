@@ -114,7 +114,6 @@ export default {
 		this.$store.dispatch('getGateInList')
 		this.$store.dispatch('getGateOutList')
 		this.$store.dispatch('getJenisKendaraanList')
-		this.$store.dispatch('getShiftList')
 	},
 }
 </script>

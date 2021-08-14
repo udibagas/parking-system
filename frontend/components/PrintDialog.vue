@@ -1,7 +1,7 @@
 <template>
 	<el-dialog
-		title="PILIH PRINTER"
 		center
+		title="PILIH PRINTER"
 		:visible.sync="show"
 		width="500px"
 		:before-close="
@@ -28,7 +28,7 @@
 		</el-form>
 
 		<div slot="footer">
-			<el-button icon="el-icon-close" @click="$emit('close')" type="info">
+			<el-button icon="el-icon-close" @click="$emit('close')">
 				BATAL
 			</el-button>
 			<el-button
@@ -57,6 +57,10 @@ export default {
 		return {
 			printer_id: null,
 		}
+	},
+
+	mounted() {
+		this.$store.dispatch('getPrinterList')
 	},
 }
 </script>

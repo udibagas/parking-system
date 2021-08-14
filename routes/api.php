@@ -17,6 +17,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ParkingTransactionController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\PrinterController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\ServerInformationController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShiftController;
@@ -49,7 +50,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('kamera/test/{kamera}', [KameraController::class, 'test']);
     Route::get('member/search', [MemberController::class, 'search']);
 
-    Route::prefix('parkingTransaction')->group(function () {
+    Route::group(['prefix' => 'parkingTransaction'], function () {
         Route::post('printTicketOut/{parkingTransaction}', [ParkingTransactionController::class, 'printTicketOut']);
         Route::post('takeSnapshot/{parkingTransaction}', [ParkingTransactionController::class, 'takeSnapshot']);
         Route::post('printReport', [ParkingTransactionController::class, 'printReport']);
@@ -58,9 +59,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('setSudahKeluarSemua', [ParkingTransactionController::class, 'setSudahKeluarSemua']);
         Route::put('setSudahKeluar/{parkingTransaction}', [ParkingTransactionController::class, 'setSudahKeluar']);
         Route::get('search', [ParkingTransactionController::class, 'search']);
+        Route::apiResource('', ParkingTransactionController::class);
     });
 
-    Route::prefix('notification', function () {
+    Route::group(['prefix' => 'notification'], function () {
         Route::get('unreadNotification', [NotificationController::class, 'unreadNotification']);
         Route::put('markAllAsRead', [NotificationController::class, 'markAllAsRead']);
         Route::put('markAsRead/{id}', [NotificationController::class, 'markAsRead']);
@@ -69,10 +71,11 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::delete('memberVehicle/{memberVehicle}', [MemberVehicleController::class, 'destroy']);
 
-    Route::prefix('memberRenewal', function () {
-        Route::post('printSlip/{memberRenewal}', [MemberRenewalController::class, 'printSlip']);
+    Route::group(['prefix' => 'memberRenewal'], function () {
         Route::get('report', [MemberRenewalController::class, 'report']);
         Route::get('reportDaily', [MemberRenewalController::class, 'reportDaily']);
+        Route::post('printSlip/{memberRenewal}', [MemberRenewalController::class, 'printSlip']);
+        Route::apiResource('', MemberRenewalController::class, ['except' => 'show']);
     });
 
     Route::apiResources([
@@ -84,15 +87,13 @@ Route::middleware('auth:sanctum')->group(function () {
         'kamera' => KameraController::class,
         'manualOpenLog' => ManualOpenLogController::class,
         'member' => MemberController::class,
-        'memberRenewal' => MemberRenewalController::class,
         'notification' => NotificationController::class,
-        'parkingTransaction' => ParkingTransactionController::class,
         'printer' => PrinterController::class,
         'pos' => PosController::class,
         'setting' => SettingController::class,
         'shift' => ShiftController::class,
         'user' => UserController::class,
-    ]);
+    ], ['except' => 'show']);
 
     Route::get('userLog', [UserLogController::class, 'index']);
     Route::delete('userLog', [UserLogController::class, 'clear']);
@@ -100,7 +101,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('snapshot', [SnapshotController::class, 'index']);
     Route::post('snapshot/delete', [SnapshotController::class, 'destroy']);
 
-    Route::prefix('backup')->group(function () {
+    Route::group(['prefix' => 'backup'], function () {
         Route::get('', [BackupController::class, 'index']);
         Route::post('', [BackupController::class, 'store']);
         Route::put('', [BackupController::class, 'restore']);
@@ -124,7 +125,7 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::get('serverInformation', [ServerInformationController::class, 'index']);
 
-// Untuk controller
+// Untuk controller gate in
 // TODO: pake middleware controller yg terdaftar aja yg boleh akses
 Route::post('parkingTransaction', [ParkingTransactionController::class, 'apiStore']);
 Route::post('gateIn/notification/{gateIn}', [GateInController::class, 'notification']);
