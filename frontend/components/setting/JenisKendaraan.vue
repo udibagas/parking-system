@@ -135,8 +135,9 @@
 			:visible.sync="showForm"
 			title="JENIS KENDARAAN"
 			:close-on-click-modal="false"
+			width="700px"
 		>
-			<el-form label-width="180px" label-position="left">
+			<el-form label-width="200px" label-position="left">
 				<el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
 					<el-input placeholder="Nama" v-model="formModel.nama"></el-input>
 					<div class="el-form-item__error" v-if="formErrors.nama">
@@ -159,23 +160,6 @@
 				</el-form-item>
 
 				<el-form-item
-					label="Mode Tarif"
-					:class="formErrors.mode_tarif ? 'is-error' : ''"
-				>
-					<el-select
-						placeholder="FLAT/PROGRESIF"
-						v-model="formModel.mode_tarif"
-						style="width: 100%"
-					>
-						<el-option :value="0" label="FLAT"></el-option>
-						<el-option :value="1" label="PROGRESIF"></el-option>
-					</el-select>
-					<div class="el-form-item__error" v-if="formErrors.mode_tarif">
-						{{ formErrors.mode_tarif[0] }}
-					</div>
-				</el-form-item>
-
-				<el-form-item
 					label="Mode Inap"
 					:class="formErrors.mode_menginap ? 'is-error' : ''"
 				>
@@ -193,70 +177,17 @@
 				</el-form-item>
 
 				<el-form-item
-					label="Tarif Flat (Rp)"
-					:class="formErrors.tarif_flat ? 'is-error' : ''"
+					label="Tarif menginap per hari (Rp)"
+					:class="{ 'is-error': formErrors.tarif_menginap }"
 				>
 					<el-input
 						type="number"
-						:step="500"
-						placeholder="Tarif Flat (Rp)"
-						v-model="formModel.tarif_flat"
+						placeholder="Tarif menginap per hari (Rp)"
+						v-model="formModel.tarif_menginap"
 					></el-input>
-					<div class="el-form-item__error" v-if="formErrors.tarif_flat">
-						{{ formErrors.tarif_flat[0] }}
-					</div>
-				</el-form-item>
 
-				<el-form-item label="Tarif Progresif">
-					<div>
-						Tarif
-						<el-input
-							size="small"
-							style="width: 80px; margin: 0 5px"
-							type="number"
-							v-model="formModel.menit_pertama"
-						></el-input>
-						menit pertama = Rp.
-						<el-input
-							size="small"
-							style="width: 111px; margin-left: 23px"
-							type="number"
-							v-model="formModel.tarif_menit_pertama"
-						></el-input>
-					</div>
-					<div>
-						Tarif
-						<el-input
-							size="small"
-							style="width: 80px; margin: 0 5px"
-							type="number"
-							v-model="formModel.menit_selanjutnya"
-						></el-input>
-						menit selanjutnya = Rp.
-						<el-input
-							size="small"
-							style="width: 111px; margin-left: 6px"
-							type="number"
-							v-model="formModel.tarif_menit_selanjutnya"
-						></el-input>
-					</div>
-					<div>
-						Tarif maksimal per hari = Rp
-						<el-input
-							size="small"
-							style="width: 205px; margin-left: 10px"
-							type="number"
-							v-model="formModel.tarif_maksimum"
-						></el-input>
-					</div>
-					<div>
-						Tarif menginap per hari = Rp
-						<el-input
-							size="small"
-							style="width: 205px; margin-left: 5px"
-							type="number"
-							v-model="formModel.tarif_menginap"
-						></el-input>
+					<div class="el-form-item__error" v-if="formErrors.tarif_menginap">
+						{{ formErrors.tarif_menginap[0] }}
 					</div>
 				</el-form-item>
 
@@ -274,7 +205,92 @@
 						{{ formErrors.denda_tiket_hilang[0] }}
 					</div>
 				</el-form-item>
+
+				<el-form-item
+					label="Mode Tarif"
+					:class="formErrors.mode_tarif ? 'is-error' : ''"
+				>
+					<el-select
+						placeholder="FLAT/PROGRESIF"
+						v-model="formModel.mode_tarif"
+						style="width: 100%"
+					>
+						<el-option :value="0" label="FLAT"></el-option>
+						<el-option :value="1" label="PROGRESIF"></el-option>
+					</el-select>
+					<div class="el-form-item__error" v-if="formErrors.mode_tarif">
+						{{ formErrors.mode_tarif[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					v-show="formModel.mode_tarif === 0"
+					label="Tarif Flat (Rp)"
+					:class="formErrors.tarif_flat ? 'is-error' : ''"
+				>
+					<el-input
+						type="number"
+						:step="500"
+						placeholder="Tarif Flat (Rp)"
+						v-model="formModel.tarif_flat"
+					></el-input>
+					<div class="el-form-item__error" v-if="formErrors.tarif_flat">
+						{{ formErrors.tarif_flat[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Tarif maksimal per hari (Rp)"
+					v-show="formModel.mode_tarif === 1"
+					:class="{ 'is-error': formErrors.tarif_maksimum }"
+				>
+					<el-input
+						type="number"
+						placeholder="Tarif maksimal per hari (Rp)"
+						v-model="formModel.tarif_maksimum"
+					></el-input>
+
+					<div class="el-form-item__error" v-if="formErrors.tarif_maksimum">
+						{{ formErrors.tarif_maksimum[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="Tarif Progresif"
+					v-show="formModel.mode_tarif === 1"
+				>
+					<div class="mb-2 flex">
+						<el-input
+							type="number"
+							v-model="formModel.menit_pertama"
+							style="width: 250px"
+							class="mr-2"
+							placeholder="Menit Pertama"
+						></el-input>
+						<el-input
+							type="number"
+							v-model="formModel.tarif_menit_pertama"
+							:placeholder="`Tarif ${formModel.menit_pertama} menit pertama (Rp)`"
+						></el-input>
+					</div>
+
+					<div class="flex">
+						<el-input
+							type="number"
+							v-model="formModel.menit_selanjutnya"
+							style="width: 250px"
+							class="mr-2"
+							placeholder="Menit Selanjutnya"
+						></el-input>
+						<el-input
+							type="number"
+							v-model="formModel.tarif_menit_selanjutnya"
+							:placeholder="`Tarif ${formModel.menit_selanjutnya} menit selanjutnya (Rp)`"
+						></el-input>
+					</div>
+				</el-form-item>
 			</el-form>
+
 			<div slot="footer">
 				<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
 				<el-button icon="el-icon-success" type="primary" @click="save">

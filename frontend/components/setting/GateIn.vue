@@ -262,9 +262,7 @@
 			</el-form>
 
 			<div slot="footer">
-				<el-button type="info" icon="el-icon-error" @click="closeForm"
-					>BATAL</el-button
-				>
+				<el-button icon="el-icon-error" @click="closeForm">BATAL</el-button>
 				<el-button type="primary" icon="el-icon-success" @click="save"
 					>SIMPAN</el-button
 				>

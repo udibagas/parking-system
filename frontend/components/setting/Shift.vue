@@ -6,7 +6,7 @@
 				icon="el-icon-plus"
 				@click="openForm()"
 				type="primary"
-				>TAMBAH JENIS KENDARAAN</el-button
+				>TAMBAH SHIFT</el-button
 			>
 		</div>
 

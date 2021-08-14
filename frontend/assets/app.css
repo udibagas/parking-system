@@ -174,8 +174,16 @@ table {
   flex-direction: column;
 }
 
+.mr-2 {
+  margin-right: 10px;
+}
+
 .mb-1 {
   margin-bottom: 5px;
+}
+
+.mb-2 {
+  margin-bottom: 10px;
 }
 
 .mb-3 {
@@ -188,6 +196,10 @@ table {
 
 .p-2 {
   padding: 2px;
+}
+
+.text-lg {
+  font-size: large;
 }
 
 .text-xl {
