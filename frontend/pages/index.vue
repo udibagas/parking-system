@@ -4,7 +4,7 @@
 			<h1
 				v-if="formModel.pos_id"
 				formModel.pos_id
-				class="mb-3 p-2 bg-red-700 text-white text-center text-xl"
+				class="mb-3 p-2 bg-red text-white text-center text-xl"
 				@click="formModel.pos_id = null"
 			>
 				{{ posList.find((p) => p.id == formModel.pos_id).nama }}
@@ -182,6 +182,7 @@
 				</el-col>
 			</el-row>
 		</div>
+
 		<div class="ml-5" v-if="snapshots.length > 0">
 			<img
 				v-for="s in snapshots"
@@ -192,7 +193,7 @@
 			/>
 		</div>
 
-		<FormBukaManual
+		<TransactionFormBukaManual
 			:show="showManualOpenForm"
 			@close="showManualOpenForm = false"
 			@open-gate="(gate_out_id) => openGate(gate_out_id)"
@@ -490,10 +491,10 @@ export default {
 			}
 
 			let params = { nomor_barcode: this.formModel.nomor_barcode }
-			axios
-				.get('/parkingTransaction/search', { params })
+			this.$axios
+				.$get('/parkingTransaction/search', { params })
 				.then((r) => {
-					const data = r.data
+					const data = r
 					this.snapshots = data.snapshots
 					this.formModel.id = data.id
 					this.formModel.gate_in_id = data.gate_in_id
@@ -679,16 +680,16 @@ export default {
 		save(ticket) {
 			this.formModel.ticket = ticket
 
-			axios({
+			this.$axios({
 				method: this.formModel.id ? 'put' : 'post',
 				url: this.formModel.id
-					? `/parkingTransaction/${this.formModel.id}`
-					: '/parkingTransaction',
+					? `/api/parkingTransaction/${this.formModel.id}`
+					: '/api/parkingTransaction',
 				data: this.formModel,
 			})
 				.then((r) => {
 					this.$message({
-						message: r.data.message,
+						message: r.message,
 						type: 'success',
 					})
 					this.openGate(this.formModel.gate_out_id)
@@ -904,12 +905,12 @@ export default {
 		},
 
 		takeSnapshot() {
-			axios
-				.post(`/api/parkingTransaction/takeSnapshot/${this.formModel.id}`, {
+			this.$axios
+				.$post(`/api/parkingTransaction/takeSnapshot/${this.formModel.id}`, {
 					gate_out_id: this.formModel.gate_out_id,
 				})
 				.then((r) => {
-					this.snapshots = r.data
+					this.snapshots = r
 					this.$forceUpdate()
 				})
 				.catch((e) => {
@@ -925,7 +926,7 @@ export default {
 		this.getSetting()
 		this.getPosList()
 
-		document.getElementById('gate-out-app').onkeydown = (e) => {
+		document.getElementById('gate-out-app').addEventListener('keydown', (e) => {
 			// console.log(e.key)
 			// ke field nomor plat
 			if (e.key == '-') {
@@ -973,7 +974,7 @@ export default {
 				e.preventDefault()
 				this.printLastTrx()
 			}
-		}
+		})
 	},
 }
 </script>
@@ -989,12 +990,14 @@ export default {
 	line-height: 43px;
 	box-sizing: border-box;
 	width: 100%;
-	@apply border-2 border-blue-800 text-3xl py-0 px-3;
+	border: 2px solid #254ec1;
+	font-size: 2em;
+	padding: 0 15px;
 }
 
 .my-input:focus,
 .my-input-time:focus {
-	@apply bg-yellow-300;
+	background-color: yellow;
 }
 
 .my-input-time {
@@ -1011,7 +1014,10 @@ export default {
 .label-big {
 	height: 43px;
 	line-height: 43px;
-	@apply bg-blue-800 text-white text-xl pl-3;
+	background-color: #254ec1;
+	color: white;
+	font-size: 1.5em;
+	padding-left: 15px;
 }
 
 .my-big-btn {
@@ -1028,6 +1034,6 @@ export default {
 }
 
 .my-big-btn:focus {
-	@apply bg-red-600;
+	background-color: red;
 }
 </style>
