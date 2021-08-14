@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<el-form inline @submit.native.prevent class="text-right">
-			<el-form-item class="mb-0">
+			<el-form-item style="margin-bottom: 0">
 				<el-button
 					size="small"
 					type="danger"
@@ -11,7 +11,7 @@
 					>HAPUS SNAPSHOT</el-button
 				>
 			</el-form-item>
-			<el-form-item class="mb-0">
+			<el-form-item style="margin-bottom: 0">
 				<el-button
 					icon="el-icon-refresh"
 					type="primary"
@@ -105,7 +105,7 @@ export default {
 	padding: 15px;
 	border: 1px solid #ddd;
 	width: 400px;
-	height: calc(100vh - 300px);
+	height: calc(100vh - 270px);
 	overflow: auto;
 }
 
