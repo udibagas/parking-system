@@ -211,6 +211,7 @@ export default {
 					})
 				})
 		},
+
 		store() {
 			this.loading = true
 			this.$axios

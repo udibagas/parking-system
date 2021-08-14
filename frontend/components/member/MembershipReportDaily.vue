@@ -66,16 +66,15 @@ export default {
 			showPrintDialog: false,
 		}
 	},
+
 	methods: {
 		requestData() {
 			let params = { date: this.date }
 			this.loading = true
 
-			axios
-				.get('/memberRenewal/reportDaily', { params: params })
-				.then((r) => {
-					this.report = r.data
-				})
+			this.$axios
+				.$get('/api/memberRenewal/reportDaily', { params })
+				.then((r) => (this.report = r))
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
@@ -83,16 +82,15 @@ export default {
 						showClose: false,
 					})
 				})
-				.finally(() => {
-					this.loading = false
-				})
+				.finally(() => (this.loading = false))
 		},
+
 		printReport(printer_id) {
 			let params = { date: this.date, action: 'print', printer_id }
 			this.loading = true
 
-			axios
-				.get('/memberRenewal/reportDaily', { params: params })
+			this.$axios
+				.$get('/api/memberRenewal/reportDaily', { params })
 				.then((r) => {
 					this.$message({
 						message: 'Silakan ambil slip',
@@ -113,6 +111,7 @@ export default {
 					this.showPrintDialog = false
 				})
 		},
+
 		getSummaries(param) {
 			const { columns, data } = param
 			const sums = []
@@ -139,6 +138,7 @@ export default {
 			return sums
 		},
 	},
+
 	mounted() {
 		this.requestData()
 	},

@@ -75,7 +75,7 @@ export default {
 	props: ['show'],
 	data() {
 		return {
-			formModel: this.$auth.user,
+			formModel: { ...this.$auth.user },
 			loading: false,
 			formErrors: {},
 			error: {},

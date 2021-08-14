@@ -249,6 +249,10 @@ export default {
 		}
 	},
 	methods: {
+		afterSave() {
+			this.$store.dispatch('getKameraList')
+		},
+
 		testKamera(id) {
 			this.$axios
 				.$get(`/kamera/test/${id}`)

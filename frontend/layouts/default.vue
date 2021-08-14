@@ -110,9 +110,11 @@ export default {
 
 	created() {
 		this.$store.dispatch('getNavigationList')
+		this.$store.dispatch('getSetting')
+		this.$store.dispatch('getGateInList')
+		this.$store.dispatch('getGateOutList')
 		this.$store.dispatch('getJenisKendaraanList')
-		this.$store.dispatch('getGroupMemberList')
-		this.$store.dispatch('getMemberList')
+		this.$store.dispatch('getShiftList')
 	},
 }
 </script>

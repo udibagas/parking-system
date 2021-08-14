@@ -366,6 +366,10 @@ export default {
 	},
 
 	methods: {
+		afterSave() {
+			this.$store.dispatch('getShiftList')
+		},
+
 		testGate(gate) {
 			console.log(`connecting to ${gate.pos.ip_address}:5678`)
 			const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`)

@@ -1,14 +1,6 @@
 <template>
 	<div>
-		<el-form
-			inline
-			class="text-right"
-			@submit.native.prevent="
-				() => {
-					return
-				}
-			"
-		>
+		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item>
 				<el-button
 					size="small"
@@ -26,6 +18,7 @@
 			</el-form-item>
 			<el-form-item>
 				<el-date-picker
+					style="margin-top: 5px"
 					size="small"
 					@change="requestData"
 					v-model="dateRange"
@@ -47,19 +40,14 @@
 					>SET SUDAH KELUAR SEMUA</el-button
 				>
 			</el-form-item>
-			<el-form-item style="margin-right: 0">
+			<el-form-item>
 				<el-input
 					size="small"
 					v-model="keyword"
 					placeholder="Cari"
 					prefix-icon="el-icon-search"
 					:clearable="true"
-					@change="
-						(v) => {
-							keyword = v
-							requestData()
-						}
-					"
+					@change="searchData"
 				>
 				</el-input>
 			</el-form-item>
@@ -74,16 +62,9 @@
 					showTrxDetail = true
 				}
 			"
-			@filter-change="
-				(f) => {
-					let c = Object.keys(f)[0]
-					filters[c] = Object.values(f[c])
-					page = 1
-					requestData()
-				}
-			"
+			@filter-change="filterChange"
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 260px)"
+			height="calc(100vh - 310px)"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -92,7 +73,7 @@
 				label="No. Tiket"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="100px"
+				min-width="110px"
 			></el-table-column>
 
 			<el-table-column
@@ -100,11 +81,7 @@
 				prop="shift.nama"
 				column-key="shift_id"
 				min-width="80px"
-				:filters="
-					shiftList.map((s) => {
-						return { value: s.id, text: s.nama }
-					})
-				"
+				:filters="shiftList.map((s) => ({ value: s.id, text: s.nama }))"
 			>
 			</el-table-column>
 
@@ -114,12 +91,10 @@
 				sortable="custom"
 				show-overflow-tooltip
 				:filters="
-					jenisKendaraanList.map((v) => {
-						return { value: v.nama, text: v.nama }
-					})
+					jenisKendaraanList.map((v) => ({ value: v.nama, text: v.nama }))
 				"
 				column-key="jenis_kendaraan"
-				min-width="160px"
+				min-width="170px"
 			>
 			</el-table-column>
 
@@ -150,11 +125,7 @@
 				show-overflow-tooltip
 				min-width="150px"
 				column-key="gate_in_id"
-				:filters="
-					gateInList.map((g) => {
-						return { value: g.id, text: g.nama }
-					})
-				"
+				:filters="gateInList.map((g) => ({ value: g.id, text: g.nama }))"
 			>
 			</el-table-column>
 
@@ -164,11 +135,7 @@
 				show-overflow-tooltip
 				min-width="150px"
 				column-key="gate_out_id"
-				:filters="
-					gateOutList.map((g) => {
-						return { value: g.id, text: g.nama }
-					})
-				"
+				:filters="gateOutList.map((g) => ({ value: g.id, text: g.nama }))"
 			>
 			</el-table-column>
 
@@ -292,17 +259,7 @@
 				header-align="center"
 			>
 				<template slot="header">
-					<el-button
-						type="text"
-						@click="
-							() => {
-								page = 1
-								keyword = ''
-								requestData()
-							}
-						"
-						icon="el-icon-refresh"
-					>
+					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
 					</el-button>
 				</template>
 				<template slot-scope="scope">
@@ -356,36 +313,27 @@
 			</el-table-column>
 		</el-table>
 
+		<br />
+
 		<el-pagination
-			class="mt-3"
+			class="text-right"
 			background
-			@current-change="
-				(p) => {
-					page = p
-					requestData()
-				}
-			"
-			@size-change="
-				(s) => {
-					pageSize = s
-					requestData()
-				}
-			"
-			layout="prev, pager, next, sizes, total"
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
 			:page-size="pageSize"
 			:page-sizes="[10, 25, 50, 100]"
 			:total="tableData.total"
-		>
-		</el-pagination>
+		></el-pagination>
 
-		<DetailTransaksi
+		<TransactionDetailTransaksi
 			v-if="trx"
 			:trx="trx"
 			:show="showTrxDetail"
 			@close="showTrxDetail = false"
 		/>
 
-		<FormTransaksiManual
+		<TransactionFormTransaksiManual
 			v-if="showForm"
 			:show="showForm"
 			:model="formModel"
@@ -433,11 +381,11 @@ export default {
 		setSudahKeluar(id) {
 			this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' })
 				.then(() => {
-					axios
-						.put('parkingTransaction/setSudahKeluar/' + id)
+					this.$axios
+						.$put('/api/parkingTransaction/setSudahKeluar/' + id)
 						.then((r) => {
 							this.$message({
-								message: r.data.message,
+								message: r.message,
 								type: 'success',
 							})
 							this.requestData()
@@ -455,13 +403,13 @@ export default {
 		setSudahKeluarSemua() {
 			this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' })
 				.then(() => {
-					axios
-						.put('parkingTransaction/setSudahKeluarSemua', {
+					this.$axios
+						.$put('/api/parkingTransaction/setSudahKeluarSemua', {
 							dateRange: this.dateRange,
 						})
 						.then((r) => {
 							this.$message({
-								message: r.data.message,
+								message: r.message,
 								type: 'success',
 							})
 							this.requestData()
@@ -477,11 +425,11 @@ export default {
 		},
 
 		printTicket(id) {
-			axios
-				.post(`/parkingTransaction/printTicketOut/${id}`)
+			this.$axios
+				.post(`/api/parkingTransaction/printTicketOut/${id}`)
 				.then((r) => {
 					this.$message({
-						message: r.data.message,
+						message: r.message,
 						type: 'success',
 					})
 				})
@@ -493,20 +441,12 @@ export default {
 				})
 		},
 	},
-
-	mounted() {
-		this.requestData()
-		this.$store.commit('getGateInList')
-		this.$store.commit('getGateOutList')
-		this.$store.commit('getJenisKendaraanList')
-		this.$store.commit('getShiftList')
-	},
 }
 </script>
 
 <style scoped>
 .block {
-	background-color: #eee;
+	background-color: rgb(209, 202, 202);
 	height: calc(50vh - 120px);
 }
 

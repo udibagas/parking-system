@@ -1,14 +1,6 @@
 <template>
 	<div>
-		<el-form
-			inline
-			class="text-right"
-			@submit.native.prevent="
-				() => {
-					return;
-				}
-			"
-		>
+		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item>
 				<el-input
 					size="small"
@@ -16,12 +8,7 @@
 					placeholder="Cari"
 					prefix-icon="el-icon-search"
 					clearable
-					@change="
-						(v) => {
-							keyword = v;
-							requestData();
-						}
-					"
+					@change="searchData"
 				>
 				</el-input>
 			</el-form-item>
@@ -32,12 +19,12 @@
 			stripe
 			@row-dblclick="
 				(row, column, event) => {
-					snapshots = row.snapshots;
-					showSnapshot = true;
+					snapshots = row.snapshots
+					showSnapshot = true
 				}
 			"
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 260px)"
+			height="calc(100vh - 310px)"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -79,17 +66,7 @@
 				header-align="center"
 			>
 				<template slot="header">
-					<el-button
-						type="text"
-						@click="
-							() => {
-								page = 1;
-								keyword = '';
-								requestData();
-							}
-						"
-						icon="el-icon-refresh"
-					>
+					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
 					</el-button>
 				</template>
 				<template slot-scope="scope">
@@ -102,8 +79,8 @@
 								icon="el-icon-camera"
 								@click.native.prevent="
 									() => {
-										snapshots = scope.row.snapshots;
-										showSnapshot = true;
+										snapshots = scope.row.snapshots
+										showSnapshot = true
 									}
 								"
 								>Lihat Snapshot</el-dropdown-item
@@ -114,35 +91,20 @@
 			</el-table-column>
 		</el-table>
 
+		<br />
+
 		<el-pagination
-			class="mt-3"
+			class="text-right"
 			background
-			@current-change="
-				(p) => {
-					page = p;
-					requestData();
-				}
-			"
-			@size-change="
-				(s) => {
-					pageSize = s;
-					requestData();
-				}
-			"
+			@current-change="currentChange"
+			@size-change="sizeChange"
 			layout="total, sizes, prev, pager, next"
 			:page-size="pageSize"
 			:page-sizes="[10, 25, 50, 100]"
 			:total="tableData.total"
-		>
-		</el-pagination>
+		></el-pagination>
 
-		<el-dialog
-			center
-			top="60px"
-			width="600px"
-			:visible.sync="showSnapshot"
-			title="SNAPSHOT"
-		>
+		<el-dialog center :visible.sync="showSnapshot" title="SNAPSHOT">
 			<el-image
 				v-for="(snapshot, i) in snapshots"
 				:key="i"
@@ -159,66 +121,23 @@
 </template>
 
 <script>
+import crud from '@/mixins/crud'
+
 export default {
-	props: ["range"],
+	mixins: [crud],
+	props: ['range'],
 	watch: {
 		range(v) {
-			this.requestData();
+			this.requestData()
 		},
 	},
 	data() {
 		return {
-			keyword: "",
-			page: 1,
-			pageSize: 10,
-			tableData: {},
-			sort: "updated_at",
-			order: "descending",
-			loading: false,
+			sort: 'updated_at',
+			order: 'descending',
 			showSnapshot: false,
 			snapshots: [],
-		};
+		}
 	},
-	methods: {
-		sortChange(c) {
-			if (c.prop != this.sort || c.order != this.order) {
-				this.sort = c.prop;
-				this.order = c.order;
-				this.requestData();
-			}
-		},
-		requestData() {
-			let params = {
-				page: this.page,
-				keyword: this.keyword,
-				pageSize: this.pageSize,
-				sort: this.sort,
-				order: this.order,
-				dateRange: this.range,
-			};
-
-			this.loading = true;
-			axios
-				.get("/manualOpenLog", { params: params })
-				.then((r) => {
-					this.tableData = r.data;
-				})
-				.catch((e) => {
-					if (e.response.status == 500) {
-						this.$message({
-							message: e.response.data.message,
-							type: "error",
-							showClose: true,
-						});
-					}
-				})
-				.finally(() => {
-					this.loading = false;
-				});
-		},
-	},
-	mounted() {
-		this.requestData();
-	},
-};
+}
 </script>

@@ -1,14 +1,6 @@
 <template>
 	<div>
-		<el-form
-			inline
-			class="text-right"
-			@submit.native.prevent="
-				() => {
-					return
-				}
-			"
-		>
+		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item v-if="$auth.user.role == 1">
 				<el-button
 					size="small"
@@ -26,21 +18,16 @@
 					placeholder="Cari"
 					prefix-icon="el-icon-search"
 					:clearable="true"
-					@change="
-						(v) => {
-							keyword = v
-							requestData()
-						}
-					"
+					@change="searchData"
 				>
 				</el-input>
 			</el-form-item>
 		</el-form>
 
 		<el-table
-			:data="tableData"
+			:data="tableData.data"
 			stripe
-			height="calc(100vh - 220px)"
+			height="calc(100vh - 310px)"
 			v-loading="loading"
 		>
 			<el-table-column
@@ -63,17 +50,7 @@
 				v-if="$auth.user.role == 1"
 			>
 				<template slot="header">
-					<el-button
-						type="text"
-						@click="
-							() => {
-								page = 1
-								keyword = ''
-								requestData()
-							}
-						"
-						icon="el-icon-refresh"
-					>
+					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
 					</el-button>
 				</template>
 				<template slot-scope="scope">
@@ -93,6 +70,19 @@
 				</template>
 			</el-table-column>
 		</el-table>
+
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
 
 		<el-dialog
 			:visible.sync="showForm"
@@ -123,15 +113,12 @@
 				</el-form-item>
 			</el-form>
 			<span slot="footer">
-				<el-button icon="el-icon-error" @click="showForm = false"
-					>BATAL</el-button
-				>
-				<el-button
-					type="primary"
-					icon="el-icon-success"
-					@click="() => (!!formModel.id ? update() : store())"
-					>SIMPAN</el-button
-				>
+				<el-button icon="el-icon-error" @click="showForm = false">
+					BATAL
+				</el-button>
+				<el-button type="primary" icon="el-icon-success" @click="save">
+					SIMPAN
+				</el-button>
 			</span>
 		</el-dialog>
 	</div>
@@ -146,6 +133,12 @@ export default {
 		return {
 			url: '/api/groupMember',
 		}
+	},
+
+	methods: {
+		afterSave() {
+			this.$store.dispatch('getGroupList')
+		},
 	},
 }
 </script>

@@ -70,11 +70,9 @@ export default {
 			let params = { dateRange: this.dateRange }
 			this.loading = true
 
-			axios
-				.get('/api/memberRenewal/report', { params: params })
-				.then((r) => {
-					this.report = r.data
-				})
+			this.$axios
+				.$get('/api/memberRenewal/report', { params })
+				.then((r) => (this.report = r))
 				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
@@ -82,17 +80,15 @@ export default {
 						showClose: false,
 					})
 				})
-				.finally(() => {
-					this.loading = false
-				})
+				.finally(() => (this.loading = false))
 		},
 
 		printReport(printer_id) {
 			let params = { dateRange: this.dateRange, action: 'print', printer_id }
 			this.loading = true
 
-			axios
-				.get('/api/memberRenewal/report', { params: params })
+			this.$axios
+				.$get('/api/memberRenewal/report', { params })
 				.then((r) => {
 					this.$message({
 						message: 'Silakan ambil slip',
@@ -140,6 +136,7 @@ export default {
 			return sums
 		},
 	},
+
 	mounted() {
 		this.requestData()
 	},

@@ -132,6 +132,12 @@ export default {
 	data() {
 		return { url: '/api/shift' }
 	},
+
+	methods: {
+		afterSave() {
+			this.$store.dispatch('getShiftList')
+		},
+	},
 }
 </script>
 

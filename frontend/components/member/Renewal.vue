@@ -1,14 +1,6 @@
 <template>
 	<div>
-		<el-form
-			inline
-			class="text-right"
-			@submit.native.prevent="
-				() => {
-					return
-				}
-			"
-		>
+		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item>
 				<el-button size="small" @click="openForm({})" type="primary"
 					><i class="el-icon-plus"></i> INPUT PEMBAYARAN KEANGGOTAAN</el-button
@@ -17,6 +9,7 @@
 
 			<el-form-item>
 				<el-date-picker
+					style="margin-top: 5px"
 					size="small"
 					@change="requestData"
 					v-model="dateRange"
@@ -37,12 +30,7 @@
 					placeholder="Cari"
 					prefix-icon="el-icon-search"
 					clearable
-					@change="
-						(v) => {
-							keyword = v
-							requestData()
-						}
-					"
+					@change="searchData"
 				>
 				</el-input>
 			</el-form-item>
@@ -52,7 +40,7 @@
 			:data="tableData.data"
 			stripe
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 260px)"
+			height="calc(100vh - 310px)"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -60,10 +48,10 @@
 				prop="created_at"
 				label="Tanggal Trx"
 				sortable="custom"
-				min-width="150"
+				min-width="180"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.created_at | readableDateTime }}
+					{{ $moment(scope.row.created_at).format('DD-MMM-YYYY HH:mm:ss') }}
 				</template>
 			</el-table-column>
 
@@ -80,7 +68,7 @@
 				prop="nomor_kartu"
 				label="Nomor Kartu"
 				sortable="custom"
-				min-width="120"
+				min-width="130"
 			></el-table-column>
 
 			<el-table-column
@@ -92,7 +80,7 @@
 				header-align="center"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.dari_tanggal | readableDate }}
+					{{ $moment(scope.row.dari_tanggal).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
 
@@ -105,7 +93,7 @@
 				header-align="center"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.sampai_tanggal | readableDate }}
+					{{ $moment(scope.row.sampai_tanggal).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
 
@@ -136,17 +124,7 @@
 				header-align="center"
 			>
 				<template slot="header">
-					<el-button
-						type="text"
-						@click="
-							() => {
-								page = 1
-								keyword = ''
-								requestData()
-							}
-						"
-						icon="el-icon-refresh"
-					>
+					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
 					</el-button>
 				</template>
 				<template slot-scope="scope">
@@ -183,19 +161,18 @@
 			</el-table-column>
 		</el-table>
 
-		<div class="flex flex-row mt-3">
-			<el-pagination
-				class="flex-grow"
-				background
-				@current-change="currentChange"
-				@size-change="sizeChange"
-				layout="total, sizes, prev, pager, next"
-				:page-size="pageSize"
-				:page-sizes="[10, 25, 50, 100]"
-				:total="tableData.total"
-			>
-			</el-pagination>
-		</div>
+		<br />
+
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
 
 		<el-dialog
 			:visible.sync="showForm"
@@ -204,7 +181,6 @@
 					? 'EDIT PEMBAYARAN KEANGGOTAAN'
 					: 'INPUT PEMBAYARAN KEANGGOTAAN'
 			"
-			width="500px"
 			v-loading="loading"
 			:close-on-click-modal="false"
 		>
@@ -307,12 +283,10 @@
 				</el-form-item>
 			</el-form>
 			<span slot="footer" class="dialog-footer">
-				<el-button icon="el-icon-success" type="primary" @click="save"
-					>SIMPAN</el-button
-				>
-				<el-button icon="el-icon-error" type="info" @click="closeForm"
-					>BATAL</el-button
-				>
+				<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
+				<el-button icon="el-icon-success" type="primary" @click="save">
+					SIMPAN
+				</el-button>
 			</span>
 		</el-dialog>
 
@@ -326,6 +300,7 @@
 
 <script>
 import crud from '@/mixins/crud'
+import { mapState } from 'vuex'
 
 export default {
 	mixins: [crud],
@@ -338,18 +313,23 @@ export default {
 			dateRange: '',
 			showPrintDialog: false,
 			selectedData: {},
+			sampai_tanggal: null,
 		}
+	},
+
+	computed: {
+		...mapState(['memberList', 'groupMemberList']),
 	},
 
 	methods: {
 		printSlip(printer_id) {
-			axios
-				.post(`${this.url}/printSlip/${this.selectedData.id}`, {
+			this.$axios
+				.$post(`${this.url}/printSlip/${this.selectedData.id}`, {
 					printer_id,
 				})
 				.then((r) => {
 					this.$message({
-						message: r.data.message,
+						message: r.message,
 						type: 'success',
 					})
 				})
@@ -363,11 +343,6 @@ export default {
 					this.showPrintDialog = false
 				})
 		},
-	},
-
-	mounted() {
-		this.requestData()
-		this.$store.dispatch('getMemberList')
 	},
 }
 </script>

@@ -858,11 +858,11 @@ export default {
 		},
 
 		getSetting(state) {
-			axios
-				.get('/setting')
+			this.$axios
+				.$get('/setting')
 				.then((r) => {
-					this.setting = r.data
-					this.formModel.plat_nomor = r.data.plat_nomor_default
+					this.setting = r
+					this.formModel.plat_nomor = r.plat_nomor_default
 
 					if (this.setting.disable_plat_nomor) {
 						document.getElementById('nomor-tiket').focus()
@@ -881,8 +881,8 @@ export default {
 		},
 
 		getPosList() {
-			axios.get('/pos').then((r) => {
-				if (r.data.length == 0) {
+			this.$axios.$get('/api/pos').then((r) => {
+				if (r.length == 0) {
 					this.$message({
 						message: 'BELUM ADA POS',
 						type: 'error',
@@ -893,10 +893,10 @@ export default {
 					this.posList = r.data
 
 					if (this.posList.length == 1) {
-						this.formModel.pos_id = r.data[0].id
+						this.formModel.pos_id = r[0].id
 
 						if (r.data[0].gate_outs.length == 1) {
-							this.formModel.gate_out_id = r.data[0].gate_outs[0].id
+							this.formModel.gate_out_id = r[0].gate_outs[0].id
 						}
 					}
 				}
@@ -905,7 +905,7 @@ export default {
 
 		takeSnapshot() {
 			axios
-				.post(`/parkingTransaction/takeSnapshot/${this.formModel.id}`, {
+				.post(`/api/parkingTransaction/takeSnapshot/${this.formModel.id}`, {
 					gate_out_id: this.formModel.gate_out_id,
 				})
 				.then((r) => {
@@ -922,12 +922,8 @@ export default {
 	},
 
 	mounted() {
-		this.$store.dispatch('getNavigationList')
 		this.getSetting()
 		this.getPosList()
-		this.$store.dispatch('getGateInList')
-		this.$store.dispatch('getGateOutList')
-		this.$store.dispatch('getJenisKendaraanList')
 
 		document.getElementById('gate-out-app').onkeydown = (e) => {
 			// console.log(e.key)

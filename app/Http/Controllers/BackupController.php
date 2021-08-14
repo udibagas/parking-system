@@ -37,9 +37,10 @@ class BackupController extends Controller
             return response(['message' => 'File backup telah diupload']);
         }
 
+        // masih gak kebaca environment-nya
         try {
             $dump = new IMysqldump\Mysqldump(
-                'mysql:host=' . env('DB_HOST') . ';dbname=' . env('DB_DATABASE'),
+                'mysql:host=' . config('database.host') . ';dbname=parking_system',
                 env('DB_USERNAME'),
                 env('DB_PASSWORD'),
                 ['add-drop-table' => true]

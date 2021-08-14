@@ -45,18 +45,18 @@
 
 <script>
 import { mapState } from 'vuex'
+
 export default {
 	props: ['show'],
+
 	computed: {
 		...mapState(['printerList']),
 	},
+
 	data() {
 		return {
 			printer_id: null,
 		}
-	},
-	mounted() {
-		this.$store.commit('getPrinterList')
 	},
 }
 </script>

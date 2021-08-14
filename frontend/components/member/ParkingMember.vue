@@ -1,14 +1,6 @@
 <template>
 	<div>
-		<el-form
-			inline
-			class="text-right"
-			@submit.native.prevent="
-				() => {
-					return
-				}
-			"
-		>
+		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item v-if="$auth.user.role == 1">
 				<el-button
 					size="small"
@@ -25,12 +17,7 @@
 					placeholder="Cari"
 					prefix-icon="el-icon-search"
 					:clearable="true"
-					@change="
-						(v) => {
-							keyword = v
-							requestData()
-						}
-					"
+					@change="searchData"
 				>
 				</el-input>
 			</el-form-item>
@@ -62,15 +49,8 @@
 				}
 			"
 			:default-sort="{ prop: sort, order: order }"
-			height="calc(100vh - 260px)"
-			@filter-change="
-				(f) => {
-					let c = Object.keys(f)[0]
-					filters[c] = Object.values(f[c])
-					page = 1
-					requestData()
-				}
-			"
+			height="calc(100vh - 310px)"
+			@filter-change="filterChange"
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
@@ -127,9 +107,7 @@
 
 			<el-table-column
 				:filters="
-					this.groupMemberList.map((g) => {
-						return { value: g.id, text: g.nama }
-					})
+					this.groupMemberList.map((g) => ({ value: g.id, text: g.nama }))
 				"
 				column-key="group_member_id"
 				prop="group.nama"
@@ -165,7 +143,7 @@
 				header-align="center"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.register_date | readableDate }}
+					{{ $moment(scope.row.register_date).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -177,7 +155,7 @@
 				header-align="center"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.expiry_date | readableDate }}
+					{{ $moment(scope.row.expiry_date).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -221,7 +199,7 @@
 				min-width="150px"
 			>
 				<template slot-scope="scope">
-					{{ scope.row.last_transaction | readableDate }}
+					{{ $moment(scope.row.last_transaction).format('DD-MMM-YYYY') }}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -257,17 +235,7 @@
 				v-if="$auth.user.role == 1"
 			>
 				<template slot="header">
-					<el-button
-						type="text"
-						@click="
-							() => {
-								page = 1
-								keyword = ''
-								requestData()
-							}
-						"
-						icon="el-icon-refresh"
-					>
+					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
 					</el-button>
 				</template>
 				<template slot-scope="scope">
@@ -302,34 +270,18 @@
 			</el-table-column>
 		</el-table>
 
-		<div class="flex flex-row mt-3">
-			<el-pagination
-				class="flex-grow"
-				background
-				@current-change="
-					(p) => {
-						page = p
-						requestData()
-					}
-				"
-				@size-change="
-					(s) => {
-						pageSize = s
-						requestData()
-					}
-				"
-				layout="total, sizes, prev, pager, next"
-				:page-size="pageSize"
-				:page-sizes="[10, 25, 50, 100]"
-				:total="tableData.total"
-			>
-			</el-pagination>
+		<br />
 
-			<div class="text-sm">
-				Menampilkan {{ tableData.from }} - {{ tableData.to }} dari
-				{{ tableData.total }}
-			</div>
-		</div>
+		<el-pagination
+			class="text-right"
+			background
+			@current-change="currentChange"
+			@size-change="sizeChange"
+			layout="total, sizes, prev, pager, next"
+			:page-size="pageSize"
+			:page-sizes="[10, 25, 50, 100]"
+			:total="tableData.total"
+		></el-pagination>
 
 		<el-dialog
 			v-if="!!selectedData"
@@ -344,15 +296,10 @@
 		<el-dialog
 			fullscreen
 			center
-			:visible.sync="show"
+			:visible.sync="showForm"
 			:title="!!formModel.id ? 'EDIT MEMBER' : 'TAMBAH MEMBER'"
 			v-loading="loading"
 			:close-on-click-modal="false"
-			:before-close="
-				(done) => {
-					closeForm()
-				}
-			"
 		>
 			<el-form label-width="150px" label-position="left">
 				<el-row :gutter="30">
@@ -662,7 +609,7 @@ export default {
 				return ''
 			}
 		},
-		...mapState(['groupMemberList', 'siklus']),
+		...mapState(['groupMemberList', 'siklus', 'setting']),
 	},
 
 	watch: {
@@ -675,8 +622,10 @@ export default {
 
 	data() {
 		return {
+			url: '/api/member',
 			sort: 'nama',
 			order: 'ascending',
+			formModel: { vehicles: [] },
 			selectedData: { vehicles: [] },
 			showDetail: false,
 			now: this.$moment().format('YYYY-MM-DD'),
@@ -685,33 +634,28 @@ export default {
 
 	methods: {
 		print() {
-			const params = Object.assign(
-				{
-					pageSize: 1000000,
-					sort: this.sort,
-					order: this.order,
-					action: 'print',
-					token: this.$store.state.token,
-				},
-				this.filters
-			)
+			const params = {
+				sort: this.sort,
+				order: this.order,
+				action: 'print',
+				token: this.$store.state.token,
+				...this.filters,
+			}
 
-			const querystring = Object.keys(params)
-				.map((key) => key + '=' + params[key])
-				.join('&')
+			const querystring = new URLSearchParams(params).toString()
 			window.open('/api/member?' + querystring, '_blank')
 		},
 
 		download() {
 			// TODO: harusnya pindah ke backend
 			const params = {
-				pageSize: 1000000,
 				sort: this.sort,
 				order: this.order,
+				...this.filters,
 			}
 
 			this.$axios
-				.$get('member', { params: Object.assign(params, this.filters) })
+				.$get('member', { params })
 				.then((response) => {
 					const data = response.data.map((d, i) => {
 						return {
@@ -786,15 +730,13 @@ export default {
 			}
 		},
 
-    afterSave() {
-      this.$store.dispatch('getMemberList')
-    },
+		afterSave() {
+			this.$store.dispatch('getMemberList')
+		},
 	},
 
-	mounted() {
-		this.requestData()
-		this.$store.dispatch('getGroupMemberList')
-		this.$store.dispatch('getSetting')
+	created() {
+		this.$store.dispatch('getMemberList')
 	},
 }
 </script>

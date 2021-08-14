@@ -7,7 +7,6 @@
 				: 'EDIT TRANSAKSI ' + formModel.nomor_barcode
 		"
 		:visible.sync="show"
-		top="60px"
 		width="800px"
 		:before-close="(done) => closeForm()"
 	>

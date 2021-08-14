@@ -286,6 +286,12 @@ export default {
 		}
 	},
 
+	methods: {
+		afterSave() {
+			this.$store.dispatch('getGateInList')
+		},
+	},
+
 	computed: {
 		...mapState(['jenisKendaraanList', 'printerList', 'kameraList']),
 	},

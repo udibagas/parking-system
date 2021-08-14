@@ -43,16 +43,13 @@ class MemberController extends Controller
             return $q->where('berbayar', 1);
         })->when($request->berbayar == ['n'] || $request->berbayar == 'n', function ($q) {
             return $q->where('berbayar', 0);
-        })->orderBy($sort, $order)->paginate($request->pageSize);
+        })->orderBy($sort, $order);
 
-        if ($request->action == 'print') {
-            return view('member.print', [
-                'data' => $data,
-                'setting' => Setting::first()
-            ]);
-        }
+        $data = $request->paginated ? $data->paginate($request->pageSize) : $data->get();
 
-        return $data;
+        return $request->action == 'print'
+            ? view('member.print', ['data' => $data, 'setting' => Setting::first()])
+            : $data;
     }
 
     /**

@@ -46,7 +46,7 @@
 			:data="tableData"
 			v-loading="loading"
 			stripe
-			height="calc(100vh - 220px)"
+			height="calc(100vh - 300px)"
 			@selection-change="handleSelectionChange"
 		>
 			<el-table-column
@@ -114,154 +114,154 @@ export default {
 			tableData: [],
 			loading: false,
 			processing: false,
-			selectedFiles: []
-		};
+			selectedFiles: [],
+		}
 	},
 
 	mounted() {
-		this.getData();
+		this.getData()
 	},
 
 	methods: {
 		getData() {
-			this.loading = true;
-			axios
-				.get("/backup")
-				.then(response => {
-					this.tableData = response.data;
+			this.loading = true
+			this.$axios
+				.$get('/api/backup')
+				.then((response) => {
+					this.tableData = response
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-						showClose: true
-					});
+						type: 'error',
+						showClose: true,
+					})
 				})
-				.finally(() => (this.loading = false));
+				.finally(() => (this.loading = false))
 		},
 
 		deleteData(file) {
-			this.$confirm("Anda yakin akan menghapus file ini?", "Konfirmasi", {
-				type: "warning"
+			this.$confirm('Anda yakin akan menghapus file ini?', 'Konfirmasi', {
+				type: 'warning',
 			})
 				.then(() => {
-					const params = { file };
-					axios
-						.delete("/backup", { params })
-						.then(response => {
+					const params = { file }
+					this.$axios
+						.$delete('/api/backup', { params })
+						.then((response) => {
 							this.$message({
-								message: response.data.message,
-								type: "success",
-								showClose: true
-							});
-							this.getData();
+								message: response.message,
+								type: 'success',
+								showClose: true,
+							})
+							this.getData()
 						})
-						.catch(e => {
+						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
-								showClose: true
-							});
-						});
+								type: 'error',
+								showClose: true,
+							})
+						})
 				})
-				.catch(e => console.log(e));
+				.catch((e) => console.log(e))
 		},
 
 		backup() {
-			this.processing = true;
-			axios
-				.post("/backup")
-				.then(response => {
+			this.processing = true
+			this.$axios
+				.$post('/api/backup')
+				.then((response) => {
 					this.$message({
-						message: response.data.message,
-						type: "success",
-						showClose: true
-					});
-					this.getData();
+						message: response.message,
+						type: 'success',
+						showClose: true,
+					})
+					this.getData()
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-						showClose: true
-					});
+						type: 'error',
+						showClose: true,
+					})
 				})
-				.finally(() => (this.processing = false));
+				.finally(() => (this.processing = false))
 		},
 
 		restore(file) {
-			this.$confirm("Anda yakin akan me-restore database?", "Konfirmasi", {
-				type: "warning"
+			this.$confirm('Anda yakin akan me-restore database?', 'Konfirmasi', {
+				type: 'warning',
 			})
 				.then(() => {
-					this.loading = true;
-					axios
-						.put("/backup", { file })
-						.then(response => {
+					this.loading = true
+					this.$axios
+						.$put('/api/backup', { file })
+						.then((response) => {
 							this.$message({
 								message: response.message,
-								type: "success",
-								showClose: true
-							});
-							this.getData();
+								type: 'success',
+								showClose: true,
+							})
+							this.getData()
 						})
-						.catch(e => {
+						.catch((e) => {
 							this.$message({
 								message: e.response.data.message,
-								type: "error",
-								showClose: true
-							});
+								type: 'error',
+								showClose: true,
+							})
 						})
-						.finally(() => (this.loading = false));
+						.finally(() => (this.loading = false))
 				})
-				.catch(e => console.log(e));
+				.catch((e) => console.log(e))
 		},
 
 		triggerOpenFile() {
-			const f = document.getElementById("input-file");
-			f.click();
+			const f = document.getElementById('input-file')
+			f.click()
 		},
 
 		uploadFile(event) {
-			var formData = new FormData();
-			formData.append("file", event.target.files[0]);
+			var formData = new FormData()
+			formData.append('file', event.target.files[0])
 
-			axios
-				.post("/backup", formData, {
-					headers: { "Content-Type": "multipart/form-data" }
+			this.$axios
+				.$post('/api/backup', formData, {
+					headers: { 'Content-Type': 'multipart/form-data' },
 				})
-				.then(response => {
+				.then((response) => {
 					this.$message({
-						message: response.data.message,
-						type: "success",
-						showClose: true
-					});
-					this.getData();
+						message: response.message,
+						type: 'success',
+						showClose: true,
+					})
+					this.getData()
 				})
-				.catch(e => {
+				.catch((e) => {
 					this.$message({
 						message: e.response.data.message,
-						type: "error",
-						showClose: true
-					});
+						type: 'error',
+						showClose: true,
+					})
 				})
 				.finally(() => {
-					this.loading = false;
-					document.getElementById("input-file").value = "";
-				});
+					this.loading = false
+					document.getElementById('input-file').value = ''
+				})
 		},
 
 		handleSelectionChange(val) {
-			this.selectedFiles = val.map(v => v.file);
+			this.selectedFiles = val.map((v) => v.file)
 		},
 
 		deleteFiles() {
-			this.deleteData(this.selectedFiles);
+			this.deleteData(this.selectedFiles)
 		},
 
 		download(url) {
-			window.open(url, "_blank");
-		}
-	}
-};
+			window.open(url, '_blank')
+		},
+	},
+}
 </script>

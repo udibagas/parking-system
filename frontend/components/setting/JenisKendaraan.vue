@@ -296,5 +296,11 @@ export default {
 			url: '/api/jenisKendaraan',
 		}
 	},
+
+	methods: {
+		afterSave() {
+			this.$store.dispatch('getJenisKendaraanList')
+		},
+	},
 }
 </script>

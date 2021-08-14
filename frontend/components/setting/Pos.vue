@@ -156,5 +156,11 @@ export default {
 	computed: {
 		...mapState(['printerList']),
 	},
+
+	methods: {
+		afterSave() {
+			this.$store.dispatch('getPosList')
+		},
+	},
 }
 </script>

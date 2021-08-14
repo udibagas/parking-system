@@ -82,7 +82,7 @@ export default {
     },
 
     afterSave() {
-      // pleade override
+      // please override
     },
 
     deleteData(id) {
@@ -146,6 +146,16 @@ export default {
         .then((response) => {
           this.loading = false
           this.tableData = response
+
+          if (response.meta) {
+            const { from, to, total } = response.meta
+            this.tableData = {
+              ...this.tableData,
+              from,
+              to,
+              total,
+            }
+          }
         })
         .catch((e) => {
           this.$message({

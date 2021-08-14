@@ -5,7 +5,7 @@ export const state = () => ({
   groupMemberList: [],
   memberList: [],
   navigationList: [],
-  gateInLIst: [],
+  gateInList: [],
   gateOutList: [],
   kameraList: [],
   posList: [],
