@@ -1,37 +1,40 @@
 <template>
-	<div
-		class="log-container bg-black text-white p-3 font-mono text-sm overflow-auto"
-		v-html="log"
-	></div>
+	<div class="log-container" v-html="log"></div>
 </template>
 
 <script>
 export default {
 	data() {
 		return {
-			log: "",
+			log: '',
 			requestInterval: null,
-		};
+		}
 	},
 	methods: {
 		getLog() {
-			axios
-				.get("controller-log")
-				.then((r) => (this.log = r.data))
-				.catch((e) => console.log(e));
+			this.$axios
+				.$get('/api/controller-log')
+				.then((response) => (this.log = response))
+				.catch((e) => console.log(e))
 		},
 	},
 	mounted() {
-		this.requestInterval = setInterval(this.getLog, 2000);
+		this.requestInterval = setInterval(this.getLog, 2000)
 	},
 	destroyed() {
-		clearInterval(this.requestInterval);
+		clearInterval(this.requestInterval)
 	},
-};
+}
 </script>
 
 <style lang="scss" scoped>
 .log-container {
-	height: calc(100vh - 155px);
+	height: calc(100vh - 230px);
+	background: black;
+	color: white;
+	padding: 15px;
+	font-family: monospace;
+	font-size: 0.9em;
+	overflow: auto;
 }
 </style>
