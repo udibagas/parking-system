@@ -48,7 +48,11 @@
 				sortable="custom"
 				show-overflow-tooltip
 				min-width="150px"
-			></el-table-column>
+			>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.created_at).format('DD-MM-YYYY HH:mm:ss') }}
+				</template>
+			</el-table-column>
 			<el-table-column
 				prop="user"
 				label="User"
@@ -109,7 +113,7 @@ export default {
 			})
 				.then(() => {
 					this.$axios
-						.$delete('/userLog')
+						.$delete('/api/userLog')
 						.then((r) => {
 							this.requestData()
 							this.$message({
