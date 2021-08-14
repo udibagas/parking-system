@@ -1,0 +1,199 @@
+html,
+body {
+  margin: 0;
+  padding: 0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.el-icon-more {
+  transform: rotate(90deg);
+  -webkit-transform: rotate(90deg);
+  -moz-transform: rotate(90deg);
+  -ms-transform: rotate(90deg);
+  -o-transform: rotate(90deg);
+}
+
+.el-table {
+  width: 100%;
+  border-top: 1px solid #eee;
+}
+
+.no-padding-dialog > .el-dialog__body {
+  padding: 0px;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-white,
+.text-white:hover,
+.text-white:active,
+.text-white:focus {
+  color: #fff !important;
+}
+
+.bg-blue {
+  background-color: blue !important;
+}
+
+.bg-indigo {
+  background-color: indigo !important;
+}
+
+.bg-purple {
+  background-color: purple !important;
+}
+
+.bg-pink {
+  background-color: pink !important;
+}
+.bg-red {
+  background-color: red !important;
+}
+
+.bg-orange {
+  background-color: orange !important;
+}
+
+.bg-yellow {
+  background-color: yellow !important;
+}
+
+.bg-green {
+  background-color: green !important;
+}
+
+.bg-teal {
+  background-color: teal !important;
+}
+
+.bg-cyan {
+  background-color: cyan !important;
+}
+
+.el-table th,
+.el-table thead.is-group th {
+  padding: 4px 0;
+}
+
+.text-red,
+.text-danger {
+  color: red;
+}
+
+.text-green,
+.text-success {
+  color: green;
+}
+
+table {
+  border-spacing: 0px;
+  border-collapse: separate;
+}
+
+.table {
+  width: 100%;
+  border-top: 2px solid #ddd;
+}
+
+.table th,
+.table td {
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.el-table .inactive-row {
+  background: #ffeff0;
+}
+
+.el-table .cell,
+.el-dialog__body {
+  word-break: normal;
+}
+
+.brand {
+  font-size: 22px;
+  margin-left: 20px;
+}
+
+.brand-box {
+  height: 150px;
+  background-color: #060446;
+  text-align: center;
+  color: #fff;
+}
+
+.btn-big {
+  font-size: 22px;
+}
+
+.el-header {
+  background-color: #254ec1;
+  color: #fff;
+  line-height: 60px;
+}
+
+.sidebar {
+  background-color: #060446;
+  border-color: #060446;
+  height: calc(100vh - 150px);
+  overflow: auto;
+}
+
+.sidebar:not(.el-menu--collapse) {
+  width: 200px;
+}
+
+.el-aside {
+  height: 100vh;
+  background-color: #060446;
+}
+
+.el-main {
+  background-color: #efefef;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.mb-1 {
+  margin-bottom: 5px;
+}
+
+.mb-3 {
+  margin-bottom: 15px;
+}
+
+.ml-5 {
+  margin-left: 25px;
+}
+
+.p-2 {
+  padding: 2px;
+}
+
+.text-xl {
+  font-size: 2.5em;
+}
+
+.border {
+  border: 1px solid #ddd;
+}
