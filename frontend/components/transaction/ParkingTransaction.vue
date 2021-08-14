@@ -382,7 +382,7 @@ export default {
 			this.$confirm('Anda yakin?', 'Confirm', { type: 'warning' })
 				.then(() => {
 					this.$axios
-						.$put('/api/parkingTransaction/setSudahKeluar/' + id)
+						.$put(`/api/parkingTransaction/setSudahKeluar/${id}`)
 						.then((r) => {
 							this.$message({
 								message: r.message,
@@ -421,7 +421,7 @@ export default {
 							})
 						})
 				})
-				.catch(() => console.log(e))
+				.catch((e) => console.log(e))
 		},
 
 		printTicket(id) {
