@@ -282,4 +282,40 @@ table {
 .el-main {
 	background-color: #efefef;
 }
+
+.flex {
+	display: flex;
+}
+
+.flex-row {
+	flex-direction: row;
+}
+
+.flex-col {
+	flex-direction: column;
+}
+
+.mb-1 {
+	margin-bottom: 5px;
+}
+
+.mb-3 {
+	margin-bottom: 15px;
+}
+
+.ml-5 {
+	margin-left: 25px;
+}
+
+.p-2 {
+	padding: 2px;
+}
+
+.text-xl {
+	font-size: 3em;
+}
+
+.border {
+	border: 1px solid #ddd;
+}
 </style>
