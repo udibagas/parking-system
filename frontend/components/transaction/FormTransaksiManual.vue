@@ -177,15 +177,14 @@
 		</el-form>
 
 		<div slot="footer">
+			<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
 			<el-button
 				type="primary"
 				icon="el-icon-success"
 				@click="() => (!!formModel.id ? update() : store())"
-				>SIMPAN</el-button
 			>
-			<el-button type="info" icon="el-icon-error" @click="closeForm"
-				>BATAL</el-button
-			>
+				SIMPAN
+			</el-button>
 		</div>
 	</el-dialog>
 </template>
