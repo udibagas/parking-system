@@ -30,7 +30,7 @@ class AppController extends Controller
     public function getNavigation(Request $request)
     {
         $nav = [
-            ['label' => 'Home', 'icon' => 'el-icon-s-home', 'path' => 'home'],
+            ['label' => 'Home', 'icon' => 'el-icon-s-home', 'path' => '/'],
             ['label' => 'Transaksi', 'icon' => 'el-icon-document-copy', 'path' => 'transaksi'],
             ['label' => 'Keanggotaan', 'icon' => 'el-icon-bank-card', 'path' => 'member'],
         ];
@@ -38,7 +38,6 @@ class AppController extends Controller
         $adminNav = [
             ['label' => 'Laporan', 'icon' => 'el-icon-data-analysis', 'path' => 'report'],
             ['label' => 'User', 'icon' => 'el-icon-user', 'path' => 'user'],
-            // ['label' => 'Snapshot', 'icon' => 'el-icon-camera', 'path' => 'snapshot'],
             ['label' => 'Log', 'icon' => 'el-icon-bell', 'path' => 'notification'],
             ['label' => 'Pengaturan', 'icon' => 'el-icon-setting', 'path' => 'setting'],
         ];
