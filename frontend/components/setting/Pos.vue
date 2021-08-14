@@ -86,13 +86,7 @@
 			v-loading="loading"
 			title="POS"
 			:close-on-click-modal="false"
-			:visible.sync="show"
-			:before-close="
-				(done) => {
-					closeForm()
-					done()
-				}
-			"
+			:visible.sync="showForm"
 		>
 			<el-form label-position="left" label-width="150px">
 				<el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
@@ -149,6 +143,7 @@
 
 <script>
 import crud from '@/mixins/crud'
+import { mapState } from 'vuex'
 
 export default {
 	mixins: [crud],
@@ -156,6 +151,10 @@ export default {
 		return {
 			url: '/api/pos',
 		}
+	},
+
+	computed: {
+		...mapState(['printerList']),
 	},
 }
 </script>

@@ -72,7 +72,6 @@
 		<el-dialog
 			:visible.sync="showForm"
 			title="SHIFT"
-			width="500px"
 			v-loading="loading"
 			:close-on-click-modal="false"
 		>
@@ -131,7 +130,7 @@ import crud from '@/mixins/crud'
 export default {
 	mixins: [crud],
 	data() {
-		return { url: '/shift' }
+		return { url: '/api/shift' }
 	},
 }
 </script>

@@ -131,7 +131,6 @@
 		></el-pagination>
 
 		<el-dialog
-			width="650px"
 			v-loading="loading"
 			:visible.sync="showForm"
 			title="JENIS KENDARAAN"

@@ -98,7 +98,7 @@ export const actions = {
   },
 
   async getPrinterList({ commit }) {
-    const data = await this.$axios.$get('/api/Printer')
+    const data = await this.$axios.$get('/api/printer')
     commit('setPrinterList', data)
   },
 

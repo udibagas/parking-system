@@ -349,6 +349,7 @@
 
 <script>
 import crud from '@/mixins/crud'
+import { mapState } from 'vuex'
 
 export default {
 	mixins: [crud],
@@ -358,6 +359,10 @@ export default {
 			url: '/api/gateOut',
 			ws: null,
 		}
+	},
+
+	computed: {
+		...mapState(['jenisKendaraanList', 'printerList', 'kameraList', 'posList']),
 	},
 
 	methods: {

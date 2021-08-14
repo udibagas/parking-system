@@ -100,7 +100,6 @@
 		<el-dialog
 			:visible.sync="showForm"
 			title="AREA PARKIR"
-			width="500px"
 			v-loading="loading"
 			:close-on-click-modal="false"
 		>
