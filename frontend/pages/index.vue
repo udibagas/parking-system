@@ -224,6 +224,7 @@ export default {
 		totalBayar() {
 			return Number(this.formModel.tarif) + Number(this.formModel.denda)
 		},
+
 		duration() {
 			if (!this.formModel.time_in || !this.formModel.time_out) {
 				return '00:00:00'
@@ -240,7 +241,14 @@ export default {
 				minute % 60
 			).padStart(2, '0')}`
 		},
-		...mapState(['gateOutList', 'gateInList', 'jenisKendaraanList']),
+
+		...mapState([
+			'setting',
+			'posList',
+			'gateInList',
+			'gateOutList',
+			'jenisKendaraanList',
+		]),
 	},
 
 	data() {
@@ -248,12 +256,11 @@ export default {
 			formModel: { nomor_barcode: '', tarif: '', denda: '' },
 			formErrors: {},
 			snapshots: [],
-			setting: {},
 			showManualOpenForm: false,
-			posList: [],
 			HIDE_PRINT_REPORT: false,
 		}
 	},
+
 	methods: {
 		toSubmit() {
 			this.runningText(`${this.duration}|Rp${this.$decimal(this.totalBayar)}`)
@@ -462,8 +469,8 @@ export default {
 
 		cekPlatNomor() {
 			let params = { plat_nomor: this.formModel.plat_nomor }
-			axios
-				.get('/member/search', { params: params })
+			this.$axios
+				.$get('/api/member/search', { params: params })
 				.then((r) => {
 					this.formModel.is_member = 1
 					this.formModel.tarif = 0
@@ -492,7 +499,7 @@ export default {
 
 			let params = { nomor_barcode: this.formModel.nomor_barcode }
 			this.$axios
-				.$get('/parkingTransaction/search', { params })
+				.$get('/api/parkingTransaction/search', { params })
 				.then((r) => {
 					const data = r
 					this.snapshots = data.snapshots
@@ -810,13 +817,13 @@ export default {
 		},
 
 		printLastTrx() {
-			axios
-				.post('/parkingTransaction/printLastTransaction', {
+			this.$axios
+				.$post('/api/parkingTransaction/printLastTransaction', {
 					pos_id: this.formModel.pos_id,
 				})
 				.then((r) => {
 					this.$message({
-						message: r.data.message,
+						message: r.message,
 						type: 'success',
 						showClose: true,
 					})
@@ -840,8 +847,8 @@ export default {
 				date: this.$moment().format('YYYY-MM-DD'),
 			}
 
-			axios
-				.post('/parkingTransaction/printReport', payload)
+			this.$axios
+				.$post('/api/parkingTransaction/printReport', payload)
 				.then((r) => {
 					this.$message({
 						message: 'SILAKAN AMBIL STRUK',
@@ -858,50 +865,33 @@ export default {
 				})
 		},
 
-		getSetting(state) {
-			this.$axios
-				.$get('/setting')
-				.then((r) => {
-					this.setting = r
-					this.formModel.plat_nomor = r.plat_nomor_default
+		async initialize() {
+			this.formModel.plat_nomor = this.setting.plat_nomor_default
 
-					if (this.setting.disable_plat_nomor) {
-						document.getElementById('nomor-tiket').focus()
-					} else {
-						document.getElementById('plat-nomor').focus()
-					}
+			if (this.setting.disable_plat_nomor) {
+				document.getElementById('nomor-tiket').focus()
+			} else {
+				document.getElementById('plat-nomor').focus()
+			}
+
+			await this.$store.dispatch('getPosList')
+
+			if (this.posList.length == 0) {
+				this.$message({
+					message: 'BELUM ADA POS',
+					type: 'error',
+					showClose: true,
+					duration: 10000,
 				})
-				.catch((e) => {
-					this.$message({
-						message: 'BELUM ADA SETTING',
-						type: 'error',
-						showClose: true,
-						duration: 10000,
-					})
-				})
-		},
+			} else {
+				if (this.posList.length == 1) {
+					this.formModel.pos_id = this.posList[0].id
 
-		getPosList() {
-			this.$axios.$get('/api/pos').then((r) => {
-				if (r.length == 0) {
-					this.$message({
-						message: 'BELUM ADA POS',
-						type: 'error',
-						showClose: true,
-						duration: 10000,
-					})
-				} else {
-					this.posList = r.data
-
-					if (this.posList.length == 1) {
-						this.formModel.pos_id = r[0].id
-
-						if (r.data[0].gate_outs.length == 1) {
-							this.formModel.gate_out_id = r[0].gate_outs[0].id
-						}
+					if (this.posList[0].gate_outs.length == 1) {
+						this.formModel.gate_out_id = this.posList.gate_outs[0].id
 					}
 				}
-			})
+			}
 		},
 
 		takeSnapshot() {
@@ -923,8 +913,7 @@ export default {
 	},
 
 	mounted() {
-		this.getSetting()
-		this.getPosList()
+		this.initialize()
 
 		document.getElementById('gate-out-app').addEventListener('keydown', (e) => {
 			// console.log(e.key)
