@@ -77,7 +77,7 @@ export default {
 		save() {
 			this.loading = true
 			this.$axios
-				.$put(`/api/user/{this.formModel.id}`, this.formModel)
+				.$put(`/api/user/${this.formModel.id}`, this.formModel)
 				.then((response) => {
 					this.$message({
 						message: 'Data berhasil diupdate',
