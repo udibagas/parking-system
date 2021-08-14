@@ -20,7 +20,7 @@ export default {
 			components: [
 				{
 					label: 'Pengaturan Umum',
-					component: 'SettingGeneralSetting',
+					component: 'SettingGeneral',
 				},
 				{
 					label: 'Jenis Kendaraan & Tarif',

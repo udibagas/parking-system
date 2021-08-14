@@ -175,106 +175,60 @@
 		<el-button
 			style="width: 100%"
 			type="primary"
-			@click="
-				() => {
-					!!formModel.id ? update() : store()
-				}
-			"
+			@click="save"
 			icon="el-icon-success"
-			>SIMPAN</el-button
 		>
+			SIMPAN
+		</el-button>
 	</div>
 </template>
 
 <script>
 export default {
-	name: 'GeneralSetting',
-
 	data() {
 		return {
-			formModel: {},
+			url: '/api/setting',
 			formErrors: {},
 			loading: false,
 		}
 	},
 
-	methods: {
-		requestData() {
-			this.$axios
-				.$get('/api/setting')
-				.then((r) => (this.formModel = r))
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
-		},
-
-		store() {
-			this.loading = true
-			this.$axios
-				.$post('/api/setting', this.formModel)
-				.then((r) => {
-					this.$message({
-						message: 'Data berhasil disimpan.',
-						type: 'success',
-						showClose: true,
-					})
-					this.requestData()
-					this.$store.dispatch('getSetting')
-				})
-				.catch((e) => {
-					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors
-					}
-
-					if (e.response.status == 500) {
-						this.formErrors = {}
-						this.$message({
-							message: e.response.data.message,
-							type: 'error',
-							showClose: true,
-						})
-					}
-				})
-				.finally(() => (this.loading = false))
-		},
-
-		update() {
-			this.loading = true
-			this.$axios
-				.$put('/api/setting/' + this.formModel.id, this.formModel)
-				.then((r) => {
-					this.$message({
-						message: 'Data berhasil disimpan.',
-						type: 'success',
-						showClose: true,
-					})
-					this.requestData()
-					this.$store.dispatch('getSetting')
-				})
-				.catch((e) => {
-					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors
-					}
-
-					if (e.response.status == 500) {
-						this.formErrors = {}
-						this.$message({
-							message: e.response.data.message,
-							type: 'error',
-							showClose: true,
-						})
-					}
-				})
-				.finally(() => (this.loading = false))
+	computed: {
+		formModel() {
+			return this.$store.state.setting
 		},
 	},
 
-	mounted() {
-		this.requestData()
+	methods: {
+		save() {
+			this.loading = true
+
+			this.$axios({
+				url: this.formModel.id ? `${this.url}/${this.formModel.id}` : this.url,
+				method: this.formModel.id ? 'PUT' : 'POST',
+				data: this.formModel,
+			})
+				.then((r) => {
+					this.$message({
+						message: 'Data berhasil disimpan.',
+						type: 'success',
+						showClose: true,
+					})
+					this.$store.dispatch('getSetting')
+				})
+				.catch((e) => {
+					if (e.response.status == 422) {
+						this.error = {}
+						this.formErrors = e.response.data.errors
+					}
+
+					if (e.response.status == 500) {
+						this.formErrors = {}
+						this.error = e.response.data
+					}
+				})
+				.finally(() => (this.loading = false))
+		},
 	},
 }
 </script>
