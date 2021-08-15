@@ -13,7 +13,7 @@ class MemberController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:1')->except(['index', 'search', 'getList']);
+        $this->middleware('role:1')->except(['index', 'search']);
     }
 
     /**
@@ -27,22 +27,24 @@ class MemberController extends Controller
         $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
         $data = Member::when($request->keyword, function ($q) use ($request) {
-            return $q->where(function ($qq) use ($request) {
-                return $qq->where('nama', 'LIKE', '%' . $request->keyword . '%')
+            $q->where(function ($q) use ($request) {
+                $q->where('nama', 'LIKE', '%' . $request->keyword . '%')
                     ->orWhere('nomor_kartu', 'LIKE', '%' . $request->keyword . '%');
             });
+        })->when($request->columns, function ($q) use ($request) {
+            $q->selectRaw($request->columns);
         })->when($request->status, function ($q) use ($request) {
-            return $q->whereIn('status', $request->status);
+            $q->whereIn('status', $request->status);
         })->when($request->group_member_id, function ($q) use ($request) {
-            return $q->whereIn('group_member_id', $request->group_member_id);
+            $q->whereIn('group_member_id', $request->group_member_id);
         })->when($request->expired == ['y'] || $request->expired == 'y', function ($q) {
-            return $q->whereRaw('expiry_date < DATE(NOW())');
+            $q->whereRaw('expiry_date < DATE(NOW())');
         })->when($request->expired == ['n'] || $request->expired == 'n', function ($q) {
-            return $q->whereRaw('expiry_date >= DATE(NOW())');
+            $q->whereRaw('expiry_date >= DATE(NOW())');
         })->when($request->berbayar == ['y'] || $request->berbayar == 'y', function ($q) {
-            return $q->where('berbayar', 1);
+            $q->where('berbayar', 1);
         })->when($request->berbayar == ['n'] || $request->berbayar == 'n', function ($q) {
-            return $q->where('berbayar', 0);
+            $q->where('berbayar', 0);
         })->orderBy($sort, $order);
 
         $data = $request->paginated ? $data->paginate($request->pageSize) : $data->get();
@@ -150,11 +152,5 @@ class MemberController extends Controller
         });
 
         return ['message' => 'Member telah dihapus'];
-    }
-
-    public function getList()
-    {
-        return Member::selectRaw('id, nama, nomor_kartu, berbayar')
-            ->orderBy('nama', 'ASC')->get();
     }
 }

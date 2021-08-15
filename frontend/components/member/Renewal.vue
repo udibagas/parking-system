@@ -2,9 +2,14 @@
 	<div>
 		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item>
-				<el-button size="small" @click="openForm({})" type="primary"
-					><i class="el-icon-plus"></i> INPUT PEMBAYARAN KEANGGOTAAN</el-button
+				<el-button
+					icon="el-icon-plus"
+					size="small"
+					@click="openForm({})"
+					type="primary"
 				>
+					INPUT PEMBAYARAN KEANGGOTAAN
+				</el-button>
 			</el-form-item>
 
 			<el-form-item>

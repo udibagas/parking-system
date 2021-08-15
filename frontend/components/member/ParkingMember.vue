@@ -657,7 +657,6 @@ export default {
 				sort: this.sort,
 				order: this.order,
 				action: 'print',
-				token: this.$store.state.token,
 				...this.filters,
 			}
 

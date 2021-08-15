@@ -44,12 +44,18 @@
 							<i class="el-icon-more"></i>
 						</span>
 						<el-dropdown-menu slot="dropdown">
-							<el-dropdown-item @click.native.prevent="openForm(scope.row)"
-								><i class="el-icon-edit-outline"></i> Edit</el-dropdown-item
+							<el-dropdown-item
+								icon="el-icon-edit-outline"
+								@click.native.prevent="openForm(scope.row)"
 							>
-							<el-dropdown-item @click.native.prevent="deleteData(scope.row.id)"
-								><i class="el-icon-delete"></i> Hapus</el-dropdown-item
+								Edit
+							</el-dropdown-item>
+							<el-dropdown-item
+								icon="el-icon-delete"
+								@click.native.prevent="deleteData(scope.row.id)"
 							>
+								Hapus
+							</el-dropdown-item>
 						</el-dropdown-menu>
 					</el-dropdown>
 				</template>

@@ -83,18 +83,21 @@
 							<el-dropdown-item
 								icon="el-icon-camera"
 								@click.native.prevent="testKamera(scope.row.id)"
-								>Test Kamera</el-dropdown-item
 							>
+								Test Kamera
+							</el-dropdown-item>
 							<el-dropdown-item
 								icon="el-icon-edit"
 								@click.native.prevent="openForm(scope.row)"
-								>Edit</el-dropdown-item
 							>
+								Edit
+							</el-dropdown-item>
 							<el-dropdown-item
 								icon="el-icon-delete"
 								@click.native.prevent="deleteData(scope.row.id)"
-								>Hapus</el-dropdown-item
 							>
+								Hapus
+							</el-dropdown-item>
 						</el-dropdown-menu>
 					</el-dropdown>
 				</template>

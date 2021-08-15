@@ -123,7 +123,8 @@ export const actions = {
   },
 
   async getMemberList({ commit }) {
-    const data = await this.$axios.$get('/api/member')
+    const params = { columns: 'id, nama, nomor_kartu, berbayar' }
+    const data = await this.$axios.$get('/api/member', { params })
     commit('setMemberList', data)
   },
 

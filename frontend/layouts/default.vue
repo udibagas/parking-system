@@ -52,11 +52,11 @@
 								>Selamat Datang, {{ $auth.user.name }}!</span
 							>
 							<el-dropdown-menu slot="dropdown">
-								<el-dropdown-item command="profile">
-									<i class="el-icon-user"></i> Profil Saya
+								<el-dropdown-item icon="el-icon-user" command="profile">
+									Profil Saya
 								</el-dropdown-item>
-								<el-dropdown-item command="logout">
-									<i class="el-icon-arrow-right"></i> Keluar
+								<el-dropdown-item icon="el-icon-arrow-right" command="logout">
+									Keluar
 								</el-dropdown-item>
 							</el-dropdown-menu>
 						</el-dropdown>
