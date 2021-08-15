@@ -23,5 +23,14 @@ class UserSeeder extends Seeder
             'role' => 1,
             'status' => 1
         ]);
+
+        User::create([
+            'name' => 'controller',
+            'email' => 'controller@mail.com',
+            'phone' => '0888',
+            'password' => 'bismillah1@#$%',
+            'role' => 0,
+            'status' => 1
+        ]);
     }
 }
