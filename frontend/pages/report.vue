@@ -243,8 +243,13 @@ export default {
 
 	methods: {
 		printReport() {
+			const params = new URLSearchParams()
+			params.append('action', 'print')
+			params.append('dateRange[]', this.dateRange[0])
+			params.append('dateRange[]', this.dateRange[1])
+
 			window.open(
-				`/api/report?action=print&dateRange[]=${this.dateRange[0]}&${dateRange[1]}=${this.dateRange[1]}`,
+				`${this.$axios.defaults.baseURL}/api/report?${params}`,
 				'_blank'
 			)
 		},
