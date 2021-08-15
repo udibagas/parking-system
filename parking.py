@@ -31,6 +31,9 @@ def login():
     if r.status_code == 200:
         response = r.json()
         API_HEADERS = {"Authorization": "Bearer " + response.token}
+        return True
+
+    return False
 
 
 def get_gates():
@@ -457,10 +460,15 @@ def gate_in_thread(gate):
 
 
 def start_app():
-    login()
+    auth = login()
+
+    if not auth:
+        logging.info("Gagal login. Keluar dari aplikasi")
+        sys.exit()
+
     gates = get_gates()
 
-    if gates == False:
+    if not gates:
         logging.info("Tidak ada gate. Keluar dari aplikasi")
         sys.exit()
 
