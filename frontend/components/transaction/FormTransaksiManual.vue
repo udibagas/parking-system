@@ -191,12 +191,15 @@
 
 <script>
 import { mapState } from 'vuex'
+
 export default {
 	props: ['show', 'model'],
+
 	computed: {
 		formModel() {
 			return this.model
 		},
+
 		durasi() {
 			var date1 = this.$moment(this.formModel.time_in)
 			var date2 = this.$moment(this.formModel.time_out)
@@ -205,22 +208,26 @@ export default {
 		},
 		...mapState(['posList', 'gateOutList', 'gateInList', 'jenisKendaraanList']),
 	},
+
 	data() {
 		return {
 			formErrors: {},
 			loading: false,
 		}
 	},
+
 	methods: {
 		closeForm() {
 			this.formErrors = {}
 			this.$emit('close')
 		},
+
 		store() {
 			this.loading = true
 			this.formModel.manual = 1
-			axios
-				.post('/parkingTransaction', this.formModel)
+
+			this.$axios
+				.$post('/api/parkingTransaction', this.formModel)
 				.then((r) => {
 					this.$message({
 						message: 'Data berhasil disimpan',
@@ -230,6 +237,7 @@ export default {
 
 					this.closeForm()
 					this.$emit('reload')
+					// TODO: handle if this error
 					this.openGate(this.formModel.gate_out_id)
 				})
 				.catch((e) => {
@@ -243,15 +251,14 @@ export default {
 						showClose: true,
 					})
 				})
-				.finally(() => {
-					this.loading = false
-				})
+				.finally(() => (this.loading = false))
 		},
+
 		update() {
 			this.loading = true
 			this.formModel.edit = 1
-			axios
-				.put(`/parkingTransaction/${this.formModel.id}`, this.formModel)
+			this.$axios
+				.$put(`/api/parkingTransaction/${this.formModel.id}`, this.formModel)
 				.then((r) => {
 					this.$message({
 						message: 'Data berhasil disimpan',
@@ -272,10 +279,9 @@ export default {
 						type: 'error',
 					})
 				})
-				.finally(() => {
-					this.loading = false
-				})
+				.finally(() => (this.loading = false))
 		},
+
 		openGate(gate_out_id) {
 			const pos = this.posList.find((p) => p.id == this.formModel.pos_id)
 			const gate = this.gateOutList.find((g) => g.id == gate_out_id)
