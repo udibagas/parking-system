@@ -28,7 +28,7 @@
 		</el-form>
 
 		<div slot="footer">
-			<el-button icon="el-icon-close" @click="$emit('close')">
+			<el-button icon="el-icon-error" @click="$emit('close')">
 				BATAL
 			</el-button>
 			<el-button

@@ -21,13 +21,13 @@
 					style="margin-top: 5px"
 					size="small"
 					@change="requestData"
-					v-model="dateRange"
+					v-model="filters.dateRange"
 					format="dd-MMM-yyyy HH:mm:ss"
 					value-format="yyyy-MM-dd HH:mm:ss"
 					type="datetimerange"
 					range-separator="-"
-					start-placeholder="Start date"
-					end-placeholder="End date"
+					start-placeholder="Dari"
+					end-placeholder="Sampai"
 				>
 				</el-date-picker>
 			</el-form-item>
@@ -328,7 +328,7 @@
 								icon="el-icon-printer"
 								v-if="!scope.row.is_member && !!scope.row.time_out"
 								@click.native.prevent="printTicket(scope.row.id)"
-								>Print Ticket Keluar</el-dropdown-item
+								>Print Tiket Keluar</el-dropdown-item
 							>
 						</el-dropdown-menu>
 					</el-dropdown>
@@ -382,6 +382,13 @@ export default {
 		]),
 	},
 
+	created() {
+		this.filters.dateRange = [
+			this.$moment().format('YYYY-MM-DD 00:00:00'),
+			this.$moment().format('YYYY-MM-DD HH:mm:ss'),
+		]
+	},
+
 	data() {
 		return {
 			url: '/api/parkingTransaction',
@@ -390,13 +397,10 @@ export default {
 			trx: null,
 			showTrxDetail: false,
 			date: this.$moment().format('YYYY-MM-DD'),
-			dateRange: [
-				this.$moment().format('YYYY-MM-DD 00:00:00'),
-				this.$moment().format('YYYY-MM-DD HH:mm:ss'),
-			],
 			formModel: {},
 			formErrors: {},
 			showForm: false,
+			filters: { dateRange: null },
 		}
 	},
 
@@ -428,7 +432,7 @@ export default {
 				.then(() => {
 					this.$axios
 						.$put('/api/parkingTransaction/setSudahKeluarSemua', {
-							dateRange: this.dateRange,
+							dateRange: this.filters.dateRange,
 						})
 						.then((r) => {
 							this.$message({

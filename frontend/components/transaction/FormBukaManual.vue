@@ -98,11 +98,11 @@ export default {
 				{ type: 'warning' }
 			)
 				.then(() => {
-					axios
-						.post('/manualOpenLog', this.formModel)
+					this.$axios
+						.$post('/api/manualOpenLog', this.formModel)
 						.then((r) => {
 							this.$message({
-								message: r.data.message,
+								message: r.message,
 								type: 'success',
 							})
 							this.$emit('open-gate', this.formModel.gate_out_id)

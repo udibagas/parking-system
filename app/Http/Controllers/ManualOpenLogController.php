@@ -22,7 +22,7 @@ class ManualOpenLogController extends Controller
         return ManualOpenLog::with(['user', 'gateOut'])->when($request->keyword, function ($q) use ($request) {
             $q->where('alasan', 'LIKE', "%{$request->keyword}%");
         })->when($request->dateRange, function ($q) use ($request) {
-            return $q->whereRaw('DATE(manual_open_logs.updated_at) BETWEEN "' . $request->dateRange[0] . '" AND "' . $request->dateRange[1] . '"');
+            return $q->whereRaw('DATE(manual_open_logs.updated_at) BETWEEN ? AND ?', $request->dateRange);
         })->orderBy($sort, $order)->paginate($request->pageSize);
     }
 

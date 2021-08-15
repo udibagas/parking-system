@@ -23,15 +23,7 @@
 			</el-form-item>
 		</el-form>
 
-		<el-table
-			show-summary
-			stripe
-			:data="report"
-			:summary-method="getSummaries"
-			height="calc(100vh - 260px)"
-		>
-			<el-table-column type="index" label="#"></el-table-column>
-
+		<el-table show-summary stripe :data="report" :summary-method="getSummaries">
 			<el-table-column label="Tanggal" header-align="center" align="center">
 				<template slot-scope="scope">
 					{{ $moment(scope.row.created_at).format('DD-MMM-YYYY HH:mm') }}

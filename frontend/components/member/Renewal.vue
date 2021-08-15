@@ -9,16 +9,16 @@
 
 			<el-form-item>
 				<el-date-picker
-					style="margin-top: 5px"
+					style="margin-top: 5px; width: 250px"
 					size="small"
 					@change="requestData"
-					v-model="dateRange"
+					v-model="filters.dateRange"
 					format="dd/MMM/yyyy"
 					value-format="yyyy-MM-dd"
 					type="daterange"
 					range-separator="-"
-					start-placeholder="Dari tanggal"
-					end-placeholder="Sampai tanggal"
+					start-placeholder="Dari tgl"
+					end-placeholder="Sampai tgl"
 				>
 				</el-date-picker>
 			</el-form-item>
@@ -31,6 +31,7 @@
 					prefix-icon="el-icon-search"
 					clearable
 					@change="searchData"
+					style="width: 150px"
 				>
 				</el-input>
 			</el-form-item>
@@ -290,7 +291,7 @@
 			</el-form>
 			<span slot="footer" class="dialog-footer">
 				<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-				<el-button icon="el-icon-success" type="primary" @click="save">
+				<el-button icon="el-icon-success" type="primary" @click="submit">
 					SIMPAN
 				</el-button>
 			</span>
@@ -316,18 +317,33 @@ export default {
 			url: '/api/memberRenewal',
 			sort: 'created_at',
 			order: 'descending',
-			dateRange: '',
 			showPrintDialog: false,
 			selectedData: {},
-			sampai_tanggal: null,
 		}
 	},
 
 	computed: {
-		...mapState(['memberList', 'groupMemberList']),
+		sampai_tanggal() {
+			try {
+				return this.$moment(this.formModel.dari_tanggal, 'YYYY-MM-DD')
+					.add(
+						this.formModel.siklus_pembayaran,
+						this.formModel.siklus_pembayaran_unit
+					)
+					.format('YYYY-MM-DD')
+			} catch (error) {
+				return ''
+			}
+		},
+		...mapState(['memberList']),
 	},
 
 	methods: {
+		submit() {
+			this.formModel.sampai_tanggal = this.sampai_tanggal
+			this.save()
+		},
+
 		printSlip(printer_id) {
 			this.$axios
 				.$post(`${this.url}/printSlip/${this.selectedData.id}`, {

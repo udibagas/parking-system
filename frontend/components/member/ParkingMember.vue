@@ -54,7 +54,11 @@
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
-			<el-table-column type="index" :index="tableData.from" label="#"></el-table-column>
+			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
 			<el-table-column
 				:filters="[
 					{ value: 1, text: 'Aktif' },
@@ -199,7 +203,11 @@
 				min-width="150px"
 			>
 				<template slot-scope="scope">
-					{{ $moment(scope.row.last_transaction).format('DD-MMM-YYYY') }}
+					{{
+						scope.row.last_transaction
+							? $moment(scope.row.last_transaction).format('DD-MMM-YYYY')
+							: ''
+					}}
 				</template>
 			</el-table-column>
 			<el-table-column
@@ -580,7 +588,7 @@
 
 			<span slot="footer" class="dialog-footer">
 				<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-				<el-button type="primary" icon="el-icon-success" @click="save">
+				<el-button type="primary" icon="el-icon-success" @click="submit">
 					SIMPAN
 				</el-button>
 			</span>
@@ -639,6 +647,11 @@ export default {
 			this.formErrors = {}
 		},
 
+		submit() {
+			this.formModel.expiry_date = this.expiry_date
+			this.save()
+		},
+
 		print() {
 			const params = {
 				sort: this.sort,
@@ -661,9 +674,9 @@ export default {
 			}
 
 			this.$axios
-				.$get('member', { params })
+				.$get(this.url, { params })
 				.then((response) => {
-					const data = response.data.map((d, i) => {
+					const data = response.map((d, i) => {
 						return {
 							No: i + 1,
 							Nama: d.nama,

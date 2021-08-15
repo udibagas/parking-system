@@ -2,6 +2,21 @@
 	<div>
 		<el-form inline class="text-right" @submit.native.prevent>
 			<el-form-item>
+				<el-date-picker
+					style="margin-top: 5px"
+					size="small"
+					@change="requestData"
+					v-model="filters.dateRange"
+					format="dd-MMM-yyyy HH:mm:ss"
+					value-format="yyyy-MM-dd HH:mm:ss"
+					type="datetimerange"
+					range-separator="-"
+					start-placeholder="Dari"
+					end-placeholder="Sampai"
+				>
+				</el-date-picker>
+			</el-form-item>
+			<el-form-item>
 				<el-input
 					size="small"
 					v-model="keyword"
@@ -29,12 +44,22 @@
 			@sort-change="sortChange"
 		>
 			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
+
+			<el-table-column
 				prop="created_at"
 				label="Tanggal"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="150px"
-			></el-table-column>
+				width="180px"
+			>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.created_at).format('DD-MMM-YYYY HH:mm:ss') }}
+				</template>
+			</el-table-column>
 
 			<el-table-column
 				prop="gate_out.nama"
@@ -133,6 +158,7 @@ export default {
 	},
 	data() {
 		return {
+			url: '/api/manualOpenLog',
 			sort: 'updated_at',
 			order: 'descending',
 			showSnapshot: false,

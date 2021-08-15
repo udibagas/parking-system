@@ -120,6 +120,7 @@ export default {
     refreshData() {
       this.page = 1
       this.keyword = ''
+      this.filters = {}
       this.requestData()
     },
 

@@ -12,6 +12,7 @@
 					range-separator="-"
 					start-placeholder="Dari tanggal"
 					end-placeholder="Sampai tanggal"
+					style="margin-top: 5px; width: 250px"
 				>
 				</el-date-picker>
 			</el-form-item>
@@ -26,18 +27,10 @@
 			</el-form-item>
 		</el-form>
 
-		<el-table
-			show-summary
-			stripe
-			:data="report"
-			:summary-method="getSummaries"
-			height="calc(100vh - 260px)"
-		>
-			<el-table-column type="index" label="#"></el-table-column>
-
+		<el-table show-summary stripe :data="report" :summary-method="getSummaries">
 			<el-table-column label="Tanggal" header-align="center" align="center">
 				<template slot-scope="scope">
-					{{ scope.row.tanggal | readableDate }}
+					{{ $moment(scope.row.tanggal).format('DD/MMM/YYYY') }}
 				</template>
 			</el-table-column>
 			<el-table-column label="Jumlah" header-align="center" align="center">
