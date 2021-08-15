@@ -661,7 +661,10 @@ export default {
 			}
 
 			const querystring = new URLSearchParams(params).toString()
-			window.open('/api/member?' + querystring, '_blank')
+			window.open(
+				`${this.$axios.defaults.baseURL}/api/member?${querystring}`,
+				'_blank'
+			)
 		},
 
 		download() {
