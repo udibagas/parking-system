@@ -59,6 +59,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('setSudahKeluarSemua', [ParkingTransactionController::class, 'setSudahKeluarSemua']);
         Route::put('setSudahKeluar/{parkingTransaction}', [ParkingTransactionController::class, 'setSudahKeluar']);
         Route::get('search', [ParkingTransactionController::class, 'search']);
+        Route::post('apiStore', [ParkingTransactionController::class, 'apiStore']);
         Route::apiResource('', ParkingTransactionController::class);
     });
 
@@ -120,15 +121,9 @@ Route::middleware('auth:sanctum')->group(function () {
         $output = shell_exec('tail -n 250 /var/log/parking.log');
         return nl2br($output);
     });
+
+    Route::post('gateIn/notification/{gateIn}', [GateInController::class, 'notification']);
 });
 
 
 Route::get('serverInformation', [ServerInformationController::class, 'index']);
-
-// Untuk controller gate in
-// TODO: pake middleware controller yg terdaftar aja yg boleh akses
-Route::post('parkingTransaction', [ParkingTransactionController::class, 'apiStore']);
-Route::post('gateIn/notification/{gateIn}', [GateInController::class, 'notification']);
-Route::get('gateIn', [GateInController::class, 'index']);
-Route::get('member/search', [MemberController::class, 'search']);
-Route::get('setting', [SettingController::class, 'index']);
