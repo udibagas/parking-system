@@ -2,15 +2,7 @@
 	<el-card>
 		<el-tabs>
 			<el-tab-pane label="NOTIFIKASI">
-				<el-form
-					:inline="true"
-					style="text-align: right"
-					@submit.native.prevent="
-						() => {
-							return
-						}
-					"
-				>
+				<el-form inline class="text-right" @submit.native.prevent>
 					<el-form-item>
 						<el-button
 							size="small"
@@ -24,29 +16,26 @@
 						<el-date-picker
 							size="small"
 							@change="requestData"
-							v-model="dateRange"
+							v-model="filters.dateRange"
 							format="dd/MMM/yyyy"
 							value-format="yyyy-MM-dd"
 							type="daterange"
-							range-separator="To"
-							start-placeholder="Start date"
-							end-placeholder="End date"
+							range-separator="-"
+							start-placeholder="Dari tgl"
+							end-placeholder="Sampai tgl"
+							style="margin-top: 5px; width: 250px"
 						>
 						</el-date-picker>
 					</el-form-item>
-					<el-form-item style="margin-right: 0">
+
+					<el-form-item>
 						<el-input
 							size="small"
 							v-model="keyword"
-							placeholder="Search"
+							placeholder="Cari"
 							prefix-icon="el-icon-search"
-							:clearable="true"
-							@change="
-								(v) => {
-									keyword = v
-									requestData()
-								}
-							"
+							clearable
+							@change="searchData"
 						>
 						</el-input>
 					</el-form-item>
@@ -115,12 +104,15 @@
 					:total="tableData.total"
 				></el-pagination>
 			</el-tab-pane>
+
 			<el-tab-pane lazy label="SNAPSHOT">
 				<NotificationSnapshot />
 			</el-tab-pane>
+
 			<el-tab-pane lazy label="LOG USER">
-				<NotificationUserLog :range="dateRange" />
+				<NotificationUserLog :range="filters.dateRange" />
 			</el-tab-pane>
+
 			<el-tab-pane lazy label="LOG GATE MASUK">
 				<NotificationControllerLog />
 			</el-tab-pane>
@@ -136,12 +128,9 @@ export default {
 
 	data() {
 		return {
+			url: '/api/notification',
 			sort: 'created_at',
 			order: 'ascending',
-			dateRange: [
-				this.$moment().format('YYYY-MM-01'),
-				this.$moment().format('YYYY-MM-DD'),
-			],
 		}
 	},
 	methods: {
@@ -150,12 +139,12 @@ export default {
 				type: 'warning',
 			})
 				.then(() => {
-					axios
-						.delete('/notification/clearNotification')
+					this.$axios
+						.$delete(`${this.url}/clearNotification`)
 						.then((r) => {
 							this.requestData()
 							this.$message({
-								message: r.data.message,
+								message: r.message,
 								type: 'success',
 							})
 						})
