@@ -178,11 +178,7 @@
 
 		<div slot="footer">
 			<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-			<el-button
-				type="primary"
-				icon="el-icon-success"
-				@click="() => (!!formModel.id ? update() : store())"
-			>
+			<el-button type="primary" icon="el-icon-success" @click="save">
 				SIMPAN
 			</el-button>
 		</div>
@@ -222,7 +218,7 @@ export default {
 			this.$emit('close')
 		},
 
-		store() {
+		save() {
 			this.loading = true
 			this.formModel.manual = 1
 
@@ -249,34 +245,6 @@ export default {
 						message: e.response.data.message,
 						type: 'error',
 						showClose: true,
-					})
-				})
-				.finally(() => (this.loading = false))
-		},
-
-		update() {
-			this.loading = true
-			this.formModel.edit = 1
-			this.$axios
-				.$put(`/api/parkingTransaction/${this.formModel.id}`, this.formModel)
-				.then((r) => {
-					this.$message({
-						message: 'Data berhasil disimpan',
-						type: 'success',
-						showClose: true,
-					})
-
-					this.closeForm()
-					this.$emit('reload')
-				})
-				.catch((e) => {
-					if (e.response.status == 422) {
-						this.formErrors = e.response.data.errors
-					}
-
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
 					})
 				})
 				.finally(() => (this.loading = false))
