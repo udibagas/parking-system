@@ -74,4 +74,15 @@ class PosController extends Controller
 
         return ['message' => 'Data telah dihapus'];
     }
+
+    public function getPosByIp(Request $request)
+    {
+        $pos = Pos::where('ip_address', $request->ip())->first();
+
+        if (!$pos) {
+            return response(['message' => 'POS TIDAK TERDAFTAR'], 500);
+        }
+
+        return $pos;
+    }
 }

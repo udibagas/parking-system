@@ -123,6 +123,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     Route::post('gateIn/notification/{gateIn}', [GateInController::class, 'notification']);
+    Route::get('getPosByIp', [PosController::class, 'getPosByIp']);
 });
 
 
