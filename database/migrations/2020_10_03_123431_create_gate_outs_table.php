@@ -17,7 +17,7 @@ class CreateGateOutsTable extends Migration
             $table->bigIncrements('id');
             $table->string('shortcut_key');
             $table->string('nama');
-            $table->string('jenis_kendaraan');
+            $table->json('jenis_kendaraan')->nullable();
             $table->string('device');
             $table->smallInteger('baudrate');
             $table->string('open_command');
