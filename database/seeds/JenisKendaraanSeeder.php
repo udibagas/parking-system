@@ -1,6 +1,6 @@
 <?php
 
-use App\JenisKendaraan;
+use App\Models\JenisKendaraan;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 

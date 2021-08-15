@@ -34,6 +34,7 @@ class CreateParkingTransactionsTable extends Migration
             $table->string('edit_by')->nullable();
             $table->string('plat_nomor')->nullable();
             $table->integer('tarif')->default(0);
+            $table->unsignedBigInteger('shift_id')->nullable();
             $table->timestamps();
         });
     }

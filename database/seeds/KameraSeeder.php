@@ -15,8 +15,7 @@ class KameraSeeder extends Seeder
         $data = [
             [
                 'nama' => 'KAMERA1',
-                'ip_address' => '192.168.1.201',
-                'snapshot_url' => 'http://192.168.1.201/cgi-bin/snapshot.cgi',
+                'snapshot_url' => 'http://192.168.1.108/cgi-bin/snapshot.cgi',
                 'username' => 'admin',
                 'password' => 'admin123',
                 'auth_type' => 'digest',
@@ -24,8 +23,7 @@ class KameraSeeder extends Seeder
             ],
             [
                 'nama' => 'KAMERA2',
-                'ip_address' => '192.168.1.202',
-                'snapshot_url' => 'http://192.168.1.202/cgi-bin/snapshot.cgi',
+                'snapshot_url' => 'http://192.168.1.109/cgi-bin/snapshot.cgi',
                 'username' => 'admin',
                 'password' => 'admin123',
                 'auth_type' => 'digest',
@@ -33,8 +31,7 @@ class KameraSeeder extends Seeder
             ],
             [
                 'nama' => 'KAMERA3',
-                'ip_address' => '192.168.1.203',
-                'snapshot_url' => 'http://192.168.1.203/cgi-bin/snapshot.cgi',
+                'snapshot_url' => 'http://192.168.1.110/cgi-bin/snapshot.cgi',
                 'username' => 'admin',
                 'password' => 'admin123',
                 'auth_type' => 'digest',
@@ -42,8 +39,7 @@ class KameraSeeder extends Seeder
             ],
             [
                 'nama' => 'KAMERA4',
-                'ip_address' => '192.168.1.204',
-                'snapshot_url' => 'http://192.168.1.204/cgi-bin/snapshot.cgi',
+                'snapshot_url' => 'http://192.168.1.110/cgi-bin/snapshot.cgi',
                 'username' => 'admin',
                 'password' => 'admin123',
                 'auth_type' => 'digest',

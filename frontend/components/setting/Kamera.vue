@@ -19,46 +19,51 @@
 				label="#"
 			></el-table-column>
 
-			<el-table-column min-width="100" label="Status" prop="status">
+			<el-table-column
+				width="100"
+				label="Status"
+				prop="status"
+				align="center"
+				header-align="center"
+			>
 				<template slot-scope="scope">
 					<el-tag
 						effect="dark"
 						:type="scope.row.status ? 'success' : 'info'"
 						size="small"
+						style="width: 100%"
 						>{{ scope.row.status ? 'Aktif' : 'Tidak Aktif' }}</el-tag
 					>
 				</template>
 			</el-table-column>
+
+			<el-table-column width="100" label="Nama" prop="nama"></el-table-column>
+
 			<el-table-column
-				min-width="150"
-				label="Nama"
-				prop="nama"
-			></el-table-column>
-			<el-table-column
-				min-width="150"
-				label="IP Address"
-				prop="ip_address"
-			></el-table-column>
-			<el-table-column
+				show-overflow-tooltip
 				min-width="150"
 				label="Snapshot URL"
 				prop="snapshot_url"
 			></el-table-column>
+
 			<el-table-column
-				min-width="150"
+				width="100"
 				label="Username"
 				prop="username"
 			></el-table-column>
+
 			<el-table-column
-				min-width="150"
+				width="100"
 				label="Password"
 				prop="password"
 			></el-table-column>
+
 			<el-table-column
-				min-width="150"
+				width="100"
 				label="Auth Type"
 				prop="auth_type"
 			></el-table-column>
+
 			<el-table-column
 				fixed="right"
 				width="60px"
@@ -120,19 +125,6 @@
 					<el-input placeholder="Nama" v-model="formModel.nama"></el-input>
 					<div class="el-form-item__error" v-if="formErrors.nama">
 						{{ formErrors.nama[0] }}
-					</div>
-				</el-form-item>
-
-				<el-form-item
-					label="Alamat IP"
-					:class="formErrors.ip_address ? 'is-error' : ''"
-				>
-					<el-input
-						placeholder="Alamat IP"
-						v-model="formModel.ip_address"
-					></el-input>
-					<div class="el-form-item__error" v-if="formErrors.ip_address">
-						{{ formErrors.ip_address[0] }}
 					</div>
 				</el-form-item>
 

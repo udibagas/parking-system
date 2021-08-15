@@ -16,7 +16,6 @@ class CreateKamerasTable extends Migration
         Schema::create('kameras', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('nama');
-            $table->string('ip_address');
             $table->string('snapshot_url');
             $table->string('username');
             $table->string('password');

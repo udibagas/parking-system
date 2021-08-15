@@ -290,7 +290,7 @@
 			title="INFORMASI MEMBER"
 			:visible.sync="showDetail"
 		>
-			<ParkingMemberDetail :member="selectedData" />
+			<MemberParkingMemberDetail :member="selectedData" />
 		</el-dialog>
 
 		<el-dialog

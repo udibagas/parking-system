@@ -13,9 +13,16 @@ class PosSeeder extends Seeder
     public function run()
     {
         $data = [
-            'nama' => 'POS1',
-            'ip_address' => '192.168.1.15',
-            'printer_id' => 1
+            [
+                'nama' => 'POS-1',
+                'ip_address' => '192.168.1.242',
+                'printer_id' => 1
+            ],
+            [
+                'nama' => 'POS-2',
+                'ip_address' => '192.168.1.243',
+                'printer_id' => 2
+            ],
         ];
 
         DB::table('pos')->truncate();

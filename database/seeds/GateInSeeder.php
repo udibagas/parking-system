@@ -14,7 +14,7 @@ class GateInSeeder extends Seeder
     {
         $data = [
             [
-                'nama' => 'GATE MOTOR',
+                'nama' => 'GATE-1',
                 'jenis_kendaraan' => 'MOTOR',
                 'controller_ip_address' => '192.168.1.100',
                 'controller_port' => 5000,
@@ -24,7 +24,7 @@ class GateInSeeder extends Seeder
                 'status' => 1
             ],
             [
-                'nama' => 'GATE MOBIL',
+                'nama' => 'GATE-2',
                 'jenis_kendaraan' => 'MOBIL',
                 'controller_ip_address' => '192.168.1.101',
                 'controller_port' => 5000,

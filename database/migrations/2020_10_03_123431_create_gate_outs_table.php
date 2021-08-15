@@ -25,6 +25,8 @@ class CreateGateOutsTable extends Migration
             $table->json('kamera')->nullable();
             $table->unsignedBigInteger('pos_id');
             $table->boolean('status')->default(true);
+            $table->string('running_text_device')->nullable();
+            $table->smallInteger('running_text_baudrate')->nullable();
             $table->timestamps();
         });
     }

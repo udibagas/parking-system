@@ -25,7 +25,6 @@ class KameraRequest extends FormRequest
     {
         return [
             'nama' => 'required',
-            'ip_address' => 'required|ipv4',
             'snapshot_url' => 'required|url',
             'username' => 'required',
             'password' => 'required',
