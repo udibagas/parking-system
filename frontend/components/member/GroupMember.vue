@@ -150,7 +150,7 @@ export default {
 
 	methods: {
 		afterSave() {
-			this.$store.dispatch('getGroupList')
+			this.$store.dispatch('getGroupMemberList')
 		},
 	},
 }
