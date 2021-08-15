@@ -57,12 +57,11 @@
 				</div>
 			</el-form-item>
 		</el-form>
+
 		<div slot="footer">
+			<el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
 			<el-button icon="el-icon-success" type="primary" @click="save">
 				SIMPAN
-			</el-button>
-			<el-button icon="el-icon-error" type="info" @click="closeForm">
-				BATAL
 			</el-button>
 		</div>
 	</el-dialog>

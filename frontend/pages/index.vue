@@ -751,6 +751,10 @@ export default {
 				(g) => g.id == this.formModel.gate_out_id
 			)
 
+			if (!gate) {
+				return
+			}
+
 			if (!gate.running_text_device || !gate.running_text_baudrate) {
 				return
 			}
@@ -787,6 +791,10 @@ export default {
 			const gate = this.gateOutList.find(
 				(g) => g.id == this.formModel.gate_out_id
 			)
+
+			if (!gate) {
+				return
+			}
 
 			if (!gate.running_text_device || !gate.running_text_baudrate) {
 				return

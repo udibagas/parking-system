@@ -11,6 +11,7 @@ export const state = () => ({
   posList: [],
   printerList: [],
   shiftList: [],
+  areaParkirList: [],
   setting: {},
   pos: {},
   siklus: [
@@ -40,6 +41,10 @@ export const mutations = {
 
   setPosList(state, data) {
     state.posList = data
+  },
+
+  setAreaParkirList(state, data) {
+    state.areaParkirList = data
   },
 
   setPrinterList(state, data) {
@@ -95,6 +100,11 @@ export const actions = {
   async getPosList({ commit }) {
     const data = await this.$axios.$get('/api/pos')
     commit('setPosList', data)
+  },
+
+  async getAreaParkirList({ commit }) {
+    const data = await this.$axios.$get('/api/areaParkir')
+    commit('setAreaParkirList', data)
   },
 
   async getPrinterList({ commit }) {

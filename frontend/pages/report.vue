@@ -1,25 +1,31 @@
 <template>
 	<div>
-		<div class="grid grid-cols-3 gap-4 mb-4">
-			<div class="border shadow rounded-md p-3">
-				Hari Ini
-				<div class="text-5xl text-purple-700">
-					Rp. {{ $decimal(summary.today) }}
-				</div>
-			</div>
-			<div class="border shadow rounded-md p-3">
-				Bulan Ini
-				<div class="text-5xl text-blue-700">
-					Rp. {{ $decimal(summary.this_month) }}
-				</div>
-			</div>
-			<div class="border shadow rounded-md p-3">
-				Total
-				<div class="text-5xl text-orange-700">
-					Rp. {{ $decimal(summary.total) }}
-				</div>
-			</div>
-		</div>
+		<el-row :gutter="20" class="mb-3">
+			<el-col :span="8">
+				<el-card>
+					Hari Ini
+					<div class="text-5xl text-purple-700">
+						Rp. {{ $decimal(summary.today) }}
+					</div>
+				</el-card>
+			</el-col>
+			<el-col :span="8">
+				<el-card>
+					Bulan Ini
+					<div class="text-5xl text-blue-700">
+						Rp. {{ $decimal(summary.this_month) }}
+					</div>
+				</el-card>
+			</el-col>
+			<el-col :span="8">
+				<el-card>
+					Total
+					<div class="text-5xl text-orange-700">
+						Rp. {{ $decimal(summary.total) }}
+					</div>
+				</el-card>
+			</el-col>
+		</el-row>
 
 		<!-- <div :class="`grid gap-4 mb-4 grid-cols-${areaParkir.length}`">
 			<div
@@ -69,7 +75,7 @@
 				</thead>
 				<tbody>
 					<tr
-						v-for="p in areaParkir"
+						v-for="p in areaParkirList"
 						:key="p.id"
 						:class="{
 							'bg-red-300': p.kapasitas == p.terisi,
@@ -174,6 +180,7 @@
 				<el-card
 					class="bg-orange-600 text-white mb-3"
 					:body-style="{ padding: '0' }"
+					v-if="parkedVehicle.length > 0"
 				>
 					<div slot="header">Kendaraan Masih Terparkir</div>
 					<table class="table min-w-full">
@@ -213,6 +220,7 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
 export default {
 	data() {
 		return {
@@ -225,9 +233,12 @@ export default {
 				this.$moment().format('YYYY-MM-DD'),
 			],
 			report: null,
-			areaParkir: [],
 			summary: {},
 		}
+	},
+
+	computed: {
+		...mapState(['areaParkirList']),
 	},
 
 	methods: {
@@ -239,11 +250,11 @@ export default {
 		},
 
 		getTransaction() {
-			axios
-				.get('/api/getTransaction', { params: { dateRange: this.dateRange } })
-				.then((r) => {
-					this.transaction = r.data
-					let total = r.data
+			this.$axios
+				.$get('/api/getTransaction', { params: { dateRange: this.dateRange } })
+				.then((response) => {
+					this.transaction = response
+					let total = response
 						.map((d) => d.total)
 						.reduce((sum, total) => sum + parseInt(total), 0)
 					this.transaction.push({ jenis_kendaraan: 'TOTAL', total })
@@ -251,16 +262,16 @@ export default {
 		},
 
 		getIncome() {
-			axios
-				.get('/api/getIncome', { params: { dateRange: this.dateRange } })
-				.then((r) => {
-					this.income = r.data
+			this.$axios
+				.$get('/api/getIncome', { params: { dateRange: this.dateRange } })
+				.then((response) => {
+					this.income = response
 
-					let total = r.data
+					let total = response
 						.map((d) => Number(d.total))
 						.reduce((sum, total) => sum + Number(total), 0)
 
-					let denda = r.data
+					let denda = response
 						.map((d) => Number(d.denda))
 						.reduce((sum, denda) => sum + Number(denda), 0)
 
@@ -268,20 +279,20 @@ export default {
 				})
 		},
 
-		getParkedVehicle() {
-			axios
-				.get('/api/getParkedVehicle', { params: { dateRange: this.dateRange } })
-				.then((r) => {
-					this.parkedVehicle = r.data
-				})
+		async getParkedVehicle() {
+			const data = await this.$axios.$get('/api/getParkedVehicle', {
+				params: { dateRange: this.dateRange },
+			})
+
+			this.parkedVehicle = data
 		},
 
 		getVehicleIn() {
-			axios
-				.get('/api/getVehicleIn', { params: { dateRange: this.dateRange } })
+			this.$axios
+				.$get('/api/getVehicleIn', { params: { dateRange: this.dateRange } })
 				.then((r) => {
-					this.vehicleIn = r.data
-					let total = r.data
+					this.vehicleIn = r
+					let total = r
 						.map((d) => d.total)
 						.reduce((sum, total) => sum + parseInt(total), 0)
 					this.vehicleIn.push({ gate: 'TOTAL', total })
@@ -289,28 +300,18 @@ export default {
 		},
 
 		getReport() {
-			axios
-				.get('/api/report', { params: { dateRange: this.dateRange } })
-				.then((r) => {
-					this.report = r.data
-				})
-		},
-
-		getAreaParkir() {
-			axios.get('/api/areaParkir').then((r) => {
-				this.areaParkir = r.data
-			})
+			this.$axios
+				.$get('/api/report', { params: { dateRange: this.dateRange } })
+				.then((r) => (this.report = r))
 		},
 
 		getSummary() {
-			axios.get('/api/summary').then((r) => {
-				this.summary = r.data
-			})
+			this.$axios.$get('/api/summary').then((r) => (this.summary = r))
 		},
 
-		requestData() {
+		async requestData() {
+			await this.$store.dispatch('getAreaParkirList')
 			this.getSummary()
-			this.getAreaParkir()
 			this.getTransaction()
 			this.getIncome()
 			this.getParkedVehicle()
@@ -318,6 +319,7 @@ export default {
 			this.getReport()
 		},
 	},
+
 	mounted() {
 		this.requestData()
 	},
