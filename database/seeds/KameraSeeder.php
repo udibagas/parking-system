@@ -14,7 +14,7 @@ class KameraSeeder extends Seeder
     {
         $data = [
             [
-                'nama' => 'KAMERA1',
+                'nama' => 'KAMERA-1',
                 'snapshot_url' => 'http://192.168.1.108/cgi-bin/snapshot.cgi',
                 'username' => 'admin',
                 'password' => 'admin123',
@@ -22,7 +22,7 @@ class KameraSeeder extends Seeder
                 'status' => 1
             ],
             [
-                'nama' => 'KAMERA2',
+                'nama' => 'KAMERA-2',
                 'snapshot_url' => 'http://192.168.1.109/cgi-bin/snapshot.cgi',
                 'username' => 'admin',
                 'password' => 'admin123',
@@ -30,7 +30,7 @@ class KameraSeeder extends Seeder
                 'status' => 1
             ],
             [
-                'nama' => 'KAMERA3',
+                'nama' => 'KAMERA-3',
                 'snapshot_url' => 'http://192.168.1.110/cgi-bin/snapshot.cgi',
                 'username' => 'admin',
                 'password' => 'admin123',
@@ -38,7 +38,7 @@ class KameraSeeder extends Seeder
                 'status' => 1
             ],
             [
-                'nama' => 'KAMERA4',
+                'nama' => 'KAMERA-4',
                 'snapshot_url' => 'http://192.168.1.110/cgi-bin/snapshot.cgi',
                 'username' => 'admin',
                 'password' => 'admin123',
