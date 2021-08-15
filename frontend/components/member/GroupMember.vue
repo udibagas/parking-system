@@ -31,17 +31,25 @@
 			v-loading="loading"
 		>
 			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
+
+			<el-table-column
 				prop="nama"
 				label="Nama"
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
+
 			<el-table-column
 				prop="keterangan"
 				label="Keterangan"
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
+
 			<el-table-column
 				fixed="right"
 				width="40px"

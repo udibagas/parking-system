@@ -19,6 +19,33 @@
 				label="#"
 			></el-table-column>
 
+			<el-table-column width="120" label="Nama" prop="nama"></el-table-column>
+
+			<el-table-column
+				width="120"
+				label="Username"
+				prop="username"
+			></el-table-column>
+
+			<el-table-column
+				width="120"
+				label="Password"
+				prop="password"
+			></el-table-column>
+
+			<el-table-column
+				width="100"
+				label="Auth Type"
+				prop="auth_type"
+			></el-table-column>
+
+			<el-table-column
+				show-overflow-tooltip
+				min-width="150"
+				label="Snapshot URL"
+				prop="snapshot_url"
+			></el-table-column>
+
 			<el-table-column
 				width="100"
 				label="Status"
@@ -36,33 +63,6 @@
 					>
 				</template>
 			</el-table-column>
-
-			<el-table-column width="100" label="Nama" prop="nama"></el-table-column>
-
-			<el-table-column
-				show-overflow-tooltip
-				min-width="150"
-				label="Snapshot URL"
-				prop="snapshot_url"
-			></el-table-column>
-
-			<el-table-column
-				width="100"
-				label="Username"
-				prop="username"
-			></el-table-column>
-
-			<el-table-column
-				width="100"
-				label="Password"
-				prop="password"
-			></el-table-column>
-
-			<el-table-column
-				width="100"
-				label="Auth Type"
-				prop="auth_type"
-			></el-table-column>
 
 			<el-table-column
 				fixed="right"
@@ -129,20 +129,6 @@
 				</el-form-item>
 
 				<el-form-item
-					label="URL Snapshot"
-					:class="formErrors.snapshot_url ? 'is-error' : ''"
-				>
-					<el-input
-						placeholder="URL Snapshot"
-						v-model="formModel.snapshot_url"
-					></el-input>
-
-					<div class="el-form-item__error" v-if="formErrors.snapshot_url">
-						{{ formErrors.snapshot_url[0] }}
-					</div>
-				</el-form-item>
-
-				<el-form-item
 					label="Username"
 					:class="formErrors.username ? 'is-error' : ''"
 				>
@@ -186,6 +172,20 @@
 					</el-select>
 					<div class="el-form-item__error" v-if="formErrors.auth_type">
 						{{ formErrors.auth_type[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item
+					label="URL Snapshot"
+					:class="formErrors.snapshot_url ? 'is-error' : ''"
+				>
+					<el-input
+						placeholder="URL Snapshot"
+						v-model="formModel.snapshot_url"
+					></el-input>
+
+					<div class="el-form-item__error" v-if="formErrors.snapshot_url">
+						{{ formErrors.snapshot_url[0] }}
 					</div>
 				</el-form-item>
 

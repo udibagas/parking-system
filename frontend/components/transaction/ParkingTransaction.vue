@@ -32,13 +32,19 @@
 				</el-date-picker>
 			</el-form-item>
 			<el-form-item v-if="$auth.user.role == 1">
-				<el-button
-					size="small"
-					type="primary"
-					icon="el-icon-finished"
-					@click="setSudahKeluarSemua"
-					>SET SUDAH KELUAR SEMUA</el-button
+				<el-tooltip
+					class="item"
+					effect="dark"
+					content="Set kendaraan sudah keluar untuk waktu terpilih"
+					placement="bottom"
 				>
+					<el-button
+						size="small"
+						type="danger"
+						icon="el-icon-finished"
+						@click="setSudahKeluarSemua"
+					></el-button>
+				</el-tooltip>
 			</el-form-item>
 			<el-form-item>
 				<el-input
@@ -48,6 +54,7 @@
 					prefix-icon="el-icon-search"
 					:clearable="true"
 					@change="searchData"
+					style="width: 150px"
 				>
 				</el-input>
 			</el-form-item>
@@ -68,6 +75,12 @@
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
+			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
+
 			<el-table-column
 				prop="nomor_barcode"
 				label="No. Tiket"
@@ -103,15 +116,25 @@
 				label="Waktu Masuk"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="150px"
-			></el-table-column>
+				min-width="180px"
+			>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.time_in).format('DD-MMM-YYYY HH:mm:ss') }}
+				</template>
+			</el-table-column>
+
 			<el-table-column
 				prop="time_out"
 				label="Waktu Keluar"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="150px"
-			></el-table-column>
+				min-width="180px"
+			>
+				<template slot-scope="scope">
+					{{ $moment(scope.row.time_out).format('DD-MMM-YYYY HH:mm:ss') }}
+				</template>
+			</el-table-column>
+
 			<el-table-column
 				prop="durasi"
 				label="Durasi"

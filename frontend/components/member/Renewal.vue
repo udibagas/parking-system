@@ -45,6 +45,12 @@
 			@sort-change="sortChange"
 		>
 			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
+
+			<el-table-column
 				prop="created_at"
 				label="Tanggal Trx"
 				sortable="custom"

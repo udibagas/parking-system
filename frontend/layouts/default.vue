@@ -44,7 +44,7 @@
 							@click.prevent="collapse = !collapse"
 							:icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
 						></el-button>
-						<span class="brand">RSVP PARKING SYSTEM</span>
+						<span class="brand">MITRATEKNIK PARKING SYSTEM</span>
 					</el-col>
 					<el-col :span="12" class="text-right">
 						<el-dropdown @command="handleCommand">

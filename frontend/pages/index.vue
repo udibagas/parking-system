@@ -203,10 +203,16 @@
 			center
 			:show-close="false"
 			:visible="!formModel.pos_id && posList.length > 1"
+			title="PILIH POS"
 		>
 			<div class="mb-5">
-				<h1 class="text-center mb-3 text-xl">PILIH POS</h1>
-				<select v-model="formModel.pos_id" class="my-input" id="pos-id">
+				<!-- <h1 class="text-center mb-3 text-xl">PILIH POS</h1> -->
+				<select
+					v-model="formModel.pos_id"
+					class="my-input"
+					id="pos-id"
+					placeholder="Pilih Pos"
+				>
 					<option v-for="g in posList" :value="g.id" :key="g.id">
 						{{ g.nama }}
 					</option>
@@ -696,7 +702,7 @@ export default {
 			})
 				.then((r) => {
 					this.$message({
-						message: r.message,
+						message: r.data.message,
 						type: 'success',
 					})
 					this.openGate(this.formModel.gate_out_id)

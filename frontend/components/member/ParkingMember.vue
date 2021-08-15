@@ -54,7 +54,7 @@
 			v-loading="loading"
 			@sort-change="sortChange"
 		>
-			<el-table-column type="index" :index="tableData.from"></el-table-column>
+			<el-table-column type="index" :index="tableData.from" label="#"></el-table-column>
 			<el-table-column
 				:filters="[
 					{ value: 1, text: 'Aktif' },
