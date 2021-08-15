@@ -3,12 +3,12 @@
 		<div>
 			<h1
 				v-if="formModel.pos_id"
-				formModel.pos_id
 				class="mb-3 p-2 bg-red text-white text-center text-xl"
 				@click="formModel.pos_id = null"
 			>
 				{{ posList.find((p) => p.id == formModel.pos_id).nama }}
 			</h1>
+
 			<el-row
 				v-if="!setting.disable_plat_nomor"
 				:gutter="10"
@@ -716,6 +716,46 @@ export default {
 				})
 		},
 
+		async connectPos() {
+			await this.$store.dispatch('getPos')
+			this.ws = new WebSocket(`ws://${this.pos.ip_address}:5678/`)
+
+			this.ws.onerror = (event) => {
+				this.$message({
+					message: 'KONEKSI KE POS GAGAL',
+					type: 'error',
+				})
+			}
+
+			this.ws.onopen = (event) => {
+				console.log('POS TEKONEKSI')
+			}
+
+			this.ws.onmessage = (event) => {
+				let data = JSON.parse(event.data)
+				this.$message({
+					message: data.message,
+					type: data.status ? 'success' : 'error',
+				})
+			}
+		},
+
+		// openGate() {
+		// 	const p = this.pos
+
+		// 	this.ws.send(
+		// 		[
+		// 			'open',
+		// 			p.gate_device_name,
+		// 			p.gate_device_baudrate,
+		// 			p.gate_command_open,
+		// 			p.gate_command_close,
+		// 		].join(';')
+		// 	)
+
+		// 	setTimeout(this.resetForm, 3000)
+		// },
+
 		openGate(gate_out_id) {
 			const pos = this.posList.find((p) => p.id == this.formModel.pos_id)
 			const gate = this.gateOutList.find((g) => g.id == gate_out_id)
@@ -988,7 +1028,7 @@ export default {
 	height: calc(50vh - 73px);
 }
 
-.my-input {
+/* .my-input {
 	height: 43px;
 	line-height: 43px;
 	box-sizing: border-box;
@@ -1038,5 +1078,65 @@ export default {
 
 .my-big-btn:focus {
 	background-color: red;
+} */
+
+.my-input {
+	border: 2px solid #160047;
+	height: 45px;
+	line-height: 45px;
+	font-size: 30px;
+	display: block;
+	width: 100%;
+	padding: 0px 15px;
+	box-sizing: border-box;
+}
+
+.my-input:focus,
+.my-input-time:focus {
+	background: rgb(255, 246, 122);
+}
+
+.label-big {
+	box-sizing: border-box;
+	background-color: #160047;
+	color: #fff;
+	padding-left: 15px;
+	font-size: 20px;
+	height: 45px;
+	line-height: 45px;
+}
+
+.tarif-input {
+	background: rgb(199, 24, 24);
+	color: #fff;
+}
+
+.my-big-btn {
+	box-sizing: border-box;
+	width: 100%;
+	border: none;
+	font-size: 20px;
+	height: 45px;
+	line-height: 45px;
+	background-color: #254ec1;
+	color: #fff;
+	border-radius: 4px;
+	margin-top: 10px;
+}
+
+.my-big-btn:focus {
+	background: rgb(199, 24, 24);
+}
+
+.label {
+	box-sizing: border-box;
+	background-color: #160047;
+	color: #fff;
+	text-align: center;
+	padding: 10px;
+}
+
+.text-center {
+	text-align: center;
 }
 </style>
