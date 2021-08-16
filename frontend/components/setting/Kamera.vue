@@ -248,7 +248,7 @@ export default {
 
 		testKamera(id) {
 			this.$axios
-				.$get(`/kamera/test/${id}`)
+				.$get(`/api/kamera/test/${id}`)
 				.then((response) => {
 					this.snapshot = 'data:image/jpeg;base64,' + response.snapshot
 					this.showSnapshot = true
