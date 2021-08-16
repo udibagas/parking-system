@@ -17,7 +17,7 @@ def login():
     global API_HEADERS
 
     data = {
-        "username": "controller",
+        "email": "controller",
         "password": "bismillah1@#$%",
         "device_name": "parking_controller",
     }
