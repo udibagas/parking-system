@@ -249,6 +249,7 @@ export default {
 		},
 
 		...mapState([
+			'pos',
 			'setting',
 			'posList',
 			'gateInList',
@@ -264,6 +265,7 @@ export default {
 			snapshots: [],
 			showManualOpenForm: false,
 			HIDE_PRINT_REPORT: false,
+			ws: null,
 		}
 	},
 
@@ -740,55 +742,20 @@ export default {
 			}
 		},
 
-		// openGate() {
-		// 	const p = this.pos
-
-		// 	this.ws.send(
-		// 		[
-		// 			'open',
-		// 			p.gate_device_name,
-		// 			p.gate_device_baudrate,
-		// 			p.gate_command_open,
-		// 			p.gate_command_close,
-		// 		].join(';')
-		// 	)
-
-		// 	setTimeout(this.resetForm, 3000)
-		// },
-
 		openGate(gate_out_id) {
-			const pos = this.posList.find((p) => p.id == this.formModel.pos_id)
 			const gate = this.gateOutList.find((g) => g.id == gate_out_id)
 
-			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`)
+			this.ws.send(
+				[
+					'open',
+					gate.device,
+					gate.baudrate,
+					gate.open_command,
+					gate.close_command,
+				].join(';')
+			)
 
-			ws.onerror = (event) => {
-				this.$message({
-					message: 'KONEKSI KE POS GAGAL',
-					type: 'error',
-				})
-			}
-
-			ws.onopen = (event) => {
-				ws.send(
-					[
-						'open',
-						gate.device,
-						gate.baudrate,
-						gate.open_command,
-						gate.close_command,
-					].join(';')
-				)
-			}
-
-			ws.onmessage = (event) => {
-				let data = JSON.parse(event.data)
-				this.$message({
-					message: data.message,
-					type: data.status ? 'success' : 'error',
-				})
-				ws.close()
-			}
+			setTimeout(this.resetForm, 3000)
 		},
 
 		runningText(text) {
@@ -946,6 +913,8 @@ export default {
 					}
 				}
 			}
+
+			this.connectPos()
 		},
 
 		takeSnapshot() {
@@ -1018,6 +987,10 @@ export default {
 				this.printLastTrx()
 			}
 		})
+	},
+
+	destroyed() {
+		this.ws.close()
 	},
 }
 </script>
