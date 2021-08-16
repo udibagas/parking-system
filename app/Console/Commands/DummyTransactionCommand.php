@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\ParkingTransaction;
+use App\Models\ParkingTransaction;
 use Illuminate\Console\Command;
 
 class DummyTransactionCommand extends Command
@@ -38,7 +38,7 @@ class DummyTransactionCommand extends Command
      */
     public function handle()
     {
-        factory(ParkingTransaction::class, 10)->create();
+        ParkingTransaction::factory(10)->create();
         $this->info('Created 10 rows');
     }
 }

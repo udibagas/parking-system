@@ -1,20 +1,27 @@
 <?php
 
-/* @var $factory \Illuminate\Database\Eloquent\Factory */
+namespace Database\Factories;
 
-use App\GateIn;
-use App\ParkingTransaction;
-use Faker\Generator as Faker;
+use App\Models\GateIn;
+use App\Models\ParkingTransaction;
+use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Str;
 
-$factory->define(ParkingTransaction::class, function (Faker $faker) {
-    $timeIn = now();
+class ParkingTransactionFactory extends Factory {
 
-    return [
-        'time_in' => $timeIn,
-        'shift_id' => ParkingTransaction::setShift($timeIn),
-        'gate_in_id' => GateIn::where('status', 1)->first()->id,
-        'nomor_barcode' => Str::random(5),
-        'jenis_kendaraan' => 'MOTOR'
-    ];
-});
+    protected $model = ParkingTransaction::class;
+
+    public function definition()
+    {
+        $timeIn = now();
+
+        return [
+            'time_in' => $timeIn,
+            'shift_id' => ParkingTransaction::setShift($timeIn),
+            'gate_in_id' => GateIn::where('status', 1)->first()->id,
+            'nomor_barcode' => Str::random(5),
+            'jenis_kendaraan' => 'MOTOR'
+        ];
+    }
+
+}

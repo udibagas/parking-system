@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\JenisKendaraan;
+use App\Models\JenisKendaraan;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 
