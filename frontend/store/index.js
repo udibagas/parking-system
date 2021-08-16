@@ -13,7 +13,7 @@ export const state = () => ({
   shiftList: [],
   areaParkirList: [],
   setting: {},
-  pos: {},
+  pos: null,
   siklus: [
     { value: 'days', label: 'hari' },
     { value: 'weeks', label: 'minggu' },
@@ -152,12 +152,7 @@ export const actions = {
       const data = await this.$axios.$get('/api/getPosByIp')
       commit('setPos', data)
     } catch (error) {
-      Message({
-        message: 'POS TIDAK TERDAFTAR',
-        type: 'error',
-        showClose: true,
-        duration: 10000,
-      })
+      commit('setPos', null)
     }
   },
 }

@@ -182,6 +182,14 @@ table {
   margin-right: 10px;
 }
 
+.mt-0 {
+  margin-top: 0px;
+}
+
+.mb-0 {
+  margin-bottom: 0px;
+}
+
 .mb-1 {
   margin-bottom: 5px;
 }
@@ -292,5 +300,17 @@ table {
 .py-1 {
   padding-left: 5px;
   padding-right: 5px;
+}
+
+.mx-auto {
+  margin: 0 auto;
+}
+
+.justify-content-center {
+  justify-content: center;
+}
+
+.align-items-center {
+  align-items: center;
 }
 

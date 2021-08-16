@@ -754,10 +754,10 @@ export default {
 		afterSave() {
 			this.$store.dispatch('getMemberList')
 		},
-	},
 
-	created() {
-		this.$store.dispatch('getMemberList')
+		afterDelete() {
+			this.$store.dispatch('getMemberList')
+		},
 	},
 }
 </script>

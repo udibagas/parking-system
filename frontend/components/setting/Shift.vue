@@ -143,6 +143,10 @@ export default {
 		afterSave() {
 			this.$store.dispatch('getShiftList')
 		},
+
+		afterDelete() {
+			this.$store.dispatch('getShiftList')
+		},
 	},
 }
 </script>

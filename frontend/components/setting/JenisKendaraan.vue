@@ -323,6 +323,10 @@ export default {
 		afterSave() {
 			this.$store.dispatch('getJenisKendaraanList')
 		},
+
+		afterDelete() {
+			this.$store.dispatch('getJenisKendaraanList')
+		},
 	},
 }
 </script>

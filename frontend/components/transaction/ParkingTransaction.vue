@@ -383,6 +383,8 @@ export default {
 	},
 
 	created() {
+		this.$store.dispatch('getShiftList')
+
 		this.filters.dateRange = [
 			this.$moment().format('YYYY-MM-DD 00:00:00'),
 			this.$moment().format('YYYY-MM-DD HH:mm:ss'),

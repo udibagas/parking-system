@@ -365,7 +365,11 @@ export default {
 
 	methods: {
 		afterSave() {
-			this.$store.dispatch('getShiftList')
+			this.$store.dispatch('getGateOutList')
+		},
+
+		afterDelete() {
+			this.$store.dispatch('getGateOutList')
 		},
 
 		testGate(gate) {

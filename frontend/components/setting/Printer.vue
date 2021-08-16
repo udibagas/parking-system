@@ -180,6 +180,10 @@ export default {
 			this.$store.dispatch('getPrinterList')
 		},
 
+		afterDelete() {
+			this.$store.dispatch('getPrinterList')
+		},
+
 		testPrinter(id) {
 			this.$axios
 				.$get(`/api/printer/test/${id}`)

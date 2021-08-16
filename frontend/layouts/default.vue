@@ -108,12 +108,12 @@ export default {
 		},
 	},
 
-	created() {
-		this.$store.dispatch('getNavigationList')
-		this.$store.dispatch('getSetting')
-		this.$store.dispatch('getGateInList')
-		this.$store.dispatch('getGateOutList')
-		this.$store.dispatch('getJenisKendaraanList')
+	async created() {
+		await this.$store.dispatch('getNavigationList')
+		await this.$store.dispatch('getSetting')
+		await this.$store.dispatch('getPos')
+		await this.$store.dispatch('getGateInList')
+		await this.$store.dispatch('getJenisKendaraanList')
 	},
 }
 </script>

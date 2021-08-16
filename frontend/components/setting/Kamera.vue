@@ -246,6 +246,10 @@ export default {
 			this.$store.dispatch('getKameraList')
 		},
 
+		afterDelete() {
+			this.$store.dispatch('getKameraList')
+		},
+
 		testKamera(id) {
 			this.$axios
 				.$get(`/api/kamera/test/${id}`)

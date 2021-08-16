@@ -162,6 +162,12 @@ export default {
 	methods: {
 		afterSave() {
 			this.$store.dispatch('getPosList')
+			this.$store.dispatch('getPos')
+		},
+
+		afterDelete() {
+			this.$store.dispatch('getPosList')
+			this.$store.dispatch('getPos')
 		},
 	},
 }

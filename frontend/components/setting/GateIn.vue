@@ -288,6 +288,10 @@ export default {
 		afterSave() {
 			this.$store.dispatch('getGateInList')
 		},
+
+		afterDelete() {
+			this.$store.dispatch('getGateInList')
+		},
 	},
 
 	computed: {

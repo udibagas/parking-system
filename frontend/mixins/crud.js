@@ -85,6 +85,10 @@ export default {
       // please override
     },
 
+    afterDelete() {
+      // please override
+    },
+
     deleteData(id) {
       this.$confirm('Anda yakin akan menghapus data ini?', 'Warning', {
         type: 'warning',
@@ -94,6 +98,7 @@ export default {
             .$delete(`${this.url}/${id}`)
             .then((r) => {
               this.requestData()
+              this.afterDelete()
               this.$message({
                 message: r.message,
                 type: 'success',

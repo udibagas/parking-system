@@ -152,6 +152,10 @@ export default {
 		afterSave() {
 			this.$store.dispatch('getGroupMemberList')
 		},
+
+		afterDelete() {
+			this.$store.dispatch('getGroupMemberList')
+		},
 	},
 }
 </script>

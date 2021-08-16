@@ -192,9 +192,11 @@ import crud from '@/mixins/crud'
 
 export default {
 	mixins: [crud],
+
 	data() {
 		return { url: '/api/areaParkir' }
 	},
+
 	computed: {
 		...mapState(['jenisKendaraanList']),
 	},

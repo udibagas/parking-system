@@ -1,225 +1,216 @@
 <template>
-	<div id="gate-out-app" class="flex flex-row">
-		<div>
-			<h1
-				v-if="formModel.pos_id"
-				class="mb-3 p-2 bg-red text-white text-center text-xl"
-				@click="formModel.pos_id = null"
-			>
-				{{ posList.find((p) => p.id == formModel.pos_id).nama }}
-			</h1>
+	<el-card id="gate-out-app">
+		<div v-if="pos" class="flex">
+			<div>
+				<h1 class="mt-0 mb-3 p-2 bg-red text-white text-center text-xl">
+					{{ pos.nama }}
+				</h1>
 
-			<el-row
-				v-if="!setting.disable_plat_nomor"
-				:gutter="10"
-				style="margin-bottom: 10px"
-			>
-				<el-col :span="10">
-					<div class="label-big">[-] NO. PLAT</div>
-				</el-col>
-				<el-col :span="14">
-					<input
-						id="plat-nomor"
-						autocomplete="off"
-						@keyup.enter="cekPlatNomor"
-						type="text"
-						placeholder="NO. PLAT"
-						v-model="formModel.plat_nomor"
-						class="my-input"
-					/>
-				</el-col>
-			</el-row>
+				<el-row
+					v-if="!setting.disable_plat_nomor"
+					:gutter="10"
+					style="margin-bottom: 10px"
+				>
+					<el-col :span="10">
+						<div class="label-big">[-] NO. PLAT</div>
+					</el-col>
+					<el-col :span="14">
+						<input
+							id="plat-nomor"
+							autocomplete="off"
+							@keyup.enter="cekPlatNomor"
+							type="text"
+							placeholder="NO. PLAT"
+							v-model="formModel.plat_nomor"
+							class="my-input"
+						/>
+					</el-col>
+				</el-row>
 
-			<el-row :gutter="10" style="margin-bottom: 10px">
-				<el-col :span="10">
-					<div class="label-big">[+] NO. TIKET/KARTU</div>
-				</el-col>
-				<el-col :span="14">
-					<input
-						id="nomor-tiket"
-						autocomplete="off"
-						@keyup.enter="cekTiket"
-						@keydown.tab="cekTiket"
-						type="text"
-						placeholder="NO. TIKET/KARTU"
-						v-model="formModel.nomor_barcode"
-						class="my-input"
-					/>
-				</el-col>
-			</el-row>
+				<el-row :gutter="10" style="margin-bottom: 10px">
+					<el-col :span="10">
+						<div class="label-big">[+] NO. TIKET/KARTU</div>
+					</el-col>
+					<el-col :span="14">
+						<input
+							id="nomor-tiket"
+							autocomplete="off"
+							@keyup.enter="cekTiket"
+							@keydown.tab="cekTiket"
+							type="text"
+							placeholder="NO. TIKET/KARTU"
+							v-model="formModel.nomor_barcode"
+							class="my-input"
+						/>
+					</el-col>
+				</el-row>
 
-			<el-row :gutter="10" style="margin-bottom: 10px">
-				<el-col :span="10">
-					<div class="label-big">[*] JENIS KENDARAAN</div>
-				</el-col>
-				<el-col :span="14">
-					<select
-						@change="hitungTarif"
-						v-model="formModel.jenis_kendaraan"
-						id="jenis-kendaraan"
-						class="my-input"
-						placeholder="JENIS KENDARAAN"
-					>
-						<option v-for="g in jenisKendaraanList" :value="g.nama" :key="g.id">
-							{{ g.shortcut_key }} - {{ g.nama }}
-						</option>
-					</select>
-				</el-col>
-			</el-row>
+				<el-row :gutter="10" style="margin-bottom: 10px">
+					<el-col :span="10">
+						<div class="label-big">[*] JENIS KENDARAAN</div>
+					</el-col>
+					<el-col :span="14">
+						<select
+							@change="hitungTarif"
+							v-model="formModel.jenis_kendaraan"
+							id="jenis-kendaraan"
+							class="my-input"
+							placeholder="JENIS KENDARAAN"
+						>
+							<option
+								v-for="g in jenisKendaraanList"
+								:value="g.nama"
+								:key="g.id"
+							>
+								{{ g.shortcut_key }} - {{ g.nama }}
+							</option>
+						</select>
+					</el-col>
+				</el-row>
 
-			<el-row
-				v-show="formModel.nomor_barcode == 'xxxxx'"
-				:gutter="10"
-				style="margin-bottom: 10px"
-			>
-				<el-col :span="10">
-					<div class="label-big">[*] JAM MASUK</div>
-				</el-col>
-				<el-col :span="14">
-					<input
-						@keyup.enter="toGateIn"
-						@change="hitungTarif"
-						id="time-in"
-						v-mask="'####-##-## ##:##'"
-						v-model="formModel.time_in"
-						class="my-input"
-					/>
-				</el-col>
-			</el-row>
+				<el-row
+					v-show="formModel.nomor_barcode == 'xxxxx'"
+					:gutter="10"
+					style="margin-bottom: 10px"
+				>
+					<el-col :span="10">
+						<div class="label-big">[*] JAM MASUK</div>
+					</el-col>
+					<el-col :span="14">
+						<input
+							@keyup.enter="toGateIn"
+							@change="hitungTarif"
+							id="time-in"
+							v-mask="'####-##-## ##:##'"
+							v-model="formModel.time_in"
+							class="my-input"
+						/>
+					</el-col>
+				</el-row>
 
-			<el-row
-				v-show="formModel.nomor_barcode == 'xxxxx'"
-				v-if="gateInList.length > 1"
-				:gutter="10"
-				style="margin-bottom: 10px"
-			>
-				<el-col :span="10">
-					<div class="label-big">GATE MASUK</div>
-				</el-col>
-				<el-col :span="14">
-					<select
-						@change="toSubmit"
-						v-model="formModel.gate_in_id"
-						id="gate-in"
-						class="my-input"
-					>
-						<option v-for="g in gateInList" :value="g.id" :key="g.id">
-							{{ g.shortcut_key }} - {{ g.nama }}
-						</option>
-					</select>
-				</el-col>
-			</el-row>
+				<el-row
+					v-show="formModel.nomor_barcode == 'xxxxx'"
+					v-if="gateInList.length > 1"
+					:gutter="10"
+					style="margin-bottom: 10px"
+				>
+					<el-col :span="10">
+						<div class="label-big">GATE MASUK</div>
+					</el-col>
+					<el-col :span="14">
+						<select
+							@change="toSubmit"
+							v-model="formModel.gate_in_id"
+							id="gate-in"
+							class="my-input"
+						>
+							<option v-for="g in gateInList" :value="g.id" :key="g.id">
+								{{ g.shortcut_key }} - {{ g.nama }}
+							</option>
+						</select>
+					</el-col>
+				</el-row>
 
-			<el-row :gutter="10" style="margin-bottom: 10px">
-				<el-col :span="10">
-					<div class="label-big">TARIF</div>
-				</el-col>
-				<el-col :span="14">
-					<input
-						disabled
-						v-model="formModel.tarif"
-						class="my-input bg-red-700 text-white"
-					/>
-				</el-col>
-			</el-row>
+				<el-row :gutter="10" style="margin-bottom: 10px">
+					<el-col :span="10">
+						<div class="label-big">TARIF</div>
+					</el-col>
+					<el-col :span="14">
+						<input
+							disabled
+							v-model="formModel.tarif"
+							class="my-input bg-red-700 text-white"
+						/>
+					</el-col>
+				</el-row>
 
-			<el-row
-				v-if="formModel.nomor_barcode == 'xxxxx'"
-				:gutter="10"
-				style="margin-bottom: 10px"
-			>
-				<el-col :span="10">
-					<div class="label-big">TARIF + DENDA</div>
-				</el-col>
-				<el-col :span="14">
-					<input
-						disabled
-						:value="Number(formModel.tarif) + Number(formModel.denda)"
-						class="my-input bg-red-700 text-white"
-					/>
-				</el-col>
-			</el-row>
+				<el-row
+					v-if="formModel.nomor_barcode == 'xxxxx'"
+					:gutter="10"
+					style="margin-bottom: 10px"
+				>
+					<el-col :span="10">
+						<div class="label-big">TARIF + DENDA</div>
+					</el-col>
+					<el-col :span="14">
+						<input
+							disabled
+							:value="Number(formModel.tarif) + Number(formModel.denda)"
+							class="my-input bg-red-700 text-white"
+						/>
+					</el-col>
+				</el-row>
 
-			<button
-				id="submit-btn"
-				@keyup.right="nextBtn"
-				@keyup.down="nextBtn"
-				@keydown.enter="submit(false)"
-				class="my-big-btn"
-				@click="submit(false)"
-			>
-				BUKA GATE
-			</button>
-			<button
-				id="submit-btn1"
-				@keyup.left="prevBtn"
-				@keyup.up="prevBtn"
-				@keydown.enter="printLastTrx"
-				class="my-big-btn"
-				@click="printLastTrx"
-			>
-				[F12] PRINT STRUK TRANSAKSI TERAKHIR
-			</button>
+				<button
+					id="submit-btn"
+					@keyup.right="nextBtn"
+					@keyup.down="nextBtn"
+					@keydown.enter="submit(false)"
+					class="my-big-btn"
+					@click="submit(false)"
+				>
+					BUKA GATE
+				</button>
+				<button
+					id="submit-btn1"
+					@keyup.left="prevBtn"
+					@keyup.up="prevBtn"
+					@keydown.enter="printLastTrx"
+					class="my-big-btn"
+					@click="printLastTrx"
+				>
+					[F12] PRINT STRUK TRANSAKSI TERAKHIR
+				</button>
 
-			<el-row :gutter="10">
-				<el-col :span="12" v-if="!HIDE_PRINT_REPORT">
-					<button
-						@keydown.enter="printReport"
-						class="my-big-btn"
-						@click="printReport"
-					>
-						[F10] PRINT LAPORAN
-					</button>
-				</el-col>
-				<el-col :span="HIDE_PRINT_REPORT ? 24 : 12">
-					<button
-						class="my-big-btn"
-						@keydown.enter="showManualOpenForm = true"
-						@click="showManualOpenForm = true"
-					>
-						[F11] BUKA GATE MANUAL
-					</button>
-				</el-col>
-			</el-row>
-		</div>
+				<el-row :gutter="10">
+					<el-col :span="12" v-if="!HIDE_PRINT_REPORT">
+						<button
+							@keydown.enter="printReport"
+							class="my-big-btn"
+							@click="printReport"
+						>
+							[F10] PRINT LAPORAN
+						</button>
+					</el-col>
+					<el-col :span="HIDE_PRINT_REPORT ? 24 : 12">
+						<button
+							class="my-big-btn"
+							@keydown.enter="showManualOpenForm = true"
+							@click="showManualOpenForm = true"
+						>
+							[F11] BUKA GATE MANUAL
+						</button>
+					</el-col>
+				</el-row>
+			</div>
 
-		<div class="ml-5" v-if="snapshots.length > 0">
-			<img
-				v-for="s in snapshots"
-				:key="s.id"
-				:src="s.url"
-				style="width: 500px"
-				class="mx-auto mb-1 border"
+			<div class="ml-5" v-if="snapshots.length > 0">
+				<img
+					v-for="s in snapshots"
+					:key="s.id"
+					:src="s.url"
+					style="width: 500px"
+					class="mx-auto mb-1 border"
+				/>
+			</div>
+
+			<TransactionFormBukaManual
+				:show="showManualOpenForm"
+				@close="showManualOpenForm = false"
+				@open-gate="(gate_out_id) => openGate(gate_out_id)"
 			/>
 		</div>
 
-		<TransactionFormBukaManual
-			:show="showManualOpenForm"
-			@close="showManualOpenForm = false"
-			@open-gate="(gate_out_id) => openGate(gate_out_id)"
-		/>
-
-		<el-dialog
-			center
-			:show-close="false"
-			:visible="!formModel.pos_id && posList.length > 1"
-			title="PILIH POS"
+		<div
+			v-else
+			class="flex flex-row justify-content-center align-items-center"
+			style="height: calc(100vh - 145px)"
 		>
-			<div class="mb-5">
-				<!-- <h1 class="text-center mb-3 text-xl">PILIH POS</h1> -->
-				<select
-					v-model="formModel.pos_id"
-					class="my-input"
-					id="pos-id"
-					placeholder="Pilih Pos"
-				>
-					<option v-for="g in posList" :value="g.id" :key="g.id">
-						{{ g.nama }}
-					</option>
-				</select>
+			<div class="text-center text-5xl text-danger">
+				KOMPUTER INI TIDAK TERDAFTAR SEBAGAI POS
 			</div>
-		</el-dialog>
-	</div>
+		</div>
+	</el-card>
 </template>
 
 <script>
@@ -248,14 +239,7 @@ export default {
 			).padStart(2, '0')}`
 		},
 
-		...mapState([
-			'pos',
-			'setting',
-			'posList',
-			'gateInList',
-			'gateOutList',
-			'jenisKendaraanList',
-		]),
+		...mapState(['pos', 'setting', 'gateInList', 'jenisKendaraanList']),
 	},
 
 	data() {
@@ -298,11 +282,8 @@ export default {
 		},
 
 		hitungTarif() {
-			const gateOut = this.gateOutList.find((g) => {
-				return (
-					g.pos_id == this.formModel.pos_id &&
-					g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
-				)
+			const gateOut = this.pos.gate_outs.find((g) => {
+				return g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
 			})
 
 			if (!gateOut) {
@@ -538,9 +519,7 @@ export default {
 
 					if (!data.member.expired && data.member.expired_in <= 5) {
 						this.$alert(
-							'Kartu akan habis masa berlaku dalam ' +
-								data.member.expired_in +
-								' hari',
+							`Kartu akan habis masa berlaku dalam ${data.member.expired_in} hari`,
 							'Perhatian',
 							{
 								type: 'warning',
@@ -558,10 +537,9 @@ export default {
 							this.formModel.jenis_kendaraan =
 								data.member.vehicles[0].jenis_kendaraan
 
-							const gateOut = this.gateOutList.find((g) => {
-								return (
-									g.pos_id == this.formModel.pos_id &&
-									g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
+							const gateOut = this.pos.gate_outs.find((g) => {
+								return g.jenis_kendaraan.includes(
+									this.formModel.jenis_kendaraan
 								)
 							})
 
@@ -719,7 +697,6 @@ export default {
 		},
 
 		async connectPos() {
-			await this.$store.dispatch('getPos')
 			this.ws = new WebSocket(`ws://${this.pos.ip_address}:5678/`)
 
 			this.ws.onerror = (event) => {
@@ -743,7 +720,7 @@ export default {
 		},
 
 		openGate(gate_out_id) {
-			const gate = this.gateOutList.find((g) => g.id == gate_out_id)
+			const gate = this.pos.gate_outs.find((g) => g.id == gate_out_id)
 
 			this.ws.send(
 				[
@@ -759,8 +736,7 @@ export default {
 		},
 
 		runningText(text) {
-			const pos = this.posList.find((p) => p.id == this.formModel.pos_id)
-			const gate = this.gateOutList.find(
+			const gate = this.pos.gate_outs.find(
 				(g) => g.id == this.formModel.gate_out_id
 			)
 
@@ -772,36 +748,15 @@ export default {
 				return
 			}
 
-			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`)
-
-			ws.onerror = (event) => {
-				this.$message({
-					message: 'KONEKSI KE RUNNING TEXT GAGAL',
-					type: 'error',
-				})
-			}
-
-			ws.onopen = (event) => {
-				ws.send(
-					[
-						'rt',
-						gate.running_text_device,
-						gate.running_text_baudrate,
-						text,
-					].join(';')
+			this.ws.send(
+				['rt', gate.running_text_device, gate.running_text_baudrate, text].join(
+					';'
 				)
-			}
-
-			ws.onmessage = (event) => {
-				let data = JSON.parse(event.data)
-				console.log(data)
-				ws.close()
-			}
+			)
 		},
 
 		resetRunningText() {
-			const pos = this.posList.find((p) => p.id == this.formModel.pos_id)
-			const gate = this.gateOutList.find(
+			const gate = this.pos.gate_outs.find(
 				(g) => g.id == this.formModel.gate_out_id
 			)
 
@@ -813,28 +768,9 @@ export default {
 				return
 			}
 
-			const ws = new WebSocket(`ws://${pos.ip_address}:5678/`)
-
-			ws.onerror = (event) => {
-				this.$message({
-					message: 'KONEKSI KE RUNNING TEXT GAGAL',
-					type: 'error',
-				})
-			}
-
-			ws.onopen = (event) => {
-				ws.send(
-					['rrt', gate.running_text_device, gate.running_text_baudrate].join(
-						';'
-					)
-				)
-			}
-
-			ws.onmessage = (event) => {
-				let data = JSON.parse(event.data)
-				console.log(data)
-				ws.close()
-			}
+			this.ws.send(
+				['rrt', gate.running_text_device, gate.running_text_baudrate].join(';')
+			)
 		},
 
 		printLastTrx() {
@@ -887,6 +823,17 @@ export default {
 		},
 
 		async initialize() {
+			if (!this.pos) {
+				return
+			}
+
+			this.formModel.pos_id = this.pos.id
+
+			if (this.pos.gate_outs.length == 1) {
+				this.formModel.gate_out_id = this.pos.gate_outs[0].id
+			}
+
+			this.connectPos()
 			this.formModel.plat_nomor = this.setting.plat_nomor_default
 
 			if (this.setting.disable_plat_nomor) {
@@ -894,27 +841,6 @@ export default {
 			} else {
 				document.getElementById('plat-nomor').focus()
 			}
-
-			await this.$store.dispatch('getPosList')
-
-			if (this.posList.length == 0) {
-				this.$message({
-					message: 'BELUM ADA POS',
-					type: 'error',
-					showClose: true,
-					duration: 10000,
-				})
-			} else {
-				if (this.posList.length == 1) {
-					this.formModel.pos_id = this.posList[0].id
-
-					if (this.posList[0].gate_outs.length == 1) {
-						this.formModel.gate_out_id = this.posList.gate_outs[0].id
-					}
-				}
-			}
-
-			this.connectPos()
 		},
 
 		takeSnapshot() {
