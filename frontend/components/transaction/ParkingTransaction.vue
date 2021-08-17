@@ -131,7 +131,11 @@
 				min-width="180px"
 			>
 				<template slot-scope="scope">
-					{{ $moment(scope.row.time_out).format('DD-MMM-YYYY HH:mm:ss') }}
+					{{
+						scope.row.time_out
+							? $moment(scope.row.time_out).format('DD-MMM-YYYY HH:mm:ss')
+							: ''
+					}}
 				</template>
 			</el-table-column>
 
