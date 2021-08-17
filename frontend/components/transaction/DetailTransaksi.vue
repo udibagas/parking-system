@@ -2,6 +2,8 @@
 	<el-dialog
 		width="80%"
 		:visible.sync="show"
+		center
+		title="DETAIL TRANSAKSI"
 		:before-close="
 			(done) => {
 				$emit('close')
@@ -9,7 +11,7 @@
 		"
 	>
 		<div class="flex flex-row">
-			<table class="table-auto" style="width: 350px">
+			<table class="table-auto" style="width: 360px">
 				<tbody>
 					<tr>
 						<td
@@ -60,13 +62,21 @@
 					</tr>
 					<tr>
 						<td class="border bg-blue-700 text-white px-4 py-1">Waktu Masuk</td>
-						<td class="border bg-blue-100 px-4 py-1">{{ trx.time_in }}</td>
+						<td class="border bg-blue-100 px-4 py-1">
+							{{ $moment(trx.time_in).format('DD-MMM-YYYY HH:mm:ss') }}
+						</td>
 					</tr>
 					<tr>
 						<td class="border bg-blue-700 text-white px-4 py-1">
 							Waktu Keluar
 						</td>
-						<td class="border bg-blue-100 px-4 py-1">{{ trx.time_out }}</td>
+						<td class="border bg-blue-100 px-4 py-1">
+							{{
+								trx.time_out
+									? $moment(trx.time_out).format('DD-MMM-YYYY HH:mm:ss')
+									: ''
+							}}
+						</td>
 					</tr>
 					<tr>
 						<td class="border bg-blue-700 text-white px-4 py-1">Durasi</td>
