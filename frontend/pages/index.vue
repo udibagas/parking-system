@@ -916,7 +916,9 @@ export default {
 	},
 
 	destroyed() {
-		this.ws.close()
+		if (this.ws) {
+			this.ws.close()
+		}
 	},
 }
 </script>
