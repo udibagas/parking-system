@@ -272,6 +272,10 @@ table {
   background-color: blue;
 }
 
+.bg-blue-700 {
+  background-color: #254ec1;
+}
+
 .bg-green-600 {
   background-color: green;
 }
@@ -293,13 +297,19 @@ table {
 }
 
 .px-3 {
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
 }
 
+.px-4 {
+  padding-left: 15px;
+  padding-right: 15px;
+}
+
+
 .py-1 {
-  padding-left: 5px;
-  padding-right: 5px;
+  padding-top: 5px;
+  padding-bottom: 5px;
 }
 
 .mx-auto {
