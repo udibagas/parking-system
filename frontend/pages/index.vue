@@ -494,7 +494,7 @@ export default {
 					this.snapshots = data.snapshots
 					this.formModel.id = data.id
 					this.formModel.gate_in_id = data.gate_in_id
-					this.formModel.time_in = data.time_in
+					this.formModel.time_in = this.$moment(data.time_in).format('YYYY-MM-DD HH:mm:ss')
 					this.formModel.is_member = data.is_member
 					this.formModel.time_out = now
 					this.formModel.tarif = 0
