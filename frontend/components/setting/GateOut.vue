@@ -359,6 +359,10 @@ export default {
 		}
 	},
 
+	created() {
+		this.$store.dispatch('getPosList')
+	},
+
 	computed: {
 		...mapState(['jenisKendaraanList', 'printerList', 'kameraList', 'posList']),
 	},
