@@ -265,7 +265,7 @@ class ParkingTransactionController extends Controller
                 return response(['message' => 'KARTU TIDAK MELAKUKAN TAP DI GATE MASUK'], 500);
             }
 
-            $timeIn = now();
+            $timeIn = date('Y-m-d H:i:s');
 
             $data = [
                 'nomor_barcode' => 'NOTAP',
