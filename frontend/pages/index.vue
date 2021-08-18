@@ -1,7 +1,7 @@
 <template>
 	<el-card id="gate-out-app">
 		<div v-if="pos" class="flex">
-			<div>
+			<div style="width:400px">
 				<h1 class="mt-0 mb-3 p-2 bg-red text-white text-center text-xl">
 					{{ pos.nama }}
 				</h1>
