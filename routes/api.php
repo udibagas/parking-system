@@ -60,8 +60,10 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('setSudahKeluar/{parkingTransaction}', [ParkingTransactionController::class, 'setSudahKeluar']);
         Route::get('search', [ParkingTransactionController::class, 'search']);
         Route::post('apiStore', [ParkingTransactionController::class, 'apiStore']);
-        Route::apiResource('', ParkingTransactionController::class);
     });
+
+    Route::apiResource('parkingTransaction', ParkingTransactionController::class);
+
 
     Route::group(['prefix' => 'notification'], function () {
         Route::get('unreadNotification', [NotificationController::class, 'unreadNotification']);
@@ -76,7 +78,6 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('report', [MemberRenewalController::class, 'report']);
         Route::get('reportDaily', [MemberRenewalController::class, 'reportDaily']);
         Route::post('printSlip/{memberRenewal}', [MemberRenewalController::class, 'printSlip']);
-        Route::apiResource('', MemberRenewalController::class, ['except' => 'show']);
     });
 
     Route::apiResources([
@@ -88,6 +89,7 @@ Route::middleware('auth:sanctum')->group(function () {
         'kamera' => KameraController::class,
         'manualOpenLog' => ManualOpenLogController::class,
         'member' => MemberController::class,
+        'memberRenewal' => MemberRenewalController::class,
         'notification' => NotificationController::class,
         'printer' => PrinterController::class,
         'pos' => PosController::class,
