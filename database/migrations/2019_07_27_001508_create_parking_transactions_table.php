@@ -28,7 +28,7 @@ class CreateParkingTransactionsTable extends Migration
             $table->bigInteger('member_id')->nullable();
             $table->string('operator')->nullable();
             $table->boolean('is_member')->default(0)->change();
-            $table->integer('denda')->default(0);
+            $table->integer('denda')->nullable()->default(0);
             $table->boolean('edit')->default(0);
             $table->boolean('manual')->default(0);
             $table->string('edit_by')->nullable();
