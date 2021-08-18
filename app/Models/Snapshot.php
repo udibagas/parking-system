@@ -25,6 +25,6 @@ class Snapshot extends Model
 
     public function getUrlAttribute()
     {
-        return url(Storage::url($this->path));
+        return Storage::url($this->path);
     }
 }

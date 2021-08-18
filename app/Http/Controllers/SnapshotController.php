@@ -21,7 +21,7 @@ class SnapshotController extends Controller
                 'label'     => $nodes[count($nodes) - 1],
                 'path'      => $node,
                 'isFile'    => $isFile,
-                'url'       => Storage::url($node)
+                'url'       => url(Storage::url($node))
             ];
         }, array_merge($dirs, $files));
     }

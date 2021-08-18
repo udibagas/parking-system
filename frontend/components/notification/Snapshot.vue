@@ -107,11 +107,12 @@ export default {
 	width: 400px;
 	height: calc(100vh - 270px);
 	overflow: auto;
+	flex-shrink: 0;
 }
 
 .img-container {
-	padding: 15px;
 	flex-grow: 1;
+	padding: 15px;
 	display: flex;
 	align-items: center;
 	justify-content: center;
