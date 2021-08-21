@@ -21,6 +21,8 @@ export default {
           this.sort = 'asc'
         } else if (c.prop == 'descending') {
           this.sort = 'desc'
+        } else {
+          this.sort = null
         }
 
         this.order = c.order
