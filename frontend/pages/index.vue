@@ -1,7 +1,7 @@
 <template>
 	<el-card>
 		<div v-if="pos" class="flex" id="gate-out-app">
-			<div style="width: 400px">
+			<div style="width: 600px; flex-shrink: 0">
 				<h1 class="mt-0 mb-3 p-2 bg-red text-white text-center text-xl">
 					{{ pos.nama }}
 				</h1>
@@ -184,13 +184,13 @@
 				</el-row>
 			</div>
 
-			<div class="ml-5" v-if="snapshots.length > 0">
+			<div class="ml-5">
 				<img
 					v-for="s in snapshots"
 					:key="s.id"
 					:src="s.url"
-					style="width: 500px"
 					class="mx-auto mb-1 border"
+					style="width: 100%"
 				/>
 			</div>
 
@@ -494,7 +494,9 @@ export default {
 					this.snapshots = data.snapshots
 					this.formModel.id = data.id
 					this.formModel.gate_in_id = data.gate_in_id
-					this.formModel.time_in = this.$moment(data.time_in).format('YYYY-MM-DD HH:mm:ss')
+					this.formModel.time_in = this.$moment(data.time_in).format(
+						'YYYY-MM-DD HH:mm:ss'
+					)
 					this.formModel.is_member = data.is_member
 					this.formModel.time_out = now
 					this.formModel.tarif = 0
