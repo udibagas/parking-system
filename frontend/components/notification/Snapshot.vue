@@ -113,9 +113,5 @@ export default {
 .img-container {
 	flex-grow: 1;
 	padding: 15px;
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex-direction: column;
 }
 </style>
