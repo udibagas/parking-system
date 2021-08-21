@@ -159,8 +159,6 @@ export default {
 	data() {
 		return {
 			url: '/api/manualOpenLog',
-			sort: 'updated_at',
-			order: 'descending',
 			showSnapshot: false,
 			snapshots: [],
 		}

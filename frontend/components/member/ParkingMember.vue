@@ -631,8 +631,6 @@ export default {
 	data() {
 		return {
 			url: '/api/member',
-			sort: 'nama',
-			order: 'ascending',
 			formModel: { vehicles: [] },
 			selectedData: { vehicles: [] },
 			showDetail: false,
@@ -654,8 +652,8 @@ export default {
 
 		print() {
 			const params = {
-				sort: this.sort,
-				order: this.order,
+				sort_prop: this.sort_prop,
+				sort_order: this.sort_order,
 				action: 'print',
 				...this.filters,
 			}

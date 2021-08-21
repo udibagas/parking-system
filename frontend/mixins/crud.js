@@ -8,24 +8,24 @@ export default {
       page: 1,
       pageSize: 10,
       tableData: {},
-      sort: 'name',
-      order: 'ascending',
+      sort_prop: 'name',
+      sort_order: 'ascending',
       filters: {},
       loading: false,
     }
   },
   methods: {
-    sortChange(c) {
-      if (c.prop != this.sort || c.order != this.order) {
-        if (c.prop == 'ascending') {
-          this.sort = 'asc'
-        } else if (c.prop == 'descending') {
-          this.sort = 'desc'
+    sortChange({ prop, order }) {
+      if (prop != this.sort_prop || order != this.sort_order) {
+        if (order == 'ascending') {
+          this.sort_order = 'asc'
+        } else if (order == 'descending') {
+          this.sort_order = 'desc'
         } else {
-          this.sort = null
+          this.sort_order = null
         }
 
-        this.order = c.order
+        this.sort_prop = prop
         this.requestData()
       }
     },
@@ -132,8 +132,8 @@ export default {
         page: this.page,
         keyword: this.keyword,
         pageSize: this.pageSize,
-        sort: this.sort,
-        order: this.order == 'descending' ? 'desc' : 'asc',
+        sort_prop: this.sort_prop,
+        sort_order: this.sort_order,
         paginated: true,
         ...this.filters,
       }

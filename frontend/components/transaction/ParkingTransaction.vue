@@ -395,8 +395,6 @@ export default {
 	data() {
 		return {
 			url: '/api/parkingTransaction',
-			sort: 'updated_at',
-			order: 'descending',
 			trx: null,
 			showTrxDetail: false,
 			date: this.$moment().format('YYYY-MM-DD'),

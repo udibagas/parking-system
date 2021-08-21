@@ -101,8 +101,6 @@ export default {
 	data() {
 		return {
 			url: '/api/userLog',
-			sort: 'updated_at',
-			order: 'descending',
 		}
 	},
 

@@ -129,8 +129,6 @@ export default {
 	data() {
 		return {
 			url: '/api/notification',
-			sort: 'created_at',
-			order: 'ascending',
 		}
 	},
 	methods: {

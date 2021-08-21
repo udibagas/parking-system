@@ -320,8 +320,6 @@ export default {
 	data() {
 		return {
 			url: '/api/memberRenewal',
-			sort: 'created_at',
-			order: 'descending',
 			showPrintDialog: false,
 			selectedData: {},
 		}
