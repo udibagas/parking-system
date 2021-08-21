@@ -5,14 +5,6 @@
 		:visible="show"
 		:show-close="false"
 	>
-		<el-alert
-			type="error"
-			title="ERROR"
-			:description="error.message + '\n' + error.file + ':' + error.line"
-			v-show="error.message"
-			style="margin-bottom: 15px"
-		>
-		</el-alert>
 		<el-form label-width="180px" label-position="left">
 			<el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
 				<el-input placeholder="Nama" v-model="formModel.name"></el-input>
@@ -70,7 +62,6 @@ export default {
 			formModel: { ...this.$auth.user },
 			loading: false,
 			formErrors: {},
-			error: {},
 		}
 	},
 	methods: {
@@ -88,13 +79,9 @@ export default {
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.error = {}
 						this.formErrors = e.response.data.errors
-					}
-
-					if (e.response.status == 500) {
+					} else {
 						this.formErrors = {}
-						this.error = e.response.data
 					}
 				})
 				.finally(() => {
