@@ -737,17 +737,9 @@ export default {
 			if (!id) {
 				this.formModel.vehicles.splice(index, 1)
 			} else {
-				axios
-					.delete(`/api/memberVehicle/${id}`)
-					.then((r) => {
-						this.formModel.vehicles.splice(index, 1)
-					})
-					.catch((e) => {
-						this.$message({
-							message: e.response.data.message,
-							type: 'error',
-						})
-					})
+				this.$axios.$delete(`/api/memberVehicle/${id}`).then((r) => {
+					this.formModel.vehicles.splice(index, 1)
+				})
 			}
 		},
 

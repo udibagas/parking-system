@@ -82,12 +82,6 @@ export default {
 							this.checkedNodes.forEach((node) => this.$refs.tree.remove(node))
 							this.checkedNodes = []
 						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-							})
-						})
 				})
 				.catch((e) => console.log(e))
 		},

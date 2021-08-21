@@ -85,27 +85,21 @@ export default {
 			vehicleTypeList: [],
 		}
 	},
+
 	methods: {
-		generateBarcodeNumber() {
-			let result = ''
-			let characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-			for (let i = 0; i < 5; i++) {
-				result += characters.charAt(
-					Math.floor(Math.random() * characters.length)
-				)
-			}
-			return result
-		},
 		setFare() {
 			let vehicle = this.vehicleTypeList.find(
 				(vt) => vt.name == this.formModel.vehicle_type
 			)
+
 			if (vehicle) {
 				this.formModel.fare = this.formModel.is_member ? 0 : vehicle.tarif_flat
 				this.$forceUpdate()
 			}
+
 			document.getElementById('plate-number').focus()
 		},
+
 		resetForm() {
 			let default_vehicle = this.vehicleTypeList.find((v) => v.is_default == 1)
 			this.formModel.plate_number = this.location.default_plate_number
@@ -121,6 +115,7 @@ export default {
 			this.$forceUpdate()
 			document.getElementById('plate-number').focus()
 		},
+
 		submit() {
 			if (
 				!this.formModel.gate_in_id ||
@@ -131,159 +126,25 @@ export default {
 			}
 
 			let params = { plate_number: this.formModel.plate_number }
-			axios
-				.get('/parkingMember/search', { params: params })
+			this.$axios
+				.$get('/parkingMember/search', { params: params })
 				.then((r) => {
 					this.formModel.fare = 0
 					this.formModel.is_member = 1
-					this.formModel.member_id = r.data.id
+					this.formModel.member_id = r.id
 				})
 				.catch((e) => {
 					this.formModel.is_member = 0
 					this.formModel.member_id = null
 				})
 				.finally(() => {
-					this.formModel.barcode_number = this.generateBarcodeNumber()
 					this.formModel.time_in = this.$moment().format('YYYY-MM-DD HH:mm:ss')
-					this.formModel.time_out = this.$moment().format('YYYY-MM-DD HH:mm:ss')
-
-					axios
-						.post('/parkingTransaction', this.formModel)
-						.then((r) => {
-							this.printTicket(r.data.id)
-						})
-						.catch((e) => {
-							this.$message({
-								message: 'DATA GAGAL DISIMPAN',
-								type: 'error',
-								showClose: true,
-							})
-						})
-				})
-		},
-		printTicket(id) {
-			axios
-				.post('/parkingTransaction/printTicket/' + id, { trx: 'IN' })
-				.then((r) => {
-					this.$message({
-						message: r.data.message,
-						type: 'success',
-						showClose: true,
-					})
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
-				.finally(() => {
-					setTimeout(this.openGate, 3000)
-				})
-		},
-		openGate() {
-			axios
-				.post('/parkingGate/openGate/' + this.formModel.gate_in_id)
-				.then((r) => {
-					this.$message({
-						message: r.data.message,
-						type: 'success',
-						showClose: true,
-					})
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
-				.finally(() => {
-					this.resetForm()
-				})
-		},
-		getLocationIdentity() {
-			axios
-				.get('/locationIdentity/search', { params: { active: 1 } })
-				.then((r) => {
-					this.location = r.data
-					this.formModel.plate_number = r.data.default_plate_number
-				})
-				.catch((e) => {
-					this.$message({
-						message: 'MOHON SET LOKASI',
-						type: 'error',
-						showClose: true,
-					})
-				})
-		},
-		getParkingGateList() {
-			axios
-				.get('/parkingGate/getList')
-				.then((r) => {
-					this.parkingGateList = r.data
-
-					if (r.data.filter((g) => g.type == 'IN').length == 0) {
-						this.$message({
-							message: 'MOHON SET GATE IN',
-							type: 'error',
-							showClose: true,
-						})
-						return
-					}
-
-					this.formModel.gate_in_id = r.data.find((g) => g.type == 'IN').id
-				})
-				.catch((e) => {
-					this.$message({
-						message: 'MOHON SET GATE',
-						type: 'error',
-						showClose: true,
-					})
-				})
-		},
-		getVehicleTypeList() {
-			axios
-				.get('/vehicleType/getList')
-				.then((r) => {
-					if (r.data.length == 0) {
-						this.$message({
-							message: 'MOHON SET JENIS KENDARAAN',
-							type: 'error',
-							showClose: true,
-						})
-						return
-					}
-
-					this.vehicleTypeList = r.data
-					let default_vehicle = r.data.find((v) => v.is_default == 1)
-
-					if (default_vehicle) {
-						this.formModel.vehicle_type = default_vehicle.name
-						this.formModel.fare = default_vehicle.tarif_flat
-						this.$forceUpdate()
-					} else {
-						this.$message({
-							message: 'MOHON SET DEFAULT JENIS KENDARAAN',
-							type: 'error',
-							showClose: true,
-						})
-					}
-				})
-				.catch((e) => {
-					this.$message({
-						message: 'MOHON SET JENIS KENDARAAN',
-						type: 'error',
-						showClose: true,
-					})
+					this.$axios.$post('/parkingTransaction', this.formModel)
 				})
 		},
 	},
+
 	mounted() {
-		this.getLocationIdentity()
-		this.getParkingGateList()
-		this.getVehicleTypeList()
 		document.getElementById('plate-number').focus()
 
 		document.getElementById('gate-in-app').onkeypress = (e) => {
@@ -307,7 +168,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style lang="css" scoped>
 .my-input {
 	border: 2px solid #160047;
 	height: 45px;

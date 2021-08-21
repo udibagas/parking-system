@@ -109,11 +109,6 @@ export default {
 							this.closeForm()
 						})
 						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-							})
-
 							if (e.response.status == 422) {
 								this.formErrors = e.response.data.errors
 							}

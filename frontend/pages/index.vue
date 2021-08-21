@@ -587,11 +587,6 @@ export default {
 					}
 				})
 				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
 					document.getElementById('nomor-tiket').focus()
 				})
 		},
@@ -681,21 +676,14 @@ export default {
 					? `/api/parkingTransaction/${this.formModel.id}`
 					: '/api/parkingTransaction',
 				data: this.formModel,
+			}).then((r) => {
+				this.$message({
+					message: r.data.message,
+					type: 'success',
+				})
+				this.openGate(this.formModel.gate_out_id)
+				this.resetForm()
 			})
-				.then((r) => {
-					this.$message({
-						message: r.data.message,
-						type: 'success',
-					})
-					this.openGate(this.formModel.gate_out_id)
-					this.resetForm()
-				})
-				.catch((e) => {
-					this.$message({
-						message: 'DATA GAGAL DISIMPAN',
-						type: 'error',
-					})
-				})
 		},
 
 		async connectPos() {
@@ -787,13 +775,6 @@ export default {
 						showClose: true,
 					})
 				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
 		},
 
 		printReport() {
@@ -812,13 +793,6 @@ export default {
 					this.$message({
 						message: 'SILAKAN AMBIL STRUK',
 						type: 'success',
-						showClose: true,
-					})
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
 						showClose: true,
 					})
 				})
@@ -855,12 +829,6 @@ export default {
 				.then((r) => {
 					this.snapshots = r
 					this.$forceUpdate()
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-					})
 				})
 		},
 	},

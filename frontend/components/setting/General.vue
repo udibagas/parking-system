@@ -218,13 +218,9 @@ export default {
 				})
 				.catch((e) => {
 					if (e.response.status == 422) {
-						this.error = {}
 						this.formErrors = e.response.data.errors
-					}
-
-					if (e.response.status == 500) {
+					} else {
 						this.formErrors = {}
-						this.error = e.response.data
 					}
 				})
 				.finally(() => (this.loading = false))

@@ -139,21 +139,13 @@ export default {
 				type: 'warning',
 			})
 				.then(() => {
-					this.$axios
-						.$delete(`${this.url}/clearNotification`)
-						.then((r) => {
-							this.requestData()
-							this.$message({
-								message: r.message,
-								type: 'success',
-							})
+					this.$axios.$delete(`${this.url}/clearNotification`).then((r) => {
+						this.requestData()
+						this.$message({
+							message: r.message,
+							type: 'success',
 						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-							})
-						})
+					})
 				})
 				.catch(() => console.log(e))
 		},

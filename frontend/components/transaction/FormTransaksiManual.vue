@@ -240,12 +240,6 @@ export default {
 					if (e.response.status == 422) {
 						this.formErrors = e.response.data.errors
 					}
-
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
 				})
 				.finally(() => (this.loading = false))
 		},

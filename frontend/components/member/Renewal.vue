@@ -360,12 +360,6 @@ export default {
 						type: 'success',
 					})
 				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-					})
-				})
 				.finally(() => {
 					this.showPrintDialog = false
 				})

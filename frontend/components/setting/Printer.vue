@@ -185,20 +185,12 @@ export default {
 		},
 
 		testPrinter(id) {
-			this.$axios
-				.$get(`/api/printer/test/${id}`)
-				.then((response) => {
-					this.$message({
-						message: response.message,
-						type: 'success',
-					})
+			this.$axios.$get(`/api/printer/test/${id}`).then((response) => {
+				this.$message({
+					message: response.message,
+					type: 'success',
 				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-					})
-				})
+			})
 		},
 	},
 }

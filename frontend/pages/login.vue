@@ -61,12 +61,7 @@ export default {
 							password: this.password,
 						},
 					})
-					.then((r) => {
-						this.$router.push('/')
-					})
-					.catch((e) => {
-						this.$message.error(e.response.data.message)
-					})
+					.then((r) => this.$router.push('/'))
 			})
 		},
 	},

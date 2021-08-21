@@ -112,23 +112,14 @@ export default {
 				type: 'warning',
 			})
 				.then(() => {
-					this.$axios
-						.$delete('/api/userLog')
-						.then((r) => {
-							this.requestData()
-							this.$message({
-								message: r.message,
-								type: 'success',
-								showClose: true,
-							})
+					this.$axios.$delete('/api/userLog').then((r) => {
+						this.requestData()
+						this.$message({
+							message: r.message,
+							type: 'success',
+							showClose: true,
 						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-								showClose: true,
-							})
-						})
+					})
 				})
 				.catch(() => console.log(e))
 		},

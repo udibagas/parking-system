@@ -130,13 +130,6 @@ export default {
 				.then((response) => {
 					this.tableData = response
 				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
-				})
 				.finally(() => (this.loading = false))
 		},
 
@@ -146,23 +139,14 @@ export default {
 			})
 				.then(() => {
 					const params = { file }
-					this.$axios
-						.$delete('/api/backup', { params })
-						.then((response) => {
-							this.$message({
-								message: response.message,
-								type: 'success',
-								showClose: true,
-							})
-							this.getData()
+					this.$axios.$delete('/api/backup', { params }).then((response) => {
+						this.$message({
+							message: response.message,
+							type: 'success',
+							showClose: true,
 						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-								showClose: true,
-							})
-						})
+						this.getData()
+					})
 				})
 				.catch((e) => console.log(e))
 		},
@@ -178,13 +162,6 @@ export default {
 						showClose: true,
 					})
 					this.getData()
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
 				})
 				.finally(() => (this.processing = false))
 		},
@@ -204,13 +181,6 @@ export default {
 								showClose: true,
 							})
 							this.getData()
-						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-								showClose: true,
-							})
 						})
 						.finally(() => (this.loading = false))
 				})
@@ -237,13 +207,6 @@ export default {
 						showClose: true,
 					})
 					this.getData()
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: true,
-					})
 				})
 				.finally(() => {
 					this.loading = false

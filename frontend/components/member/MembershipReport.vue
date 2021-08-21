@@ -74,13 +74,6 @@ export default {
 			this.$axios
 				.$get('/api/memberRenewal/report', { params })
 				.then((r) => (this.report = r))
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-						showClose: false,
-					})
-				})
 				.finally(() => (this.loading = false))
 		},
 
@@ -94,13 +87,6 @@ export default {
 					this.$message({
 						message: 'Silakan ambil slip',
 						type: 'success',
-						showClose: false,
-					})
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
 						showClose: false,
 					})
 				})
