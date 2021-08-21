@@ -29,7 +29,7 @@ class UserController extends Controller
         })->when($request->status, function ($q) use ($request) {
             return $q->whereIn('status', $request->status);
         })->where('name', '!=', 'controller')
-            ->orderBy($request->sort ?: 'name', $request->order ?: 'asc');
+            ->orderBy($request->sort_prop ?: 'name', $request->sort_order ?: 'asc');
 
         return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }

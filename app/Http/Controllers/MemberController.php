@@ -42,7 +42,7 @@ class MemberController extends Controller
             $q->where('berbayar', 1);
         })->when($request->berbayar == ['n'] || $request->berbayar == 'n', function ($q) {
             $q->where('berbayar', 0);
-        })->orderBy($request->sort ?: 'nama', $request->order ?: 'asc');
+        })->orderBy($request->sort_prop ?: 'nama', $request->sort_order ?: 'asc');
 
         $data = $request->paginated ? $data->paginate($request->pageSize) : $data->get();
 

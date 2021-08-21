@@ -29,7 +29,8 @@ class UserLogController extends Controller
                 });
             })->when($request->dateRange, function ($q) use ($request) {
                 $q->whereRaw('DATE(user_logs.updated_at) BETWEEN "' . $request->dateRange[0] . '" AND "' . $request->dateRange[1] . '"');
-            })->orderBy($request->sort ?: 'updated_at', $request->order ?: 'desc')->paginate($request->pageSize);
+            })->orderBy($request->sort_prop ?: 'updated_at', $request->sort_order ?: 'desc')
+            ->paginate($request->pageSize);
     }
 
     /**

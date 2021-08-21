@@ -37,7 +37,7 @@ class MemberRenewalController extends Controller
             })->orWhereHas('user', function ($q) use ($request) {
                 $q->where('name', 'LIKE', "%{$request->keyword}%");
             });
-        })->orderBy($request->sort ?: 'id', $request->order ?: 'desc')->paginate($request->pageSize);
+        })->orderBy($request->sort_prop ?: 'id', $request->sort_order ?: 'desc')->paginate($request->pageSize);
 
         return new MemberRenewalCollection($resource);
     }

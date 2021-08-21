@@ -20,7 +20,7 @@ class NotificationController extends Controller
             $q->whereNull('read_at');
         })->when($request->dateRange, function ($q) use ($request) {
             $q->whereRaw('DATE(updated_at) BETWEEN "' . $request->dateRange[0] . '" AND "' . $request->dateRange[1] . '"');
-        })->orderBy($request->sort ?: 'created_at', $request->order ?: 'desc')
+        })->orderBy($request->sort_prop ?: 'created_at', $request->sort_order ?: 'desc')
             ->paginate($request->pageSize);
     }
 

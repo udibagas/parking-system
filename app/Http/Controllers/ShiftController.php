@@ -15,7 +15,7 @@ class ShiftController extends Controller
      */
     public function index(Request $request)
     {
-        $data = Shift::orderBy($request->sortColumn ?: 'nama', $request->sortOrder ?: 'asc');
+        $data = Shift::orderBy($request->sort_prop ?: 'nama', $request->sort_order ?: 'asc');
         return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 

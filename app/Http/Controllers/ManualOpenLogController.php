@@ -21,7 +21,7 @@ class ManualOpenLogController extends Controller
                 $q->where('alasan', 'LIKE', "%{$request->keyword}%");
             })->when($request->dateRange, function ($q) use ($request) {
                 $q->whereRaw('DATE(manual_open_logs.updated_at) BETWEEN ? AND ?', $request->dateRange);
-            })->orderBy($request->sort ?: 'updated_at', $request->order ?: 'desc')
+            })->orderBy($request->sort_prop ?: 'updated_at', $request->sort_order ?: 'desc')
             ->paginate($request->pageSize);
     }
 
