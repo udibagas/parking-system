@@ -29,15 +29,15 @@ class MemberRenewalController extends Controller
     public function index(Request $request)
     {
         $resource = MemberRenewal::when($request->dateRange, function ($q) use ($request) {
-            return $q->whereRaw("DATE(updated_at) BETWEEN '{$request->dateRange[0]}' AND '{$request->dateRange[1]}' ");
+            $q->whereRaw("DATE(updated_at) BETWEEN '{$request->dateRange[0]}' AND '{$request->dateRange[1]}' ");
         })->when($request->keyword, function ($q) use ($request) {
-            return $q->whereHas('member', function ($q) use ($request) {
+            $q->whereHas('member', function ($q) use ($request) {
                 $q->where('nama', 'LIKE', "%{$request->keyword}%")
                     ->orWhere('nomor_kartu', 'LIKE', "%{$request->keyword}%");
             })->orWhereHas('user', function ($q) use ($request) {
                 $q->where('name', 'LIKE', "%{$request->keyword}%");
             });
-        })->orderBy($request->sort ?: 'id', $request->order == 'ascending' ? 'asc' : 'desc')->paginate($request->pageSize);
+        })->orderBy($request->sort ?: 'id', $request->order ?: 'desc')->paginate($request->pageSize);
 
         return new MemberRenewalCollection($resource);
     }

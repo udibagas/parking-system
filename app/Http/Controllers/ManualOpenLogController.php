@@ -16,14 +16,13 @@ class ManualOpenLogController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'updated_at';
-        $order = $request->order == 'ascending' ? 'asc' : 'desc';
-
-        return ManualOpenLog::with(['user', 'gateOut'])->when($request->keyword, function ($q) use ($request) {
-            $q->where('alasan', 'LIKE', "%{$request->keyword}%");
-        })->when($request->dateRange, function ($q) use ($request) {
-            return $q->whereRaw('DATE(manual_open_logs.updated_at) BETWEEN ? AND ?', $request->dateRange);
-        })->orderBy($sort, $order)->paginate($request->pageSize);
+        return ManualOpenLog::with(['user', 'gateOut'])
+            ->when($request->keyword, function ($q) use ($request) {
+                $q->where('alasan', 'LIKE', "%{$request->keyword}%");
+            })->when($request->dateRange, function ($q) use ($request) {
+                $q->whereRaw('DATE(manual_open_logs.updated_at) BETWEEN ? AND ?', $request->dateRange);
+            })->orderBy($request->sort ?: 'updated_at', $request->order ?: 'desc')
+            ->paginate($request->pageSize);
     }
 
     /**

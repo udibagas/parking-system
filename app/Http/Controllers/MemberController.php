@@ -23,9 +23,6 @@ class MemberController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'nama';
-        $order = $request->order == 'ascending' ? 'asc' : 'desc';
-
         $data = Member::when($request->keyword, function ($q) use ($request) {
             $q->where(function ($q) use ($request) {
                 $q->where('nama', 'LIKE', '%' . $request->keyword . '%')
@@ -45,7 +42,7 @@ class MemberController extends Controller
             $q->where('berbayar', 1);
         })->when($request->berbayar == ['n'] || $request->berbayar == 'n', function ($q) {
             $q->where('berbayar', 0);
-        })->orderBy($sort, $order);
+        })->orderBy($request->sort ?: 'nama', $request->order ?: 'asc');
 
         $data = $request->paginated ? $data->paginate($request->pageSize) : $data->get();
 
@@ -88,10 +85,9 @@ class MemberController extends Controller
             return response(['message' => 'Nomor Kartu/Plat Nomor darus diisi'], 500);
         }
 
-        $member = Member::selectRaw('members.*')
-            ->where('status', 1)
+        $member = Member::where('status', 1)
             ->when($request->nomor_kartu, function ($q) use ($request) {
-                $q->where('members.nomor_kartu', 'LIKE', '%' . $request->nomor_kartu);
+                $q->where('nomor_kartu', 'LIKE', '%' . $request->nomor_kartu);
             })->when($request->plat_nomor, function ($q) use ($request) {
                 $q->whereHas('vehicles', function ($q) use ($request) {
                     $q->where('plat_nomor', 'LIKE', $request->plat_nomor);

@@ -17,7 +17,12 @@ export default {
   methods: {
     sortChange(c) {
       if (c.prop != this.sort || c.order != this.order) {
-        this.sort = c.prop
+        if (c.prop == 'ascending') {
+          this.sort = 'asc'
+        } else if (c.prop == 'descending') {
+          this.sort = 'desc'
+        }
+
         this.order = c.order
         this.requestData()
       }

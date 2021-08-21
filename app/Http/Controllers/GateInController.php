@@ -27,10 +27,6 @@ class GateInController extends Controller
                 $q->where('status', $request->status);
             });
 
-        // ->get()->map(function ($item) {
-        //     return array_merge($item->toArray(), ['kameraList' => $item->kameraList]);
-        // });
-
         return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 

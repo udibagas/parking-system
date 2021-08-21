@@ -19,19 +19,17 @@ class UserLogController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'updated_at';
-        $order = $request->order == 'ascending' ? 'asc' : 'desc';
 
         return UserLog::selectRaw('user_logs.*, users.name AS user')
             ->join('users', 'users.id', '=', 'user_logs.user_id')
             ->when($request->keyword, function ($q) use ($request) {
-                return $q->where(function ($qq) use ($request) {
-                    return $qq->where('users.name', 'LIKE', '%' . $request->keyword . '%')
+                $q->where(function ($q) use ($request) {
+                    $q->where('users.name', 'LIKE', '%' . $request->keyword . '%')
                         ->orWhere('action', 'LIKE', '%' . $request->keyword . '%');
                 });
             })->when($request->dateRange, function ($q) use ($request) {
-                return $q->whereRaw('DATE(user_logs.updated_at) BETWEEN "' . $request->dateRange[0] . '" AND "' . $request->dateRange[1] . '"');
-            })->orderBy($sort, $order)->paginate($request->pageSize);
+                $q->whereRaw('DATE(user_logs.updated_at) BETWEEN "' . $request->dateRange[0] . '" AND "' . $request->dateRange[1] . '"');
+            })->orderBy($request->sort ?: 'updated_at', $request->order ?: 'desc')->paginate($request->pageSize);
     }
 
     /**

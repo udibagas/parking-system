@@ -15,12 +15,12 @@ class NotificationController extends Controller
     public function index(Request $request)
     {
         return DB::table('notifications')->when($request->keyword, function ($q) use ($request) {
-            return $q->whereJsonContains('message', 'LIKE', '%' . $request->keyword . '%');
+            $q->whereJsonContains('message', 'LIKE', '%' . $request->keyword . '%');
         })->when($request->read == 0, function ($q) {
-            return $q->whereNull('read_at');
+            $q->whereNull('read_at');
         })->when($request->dateRange, function ($q) use ($request) {
-            return $q->whereRaw('DATE(updated_at) BETWEEN "' . $request->dateRange[0] . '" AND "' . $request->dateRange[1] . '"');
-        })->orderBy($request->sort ? $request->sort : 'created_at', $request->order == 'ascending' ? 'asc' : 'desc')
+            $q->whereRaw('DATE(updated_at) BETWEEN "' . $request->dateRange[0] . '" AND "' . $request->dateRange[1] . '"');
+        })->orderBy($request->sort ?: 'created_at', $request->order ?: 'desc')
             ->paginate($request->pageSize);
     }
 

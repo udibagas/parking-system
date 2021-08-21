@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\TakeSnapshot;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -75,5 +76,22 @@ class ParkingTransaction extends Model
     {
         $shift = Shift::whereRaw('TIME(?) BETWEEN mulai AND selesai', [$timeIn, $timeIn])->first();
         return $shift ? $shift->id : null;
+    }
+
+    protected static function booted()
+    {
+        static::created(function ($model) {
+            AreaParkir::whereJsonContains('jenis_kendaraan', $model->jenis_kendaraan)->increment('terisi');
+
+            if ($model->is_member) {
+                Member::find($model->member_id)->update(['last_in' => $model->time_in]);
+            }
+        });
+
+        static::updated(function ($model) {
+            if (!$model->edit) {
+                AreaParkir::whereJsonContains('jenis_kendaraan', $model->jenis_kendaraan)->decrement('terisi');
+            }
+        });
     }
 }

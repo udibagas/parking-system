@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\AreaParkir;
-use App\Events\KendaraanKeluarEvent;
-use App\Events\KendaraanMasukEvent;
 use App\Models\GateIn;
 use App\Models\GateOut;
 use Illuminate\Http\Request;
@@ -34,56 +32,57 @@ class ParkingTransactionController extends Controller
      */
     public function index(Request $request)
     {
-        $sort = $request->sort ? $request->sort : 'updated_at';
-        $order = $request->order == 'ascending' ? 'asc' : 'desc';
-
         return ParkingTransaction::with(['gateIn', 'gateOut', 'snapshots', 'shift'])
             ->when($request->dateRange, function ($q) use ($request) {
-                return $q->whereBetween('time_in', $request->dateRange);
+                $q->whereBetween('time_in', $request->dateRange);
             })->when($request->keyword, function ($q) use ($request) {
-                return $q->where(function ($qq) use ($request) {
-                    return $qq->where('nomor_barcode', 'LIKE', '%' . $request->keyword . '%')
+                $q->where(function ($q) use ($request) {
+                    $q->where('nomor_barcode', 'LIKE', '%' . $request->keyword . '%')
                         ->orWhere('plat_nomor', 'LIKE', '%' . $request->keyword . '%')
                         ->orWhere('nomor_kartu', 'LIKE', '%' . $request->keyword . '%')
                         ->orWhere('operator', 'LIKE', '%' . $request->keyword . '%')
                         ->orWhere('jenis_kendaraan', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhere('edit_by', 'LIKE', '%' . $request->keyword . '%');
-                    // TODO: sesuaikan ini
-                    // ->orWhere('parking_gate_in.name', 'LIKE', '%' . $request->keyword . '%')
-                    // ->orWhere('parking_gate_out.name', 'LIKE', '%' . $request->keyword . '%');
+                        ->orWhere('edit_by', 'LIKE', '%' . $request->keyword . '%')
+                        ->orWhereHas('gateIn', function ($q) use ($request) {
+                            $q->where('nama', 'LIKE', "%{$request->keyword}%");
+                        })->orWhereHas('gateOut', function ($q) use ($request) {
+                            $q->where('nama', 'LIKE', "%{$request->keyword}%");
+                        })->orWhereHas('member', function ($q) use ($request) {
+                            $q->where('nama', 'LIKE', "%{$request->keyword}%");
+                        });
                 });
             })->when($request->is_member, function ($q) use ($request) {
-                return $q->whereIn('is_member', $request->is_member);
+                $q->whereIn('is_member', $request->is_member);
             })->when($request->jenis_kendaraan, function ($q) use ($request) {
-                return $q->whereIn('jenis_kendaraan', $request->jenis_kendaraan);
+                $q->whereIn('jenis_kendaraan', $request->jenis_kendaraan);
             })->when($request->gate_in_id, function ($q) use ($request) {
-                return $q->whereIn('gate_in_id', $request->gate_in_id);
+                $q->whereIn('gate_in_id', $request->gate_in_id);
             })->when($request->gate_out_id, function ($q) use ($request) {
-                return $q->whereIn('gate_out_id', $request->gate_out_id);
+                $q->whereIn('gate_out_id', $request->gate_out_id);
             })->when($request->shift_id, function ($q) use ($request) {
-                return $q->whereIn('shift_id', $request->shift_id);
+                $q->whereIn('shift_id', $request->shift_id);
             })->when($request->denda, function ($q) use ($request) {
                 if ($request->denda[0] == 'Y') {
-                    return $q->where('denda', '>', 0);
+                    $q->where('denda', '>', 0);
                 }
                 if ($request->denda[0] == 'T') {
-                    return $q->where('denda', 0);
+                    $q->where('denda', 0);
                 }
             })->when($request->edit, function ($q)  use ($request) {
                 if ($request->edit[0] == 'Y') {
-                    return $q->where('edit', 1);
+                    $q->where('edit', 1);
                 }
                 if ($request->edit[0] == 'T') {
-                    return $q->where('edit', 0);
+                    $q->where('edit', 0);
                 }
             })->when($request->manual, function ($q)  use ($request) {
                 if ($request->manual[0] == 'Y') {
-                    return $q->where('manual', 1);
+                    $q->where('manual', 1);
                 }
                 if ($request->manual[0] == 'T') {
-                    return $q->where('manual', 0);
+                    $q->where('manual', 0);
                 }
-            })->orderBy($sort, $order)->paginate($request->pageSize);
+            })->orderBy($request->sort ?: 'desc', $$request->order ?: 'updated_at')->paginate($request->pageSize);
     }
 
     /**
@@ -187,14 +186,6 @@ class ParkingTransactionController extends Controller
         if (!$parkingTransaction->is_member) {
             PrintTicketIn::dispatch($parkingTransaction);
         }
-
-        if ($parkingTransaction->is_member) {
-            Member::where('id', $request->member_id)->update([
-                'last_transaction' => now()
-            ]);
-        }
-
-        event(new KendaraanMasukEvent($request->jenis_kendaraan));
 
         return [
             'message' => 'Data berhasil disimpan',
@@ -362,10 +353,6 @@ class ParkingTransactionController extends Controller
             ];
         }
 
-        if (!$request->edit) {
-            event(new KendaraanKeluarEvent($parkingTransaction));
-        }
-
         return [
             'message' => 'TIDAK MENCETAK STRUK',
             'data' => $parkingTransaction->load(['snapshots'])
@@ -379,6 +366,7 @@ class ParkingTransactionController extends Controller
         ]);
 
         TakeSnapshot::dispatchSync(GateOut::find($request->gate_out_id), $parkingTransaction);
+        $parkingTransaction->refresh();
         return $parkingTransaction->snapshots;
     }
 
@@ -424,7 +412,6 @@ class ParkingTransactionController extends Controller
         $parkingTransaction->time_out = now();
         $parkingTransaction->operator = auth()->user()->name;
         $parkingTransaction->save();
-        event(new KendaraanKeluarEvent($parkingTransaction));
         return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
     }
 
@@ -443,6 +430,7 @@ class ParkingTransactionController extends Controller
             ':stop' => $request->dateRange[1]
         ]);
 
+        // Ini harusnya dikurangi data yg sudah keluar, belum tentu benar2 sudah diset keluar semua
         AreaParkir::where('terisi', '>', 0)->update(['terisi' => 0]);
         return ['message' => 'KENDARAAN BERHASIL DISET SUDAH KELUAR'];
     }
