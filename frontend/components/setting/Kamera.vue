@@ -251,18 +251,10 @@ export default {
 		},
 
 		testKamera(id) {
-			this.$axios
-				.$get(`/api/kamera/test/${id}`)
-				.then((response) => {
-					this.snapshot = 'data:image/jpeg;base64,' + response.snapshot
-					this.showSnapshot = true
-				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-					})
-				})
+			this.$axios.$get(`/api/kamera/test/${id}`).then((response) => {
+				this.snapshot = 'data:image/jpeg;base64,' + response.snapshot
+				this.showSnapshot = true
+			})
 		},
 	},
 }

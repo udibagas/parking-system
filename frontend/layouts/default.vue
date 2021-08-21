@@ -111,7 +111,6 @@ export default {
 	async created() {
 		await this.$store.dispatch('getNavigationList')
 		await this.$store.dispatch('getSetting')
-		await this.$store.dispatch('getPos')
 		await this.$store.dispatch('getGateInList')
 		await this.$store.dispatch('getJenisKendaraanList')
 	},

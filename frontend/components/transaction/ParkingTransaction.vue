@@ -389,10 +389,10 @@ export default {
 	created() {
 		this.$store.dispatch('getShiftList')
 
-		this.filters.dateRange = [
-			this.$moment().format('YYYY-MM-DD 00:00:00'),
-			this.$moment().format('YYYY-MM-DD HH:mm:ss'),
-		]
+		// this.filters.dateRange = [
+		// 	this.$moment().format('YYYY-MM-DD 00:00:00'),
+		// 	this.$moment().format('YYYY-MM-DD HH:mm:ss'),
+		// ]
 	},
 
 	data() {
@@ -423,12 +423,6 @@ export default {
 							})
 							this.requestData()
 						})
-						.catch((e) => {
-							this.$message({
-								message: r.response.data.message,
-								type: 'error',
-							})
-						})
 				})
 				.catch(() => console.log(e))
 		},
@@ -447,12 +441,6 @@ export default {
 							})
 							this.requestData()
 						})
-						.catch((e) => {
-							this.$message({
-								message: e.response.data.message,
-								type: 'error',
-							})
-						})
 				})
 				.catch((e) => console.log(e))
 		},
@@ -466,50 +454,7 @@ export default {
 						type: 'success',
 					})
 				})
-				.catch((e) => {
-					this.$message({
-						message: e.response.data.message,
-						type: 'error',
-					})
-				})
 		},
 	},
 }
 </script>
-
-<style scoped>
-.block {
-	background-color: rgb(209, 202, 202);
-	height: calc(50vh - 120px);
-}
-
-.td-label {
-	width: 200px;
-	font-weight: bold;
-	background-color: #ddd;
-	padding: 5px 10px;
-}
-
-.td-value {
-	background-color: #eee;
-	padding: 5px 10px;
-}
-
-.col-value,
-.col-label {
-	font-size: 16px;
-	color: #fff;
-}
-
-.summary-container {
-	height: 150px;
-}
-
-.summary-info {
-	font-size: 30px;
-}
-
-.text-center {
-	text-align: center;
-}
-</style>

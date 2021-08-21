@@ -825,6 +825,8 @@ export default {
 		},
 
 		async initialize() {
+			await this.$store.dispatch('getPos')
+
 			if (!this.pos) {
 				return
 			}
@@ -926,63 +928,6 @@ export default {
 </script>
 
 <style lang="css" scoped>
-.block {
-	background-color: #eee;
-	height: calc(50vh - 73px);
-}
-
-/* .my-input {
-	height: 43px;
-	line-height: 43px;
-	box-sizing: border-box;
-	width: 100%;
-	border: 2px solid #254ec1;
-	font-size: 2em;
-	padding: 0 15px;
-}
-
-.my-input:focus,
-.my-input-time:focus {
-	background-color: yellow;
-}
-
-.my-input-time {
-	border: 2px solid #160047;
-	height: 43px;
-	line-height: 43px;
-	font-size: 20px;
-	display: block;
-	width: 100%;
-	padding: 0px 10px;
-	box-sizing: border-box;
-}
-
-.label-big {
-	height: 43px;
-	line-height: 43px;
-	background-color: #254ec1;
-	color: white;
-	font-size: 1.5em;
-	padding-left: 15px;
-}
-
-.my-big-btn {
-	box-sizing: border-box;
-	width: 100%;
-	border: none;
-	font-size: 20px;
-	height: 43px;
-	line-height: 43px;
-	background-color: #254ec1;
-	color: #fff;
-	border-radius: 4px;
-	margin-top: 10px;
-}
-
-.my-big-btn:focus {
-	background-color: red;
-} */
-
 .my-input {
 	border: 2px solid #160047;
 	height: 45px;
