@@ -79,10 +79,26 @@
 					</tr>
 					<tr>
 						<td class="border bg-blue-600 text-white py-1 px-3">
-							Transaksi Terkahir
+							Terakhir Masuk
 						</td>
 						<td class="border bg-blue-100 py-1 px-3">
-							{{ member.last_transaction }}
+							{{
+								member.last_in
+									? $moment(member.last_in).format('DD-MMM-YYYY HH:mm:ss')
+									: ''
+							}}
+						</td>
+					</tr>
+					<tr>
+						<td class="border bg-blue-600 text-white py-1 px-3">
+							Terakhir Keluar
+						</td>
+						<td class="border bg-blue-100 py-1 px-3">
+							{{
+								member.last_out
+									? $moment(member.last_out).format('DD-MMM-YYYY HH:mm:ss')
+									: ''
+							}}
 						</td>
 					</tr>
 					<tr>
