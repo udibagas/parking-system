@@ -22,12 +22,6 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        KendaraanMasukEvent::class => [
-            KendaraanMasukListener::class
-        ],
-        KendaraanKeluarEvent::class => [
-            KendaraanKeluarListener::class
-        ]
     ];
 
     /**
