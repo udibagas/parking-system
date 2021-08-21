@@ -82,7 +82,7 @@ class ParkingTransactionController extends Controller
                 if ($request->manual[0] == 'T') {
                     $q->where('manual', 0);
                 }
-            })->orderBy($request->sort ?: 'desc', $$request->order ?: 'updated_at')->paginate($request->pageSize);
+            })->orderBy($request->sort ?: 'desc', $request->order ?: 'updated_at')->paginate($request->pageSize);
     }
 
     /**
