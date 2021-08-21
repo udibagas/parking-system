@@ -8,8 +8,8 @@ export default {
       page: 1,
       pageSize: 10,
       tableData: {},
-      sort_prop: 'name',
-      sort_order: 'ascending',
+      sort_prop: null,
+      sort_order: 'asc',
       filters: {},
       loading: false,
     }
@@ -22,7 +22,7 @@ export default {
         } else if (order == 'descending') {
           this.sort_order = 'desc'
         } else {
-          this.sort_order = null
+          this.sort_order = 'asc'
         }
 
         this.sort_prop = prop
