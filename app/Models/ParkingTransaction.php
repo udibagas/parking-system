@@ -89,7 +89,12 @@ class ParkingTransaction extends Model
         });
 
         static::updated(function ($model) {
-            if (!$model->edit) {
+            if ($model->is_member && $model->time_out) {
+                Member::find($model->member_id)->update(['last_out' => $model->time_out]);
+            }
+
+            // TODO: sepertinya logic-nya belum bener
+            if (!$model->edit && $model->time_out) {
                 AreaParkir::whereJsonContains('jenis_kendaraan', $model->jenis_kendaraan)->decrement('terisi');
             }
         });
