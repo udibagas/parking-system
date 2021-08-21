@@ -40,7 +40,7 @@
 			</div>
 
 			<div class="img-container">
-				<img :src="url" alt="" style="max-width: 800px" />
+				<img :src="url" alt="" style="width: 100%" />
 			</div>
 		</div>
 	</div>
