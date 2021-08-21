@@ -168,7 +168,7 @@
 
 			<el-table-column
 				v-if="$auth.user.role == 1"
-				prop="tarif"
+				prop="parking_transactions.tarif"
 				label="Tarif"
 				sortable="custom"
 				align="right"
@@ -207,18 +207,15 @@
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
-			<!-- <el-table-column prop="is_member" label="Member" sortable="custom" show-overflow-tooltip min-width="120px">
-                <template slot-scope="scope">
-                    {{scope.row.is_member ? 'Ya' : 'Tidak'}}
-                </template>
-            </el-table-column> -->
+
 			<el-table-column
-				prop="member"
+				prop="member.nama"
 				label="Nama Member"
 				sortable="custom"
 				show-overflow-tooltip
 				min-width="150px"
 			></el-table-column>
+
 			<el-table-column
 				prop="nomor_kartu"
 				label="Nomor Kartu"
