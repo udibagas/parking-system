@@ -811,7 +811,6 @@ export default {
 				this.formModel.gate_out_id = this.pos.gate_outs[0].id
 			}
 
-			this.connectPos()
 			this.formModel.plat_nomor = this.setting.plat_nomor_default
 
 			if (this.setting.disable_plat_nomor) {
@@ -819,6 +818,9 @@ export default {
 			} else {
 				document.getElementById('plat-nomor').focus()
 			}
+
+			await this.connectPos()
+			// todo: kasih popup bahwa tidak terkoneksi dengan pos sehingga tidak bisa buka gate
 		},
 
 		takeSnapshot() {
@@ -833,8 +835,8 @@ export default {
 		},
 	},
 
-	mounted() {
-		this.initialize()
+	async mounted() {
+		await this.initialize()
 
 		document.getElementById('gate-out-app').addEventListener('keydown', (e) => {
 			// console.log(e.key)
