@@ -534,11 +534,12 @@ export default {
 					}
 
 					if (!!this.setting.disable_plat_nomor) {
+						const vehicle = data.member.vehicles[0]
+						this.formModel.jenis_kendaraan = vehicle.jenis_kendaraan
+						this.formModel.plat_nomor = vehicle.plat_nomor
+
 						// member auto open sesuai setingan
 						if (!!this.setting.member_auto_open) {
-							this.formModel.jenis_kendaraan =
-								data.member.vehicles[0].jenis_kendaraan
-
 							const gateOut = this.pos.gate_outs.find((g) => {
 								return g.jenis_kendaraan.includes(
 									this.formModel.jenis_kendaraan
@@ -838,6 +839,10 @@ export default {
 
 	async mounted() {
 		await this.initialize()
+
+		if (!this.pos) {
+			return
+		}
 
 		document.getElementById('gate-out-app').addEventListener('keydown', (e) => {
 			// console.log(e.key)
