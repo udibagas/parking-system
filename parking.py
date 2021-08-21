@@ -199,9 +199,14 @@ def gate_in_thread(gate):
                         + str(push_button_or_card)
                     )
 
-                    if b"W" in push_button_or_card:
+                    if b"W" in push_button_or_card or b"X" in push_button_or_card:
+                        delimiter = "W"
+
+                        if (b"X" in push_button_or_card):
+                            delimiter = "X"
+
                         nomor_kartu = (
-                            str(push_button_or_card).split("W")[1].split("\\xa9")[0]
+                            str(push_button_or_card).split(delimiter)[1].split("\\xa9")[0]
                         )
                         member = check_card(gate, str(int(nomor_kartu, 16)))
                         time.sleep(0.1)  # kasih jeda biar audio bisa play
