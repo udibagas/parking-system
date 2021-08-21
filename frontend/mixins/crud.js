@@ -3,7 +3,6 @@ export default {
     return {
       showForm: false,
       formErrors: {},
-      error: {},
       formModel: {},
       keyword: '',
       page: 1,
@@ -41,7 +40,6 @@ export default {
     },
 
     openForm(data) {
-      this.error = {}
       this.formErrors = {}
       this.formModel = { ...data }
       this.showForm = true
@@ -67,13 +65,9 @@ export default {
         })
         .catch((e) => {
           if (e.response.status == 422) {
-            this.error = {}
             this.formErrors = e.response.data.errors
-          }
-
-          if (e.response.status == 500) {
+          } else {
             this.formErrors = {}
-            this.error = e.response.data
           }
         })
         .finally(() => {
@@ -94,24 +88,15 @@ export default {
         type: 'warning',
       })
         .then(() => {
-          this.$axios
-            .$delete(`${this.url}/${id}`)
-            .then((r) => {
-              this.requestData()
-              this.afterDelete()
-              this.$message({
-                message: r.message,
-                type: 'success',
-                showClose: true,
-              })
+          this.$axios.$delete(`${this.url}/${id}`).then((r) => {
+            this.requestData()
+            this.afterDelete()
+            this.$message({
+              message: r.message,
+              type: 'success',
+              showClose: true,
             })
-            .catch((e) => {
-              this.$message({
-                message: e.response.data.message,
-                type: 'error',
-                showClose: true,
-              })
-            })
+          })
         })
         .catch(() => console.log(e))
     },
@@ -162,13 +147,6 @@ export default {
               total,
             }
           }
-        })
-        .catch((e) => {
-          this.$message({
-            message: e.response.data.message,
-            type: 'error',
-            showClose: true,
-          })
         })
         .finally(() => (this.loading = false))
     },
