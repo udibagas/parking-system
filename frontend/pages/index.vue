@@ -702,10 +702,11 @@ export default {
 
 			this.ws.onmessage = (event) => {
 				let data = JSON.parse(event.data)
-				this.$message({
-					message: data.message,
-					type: data.status ? 'success' : 'error',
-				})
+				console.error(data)
+				// this.$message({
+				// 	message: data.message,
+				// 	type: data.status ? 'success' : 'error',
+				// })
 			}
 		},
 
