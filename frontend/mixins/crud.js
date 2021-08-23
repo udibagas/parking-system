@@ -9,7 +9,7 @@ export default {
       pageSize: 10,
       tableData: {},
       sort_prop: null,
-      sort_order: 'asc',
+      sort_order: null,
       filters: {},
       loading: false,
     }
