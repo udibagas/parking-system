@@ -197,6 +197,7 @@
 			<TransactionFormBukaManual
 				:show="showManualOpenForm"
 				@close="showManualOpenForm = false"
+				:gateOutList="pos.gate_outs"
 				@open-gate="(gate_out_id) => openGate(gate_out_id)"
 			/>
 		</div>
