@@ -651,8 +651,8 @@ export default {
 
 		print() {
 			const params = {
-				sort_prop: this.sort_prop,
-				sort_order: this.sort_order,
+				sort_prop: this.sort_prop || 'nama',
+				sort_order: this.sort_order || 'asc',
 				action: 'print',
 				...this.filters,
 			}
