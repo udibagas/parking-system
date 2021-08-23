@@ -10,6 +10,7 @@ class Member extends Model
     protected $fillable = [
         'nama',
         'nomor_kartu',
+        'card_type',
         'status',
         'expiry_date',
         'balance',
