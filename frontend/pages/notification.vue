@@ -44,7 +44,6 @@
 				<el-table
 					stripe
 					:data="tableData.data"
-					:default-sort="{ prop: sort, order: order }"
 					height="calc(100vh - 315px)"
 					v-loading="loading"
 					@sort-change="sortChange"

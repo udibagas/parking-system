@@ -33,7 +33,6 @@
 			height="calc(100vh - 255px)"
 			v-loading="loading"
 			:data="tableData.data"
-			:default-sort="{ prop: sort, order: order }"
 			@sort-change="sortChange"
 		>
 			<el-table-column

@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Member;
 use App\Http\Requests\MemberRequest;
+use App\Models\GroupMember;
+use App\Models\JenisKendaraan;
 use App\Models\ParkingTransaction;
 use App\Models\Setting;
 use Illuminate\Support\Facades\DB;
@@ -97,7 +99,35 @@ class MemberController extends Controller
             })->first();
 
         if (!$member) {
-            return response(['message' => 'Member tidak ditemukan'], 404);
+            if ($request->card_type == 'UHF') {
+                $member = Member::create([
+                    'nama' => $request->nomor_kartu,
+                    'nomor_kartu' => $request->nomor_kartu,
+                    'card_type' => 'UHF',
+                    'status' => 1,
+                    'expiry_date' => now()->addDays(1)->format('Y-m-d'),
+                    'phone' => '08xxx',
+                    'group_member_id' => GroupMember::first()->id,
+                    'berbayar' => true,
+                    'siklus_pembayaran_unit' => 'months',
+                    'register_date' => date('Y-m-d'),
+                    'siklus_pembayaran' => 1,
+                    'tarif' => 0
+                ]);
+
+                $member->vehicles()->create([
+                    'jenis_kendaraan' => JenisKendaraan::first()->nama,
+                    'plat_nomor' => 'HXXX',
+                    'merk' => 'MERK DUMMY',
+                    'tipe' => 'TIPE DUMMY',
+                    'tahun' => date('Y'),
+                    'warna' => 'HITAM',
+                ]);
+
+                return $member;
+            } else {
+                return response(['message' => 'Member tidak ditemukan'], 404);
+            }
         }
 
         // kalau cari berdasarkan kartu berarti di gate in, cari apa dia ada transaksi yg blm closed

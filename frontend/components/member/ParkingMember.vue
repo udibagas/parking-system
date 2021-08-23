@@ -48,7 +48,6 @@
 					showDetail = true
 				}
 			"
-			:default-sort="{ prop: sort, order: order }"
 			height="calc(100vh - 310px)"
 			@filter-change="filterChange"
 			v-loading="loading"
@@ -668,8 +667,8 @@ export default {
 		download() {
 			// TODO: harusnya pindah ke backend
 			const params = {
-				sort: this.sort,
-				order: this.order,
+				sort_prop: this.sort_prop,
+				sort_order: this.sort_order,
 				...this.filters,
 			}
 
