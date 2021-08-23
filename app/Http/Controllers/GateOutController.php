@@ -4,7 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Models\GateOut;
 use App\Http\Requests\GateOutRequest;
+use App\Models\Kamera;
+use App\Notifications\KameraErrorNotification;
+use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class GateOutController extends Controller
 {
@@ -68,25 +72,30 @@ class GateOutController extends Controller
         return ['message' => 'Data telah dihapus'];
     }
 
-    // public function test(GateOut $gateOut)
-    // {
-    //     $connection = \ssh2_connect($gateOut->pos->ip_address);
-    //     \ssh2_auth_password($connection, $gateOut->pos->username, $gateOut->pos->password);
+    public function takeSnapshot(GateOut $gateOut)
+    {
+        $kameras = Kamera::whereIn('id', $gateOut->kamera)->active()->get();
+        $client = new Client(['timeout' => 3]);
 
-    //     $openCommand = "stty -F {$gateOut->device} {$gateOut->baudrate}; echo {$gateOut->open_command} > {$gateOut->device}";
-    //     $closeCommand = "stty -F {$gateOut->device} {$gateOut->baudrate}; echo {$gateOut->close_command} > {$gateOut->device}";
+        foreach ($kameras as $kamera) {
+            try {
+                $response = $client->request('GET', $kamera->snapshot_url, [
+                    'auth' => [
+                        $kamera->username,
+                        $kamera->password,
+                        $kamera->auth_type == 'digest' ? 'digest' : null
+                    ]
+                ]);
 
-    //     \ssh2_exec($connection, $openCommand);
+                $fileName = $gateOut->nama . '-' . $kamera->nama . date('-YmdHis') . '.jpeg';
+                $path = 'snapshots/' . date('Y/m/d/H/') . $fileName;
+                Storage::put($path, $response->getBody());
+            } catch (\Exception $e) {
+                $kamera->notify(new KameraErrorNotification($kamera));
+                continue;
+            }
+        }
 
-    //     if ($gateOut->close_command) {
-    //         sleep(1);
-    //         \ssh2_exec($connection, $closeCommand);
-    //     }
-
-    //     return [
-    //         'open_command' => $openCommand,
-    //         'close_command' => $closeCommand,
-    //         'message' => 'GATE BERHASIL DIBUKA'
-    //     ];
-    // }
+        return ['message' => 'OK'];
+    }
 }

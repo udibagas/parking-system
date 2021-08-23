@@ -119,6 +119,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('report', [ReportController::class, 'pendapatan']);
     Route::get('summary', [ReportController::class, 'summary']);
 
+    Route::post('takeSnapshot/{gateOut}', [GateOutController::class, 'takeSnapshot']);
+
     Route::get('controller-log', function () {
         $output = shell_exec('tail -n 250 /var/log/parking.log');
         return nl2br($output);
