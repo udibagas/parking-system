@@ -53,16 +53,14 @@ export default {
 	},
 	methods: {
 		login() {
-			this.$axios.$get('/sanctum/csrf-cookie').then(() => {
-				this.$auth
-					.loginWith('local', {
-						data: {
-							email: this.email,
-							password: this.password,
-						},
-					})
-					.then((r) => this.$router.push('/'))
-			})
+			this.$auth
+				.loginWith('cookie', {
+					data: {
+						email: this.email,
+						password: this.password,
+					},
+				})
+				.then((r) => this.$router.push('/'))
 		},
 	},
 }

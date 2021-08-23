@@ -40,8 +40,8 @@ export default {
   // Modules: https://go.nuxtjs.dev/config-modules
   modules: [
     // https://go.nuxtjs.dev/axios
-    '@nuxtjs/axios',
     '@nuxtjs/auth-next',
+    '@nuxtjs/axios',
   ],
 
   router: {
@@ -50,11 +50,12 @@ export default {
 
   auth: {
     strategies: {
-      local: {
+      cookie: {
         endpoints: {
           login: { url: '/api/login' },
           logout: { url: '/api/logout' },
           user: { url: '/api/me' },
+          csrf: { url: '/sanctum/csrf-cookie' },
         },
       },
     },
@@ -62,11 +63,11 @@ export default {
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
+    credentials: true,
     // development
     // baseURL: process.env.API_URL || 'http://localhost:8000',
     // production
     baseURL: process.env.API_URL || '',
-    credentials: true,
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
