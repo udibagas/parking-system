@@ -104,7 +104,7 @@ class MemberController extends Controller
                     'nama' => $request->nomor_kartu,
                     'nomor_kartu' => $request->nomor_kartu,
                     'card_type' => 'UHF',
-                    'status' => 1,
+                    'status' => 0,
                     'expiry_date' => now()->addDays(1)->format('Y-m-d'),
                     'phone' => '08xxx',
                     'group_member_id' => GroupMember::first()->id,
