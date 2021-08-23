@@ -32,6 +32,8 @@ class MemberController extends Controller
             $q->selectRaw($request->columns);
         })->when($request->status, function ($q) use ($request) {
             $q->whereIn('status', $request->status);
+        })->when($request->card_type, function ($q) use ($request) {
+            $q->whereIn('card_type', $request->card_type);
         })->when($request->group_member_id, function ($q) use ($request) {
             $q->whereIn('group_member_id', $request->group_member_id);
         })->when($request->expired == ['y'] || $request->expired == 'y', function ($q) {
