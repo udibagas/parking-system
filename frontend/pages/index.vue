@@ -163,16 +163,23 @@
 				</button>
 
 				<el-row :gutter="10">
-					<el-col :span="12" v-if="!HIDE_PRINT_REPORT">
-						<button
+					<el-col :span="12">
+						<!-- <button
 							@keydown.enter="printReport"
 							class="my-big-btn"
 							@click="printReport"
 						>
 							[F10] PRINT LAPORAN
+						</button> -->
+						<button
+							@keydown.enter="openGateMemberUHF"
+							class="my-big-btn"
+							@click="openGateMemberUHF"
+						>
+							[F10] BUKA GATE UHF
 						</button>
 					</el-col>
-					<el-col :span="HIDE_PRINT_REPORT ? 24 : 12">
+					<el-col :span="12">
 						<button
 							class="my-big-btn"
 							@keydown.enter="showManualOpenForm = true"
@@ -249,7 +256,6 @@ export default {
 			formErrors: {},
 			snapshots: [],
 			showManualOpenForm: false,
-			HIDE_PRINT_REPORT: true,
 			ws: null,
 		}
 	},
@@ -728,6 +734,16 @@ export default {
 			setTimeout(this.resetForm, 3000)
 		},
 
+		openGateMemberUHF() {
+			// asumsi gate out cuma 1
+			const gate_id = this.pos.gate_outs[0].id
+			this.openGate(gate_id)
+			this.$axios.$post(`/api/takeSnapshot/${gate_id}`).then((r) => {
+				this.snapshots = r
+				this.$forceUpdate()
+			})
+		},
+
 		runningText(text) {
 			const gate = this.pos.gate_outs.find(
 				(g) => g.id == this.formModel.gate_out_id
@@ -881,7 +897,8 @@ export default {
 
 			if (e.key == 'F10') {
 				e.preventDefault()
-				this.printReport()
+				// this.printReport()
+				this.openGateMemberUHF()
 			}
 
 			if (e.key == 'F11') {
