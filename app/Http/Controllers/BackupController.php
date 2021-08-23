@@ -40,7 +40,7 @@ class BackupController extends Controller
         // masih gak kebaca environment-nya
         try {
             $dump = new IMysqldump\Mysqldump(
-                'mysql:host=' . config('database.host') . ';dbname=parking_system',
+                'mysql:host=' . env('DB_HOST') . ';dbname=' . env('DB_DATABASE'),
                 env('DB_USERNAME'),
                 env('DB_PASSWORD'),
                 ['add-drop-table' => true]
