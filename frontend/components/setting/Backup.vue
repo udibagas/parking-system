@@ -55,20 +55,26 @@
 				align="center"
 				header-align="center"
 			></el-table-column>
+
 			<el-table-column type="index" label="#"></el-table-column>
+
 			<el-table-column
 				prop="tanggal"
 				label="Tanggal"
 				width="200"
 			></el-table-column>
+
 			<el-table-column prop="file" label="File"></el-table-column>
+
 			<el-table-column
 				prop="size"
 				label="Ukuran"
 				width="100"
 				align="right"
 				header-align="right"
-			></el-table-column>
+			>
+			</el-table-column>
+
 			<el-table-column width="60" align="center" header-align="center">
 				<template slot="header">
 					<el-button
