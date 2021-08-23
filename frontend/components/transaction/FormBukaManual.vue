@@ -23,6 +23,7 @@
 			</el-form-item>
 
 			<el-form-item
+				v-if="this.gateOutList.length > 1"
 				label="Gate Keluar"
 				:class="{ 'is-error': formErrors.gate_out_id }"
 			>
@@ -68,19 +69,19 @@
 </template>
 
 <script>
-import { mapState } from 'vuex'
-
 export default {
-	props: ['show'],
-
-	computed: {
-		...mapState(['gateOutList']),
-	},
+	props: ['show', 'gateOutList'],
 
 	data() {
 		return {
 			formModel: {},
 			formErrors: {},
+		}
+	},
+
+	mounted() {
+		if (this.gateOutList.length == 1) {
+			this.formModel.gate_out_id = this.gateOutList[0].id
 		}
 	},
 
