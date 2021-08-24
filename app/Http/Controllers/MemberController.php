@@ -137,7 +137,7 @@ class MemberController extends Controller
                 ->first();
 
             $setting = Setting::first();
-            $member->unclosed = ($setting && $setting->must_checkout && $unclosed) ? true : false;
+            $member->unclosed = ($setting && $setting->must_checkout && $unclosed && $member->card_type != 'UHF') ? true : false;
 
             // kalau gak harus check out otomatis close trx sebelumnya
             if ($setting && !$setting->must_checkout && $unclosed) {
