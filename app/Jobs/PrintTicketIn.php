@@ -62,7 +62,7 @@ class PrintTicketIn implements ShouldQueue
 
         try {
             $p->setJustification(Printer::JUSTIFY_CENTER);
-            $p->text("TIKET PARKIR\n");
+            $p->text("CV. SEMANGKA JAYA\n");
             $p->setTextSize(2, 2);
             $p->text($setting->nama_lokasi . "\n\n");
             $p->setTextSize(1, 1);
