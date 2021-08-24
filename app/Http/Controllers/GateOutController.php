@@ -14,7 +14,7 @@ class GateOutController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:1')->except(['index']);
+        $this->middleware('role:1')->except(['index', 'takeSnapshot']);
     }
 
     /**
