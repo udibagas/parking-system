@@ -73,7 +73,7 @@ class PrintTicketIn implements ShouldQueue
             $p->text(str_pad('TANGGAL', 10, ' ') . ' : ' . date('d-M-Y', strtotime($parkingTransaction->time_in)) . "\n");
             $p->text(str_pad('JAM', 10, ' ') . ' : ' . date('H:i:s', strtotime($parkingTransaction->time_in)) . "\n\n\n");
             $p->setJustification(Printer::JUSTIFY_CENTER);
-            $p->setBarcodeHeight(20);
+            $p->setBarcodeHeight(200);
             $p->setBarcodeWidth(4);
             $p->setBarcodeTextPosition(Printer::BARCODE_TEXT_BELOW);
             $p->barcode($parkingTransaction->nomor_barcode);
