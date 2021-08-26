@@ -2,9 +2,9 @@
 
 namespace App\Models;
 
-use App\Jobs\TakeSnapshot;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use function Illuminate\Events\queueable;
 
 class ParkingTransaction extends Model
 {
@@ -80,15 +80,15 @@ class ParkingTransaction extends Model
 
     protected static function booted()
     {
-        static::created(function ($model) {
+        static::created(queueable(function ($model) {
             AreaParkir::whereJsonContains('jenis_kendaraan', $model->jenis_kendaraan)->increment('terisi');
 
             if ($model->is_member) {
                 Member::find($model->member_id)->update(['last_in' => $model->time_in]);
             }
-        });
+        }));
 
-        static::updated(function ($model) {
+        static::updated(queueable(function ($model) {
             if ($model->is_member && $model->time_out) {
                 Member::find($model->member_id)->update(['last_out' => $model->time_out]);
             }
@@ -97,6 +97,6 @@ class ParkingTransaction extends Model
             if (!$model->edit && $model->time_out) {
                 AreaParkir::whereJsonContains('jenis_kendaraan', $model->jenis_kendaraan)->decrement('terisi');
             }
-        });
+        }));
     }
 }
