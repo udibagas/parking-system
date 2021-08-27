@@ -64,21 +64,21 @@ class PrintTicketIn implements ShouldQueue
             $p->setJustification(Printer::JUSTIFY_CENTER);
             $p->text("CV. SEMANGKA JAYA\n");
             $p->setTextSize(2, 2);
-            $p->text($setting->nama_lokasi . "\n\n\n");
+            $p->text($setting->nama_lokasi . "\n\n");
             $p->setTextSize(1, 1);
             // $p->text($setting->alamat_lokasi . "\n\n");
 
             $p->setJustification(Printer::JUSTIFY_LEFT);
             $p->text(str_pad('GATE', 10, ' ') . " : {$parkingTransaction->gateIn->nama}/{$parkingTransaction->jenis_kendaraan}\n");
             $p->text(str_pad('TANGGAL', 10, ' ') . ' : ' . date('d-M-Y', strtotime($parkingTransaction->time_in)) . "\n");
-            $p->text(str_pad('JAM', 10, ' ') . ' : ' . date('H:i:s', strtotime($parkingTransaction->time_in)) . "\n\n\n");
+            $p->text(str_pad('JAM', 10, ' ') . ' : ' . date('H:i:s', strtotime($parkingTransaction->time_in)) . "\n\n");
             $p->setJustification(Printer::JUSTIFY_CENTER);
-            $p->setBarcodeHeight(200);
+            $p->setBarcodeHeight(100);
             $p->setBarcodeWidth(4);
             $p->setBarcodeTextPosition(Printer::BARCODE_TEXT_BELOW);
             $p->barcode($parkingTransaction->nomor_barcode);
-            $p->text("\n\n\n");
-            $p->text($setting->info_tambahan_tiket . "\n\n\n");
+            $p->text("\n\n");
+            $p->text($setting->info_tambahan_tiket . "\n\n");
             $p->cut();
             $p->close();
         } catch (\Exception $e) {
