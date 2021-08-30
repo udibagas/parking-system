@@ -4,6 +4,7 @@ import requests
 import sys
 import time
 import datetime
+import websockets
 
 API_URL = "http://localhost/api"
 API_HEADERS = None
@@ -91,21 +92,20 @@ def crc(cmd):
 
 async def open_gate(gate):
     message = f'open;{gate["device"]};{gate["baudrate"]};{gate["open_command"]};{gate["close_command"]}'
-    pos = gate["pos"]
+    uri = f'ws://{gate["pos"]["ip_address"]}:5678'
 
-    logging.debug(f'{gate["nama"]}: connecting to {pos["ip_address"]}:5678')
+    logging.debug(f'{gate["nama"]}: connecting to {gate["pos"]["ip_address"]}:5678')
 
     try:
-        reader, writer = asyncio.open_connection(pos["ip_address"], 5678)
+        ws = websockets.connect(uri)
     except Exception as e:
         logging.error(f'{gate["nama"]}: failed to connect to pos')
         return
 
-    writer.write(message)
-    await writer.drain()
-    response = await reader.read(1000)
-    logging.info(f'{gate["nama"]}: {response.decode()}')
-    writer.close()
+    ws.send(message)
+    response = await ws.recv()
+    logging.info(f'{gate["nama"]}: {response}')
+    ws.close()
 
 
 def save_data(trx):
