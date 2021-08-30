@@ -70,18 +70,24 @@ def crc(cmd):
 
 
 async def uhf_reader(gate):
-    reader, writer = await asyncio.open_connection(
-        gate["uhf_reader_host"], gate["uhf_reader_port"]
-    )
-
     while True:
-        for cmd in [INVENTORY1, INVENTORY2]:
-            command = crc(cmd)
-            writer.write(command.encode())
-            await writer.drain()
+        try:
+            logging.debug(f'Connecting to {gate["nama"]}')
+            reader, writer = await asyncio.open_connection(
+                gate["uhf_reader_host"], gate["uhf_reader_port"]
+            )
+        except Exception as e:
+            logging.error(f' {gate["nama"]} : failed to connect to uhf reader')
+            return
 
-            data = await reader.read(64)
-            logging.info(f"{gate['nama']} : {data.decode()}")
+        while True:
+            for cmd in [INVENTORY1, INVENTORY2]:
+                command = crc(cmd)
+                writer.write(command.encode())
+                await writer.drain()
+
+                data = await reader.read(64)
+                logging.info(f"{gate['nama']} : {data.decode()}")
 
 
 if __name__ == "__main__":
