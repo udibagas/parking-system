@@ -40,7 +40,7 @@ def login():
 
 def get_uhf_readers():
     try:
-        r = requests.get(API_URL + "/uhfReader", timeout=3, headers=API_HEADERS)
+        r = requests.get(API_URL + "/uhfReaders", timeout=3, headers=API_HEADERS)
     except Exception as e:
         logging.error("Failed to get uhf reader " + str(e))
         return False
