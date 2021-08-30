@@ -82,6 +82,14 @@
 				prop="close_command"
 			></el-table-column>
 
+			<el-table-column min-width="200" label="UHF Reader">
+				<template slot-scope="scope">
+					{{ scope.row.uhf_reader_host || '-' }}:{{
+						scope.row.uhf_reader_port || '-'
+					}}
+				</template>
+			</el-table-column>
+
 			<el-table-column min-width="200" label="Running Text Device">
 				<template slot-scope="scope">
 					{{ scope.row.running_text_device }}:{{
@@ -227,6 +235,21 @@
 
 					<div class="el-form-item__error" v-if="formErrors.baudrate">
 						{{ formErrors.baudrate[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item label="UHF Reader">
+					<div class="flex">
+						<el-input
+							class="mr-2"
+							placeholder="IP Address"
+							v-model="formModel.uhf_reader_host"
+						></el-input>
+						<el-input
+							type="number"
+							placeholder="Port"
+							v-model="formModel.uhf_reader_port"
+						></el-input>
 					</div>
 				</el-form-item>
 

@@ -14,7 +14,7 @@ class GateOutController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:1')->except(['index', 'takeSnapshot']);
+        $this->middleware('role:1')->except(['index', 'takeSnapshot', 'uhfReaders']);
     }
 
     /**
@@ -26,6 +26,11 @@ class GateOutController extends Controller
     {
         $data = GateOut::orderBy('nama', 'asc')->with(['pos']);
         return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
+    }
+
+    public function uhfReaders(Request $request)
+    {
+        return GateOut::whereNotNull('uhf_reader_host')->whereNotNull('uhf_reader_port')->get();
     }
 
     /**

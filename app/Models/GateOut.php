@@ -18,7 +18,9 @@ class GateOut extends Model
         'pos_id',
         'status',
         'running_text_device',
-        'running_text_baudrate'
+        'running_text_baudrate',
+        'uhf_reader_host',
+        'uhf_reader_port'
     ];
 
     protected $casts = ['kamera' => 'json', 'jenis_kendaraan' => 'json'];
