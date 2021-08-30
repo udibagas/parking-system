@@ -28,9 +28,11 @@ class GateOutController extends Controller
         return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
-    public function uhfReaders(Request $request)
+    public function uhfReaders()
     {
-        return GateOut::whereNotNull('uhf_reader_host')->whereNotNull('uhf_reader_port')->get();
+        return GateOut::where('status', 1)
+            ->whereNotNull('uhf_reader_host')
+            ->whereNotNull('uhf_reader_port')->get();
     }
 
     /**
