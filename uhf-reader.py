@@ -96,16 +96,10 @@ async def open_gate(gate):
 
     logging.debug(f'{gate["nama"]}: connecting to {gate["pos"]["ip_address"]}:5678')
 
-    try:
-        ws = websockets.connect(uri)
-    except Exception as e:
-        logging.error(f'{gate["nama"]}: failed to connect to pos')
-        return
-
-    ws.send(message)
-    response = await ws.recv()
-    logging.info(f'{gate["nama"]}: {response}')
-    ws.close()
+    async with websockets.connect(uri) as ws:
+        await ws.send(message)
+        response = await ws.recv()
+        logging.info(f'{gate["nama"]}: {response}')
 
 
 def save_data(trx):
