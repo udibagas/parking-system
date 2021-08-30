@@ -194,9 +194,9 @@ async def uhf_reader(gate):
                 trx["jenis_kendaraan"] = gate["jenis_kendaraan"]
                 trx["plat_nomor"] = trx["member"]["vehicles"][0]["plat_nomor"]
 
+                open_gate(gate)  # yang penting buka dulu
                 save_data(trx)
                 take_snapshot(trx, gate)
-                open_gate(gate)
 
 
 if __name__ == "__main__":
