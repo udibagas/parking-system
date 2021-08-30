@@ -172,7 +172,8 @@ async def uhf_reader(gate):
                     data = await reader.read(64)
                 except Exception as e:
                     logging.error(f'{gate["nama"]}: Failed to send command {str(e)}')
-                    command_error = True  # to break while loop
+                    # break while loop biar connect ulang reader
+                    command_error = True
                     break  # break for loop
 
                 logging.info(f"{gate['nama']}: {data.decode()}")
