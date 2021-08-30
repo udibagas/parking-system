@@ -83,7 +83,7 @@ async def uhf_reader(gate):
         except Exception as e:
             logging.error(f' {gate["nama"]} : failed to connect to uhf reader')
             time.sleep(3)
-            return
+            continue
 
         while True:
             for cmd in [INVENTORY1, INVENTORY2]:
