@@ -30,7 +30,8 @@ class GateOutController extends Controller
 
     public function uhfReaders()
     {
-        return GateOut::where('status', 1)
+        return GateOut::with(['pos'])
+            ->where('status', 1)
             ->whereNotNull('uhf_reader_host')
             ->whereNotNull('uhf_reader_port')->get();
     }
