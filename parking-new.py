@@ -1,6 +1,7 @@
 import asyncio
 import logging
 import requests
+import sys
 
 API_URL = "http://localhost/api"
 API_HEADERS = None
@@ -84,14 +85,16 @@ async def uhf_reader(gate):
 
 
 if __name__ == "__main__":
-    log_file = "/var/log/parking.log"
-
     logging.basicConfig(
-        filename=log_file,
+        filename="/var/log/parking.log",
         filemode="a",
         level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(message)s",
     )
+
+    if not login():
+        logging.info("Gagal login. Keluar dari aplikasi")
+        sys.exit()
 
     readers = get_uhf_readers()
 
