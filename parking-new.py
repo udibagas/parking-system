@@ -2,6 +2,7 @@ import asyncio
 import logging
 import requests
 import sys
+import time
 
 API_URL = "http://localhost/api"
 API_HEADERS = None
@@ -71,13 +72,17 @@ def crc(cmd):
 
 async def uhf_reader(gate):
     while True:
+        logging.debug(
+            f'Connecting to {gate["uhf_reader_host"]}:{gate["uhf_reader_port"]}...'
+        )
+
         try:
-            logging.debug(f'Connecting to {gate["nama"]}')
             reader, writer = await asyncio.open_connection(
                 gate["uhf_reader_host"], gate["uhf_reader_port"]
             )
         except Exception as e:
             logging.error(f' {gate["nama"]} : failed to connect to uhf reader')
+            time.sleep(3)
             return
 
         while True:
