@@ -1,19 +1,27 @@
 <template>
-	<div class="log-container" v-html="log"></div>
+	<div>
+		<!-- TODO: kasih filter -->
+		<el-input autofocus placeholder="Cari log" v-model="keyword"></el-input>
+		<div class="log-container" v-html="log"></div>
+	</div>
 </template>
 
 <script>
 export default {
+	props: ['url'],
 	data() {
 		return {
 			log: '',
 			requestInterval: null,
+			keyword: '',
 		}
 	},
 	methods: {
 		getLog() {
+			const params = { keyword: this.keyword }
+
 			this.$axios
-				.$get('/api/controller-log')
+				.$get(this.url, { params })
 				.then((response) => (this.log = response))
 				.catch((e) => console.log(e))
 		},

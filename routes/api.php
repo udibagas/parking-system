@@ -121,8 +121,13 @@ Route::middleware('auth:sanctum')->group(function () {
 
     Route::post('takeSnapshot/{gateOut}', [GateOutController::class, 'takeSnapshot']);
 
-    Route::get('controller-log', function () {
-        $output = shell_exec('tail -n 250 /var/log/parking.log');
+    Route::get('controller-log', function (Request $request) {
+        $output = shell_exec("tail -n 250 /var/log/parking.log | grep {$request->keyword}");
+        return nl2br($output);
+    });
+
+    Route::get('uhf-log', function (Request $request) {
+        $output = shell_exec("tail -n 250 /var/log/ufh.log | grep {$request->keyword}");
         return nl2br($output);
     });
 

@@ -113,7 +113,11 @@
 			</el-tab-pane>
 
 			<el-tab-pane lazy label="LOG GATE MASUK">
-				<NotificationControllerLog />
+				<NotificationControllerLog url="/api/controller-log" />
+			</el-tab-pane>
+
+			<el-tab-pane lazy label="LOG GATE KELUAR">
+				<NotificationControllerLog url="/api/uhf-log" />
 			</el-tab-pane>
 		</el-tabs>
 	</el-card>

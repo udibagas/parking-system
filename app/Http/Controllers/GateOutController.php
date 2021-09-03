@@ -45,7 +45,7 @@ class GateOutController extends Controller
     public function store(GateOutRequest $request)
     {
         $gateOut = GateOut::create($request->all());
-
+        shell_exec('sudo systemctl restart uhf-reader');
         return ['message' => 'Data telah disimpan', 'data' => $gateOut];
     }
 
@@ -64,7 +64,7 @@ class GateOutController extends Controller
     public function update(GateOutRequest $request, GateOut $gateOut)
     {
         $gateOut->update($request->all());
-
+        shell_exec('sudo systemctl restart uhf-reader');
         return ['message' => 'Data telah disimpan', 'data' => $gateOut];
     }
 
@@ -77,6 +77,7 @@ class GateOutController extends Controller
     public function destroy(GateOut $gateOut)
     {
         $gateOut->delete();
+        shell_exec('sudo systemctl restart uhf-reader');
         return ['message' => 'Data telah dihapus'];
     }
 
