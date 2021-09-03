@@ -37,7 +37,7 @@ export default {
 
 <style lang="scss" scoped>
 .log-container {
-	height: calc(100vh - 230px);
+	height: calc(100vh - 270px);
 	background: black;
 	color: white;
 	padding: 15px;
