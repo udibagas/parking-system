@@ -375,7 +375,30 @@
 								{{ formErrors.nomor_kartu[0] }}
 							</div>
 						</el-form-item>
+						<!-- DISINI -->
+
+						<el-form-item
+							label="Jenis Kartu"
+							:class="formErrors.card_type ? 'is-error' : ''"
+						>
+							<el-select
+								v-model="formModel.card_type"
+								placeholder="Jenis Kartu"
+								style="width: 100%"
+							>
+								<el-option
+									v-for="(t, i) in ['RFID', 'UHF']"
+									:value="t"
+									:label="t"
+									:key="i"
+								></el-option>
+							</el-select>
+							<div class="el-form-item__error" v-if="formErrors.card_type">
+								{{ formErrors.card_type[0] }}
+							</div>
+						</el-form-item>
 					</el-col>
+
 					<el-col :span="8">
 						<el-form-item
 							label="Tanggal Daftar"
@@ -394,12 +417,12 @@
 						</el-form-item>
 
 						<el-form-item
-							label="Jenis"
+							label="Jenis Anggota"
 							:class="formErrors.berbayar ? 'is-error' : ''"
 						>
 							<el-select
 								v-model="formModel.berbayar"
-								placeholder="Jenis"
+								placeholder="Jenis Anggota"
 								style="width: 100%"
 							>
 								<el-option
