@@ -157,14 +157,22 @@ async def uhf_reader(gate):
 
         logging.info(f'{gate["nama"]}: connected to UHF reader')
 
+        on_queue = ""
+
         while True:
-            time.sleep(1)
+            time.sleep(0.5)
             # send command
             writer.write(crc(TID))
             await writer.drain()
             data = (await reader.read(64)).hex().upper()
             card_number = str(int(data, 16))
             logging.info(f"{gate['nama']}: {data} / {card_number}")
+
+            # kalau di queue masih nomor yg sama baca ulang sampai dapat nomor yg baru
+            if on_queue == card_number:
+                continue
+
+            on_queue = card_number
             trx = check_card(card_number)
 
             if not trx:
@@ -183,6 +191,10 @@ async def uhf_reader(gate):
             open_gate(gate)  # yang penting buka dulu, simpan belakangan
             save_data(trx)
             take_snapshot(trx, gate)
+            # kasih jeda waktu yg reasonable buat mobil keluar
+            time.sleep(3)
+            # reset on queue biar bisa baca kartu lagi
+            on_queue = ""
 
 
 if __name__ == "__main__":
