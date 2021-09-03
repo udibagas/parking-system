@@ -10,8 +10,8 @@ API_URL = "http://localhost/api"
 API_HEADERS = None
 
 # scan
-INVENTORY1 = "06 FF 01 00 06"  # membaca TID
-INVENTORY2 = "04 FF 0F"  # Membaca EPC
+TID = "06 FF 01 00 06"  # membaca TID
+EPC = "04 FF 0F"  # Membaca EPC
 
 
 # crc
@@ -155,48 +155,37 @@ async def uhf_reader(gate):
 
         logging.info(f'{gate["nama"]}: connected to UHF reader')
 
-        command_error = False
+        while True:
+            time.sleep(1)
+            # send command
+            writer.write(crc(TID))
+            await writer.drain()
+            data = (await reader.read(64)).hex().upper()
+            card_number = str(int(data, 16))
+            logging.info(f"{gate['nama']}: {data} / {card_number}")
+            trx = check_card(card_number)
 
-        while not command_error:
-            for cmd in [INVENTORY1, INVENTORY2]:
-                command = crc(cmd)
-                try:
-                    writer.write(command.encode())
-                    await writer.drain()
-                    data = await reader.read(64)
-                except Exception as e:
-                    logging.error(f'{gate["nama"]}: Failed to send command {str(e)}')
-                    # break while loop biar connect ulang reader
-                    command_error = True
-                    break  # break for loop
+            if not trx:
+                logging.info(f'{gate["nama"]}: card {card_number} is not registered')
+                continue  # re-run command
 
-                logging.info(f"{gate['nama']}: {data.decode()}")
-                card_number = str(int(data.decode(), 16))
-                trx = check_card(card_number, "UHF")
+            if trx["member"]["expired"]:
+                logging.info(f'{gate["nama"]}: card {card_number} expired')
+                continue  # re-run command
 
-                if not trx:
-                    logging.info(
-                        f'{gate["nama"]}: card {card_number} is not registered'
-                    )
-                    continue  # re-run command
+            trx["time_out"] = datetime.datetime.now()
+            trx["gate_out_id"] = gate["id"]
+            trx["jenis_kendaraan"] = gate["jenis_kendaraan"]
+            trx["plat_nomor"] = trx["member"]["vehicles"][0]["plat_nomor"]
 
-                if trx["member"]["expired"]:
-                    logging.info(f'{gate["nama"]}: card {card_number} expired')
-                    continue  # re-run command
-
-                trx["time_out"] = datetime.datetime.now()
-                trx["gate_out_id"] = gate["id"]
-                trx["jenis_kendaraan"] = gate["jenis_kendaraan"]
-                trx["plat_nomor"] = trx["member"]["vehicles"][0]["plat_nomor"]
-
-                open_gate(gate)  # yang penting buka dulu
-                save_data(trx)
-                take_snapshot(trx, gate)
+            open_gate(gate)  # yang penting buka dulu, simpan belakangan
+            save_data(trx)
+            take_snapshot(trx, gate)
 
 
 if __name__ == "__main__":
     logging.basicConfig(
-        filename="/var/log/parking.log",
+        filename="/var/log/uhf.log",
         filemode="a",
         level=logging.DEBUG,
         format="%(asctime)s - %(levelname)s - %(message)s",
