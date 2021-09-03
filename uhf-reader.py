@@ -165,6 +165,10 @@ async def uhf_reader(gate):
             writer.write(crc(TID))
             await writer.drain()
             data = (await reader.read(64)).hex().upper()
+
+            if not data:
+                continue
+
             card_number = str(int(data, 16))
             logging.info(f"{gate['nama']}: {data} / {card_number}")
 
