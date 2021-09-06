@@ -217,6 +217,7 @@ if __name__ == "__main__":
 
     if not readers:
         logging.error("UHF Readers not found")
+        sys.exit()
 
     for reader in readers:
         asyncio.run(uhf_reader(reader))
