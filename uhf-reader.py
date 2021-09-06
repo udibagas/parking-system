@@ -162,7 +162,7 @@ async def uhf_reader(gate):
         while True:
             time.sleep(0.5)
             # send command
-            writer.write(crc(TID))
+            writer.write(crc(EPC))
             await writer.drain()
             data = (await reader.read(64)).hex().upper()
 
