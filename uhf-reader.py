@@ -169,7 +169,10 @@ async def uhf_reader(gate):
             if not data:
                 continue
 
-            card_number = str(int(data, 16))
+            if len(data) < 40:
+                continue
+
+            card_number = str(int(data[28:34], 16))
             logging.info(f"{gate['nama']}: {data} / {card_number}")
 
             # kalau di queue masih nomor yg sama baca ulang sampai dapat nomor yg baru
