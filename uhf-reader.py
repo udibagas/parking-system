@@ -173,7 +173,7 @@ async def uhf_reader(gate):
                 continue
 
             card_number = str(int(data[28:34], 16))
-            logging.info(f"{gate['nama']}: {data} / {card_number}")
+            logging.info(f"{gate['nama']}: {data[28:34]} / {card_number}")
 
             # kalau di queue masih nomor yg sama baca ulang sampai dapat nomor yg baru
             if on_queue == card_number:
