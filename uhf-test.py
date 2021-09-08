@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import socket
+import time
 
 host = '192.168.1.190'
 port = 6000
@@ -43,5 +44,7 @@ def send_cmd(cmd):
     print(hex_space)
     s.close()
 
-send_cmd(INVENTORY1)
-send_cmd(INVENTORY2)
+while True:
+    send_cmd(INVENTORY1)
+    send_cmd(INVENTORY2)
+    time.sleep(1)
