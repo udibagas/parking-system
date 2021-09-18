@@ -6,7 +6,6 @@ use App\Models\ParkingTransaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class PrintStrukFailedNotification extends Notification implements ShouldQueue
 {
@@ -47,16 +46,5 @@ class PrintStrukFailedNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return ['message' => $this->message];
-    }
-
-    /**
-     * Get the broadcastable representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return BroadcastMessage
-     */
-    public function toBroadcast($notifiable)
-    {
-        return new BroadcastMessage(['message' => $this->message]);
     }
 }
