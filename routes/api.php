@@ -25,6 +25,7 @@ use App\Http\Controllers\SnapshotController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserLogController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -37,6 +38,8 @@ use Illuminate\Support\Facades\Route;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
+
+Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::post('login', [AuthController::class, 'login']);
 
