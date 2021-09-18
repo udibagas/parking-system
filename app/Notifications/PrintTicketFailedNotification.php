@@ -6,6 +6,7 @@ use App\Models\ParkingTransaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class PrintTicketFailedNotification extends Notification implements ShouldQueue
 {
@@ -13,7 +14,7 @@ class PrintTicketFailedNotification extends Notification implements ShouldQueue
 
     public $parkingTransaction;
 
-    public $error;
+    public $message;
 
     /**
      * Create a new notification instance.
@@ -24,7 +25,7 @@ class PrintTicketFailedNotification extends Notification implements ShouldQueue
     {
         $this->parkingTransaction = $parkingTransaction;
 
-        $this->error = $error;
+        $this->message = "Pengunjung di {$this->parkingTransaction->gateIn->nama} gagal print tiket. Informasikan nomor barcode kepada pengunjung. {$this->parkingTransaction->nomor_barcode}. {$error}";
     }
 
     /**
@@ -35,7 +36,7 @@ class PrintTicketFailedNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -46,8 +47,17 @@ class PrintTicketFailedNotification extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
-        return [
-            'message' => "Pengunjung di {$this->parkingTransaction->gateIn->nama} gagal print tiket. Informasikan nomor barcode kepada pengunjung. {$this->parkingTransaction->nomor_barcode}. {$this->error}",
-        ];
+        return ['message' => $this->message];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage(['message' => $this->message]);
     }
 }

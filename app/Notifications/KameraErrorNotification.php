@@ -6,12 +6,15 @@ use App\Models\Kamera;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class KameraErrorNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
     public $kamera;
+
+    public $message;
 
     /**
      * Create a new notification instance.
@@ -21,6 +24,7 @@ class KameraErrorNotification extends Notification implements ShouldQueue
     public function __construct(Kamera $kamera)
     {
         $this->kamera = $kamera;
+        $this->message = "Kamera {$this->kamera->nama} gagal mengambil snapshot";
     }
 
     /**
@@ -31,7 +35,7 @@ class KameraErrorNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -42,8 +46,17 @@ class KameraErrorNotification extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
-        return [
-            'message' => "Kamera {$this->kamera->nama} gagal mengambil snapshot"
-        ];
+        return ['message' => $this->message];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage(['message' => $this->message]);
     }
 }

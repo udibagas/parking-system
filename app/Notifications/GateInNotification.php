@@ -2,10 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Models\GateIn;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class GateInNotification extends Notification implements ShouldQueue
 {
@@ -31,7 +31,7 @@ class GateInNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -45,5 +45,16 @@ class GateInNotification extends Notification implements ShouldQueue
         return [
             'message' => $this->message
         ];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage(['message' => $this->message]);
     }
 }

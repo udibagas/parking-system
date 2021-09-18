@@ -6,6 +6,7 @@ use App\Models\ParkingTransaction;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class PrintStrukFailedNotification extends Notification implements ShouldQueue
 {
@@ -13,7 +14,7 @@ class PrintStrukFailedNotification extends Notification implements ShouldQueue
 
     public $parkingTransaction;
 
-    public $error;
+    public $message;
 
     /**
      * Create a new notification instance.
@@ -23,8 +24,7 @@ class PrintStrukFailedNotification extends Notification implements ShouldQueue
     public function __construct(ParkingTransaction $parkingTransaction, $error)
     {
         $this->parkingTransaction = $parkingTransaction;
-
-        $this->error = $error;
+        $this->message = "Gagal print tiket di {$this->parkingTransaction->gateIn->nama}. {$error}";
     }
 
     /**
@@ -35,7 +35,7 @@ class PrintStrukFailedNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database'];
+        return ['database', 'broadcast'];
     }
 
     /**
@@ -46,8 +46,17 @@ class PrintStrukFailedNotification extends Notification implements ShouldQueue
      */
     public function toArray($notifiable)
     {
-        return [
-            'message' => "Gagal print tiket di {$this->parkingTransaction->gateIn->nama}. {$this->error}",
-        ];
+        return ['message' => $this->message];
+    }
+
+    /**
+     * Get the broadcastable representation of the notification.
+     *
+     * @param  mixed  $notifiable
+     * @return BroadcastMessage
+     */
+    public function toBroadcast($notifiable)
+    {
+        return new BroadcastMessage(['message' => $this->message]);
     }
 }
