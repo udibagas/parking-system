@@ -23,7 +23,9 @@
     "@nuxtjs/moment": "^1.6.1",
     "@vue/composition-api": "^1.1.1",
     "eslint-config-prettier": "^8.3.0",
+    "laravel-echo": "^1.11.2",
     "prettier": "^2.3.2",
+    "pusher-js": "^7.0.3",
     "sass-loader": "^10.2.0"
   }
 }

@@ -29,6 +29,7 @@ export default {
     '@/plugins/decimal',
     '@/plugins/mask',
     '@/plugins/axios',
+    '@/plugins/echo',
   ],
 
   // Auto import components: https://go.nuxtjs.dev/config-components
@@ -65,9 +66,9 @@ export default {
   axios: {
     credentials: true,
     // development
-    // baseURL: process.env.API_URL || 'http://localhost:8000',
+    baseURL: process.env.API_URL || 'http://localhost:8000',
     // production
-    baseURL: process.env.API_URL || '',
+    // baseURL: process.env.API_URL || '',
   },
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
