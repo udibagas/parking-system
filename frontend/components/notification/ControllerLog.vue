@@ -1,7 +1,18 @@
 <template>
 	<div>
 		<!-- TODO: kasih filter -->
-		<el-input autofocus placeholder="Cari log" v-model="keyword"></el-input>
+		<el-form inline class="text-right">
+			<el-form-item>
+				<el-input
+					size="small"
+					autofocus
+					placeholder="Cari log"
+					v-model="keyword"
+					prefix-icon="el-icon-search"
+					clearable
+				></el-input>
+			</el-form-item>
+		</el-form>
 		<div class="log-container" v-html="log"></div>
 	</div>
 </template>
@@ -13,7 +24,7 @@ export default {
 		return {
 			log: '',
 			requestInterval: null,
-			keyword: '',
+			keyword: null,
 		}
 	},
 	methods: {
@@ -37,7 +48,7 @@ export default {
 
 <style lang="scss" scoped>
 .log-container {
-	height: calc(100vh - 270px);
+	height: calc(100vh - 290px);
 	background: black;
 	color: white;
 	padding: 15px;
