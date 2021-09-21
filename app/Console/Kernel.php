@@ -37,6 +37,8 @@ class Kernel extends ConsoleKernel
             if ($age > 0) {
                 $schedule->command('trx:delete ' . $age)->dailyAt('12:00');
             }
+
+            $schedule->command('data:sync')->everyMinute();
         } catch (\Exception $e) {
             // nothing todo
         }
