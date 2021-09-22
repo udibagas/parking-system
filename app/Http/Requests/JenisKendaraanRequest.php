@@ -25,6 +25,7 @@ class JenisKendaraanRequest extends FormRequest
     {
         return [
             'nama' => 'required',
+            'group' => 'required',
             'shortcut_key' => 'required|max:1',
             'tarif_flat' => 'numeric',
             'denda_tiket_hilang' => 'numeric'
@@ -35,6 +36,7 @@ class JenisKendaraanRequest extends FormRequest
     {
         return [
             'nama' => 'Nama',
+            'group' => 'Group',
             'shortcut_key' => 'Shortcut Key',
             'tarif_flat' => 'Tarif Flat',
             'denda_tiket_hilang' => 'Denda Tiket Hilang'

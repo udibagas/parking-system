@@ -30,6 +30,7 @@ class ParkingTransaction extends Model
         'edit_by',
         'manual',
         'shift_id',
+        'group'
     ];
 
     protected $appends = ['durasi'];

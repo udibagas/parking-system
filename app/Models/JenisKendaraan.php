@@ -19,7 +19,8 @@ class JenisKendaraan extends Model
         'tarif_menit_selanjutnya',
         'tarif_maksimum',
         'tarif_menginap',
-        'mode_menginap'
+        'mode_menginap',
+        'group'
     ];
 
     const MODE_TARIF_FLAT = 0;

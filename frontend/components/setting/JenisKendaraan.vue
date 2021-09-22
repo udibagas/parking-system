@@ -29,6 +29,13 @@
 				label="Nama"
 				min-width="100px"
 			></el-table-column>
+
+			<el-table-column
+				prop="group"
+				label="Group"
+				min-width="100px"
+			></el-table-column>
+
 			<el-table-column
 				prop="shortcut_key"
 				label="Shortcut"
@@ -36,6 +43,7 @@
 				header-align="center"
 				min-width="100px"
 			></el-table-column>
+
 			<el-table-column
 				label="Mode Tarif"
 				align="center"
@@ -148,6 +156,13 @@
 					<el-input placeholder="Nama" v-model="formModel.nama"></el-input>
 					<div class="el-form-item__error" v-if="formErrors.nama">
 						{{ formErrors.nama[0] }}
+					</div>
+				</el-form-item>
+
+				<el-form-item label="Group" :class="formErrors.group ? 'is-error' : ''">
+					<el-input placeholder="Group" v-model="formModel.group"></el-input>
+					<div class="el-form-item__error" v-if="formErrors.group">
+						{{ formErrors.group[0] }}
 					</div>
 				</el-form-item>
 
