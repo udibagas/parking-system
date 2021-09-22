@@ -293,6 +293,7 @@ class ParkingTransactionController extends Controller
             $request->validate([
                 'plat_nomor' => 'required',
                 'jenis_kendaraan' => 'required',
+                'group' => 'required',
                 'gate_in_id' => 'required',
                 'gate_out_id' => 'required',
                 'time_in' => 'required',
@@ -318,6 +319,7 @@ class ParkingTransactionController extends Controller
                 }],
             ], [], [
                 'plat_nomor' => 'Plat Nomor',
+                'group' => 'Group',
                 'jenis_kendaraan' => 'Jenis Kendaraan',
                 'gate_in_id' => 'Gate Masuk',
                 'gate_out_id' => 'Gate Keluar',
