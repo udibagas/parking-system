@@ -208,7 +208,7 @@
 				@open-gate="(gate_out_id) => openGate(gate_out_id)"
 			/>
 
-      <NotificationMessage />
+			<NotificationMessage />
 		</div>
 
 		<div
@@ -291,6 +291,10 @@ export default {
 		},
 
 		hitungTarif() {
+			this.formModel.group = this.jenisKendaraanList.find(
+				(k) => k.nama == this.formModel.jenis_kendaraan
+			).group
+
 			const gateOut = this.pos.gate_outs.find((g) => {
 				return g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
 			})
