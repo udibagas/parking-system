@@ -186,6 +186,19 @@
 					</el-form-item>
 
 					<el-form-item
+						label="Server Address"
+						:class="{ 'is-error': formErrors.server_address }"
+					>
+						<el-input
+							placeholder="Server Address"
+							v-model="formModel.server_address"
+						></el-input>
+						<div class="el-form-item__error" v-if="formErrors.server_address">
+							{{ formErrors.server_address[0] }}
+						</div>
+					</el-form-item>
+
+					<el-form-item
 						label="ID Pelanggan"
 						:class="{ 'is-error': formErrors.id_pelanggan }"
 					>
