@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
 	data() {
 		return {
@@ -34,11 +36,14 @@ export default {
 		}
 	},
 
+	computed: {
+		...mapState(['setting']),
+	},
+
 	mounted() {
-		// TODO: ambil setingan dari database
 		this.echo = this.$echo({
 			key: 'pusher_app_key',
-			host: '127.0.0.1',
+			host: this.setting.server_address,
 			port: 6001,
 		})
 
