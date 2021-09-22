@@ -55,6 +55,8 @@ class ParkingTransactionController extends Controller
                 $q->whereIn('is_member', $request->is_member);
             })->when($request->jenis_kendaraan, function ($q) use ($request) {
                 $q->whereIn('jenis_kendaraan', $request->jenis_kendaraan);
+            })->when($request->group, function ($q) use ($request) {
+                $q->whereIn('group', $request->group);
             })->when($request->gate_in_id, function ($q) use ($request) {
                 $q->whereIn('gate_in_id', $request->gate_in_id);
             })->when($request->gate_out_id, function ($q) use ($request) {
