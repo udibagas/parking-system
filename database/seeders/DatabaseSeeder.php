@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\AreaParkir;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -23,6 +22,6 @@ class DatabaseSeeder extends Seeder
         $this->call(GateInSeeder::class);
         $this->call(GateOutSeeder::class);
         $this->call(GroupMemberSeeder::class);
-        $this->call(AreaParkir::class);
+        $this->call(AreaParkirSeeder::class);
     }
 }
