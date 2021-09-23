@@ -164,20 +164,20 @@
 
 				<el-row :gutter="10">
 					<el-col :span="12">
-						<!-- <button
+						<button
 							@keydown.enter="printReport"
 							class="my-big-btn"
 							@click="printReport"
 						>
 							[F10] PRINT LAPORAN
-						</button> -->
-						<button
+						</button>
+						<!-- <button
 							@keydown.enter="openGateMemberUHF"
 							class="my-big-btn"
 							@click="openGateMemberUHF"
 						>
 							[F10] BUKA GATE UHF
-						</button>
+						</button> -->
 					</el-col>
 					<el-col :span="12">
 						<button
@@ -903,8 +903,8 @@ export default {
 
 			if (e.key == 'F10') {
 				e.preventDefault()
-				// this.printReport()
-				this.openGateMemberUHF()
+				this.printReport()
+				// this.openGateMemberUHF()
 			}
 
 			if (e.key == 'F11') {
