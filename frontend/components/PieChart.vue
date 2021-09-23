@@ -36,6 +36,10 @@ export default {
 
 	data() {
 		return {
+			// data: [
+			// 	{ name: 'a', value: 2 },
+			// 	{ name: 'b', value: 3 },
+			// ],
 			data: [],
 			chartOption: {
 				title: {
@@ -45,25 +49,30 @@ export default {
 				},
 				tooltip: {
 					trigger: 'item',
-					formatter: '{a} <br/>{b} : {c} ({d}%)',
+					formatter: `{a} <br/>{b} : {c} ({d}%)`,
 				},
 				legend: {
 					orient: 'vertical',
-					top: 'middle',
+					top: 'bottom',
 					left: 'left',
+					// data: ['a', 'b'],
 					data: [],
 					formatter: (n) => {
 						const { name, value } = this.data.find((d) => d.name == n)
-						return `${name} = ${this.$decimal(value)}`
+						return `${name}: ${this.$decimal(value)}`
 					},
 				},
 				series: [
 					{
 						name: this.label,
 						type: 'pie',
-						radius: '55%',
-						center: ['65%', '60%'],
+						radius: '50%',
+						center: ['70%', '50%'],
 						data: [],
+						// data: [
+						// 	{ name: 'a', value: 2 },
+						// 	{ name: 'b', value: 3 },
+						// ],
 						emphasis: {
 							itemStyle: {
 								shadowBlur: 10,
