@@ -75,68 +75,107 @@
 			@sort-change="sortChange"
 		>
 			<el-table-column
+				type="index"
+				:index="tableData.from"
+				label="#"
+			></el-table-column>
+
+			<el-table-column
+				prop="nomor_barcode"
 				label="No. Tiket"
 				sortable="custom"
+				show-overflow-tooltip
+				min-width="110px"
+			></el-table-column>
+
+			<el-table-column
+				label="Shift"
+				prop="shift.nama"
+				column-key="shift_id"
+				min-width="80px"
+				:filters="shiftList.map((s) => ({ value: s.id, text: s.nama }))"
+			>
+			</el-table-column>
+
+			<el-table-column
+				prop="jenis_kendaraan"
+				label="Jenis Kendaraan"
+				sortable="custom"
+				show-overflow-tooltip
 				:filters="
 					jenisKendaraanList.map((v) => ({ value: v.nama, text: v.nama }))
 				"
 				column-key="jenis_kendaraan"
-				min-width="150"
-				show-overflow-tooltip
+				min-width="170px"
 			>
-				<template slot-scope="{ row }">
-					<strong>{{ row.nomor_barcode }}</strong
-					><br />
-					{{ row.jenis_kendaraan }}
-					{{ row.plat_nomor ? `- ${row.plat_nomor}` : '' }}
-				</template>
 			</el-table-column>
 
 			<el-table-column
 				prop="time_in"
-				label="Masuk"
+				label="Waktu Masuk"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="140px"
-				column-key="gate_in_id"
-				:filters="gateInList.map((g) => ({ value: g.id, text: g.nama }))"
+				min-width="180px"
 			>
-				<template slot-scope="{ row }">
-					{{ $moment(row.time_in).format('DD/MMM/YY HH:mm') }} <br />
-					{{ row.gate_in.nama }}
+				<template slot-scope="scope">
+					{{ $moment(scope.row.time_in).format('DD-MMM-YYYY HH:mm:ss') }}
 				</template>
 			</el-table-column>
 
 			<el-table-column
 				prop="time_out"
-				label="Keluar"
+				label="Waktu Keluar"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="140px"
-				column-key="gate_out_id"
-				:filters="gateOutList.map((g) => ({ value: g.id, text: g.nama }))"
+				min-width="180px"
 			>
-				<template slot-scope="{ row }">
+				<template slot-scope="scope">
 					{{
-						row.time_out ? $moment(row.time_out).format('DD/MMM/YY HH:mm') : ''
+						scope.row.time_out
+							? $moment(scope.row.time_out).format('DD-MMM-YYYY HH:mm:ss')
+							: ''
 					}}
-					<br />
-					{{ row.gate_out ? row.gate_out.nama : '-' }}
 				</template>
 			</el-table-column>
 
 			<el-table-column
+				prop="durasi"
 				label="Durasi"
 				show-overflow-tooltip
+				min-width="100px"
+			></el-table-column>
+
+			<el-table-column
+				prop="gate_in.nama"
+				label="Gate Masuk"
+				show-overflow-tooltip
+				min-width="150px"
+				column-key="gate_in_id"
+				:filters="gateInList.map((g) => ({ value: g.id, text: g.nama }))"
+			>
+			</el-table-column>
+
+			<el-table-column
+				prop="gate_out.nama"
+				label="Gate Keluar"
+				show-overflow-tooltip
+				min-width="150px"
+				column-key="gate_out_id"
+				:filters="gateOutList.map((g) => ({ value: g.id, text: g.nama }))"
+			>
+			</el-table-column>
+
+			<el-table-column
+				v-if="$auth.user.role == 1"
 				prop="parking_transactions.tarif"
+				label="Tarif"
 				sortable="custom"
+				align="right"
+				header-align="right"
 				min-width="100px"
 			>
-				<template slot-scope="{ row }">
-					{{ row.durasi }}
-					<div v-if="$auth.user.role == 1" style="font-weight: bold">
-						Rp. {{ $decimal(row.tarif) }}
-					</div>
+				<template slot-scope="scope">
+					Rp. {{ $decimal(scope.row.tarif) }}
 				</template>
 			</el-table-column>
 
@@ -144,6 +183,7 @@
 				v-if="$auth.user.role == 1"
 				prop="denda"
 				label="Denda"
+				sortable="custom"
 				align="right"
 				column-key="denda"
 				:filters="[
@@ -152,7 +192,7 @@
 				]"
 				:filter-multiple="false"
 				header-align="right"
-				min-width="100px"
+				min-width="120px"
 			>
 				<template slot-scope="scope">
 					Rp. {{ $decimal(scope.row.denda) }}
@@ -160,35 +200,40 @@
 			</el-table-column>
 
 			<el-table-column
-				label="Member"
+				prop="plat_nomor"
+				label="Plat Nomor"
 				sortable="custom"
 				show-overflow-tooltip
-				min-width="120"
-			>
-				<template slot-scope="{ row }">
-					<strong> {{ row.member ? row.member.nama : '' }} </strong> <br />
-					{{ row.nomor_kartu }}
-				</template>
-			</el-table-column>
+				min-width="150px"
+			></el-table-column>
+
+			<el-table-column
+				prop="member.nama"
+				label="Nama Member"
+				sortable="custom"
+				show-overflow-tooltip
+				min-width="150px"
+			></el-table-column>
+
+			<el-table-column
+				prop="nomor_kartu"
+				label="Nomor Kartu"
+				sortable="custom"
+				show-overflow-tooltip
+				min-width="150px"
+			></el-table-column>
 
 			<el-table-column
 				prop="operator"
 				label="Operator"
+				sortable="custom"
 				show-overflow-tooltip
-				min-width="90"
+				min-width="150px"
 			></el-table-column>
 
 			<el-table-column
-				label="Shift"
-				prop="shift.nama"
-				column-key="shift_id"
-				min-width="80"
-				:filters="shiftList.map((s) => ({ value: s.id, text: s.nama }))"
-			>
-			</el-table-column>
-
-			<el-table-column
 				label="Edit"
+				sortable="custom"
 				align="center"
 				header-align="center"
 				column-key="edit"
@@ -199,14 +244,14 @@
 				:filter-multiple="false"
 				min-width="100px"
 			>
-				<template slot-scope="{ row }">
-					{{ row.edit ? 'YA' : 'TIDAK' }} <br />
-					{{ row.edit_by }}
+				<template slot-scope="scope">
+					{{ scope.row.edit ? 'YA' : 'TIDAK' }}
 				</template>
 			</el-table-column>
 
 			<el-table-column
 				label="Manual"
+				sortable="custom"
 				align="center"
 				header-align="center"
 				column-key="manual"
@@ -215,12 +260,20 @@
 					{ value: 'T', text: 'TIDAK' },
 				]"
 				:filter-multiple="false"
-				min-width="100px"
+				min-width="120px"
 			>
 				<template slot-scope="scope">
 					{{ scope.row.manual ? 'YA' : 'TIDAK' }}
 				</template>
 			</el-table-column>
+
+			<el-table-column
+				prop="edit_by"
+				label="Diedit Oleh"
+				sortable="custom"
+				show-overflow-tooltip
+				min-width="150px"
+			></el-table-column>
 
 			<el-table-column
 				fixed="right"
@@ -262,7 +315,7 @@
 								"
 								@click.native.prevent="
 									() => {
-										formModel = { ...scope.row }
+										formModel = scope.row
 										formErrors = {}
 										showForm = true
 									}
