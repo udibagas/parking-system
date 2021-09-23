@@ -67,7 +67,7 @@ export default {
 						name: this.label,
 						type: 'pie',
 						radius: '50%',
-						center: ['70%', '50%'],
+						center: ['65%', '60%'],
 						data: [],
 						// data: [
 						// 	{ name: 'a', value: 2 },
