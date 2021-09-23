@@ -1,67 +1,6 @@
 <template>
 	<div>
-		<el-row :gutter="20" class="mb-3">
-			<el-col :span="8">
-				<el-card>
-					Hari Ini
-					<div class="text-5xl text-purple-700">
-						Rp. {{ $decimal(summary.today) }}
-					</div>
-				</el-card>
-			</el-col>
-			<el-col :span="8">
-				<el-card>
-					Bulan Ini
-					<div class="text-5xl text-blue-700">
-						Rp. {{ $decimal(summary.this_month) }}
-					</div>
-				</el-card>
-			</el-col>
-			<el-col :span="8">
-				<el-card>
-					Total
-					<div class="text-5xl text-orange-700">
-						Rp. {{ $decimal(summary.total) }}
-					</div>
-				</el-card>
-			</el-col>
-		</el-row>
-
-		<!-- <div :class="`grid gap-4 mb-4 grid-cols-${areaParkir.length}`">
-			<div
-				v-for="p in areaParkir"
-				:key="p.id"
-				class="border rounded-md shadow p-3"
-				:class="{
-					'bg-red-200': p.kapasitas == p.terisi,
-					'bg-green-200': p.terisi < p.kapasitas,
-				}"
-			>
-				<div class="text-purple-700 mb-3 text-center text-2xl">
-					{{ p.nama }}
-				</div>
-				<div class="flex text-center">
-					<div class="flex-grow">
-						<div class="text-4xl text-blue-700">
-							{{ p.kapasitas }}
-						</div>
-						Kapasitas
-					</div>
-					<div class="flex-grow">
-						<div class="text-4xl text-red-700">
-							{{ p.terisi }}
-						</div>
-						Terisi
-					</div>
-					<div class="flex-grow">
-						<div class="text-4xl text-green-700">
-							{{ p.kapasitas - p.terisi }}
-						</div>
-						Tersedia
-					</div>
-				</div>
-			</div>
-		</div> -->
+		<ReportIncomeSummary />
 
 		<el-card class="mb-3" :body-style="{ padding: '0' }">
 			<table class="min-w-full">
@@ -120,6 +59,8 @@
 				</el-button>
 			</el-col>
 		</el-row>
+
+		<ReportChart :date="dateRange" />
 
 		<el-row :gutter="15">
 			<el-col :span="10">
@@ -233,7 +174,6 @@ export default {
 				this.$moment().format('YYYY-MM-DD'),
 			],
 			report: null,
-			summary: {},
 		}
 	},
 
@@ -310,13 +250,8 @@ export default {
 				.then((r) => (this.report = r))
 		},
 
-		getSummary() {
-			this.$axios.$get('/api/summary').then((r) => (this.summary = r))
-		},
-
 		async requestData() {
 			await this.$store.dispatch('getAreaParkirList')
-			this.getSummary()
 			this.getTransaction()
 			this.getIncome()
 			this.getParkedVehicle()
