@@ -32,59 +32,64 @@ class ParkingTransactionController extends Controller
      */
     public function index(Request $request)
     {
-        return ParkingTransaction::with(['gateIn', 'gateOut', 'snapshots', 'shift', 'member:nama'])
-            ->when($request->dateRange, function ($q) use ($request) {
-                $q->whereBetween('time_in', $request->dateRange);
-            })->when($request->keyword, function ($q) use ($request) {
-                $q->where(function ($q) use ($request) {
-                    $q->where('nomor_barcode', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhere('plat_nomor', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhere('nomor_kartu', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhere('operator', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhere('jenis_kendaraan', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhere('edit_by', 'LIKE', '%' . $request->keyword . '%')
-                        ->orWhereHas('gateIn', function ($q) use ($request) {
-                            $q->where('nama', 'LIKE', "%{$request->keyword}%");
-                        })->orWhereHas('gateOut', function ($q) use ($request) {
-                            $q->where('nama', 'LIKE', "%{$request->keyword}%");
-                        })->orWhereHas('member', function ($q) use ($request) {
-                            $q->where('nama', 'LIKE', "%{$request->keyword}%");
-                        });
-                });
-            })->when($request->is_member, function ($q) use ($request) {
-                $q->whereIn('is_member', $request->is_member);
-            })->when($request->jenis_kendaraan, function ($q) use ($request) {
-                $q->whereIn('jenis_kendaraan', $request->jenis_kendaraan);
-            })->when($request->group, function ($q) use ($request) {
-                $q->whereIn('group', $request->group);
-            })->when($request->gate_in_id, function ($q) use ($request) {
-                $q->whereIn('gate_in_id', $request->gate_in_id);
-            })->when($request->gate_out_id, function ($q) use ($request) {
-                $q->whereIn('gate_out_id', $request->gate_out_id);
-            })->when($request->shift_id, function ($q) use ($request) {
-                $q->whereIn('shift_id', $request->shift_id);
-            })->when($request->denda, function ($q) use ($request) {
-                if ($request->denda[0] == 'Y') {
-                    $q->where('denda', '>', 0);
-                }
-                if ($request->denda[0] == 'T') {
-                    $q->where('denda', 0);
-                }
-            })->when($request->edit, function ($q)  use ($request) {
-                if ($request->edit[0] == 'Y') {
-                    $q->where('edit', 1);
-                }
-                if ($request->edit[0] == 'T') {
-                    $q->where('edit', 0);
-                }
-            })->when($request->manual, function ($q)  use ($request) {
-                if ($request->manual[0] == 'Y') {
-                    $q->where('manual', 1);
-                }
-                if ($request->manual[0] == 'T') {
-                    $q->where('manual', 0);
-                }
-            })->orderBy($request->sort_prop ?: 'updated_at', $request->sort_order ?: 'desc')->paginate($request->pageSize);
+        return ParkingTransaction::with([
+            'gateIn:nama',
+            'gateOut:nama',
+            'snapshots:id,path',
+            'shift:nama',
+            'member:nama'
+        ])->when($request->dateRange, function ($q) use ($request) {
+            $q->whereBetween('time_in', $request->dateRange);
+        })->when($request->keyword, function ($q) use ($request) {
+            $q->where(function ($q) use ($request) {
+                $q->where('nomor_barcode', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('plat_nomor', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('nomor_kartu', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('operator', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('jenis_kendaraan', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhere('edit_by', 'LIKE', '%' . $request->keyword . '%')
+                    ->orWhereHas('gateIn', function ($q) use ($request) {
+                        $q->where('nama', 'LIKE', "%{$request->keyword}%");
+                    })->orWhereHas('gateOut', function ($q) use ($request) {
+                        $q->where('nama', 'LIKE', "%{$request->keyword}%");
+                    })->orWhereHas('member', function ($q) use ($request) {
+                        $q->where('nama', 'LIKE', "%{$request->keyword}%");
+                    });
+            });
+        })->when($request->is_member, function ($q) use ($request) {
+            $q->whereIn('is_member', $request->is_member);
+        })->when($request->jenis_kendaraan, function ($q) use ($request) {
+            $q->whereIn('jenis_kendaraan', $request->jenis_kendaraan);
+        })->when($request->group, function ($q) use ($request) {
+            $q->whereIn('group', $request->group);
+        })->when($request->gate_in_id, function ($q) use ($request) {
+            $q->whereIn('gate_in_id', $request->gate_in_id);
+        })->when($request->gate_out_id, function ($q) use ($request) {
+            $q->whereIn('gate_out_id', $request->gate_out_id);
+        })->when($request->shift_id, function ($q) use ($request) {
+            $q->whereIn('shift_id', $request->shift_id);
+        })->when($request->denda, function ($q) use ($request) {
+            if ($request->denda[0] == 'Y') {
+                $q->where('denda', '>', 0);
+            }
+            if ($request->denda[0] == 'T') {
+                $q->where('denda', 0);
+            }
+        })->when($request->edit, function ($q)  use ($request) {
+            if ($request->edit[0] == 'Y') {
+                $q->where('edit', 1);
+            }
+            if ($request->edit[0] == 'T') {
+                $q->where('edit', 0);
+            }
+        })->when($request->manual, function ($q)  use ($request) {
+            if ($request->manual[0] == 'Y') {
+                $q->where('manual', 1);
+            }
+            if ($request->manual[0] == 'T') {
+                $q->where('manual', 0);
+            }
+        })->orderBy($request->sort_prop ?: 'updated_at', $request->sort_order ?: 'desc')->paginate($request->pageSize);
     }
 
     /**
