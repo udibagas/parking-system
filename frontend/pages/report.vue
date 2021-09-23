@@ -2,7 +2,7 @@
 	<div>
 		<ReportIncomeSummary />
 
-		<el-card class="mb-3" :body-style="{ padding: '0' }">
+		<!-- <el-card class="mb-3" :body-style="{ padding: '0' }">
 			<table class="min-w-full">
 				<thead>
 					<tr>
@@ -34,7 +34,7 @@
 					</tr>
 				</tbody>
 			</table>
-		</el-card>
+		</el-card> -->
 
 		<el-row class="mb-3 border rounded-md p-3 bg-gray-200">
 			<el-col :span="8">
