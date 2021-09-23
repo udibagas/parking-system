@@ -26,7 +26,7 @@ use([
 ])
 
 export default {
-	props: ['title', 'label', 'url', 'date', 'group'],
+	props: ['title', 'subtext', 'label', 'url', 'date', 'group'],
 
 	components: { VChart },
 
@@ -36,10 +36,12 @@ export default {
 
 	data() {
 		return {
+			data: [],
 			chartOption: {
 				title: {
 					text: this.title,
 					left: 'center',
+					subtext: this.subtext,
 				},
 				tooltip: {
 					trigger: 'item',
@@ -47,15 +49,20 @@ export default {
 				},
 				legend: {
 					orient: 'vertical',
+					top: 'middle',
 					left: 'left',
 					data: [],
+					formatter: (n) => {
+						const { name, value } = this.data.find((d) => d.name == n)
+						return `${name} = ${this.$decimal(value)}`
+					},
 				},
 				series: [
 					{
 						name: this.label,
 						type: 'pie',
 						radius: '55%',
-						center: ['50%', '60%'],
+						center: ['65%', '60%'],
 						data: [],
 						emphasis: {
 							itemStyle: {
@@ -74,6 +81,7 @@ export default {
 		getData() {
 			const params = { date: this.date, group: this.group }
 			this.$axios.$get(this.url, { params }).then((res) => {
+				this.data = res
 				this.chartOption.legend.data = res.map((d) => d.name)
 				this.chartOption.series[0].data = res
 			})
@@ -92,7 +100,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .chart {
 	height: 300px;
 }

@@ -13,6 +13,7 @@
 						:date="date"
 						:group="group"
 						:title="`GROUP ${group}`"
+						subtext="Jumlah Kendaraan Berdasarkan Group"
 					/>
 				</el-card>
 			</el-col>
@@ -29,6 +30,7 @@
 						:date="date"
 						:group="group"
 						:title="`GROUP ${group}`"
+						subtext="Pendapatan Berdasarkan Group"
 					/>
 				</el-card>
 			</el-col>

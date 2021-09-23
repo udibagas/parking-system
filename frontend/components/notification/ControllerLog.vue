@@ -46,7 +46,7 @@ export default {
 }
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .log-container {
 	height: calc(100vh - 290px);
 	background: black;
