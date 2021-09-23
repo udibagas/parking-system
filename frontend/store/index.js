@@ -2,6 +2,7 @@ import { Message } from 'element-ui'
 
 export const state = () => ({
   jenisKendaraanList: [],
+  groupJenisKendaraanList: [],
   groupMemberList: [],
   memberList: [],
   navigationList: [],
@@ -25,6 +26,7 @@ export const state = () => ({
 export const mutations = {
   setJenisKendaraanList(state, data) {
     state.jenisKendaraanList = data
+    state.groupJenisKendaraanList = [...new Set(data.map((d) => d.group))]
   },
 
   setGateInList(state, data) {
