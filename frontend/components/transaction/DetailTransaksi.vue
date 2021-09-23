@@ -39,7 +39,7 @@
 					<tr>
 						<td class="border bg-blue-700 text-white px-4 py-1">Member</td>
 						<td class="border bg-blue-100 px-4 py-1">
-							{{ trx.is_member ? 'Ya' : 'Tidak' }}
+							{{ trx.is_member ? trx.member.nama : 'Tidak' }}
 						</td>
 					</tr>
 					<tr>
