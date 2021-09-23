@@ -33,11 +33,11 @@ class ParkingTransactionController extends Controller
     public function index(Request $request)
     {
         return ParkingTransaction::with([
-            'gateIn:nama',
-            'gateOut:nama',
+            'gateIn:id,nama',
+            'gateOut:id,nama',
             'snapshots:id,path',
-            'shift:nama',
-            'member:nama'
+            'shift:id,nama',
+            'member:id,nama'
         ])->when($request->dateRange, function ($q) use ($request) {
             $q->whereBetween('time_in', $request->dateRange);
         })->when($request->keyword, function ($q) use ($request) {
