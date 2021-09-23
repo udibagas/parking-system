@@ -35,7 +35,7 @@ class ParkingTransactionController extends Controller
         return ParkingTransaction::with([
             'gateIn:id,nama',
             'gateOut:id,nama',
-            'snapshots:id,path',
+            'snapshots',
             'shift:id,nama',
             'member:id,nama'
         ])->when($request->dateRange, function ($q) use ($request) {
