@@ -169,4 +169,38 @@ class ReportController extends Controller
             'total' => $total ?: 0
         ];
     }
+
+    public function totalByGroup(Request $request)
+    {
+        $request->validate(['date' => 'required|array', 'group' => 'required']);
+
+        $sql = <<<SQL
+            SELECT
+                COUNT(id) AS `value`,
+                `jenis_kendaraan` AS `name`
+            FROM parking_transactions
+            WHERE DATE(time_out) BETWEEN ? AND ?
+                AND `group` = ?
+            GROUP BY `name`
+        SQL;
+
+        return DB::select($sql, [...$request->date, $request->group]);
+    }
+
+    public function sumByGroup(Request $request)
+    {
+        $request->validate(['date' => 'required|array', 'group' => 'required']);
+
+        $sql = <<<SQL
+            SELECT
+                SUM(tarif + denda) AS `value`,
+                `jenis_kendaraan` AS `name`
+            FROM parking_transactions
+            WHERE DATE(time_out) BETWEEN ? AND ?
+                AND `group` = ?
+            GROUP BY `name`
+        SQL;
+
+        return DB::select($sql, [...$request->date, $request->group]);
+    }
 }

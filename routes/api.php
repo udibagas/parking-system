@@ -121,6 +121,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('getVehicleIn', [ReportController::class, 'getVehicleIn']);
     Route::get('report', [ReportController::class, 'pendapatan']);
     Route::get('summary', [ReportController::class, 'summary']);
+    Route::get('totalByGroup', [ReportController::class, 'totalByGroup']);
+    Route::get('sumByGroup', [ReportController::class, 'sumByGroup']);
 
     Route::post('takeSnapshot/{gateOut}', [GateOutController::class, 'takeSnapshot']);
 
