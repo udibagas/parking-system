@@ -360,14 +360,17 @@ export default {
 
 			var durasiReal = durasiMenit - tarif.menit_pertama
 
+			// mode menginap 24 jam
 			if (tarif.mode_menginap == 0) {
 				var hariParkir = Math.ceil(durasiMenit / (60 * 24))
 
+				// mode tarif flat
 				if (hariParkir == 0 && tarif.mode_tarif == 0) {
 					hariParkir = 1
 				}
 			}
 
+			// mode menginap lewat tengah malam
 			if (tarif.mode_menginap == 1) {
 				var hariIn = this.$moment(timeIn.format('YYYY-MM-DD'))
 				var hariOut = this.$moment(timeOut.format('YYYY-MM-DD'))
@@ -389,25 +392,35 @@ export default {
 					tarifMenitPertama + hariParkir * tarif.tarif_flat + tarifMenginap
 			}
 
+			// tarif progresif
 			if (tarif.mode_tarif == 1) {
 				var tarifMaksimum = hariMenginap * tarif.tarif_maksimum
 
+				// menginap 24 jam
 				if (tarif.mode_menginap == 0) {
-					var tarifHariTerakhir =
-						Math.ceil((durasiMenit % (60 * 24)) / tarif.menit_selanjutnya) *
-						tarif.tarif_menit_selanjutnya
+					const sisaMenit = durasiMenit % (60 * 24)
+					var tarifHariTerakhir = 0
+
+					if (sisaMenit <= tarif.menit_pertama) {
+						tarifHariTerakhir = tarif.tarif_menit_pertama
+					} else {
+						tarifHariTerakhir =
+							tarif.tarif_menit_pertama +
+							Math.ceil(
+								(sisaMenit - tarif.menit_pertama) / tarif.menit_selanjutnya
+							) *
+								tarif.tarif_menit_selanjutnya
+					}
 
 					if (tarifHariTerakhir > tarif.tarif_maksimum) {
 						tarifHariTerakhir = tarif.tarif_maksimum
 					}
 
 					this.formModel.tarif =
-						tarifMenitPertama +
-						tarifMaksimum +
-						tarifHariTerakhir +
-						tarifMenginap
+						tarifMaksimum + tarifHariTerakhir + tarifMenginap
 				}
 
+				// menginap lewat lengahmalam
 				if (tarif.mode_menginap == 1) {
 					if (hariParkir > 1) {
 						var menitHariPertama =
