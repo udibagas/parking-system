@@ -519,7 +519,7 @@
 				</el-row>
 			</el-form>
 
-			<el-table :data="formModel.vehicles" height="calc(100vh - 433px)">
+			<el-table :data="formModel.vehicles">
 				<el-table-column label="Jenis Kendaraan">
 					<template slot-scope="scope">
 						<el-select
@@ -529,10 +529,10 @@
 							style="width: 100%"
 						>
 							<el-option
-								v-for="(t, i) in ['MOBIL', 'MOTOR']"
-								:value="t"
-								:label="t"
-								:key="i"
+								v-for="kendaraan in jenisKendaraanList"
+								:value="kendaraan.nama"
+								:label="kendaraan.nama"
+								:key="kendaraan.id"
 							></el-option>
 						</el-select>
 					</template>
@@ -639,7 +639,7 @@ export default {
 				return ''
 			}
 		},
-		...mapState(['groupMemberList', 'siklus', 'setting']),
+		...mapState(['groupMemberList', 'siklus', 'setting', 'jenisKendaraanList']),
 	},
 
 	watch: {
