@@ -69,7 +69,7 @@ async def gate(websocket, path):
                 p.set(align='center')
                 p.image(
                     "/home/rsvp-motor/apps/parking-system/public/images/logo.jpeg")
-                p.text("TIKET PARKIR\n")
+                p.text("TIKET PARKIR\n\n")
                 # p.text(cfg[2] + "\n")  # location
                 # p.text(cfg[3] + "\n\n")  # address
                 p.set(align='left')
