@@ -108,9 +108,8 @@ export default {
         .catch(() => console.log(e))
     },
 
-    searchData(v) {
+    searchData() {
       this.page = 1
-      this.keyword = v
       this.requestData()
     },
 

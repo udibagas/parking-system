@@ -108,6 +108,10 @@
 				<NotificationSnapshot />
 			</el-tab-pane>
 
+			<el-tab-pane lazy label="ABSENSI OPERATOR">
+				<AbsensiOperator :date="filters.dateRange" />
+			</el-tab-pane>
+
 			<el-tab-pane lazy label="LOG USER">
 				<NotificationUserLog :range="filters.dateRange" />
 			</el-tab-pane>

@@ -22,6 +22,7 @@ class UserLogController extends Controller
 
         return UserLog::selectRaw('user_logs.*, users.name AS user')
             ->join('users', 'users.id', '=', 'user_logs.user_id')
+            ->where('users.name', '!=', 'controller')
             ->when($request->keyword, function ($q) use ($request) {
                 $q->where(function ($q) use ($request) {
                     $q->where('users.name', 'LIKE', '%' . $request->keyword . '%')

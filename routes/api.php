@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AbsensiOperatorController;
 use App\Http\Controllers\AppController;
 use App\Http\Controllers\AreaParkirController;
 use App\Http\Controllers\AuthController;
@@ -18,7 +19,6 @@ use App\Http\Controllers\ParkingTransactionController;
 use App\Http\Controllers\PosController;
 use App\Http\Controllers\PrinterController;
 use App\Http\Controllers\ReportController;
-use App\Http\Controllers\ServerInformationController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\ShiftController;
 use App\Http\Controllers\SnapshotController;
@@ -102,6 +102,7 @@ Route::middleware('auth:sanctum')->group(function () {
     ], ['except' => 'show']);
 
     Route::get('userLog', [UserLogController::class, 'index']);
+    Route::get('absensiOperator', [AbsensiOperatorController::class, 'index']);
     Route::delete('userLog', [UserLogController::class, 'clear']);
 
     Route::get('snapshot', [SnapshotController::class, 'index']);

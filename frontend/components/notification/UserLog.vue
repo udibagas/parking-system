@@ -31,12 +31,6 @@
 		<el-table
 			:data="tableData.data"
 			stripe
-			@row-dblclick="
-				(row, column, event) => {
-					snapshot = row.snapshot
-					showSnapshot = true
-				}
-			"
 			height="calc(100vh - 310px)"
 			v-loading="loading"
 			@sort-change="sortChange"
