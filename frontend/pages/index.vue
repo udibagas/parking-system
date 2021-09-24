@@ -30,7 +30,7 @@
 					<el-col :span="14">
 						<select
 							placeholder="JENIS KENDARAAN"
-							@change="toDriveThruField"
+							@change="setFare"
 							v-model="formModel.vehicle_type"
 							id="vehicle-type"
 							class="my-input"
@@ -42,7 +42,7 @@
 					</el-col>
 				</el-row>
 
-				<el-row :gutter="10" style="margin-bottom: 10px">
+				<!-- <el-row :gutter="10" style="margin-bottom: 10px">
 					<el-col :span="10">
 						<div class="label-big">[+] DRIVE THRU</div>
 					</el-col>
@@ -58,7 +58,7 @@
 							<option :value="1">1 - YA</option>
 						</select>
 					</el-col>
-				</el-row>
+				</el-row> -->
 
 				<el-row :gutter="10" style="margin-bottom: 10px">
 					<el-col :span="10">
@@ -117,12 +117,13 @@ export default {
 		...mapState(['setting', 'pos', 'vehicleTypeList']),
 	},
 	methods: {
-		toDriveThruField() {
-			document.getElementById('drive-thru').focus()
-		},
+		// toDriveThruField() {
+		// 	document.getElementById('drive-thru').focus()
+		// },
 
 		setFare() {
-			if (this.formModel.is_member || this.formModel.drive_thru) {
+			// if (this.formModel.is_member || this.formModel.drive_thru) {
+			if (this.formModel.is_member) {
 				this.formModel.fare = 0
 			} else {
 				let vehicle = this.vehicleTypeList.find(
@@ -181,7 +182,7 @@ export default {
 					this.formModel.vehicle_type = r.vehicles[0].vehicle_type
 
 					if (this.setting.member_auto_open) {
-						this.formModel.drive_thru = 0
+						// this.formModel.drive_thru = 0
 						this.submit()
 					}
 				})
@@ -202,7 +203,7 @@ export default {
 			this.formModel.card_number = ''
 			this.formModel.vehicle_type = ''
 			this.formModel.fare = ''
-			this.formModel.drive_thru = ''
+			// this.formModel.drive_thru = ''
 			this.snapshot_url = null
 			this.$forceUpdate()
 			document.getElementById('card-number').focus()
@@ -229,7 +230,8 @@ export default {
 					this.$axios
 						.$post('/api/parkingTransaction', this.formModel)
 						.then((r) => {
-							if (!this.formModel.drive_thru || !this.formModel.is_member) {
+							// if (!this.formModel.drive_thru || !this.formModel.is_member) {
+							if (!this.formModel.is_member) {
 								this.formModel.time_in = this.$moment(r.time_in).format(
 									'DD-MMM-YYYY HH:mm'
 								)
@@ -373,11 +375,11 @@ export default {
 			}
 
 			// ke field drive thru
-			if (e.key == '+') {
-				e.preventDefault()
-				this.formModel.drive_thru = ''
-				document.getElementById('drive-thru').focus()
-			}
+			// if (e.key == '+') {
+			// 	e.preventDefault()
+			// 	this.formModel.drive_thru = ''
+			// 	document.getElementById('drive-thru').focus()
+			// }
 
 			// print report
 			if (e.key == 'F10') {
