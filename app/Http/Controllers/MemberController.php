@@ -50,6 +50,34 @@ class MemberController extends Controller
 
         $data = $request->paginated ? $data->paginate($request->pageSize) : $data->get();
 
+        if ($request->action == 'export') {
+            $siklus = [
+                'days' => 'hari',
+                'weeks' => 'minggu',
+                'months' => 'bulan',
+                'years' => 'tahun'
+            ];
+
+            return $data->map(function ($item, $index) use ($siklus) {
+                return [
+                    'No' => $index + 1,
+                    'Nama' => $item->nama,
+                    'Jenis' => $item->berbayar ? 'BERBAYAR' : 'GRATIS',
+                    'Group' => $item->group->nama,
+                    'Nomor Kartu' => $item->nomor_kartu,
+                    'Plat Nomor' => implode(',', $item->vehicles->pluck('plat_nomor')->toArray()),
+                    'Tanggal Daftar' => $item->register_date,
+                    'Tanggal Kedaluarsa' => $item->expiry_date,
+                    'Tarif' => $item->tarif,
+                    'Siklus Bayar' => "{$item->siklus_pembayaran}  {$siklus[$item->siklus_pembayaran_unit]}",
+                    'Nomor HP' => $item->phone,
+                    'Transaksi Terakhir' => $item->last_transaction ?? '-',
+                    'Status Kartu' => $item->expired ? 'KEDALUARSA' : 'BERLAKU',
+                    'Status Anggota' => $item->status ? 'AKTIF' : 'NONAKTIF'
+                ];
+            });
+        }
+
         return $request->action == 'print'
             ? view('member.print', ['data' => $data, 'setting' => Setting::first()])
             : $data;

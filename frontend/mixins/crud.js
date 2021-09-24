@@ -1,3 +1,5 @@
+import exportFromJSON from 'export-from-json'
+
 export default {
   data() {
     return {
@@ -154,6 +156,22 @@ export default {
             }
           }
         })
+        .finally(() => (this.loading = false))
+    },
+
+    exportData(fileName) {
+      const params = {
+        sort_prop: this.sort_prop,
+        sort_order: this.sort_order,
+        ...this.filters,
+        action: 'export',
+      }
+
+      this.loading = true
+      this.$axios
+        .$get(this.url, { params })
+        .then((data) => exportFromJSON({ data, fileName, exportType: 'xls' }))
+        .catch((e) => console.log(e))
         .finally(() => (this.loading = false))
     },
   },

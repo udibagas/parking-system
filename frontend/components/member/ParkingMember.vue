@@ -27,7 +27,7 @@
 						icon="el-icon-download"
 						size="small"
 						type="primary"
-						@click="download"
+						@click="exportData('member-parkir')"
 					></el-button>
 					<el-button
 						icon="el-icon-printer"
@@ -619,7 +619,6 @@
 </template>
 
 <script>
-import exportFromJSON from 'export-from-json'
 import { mapState } from 'vuex'
 import crud from '@/mixins/crud'
 
@@ -685,51 +684,6 @@ export default {
 				`${this.$axios.defaults.baseURL}/api/member?${querystring}`,
 				'_blank'
 			)
-		},
-
-		download() {
-			// TODO: harusnya pindah ke backend
-			const params = {
-				sort_prop: this.sort_prop,
-				sort_order: this.sort_order,
-				...this.filters,
-			}
-
-			this.$axios
-				.$get(this.url, { params })
-				.then((response) => {
-					const data = response.map((d, i) => {
-						return {
-							No: i + 1,
-							Nama: d.nama,
-							Jenis: d.berbayar ? 'BERBAYAR' : 'GRATIS',
-							Group: d.group.nama,
-							'Nomor Kartu': d.nomor_kartu,
-							'Plat Nomor': d.vehicles.map((v) => v.plat_nomor).join(', '),
-							'Tanggal Daftar': d.register_date,
-							'Tanggal Kedaluarsa': d.expiry_date,
-							Tarif: d.tarif,
-							'Siklus Bayar':
-								d.siklus_pembayaran +
-								' ' +
-								this.siklus.find((s) => s.value == d.siklus_pembayaran_unit)
-									.label,
-							'Nomor HP': d.phone_number,
-							// "Alamat Email": d.email,
-							'Transaksi Terakhir': d.last_transaction || '',
-							'Status Kartu': d.expired ? 'KEDALUARSA' : 'BERLAKU',
-							'Status Anggota': d.status ? 'AKTIF' : 'NONAKTIF',
-						}
-					})
-
-					exportFromJSON({
-						data,
-						fileName: 'member-parkir',
-						exportType: 'xls',
-					})
-				})
-				.catch((e) => console.log(e))
-				.finally(() => (this.loading = false))
 		},
 
 		addVehicle() {
