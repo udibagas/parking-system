@@ -51,19 +51,27 @@ class SyncData extends Command
                 DATE(time_out) AS tanggal,
                 CAST(SUM(tarif + denda) AS UNSIGNED) AS pendapatan,
                 COUNT(id) AS jumlah_kendaraan,
-                jenis_kendaraan
+                jenis_kendaraan,
+                `group`
             FROM parking_transactions
-            GROUP BY jenis_kendaraan, tanggal
+            GROUP BY jenis_kendaraan, tanggal, `group`
         SQL;
 
         $data           = DB::select($sql, [date('Y-m-d')]);
         $customer_id    = Setting::first()->id_pelanggan;
 
-        $client   = new Client(['timeout' => 10]);
-        $response = $client->post(env('CLOUD_SERVER_URL', 'http://localhost:8000/api/sync'), [
-            'json' => compact('data', 'customer_id'),
-        ]);
+        $this->line("SENDING : " . json_encode($data));
 
-        $this->line($response->getBody());
+        try {
+            $client   = new Client(['timeout' => 10]);
+            $response = $client->post(env('CLOUD_SERVER_URL', 'http://localhost:8000/api/sync'), [
+                'headers' => ['Content-Type' => 'application/json'],
+                'json' => compact('data', 'customer_id'),
+            ]);
+
+            $this->line($response->getBody());
+        } catch (\Exception $e) {
+            $this->error($e->getMessage());
+        }
     }
 }
