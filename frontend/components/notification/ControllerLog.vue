@@ -1,6 +1,5 @@
 <template>
 	<div>
-		<!-- TODO: kasih filter -->
 		<el-form inline class="text-right">
 			<el-form-item>
 				<el-input

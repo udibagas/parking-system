@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\ParkingTransaction;
 use App\Models\Setting;
 use GuzzleHttp\Client;
 use Illuminate\Console\Command;
@@ -54,11 +55,13 @@ class SyncData extends Command
                 jenis_kendaraan,
                 `group`
             FROM parking_transactions
+            WHERE time_out IS NOT NULL
             GROUP BY jenis_kendaraan, tanggal, `group`
         SQL;
 
         $data           = DB::select($sql, [date('Y-m-d')]);
         $customer_id    = Setting::first()->id_pelanggan;
+        // $terparkir      = ParkingTransaction::whereNull('time_out')->count();
 
         $this->line("SENDING : " . json_encode($data));
 
