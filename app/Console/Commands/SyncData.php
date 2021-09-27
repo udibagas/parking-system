@@ -50,7 +50,7 @@ class SyncData extends Command
         $sql = <<<SQL
             SELECT
                 DATE(time_out) AS tanggal,
-                SUM(tarif + denda) AS pendapatan,
+                COALESCE(CAST(SUM(tarif + denda) AS UNSIGNED), 0) AS pendapatan,
                 COUNT(id) AS jumlah_kendaraan,
                 jenis_kendaraan,
                 `group`
