@@ -2,6 +2,7 @@
 
 namespace App\Console\Commands;
 
+use App\Models\JenisKendaraan;
 use App\Models\ParkingTransaction;
 use App\Models\Setting;
 use GuzzleHttp\Client;
@@ -56,20 +57,36 @@ class SyncData extends Command
                 `group`
             FROM parking_transactions
             WHERE time_out IS NOT NULL
+                AND DATE(time_out) = ?
             GROUP BY jenis_kendaraan, tanggal, `group`
         SQL;
 
         $data           = DB::select($sql, [date('Y-m-d')]);
-        $customer_id    = Setting::first()->id_pelanggan;
-        // $terparkir      = ParkingTransaction::whereNull('time_out')->count();
 
-        $this->line("SENDING : " . json_encode($data));
+        $sql = <<<SQL
+            SELECT
+                DATE(time_in) AS tanggal,
+                COUNT(id) AS jumlah,
+                jenis_kendaraan,
+                `group`
+            FROM parking_transactions
+            WHERE time_out IS NOT NULL
+                AND `group` IS NOT NULL
+            GROUP BY jenis_kendaraan, tanggal, `group`
+        SQL;
+
+        $terparkir = DB::select($sql);
+        $customer_id    = Setting::first()->id_pelanggan;
+        $tarif = JenisKendaraan::all();
+        $this->line("PENDAPATAN : " . json_encode($data));
+        $this->line("TERPARKIR : " . json_encode($terparkir));
+        $this->line("TARIF : " . json_encode($tarif));
 
         try {
             $client   = new Client(['timeout' => 10]);
-            $response = $client->post(env('CLOUD_SERVER_URL', 'http://localhost:8000/api/sync'), [
+            $response = $client->post(env('CLOUD_SERVER_URL', 'http://localhost:8000/api/report'), [
                 'headers' => ['Content-Type' => 'application/json'],
-                'json' => compact('data', 'customer_id'),
+                'json' => compact('data', 'customer_id', 'terparkir', 'tarif'),
             ]);
 
             $this->line($response->getBody());
