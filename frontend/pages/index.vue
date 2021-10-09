@@ -259,6 +259,7 @@ export default {
 			snapshots: [],
 			showManualOpenForm: false,
 			ws: null,
+			updateTarifInterval: null,
 		}
 	},
 
@@ -930,12 +931,19 @@ export default {
 				this.printLastTrx()
 			}
 		})
+
+		this.updateTarifInterval = setInterval(
+			this.$store.dispatch('getJenisKendaraanList'),
+			60000
+		)
 	},
 
 	destroyed() {
 		if (this.ws) {
 			this.ws.close()
 		}
+
+		clearInterval(this.updateTarifInterval)
 	},
 }
 </script>
