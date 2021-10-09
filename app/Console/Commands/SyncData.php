@@ -76,20 +76,37 @@ class SyncData extends Command
         SQL;
 
         $terparkir = DB::select($sql);
-        $customer_id    = Setting::first()->id_pelanggan;
+        $customer_id = Setting::first()->id_pelanggan;
         $tarif = JenisKendaraan::all();
-        $this->line("PENDAPATAN : " . json_encode($data));
-        $this->line("TERPARKIR : " . json_encode($terparkir));
-        $this->line("TARIF : " . json_encode($tarif));
+
+        // $this->line("CUSTOMER ID : " . $customer_id);
+        // $this->line("PENDAPATAN : " . json_encode($data));
+        // $this->line("TERPARKIR : " . json_encode($terparkir));
+        // $this->line("TARIF : " . json_encode($tarif));
 
         try {
             $client   = new Client(['timeout' => 10]);
-            $response = $client->post(env('CLOUD_SERVER_URL', 'http://localhost:8000/api/report'), [
-                'headers' => ['Content-Type' => 'application/json'],
+            $response = $client->post(env('CLOUD_SERVER_URL', 'http://127.0.0.1:8000/api/report'), [
+                'headers' => [
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ],
                 'json' => compact('data', 'customer_id', 'terparkir', 'tarif'),
             ]);
 
-            $this->line($response->getBody());
+            $body = $response->getBody();
+            $json = json_decode($body);
+
+            foreach ($json->tarif as $tarif) {
+                $jenisKendaraan = JenisKendaraan::firstOrCreate([
+                    'nama' => $tarif->nama,
+                    'group' => $tarif->group,
+                ], (array) $tarif);
+
+                if (strtotime($tarif->updated_at) > strtotime($jenisKendaraan->last_sync)) {
+                    $jenisKendaraan->update(array_merge((array) $tarif, ['last_sync' => now()]));
+                }
+            }
         } catch (\Exception $e) {
             $this->error($e->getMessage());
         }
