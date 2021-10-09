@@ -20,7 +20,8 @@ class JenisKendaraan extends Model
         'tarif_maksimum',
         'tarif_menginap',
         'mode_menginap',
-        'group'
+        'group',
+        'last_sync'
     ];
 
     const MODE_TARIF_FLAT = 0;
