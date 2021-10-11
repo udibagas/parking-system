@@ -71,7 +71,7 @@ class SyncData extends Command
                 jenis_kendaraan,
                 `group`
             FROM parking_transactions
-            WHERE time_out IS NOT NULL
+            WHERE time_out IS NULL
                 AND `group` IS NOT NULL
             GROUP BY jenis_kendaraan, tanggal, `group`
         SQL;
