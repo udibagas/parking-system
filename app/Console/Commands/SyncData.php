@@ -62,7 +62,7 @@ class SyncData extends Command
             GROUP BY jenis_kendaraan, tanggal, `group`
         SQL;
 
-        $data           = DB::select($sql, [date('Y-m-d')]);
+        $data = DB::select($sql, [date('Y-m-d')]);
 
         $sql = <<<SQL
             SELECT
