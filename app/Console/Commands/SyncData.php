@@ -66,13 +66,12 @@ class SyncData extends Command
 
         $sql = <<<SQL
             SELECT
-                DATE(time_in) AS tanggal,
                 COUNT(id) AS jumlah,
                 jenis_kendaraan,
                 `group`
             FROM parking_transactions
             WHERE time_out IS NULL
-            GROUP BY jenis_kendaraan, tanggal, `group`
+            GROUP BY jenis_kendaraan, `group`
         SQL;
 
         $terparkir = DB::select($sql);
