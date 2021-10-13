@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<el-form inline class="text-right" @submit.native.prevent>
-			<el-form-item v-if="$auth.user.role == 1">
+			<el-form-item>
 				<el-button
 					size="small"
 					@click="openForm({ vehicles: [], register_date: now, tarif: 0 })"
@@ -239,7 +239,6 @@
 				width="40px"
 				align="center"
 				header-align="center"
-				v-if="$auth.user.role == 1"
 			>
 				<template slot="header">
 					<el-button type="text" @click="refreshData" icon="el-icon-refresh">
@@ -267,6 +266,7 @@
 								>Edit</el-dropdown-item
 							>
 							<el-dropdown-item
+              v-if="$auth.user.role == 1"
 								icon="el-icon-delete"
 								@click.native.prevent="deleteData(scope.row.id)"
 								>Hapus</el-dropdown-item
