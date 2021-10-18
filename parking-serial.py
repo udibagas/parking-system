@@ -6,6 +6,8 @@ import time
 import logging
 from playsound import playsound
 import requests
+from serial_asyncio import open_serial_connection
+
 
 API_URL = "http://localhost/api"
 API_HEADERS = None
@@ -101,15 +103,14 @@ def save_data(gate, data):
 
 
 async def read_controller(gate):
-    reader, writer = await asyncio.open_unix_connection("/dev/manless")
+    reader, writer = await open_serial_connection(url="/dev/manless", baudrate=9600)
 
     while True:
         data = await reader.read(1024)
 
         # kendaraan terdeteksi
         if b"IN1ON" in data:
-            # TODO: play selamat datang
-            playsound("./audio/selamat-datang.mp3")
+            playsound("./audio/silakan-tekan-tombol.mp3")
 
             data = await reader.read(1024)
 
@@ -126,7 +127,7 @@ async def read_controller(gate):
                 member = check_card(gate, str(int(nomor_kartu, 16)), card_type)
 
                 if not member:
-                    playsound("./audio/kartu-tidak-terdaftar.mp3")
+                    playsound("./audio/kartu-invalid.mp3")
                     continue
 
                 if member["expired"]:
@@ -137,7 +138,7 @@ async def read_controller(gate):
                     playsound("./audio/transaksi-belum-selesai.mp3")
                     continue
 
-                if not member["expired"] and member["expired_in"] == 5:
+                if not member["expired"] and member["expired_in"] <= 5:
                     playsound("./audio/expired-dalam-5hari.mp3")
 
                 if not member["expired"] and member["expired_in"] == 1:
@@ -230,4 +231,6 @@ if __name__ == "__main__":
     logging.info("Memulai aplikasi...")
 
     for gate in gates:
+        # asyncio.get_event_loop().run_until_complete(read_controller, (gate,))
+        # asyncio.get_event_loop().run_forever()
         asyncio.run(read_controller(gate))
