@@ -185,10 +185,9 @@ async def read_controller(gate):
             save_data(gate, data)
 
             if data["is_member"]:
-                playsound("./sound/silakan-ambil-tiket.mp3")
-
-            playsound("./sound/terimakasih.mp3")
-            time.sleep(1)
+                playsound("./audio/silakan-ambil-tiket.mp3")
+            else:
+                playsound("./audio/terimakasih.mp3")
 
             # buka gate
             writer.write("*TRIG1#".encode())
