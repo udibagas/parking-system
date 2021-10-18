@@ -2,7 +2,6 @@
 
 import asyncio
 import sys
-import time
 import logging
 from playsound import playsound
 import requests
@@ -177,7 +176,7 @@ async def read_controller(gate):
                 continue
 
             else:
-                time.sleep(1)
+                asyncio.sleep(1)
                 continue
 
             data["gate_in_id"] = gate["id"]
