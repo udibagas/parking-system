@@ -102,7 +102,9 @@ def save_data(gate, data):
 
 
 async def read_controller(gate):
-    reader, writer = await open_serial_connection(url="/dev/manless", baudrate=9600)
+    reader, writer = await open_serial_connection(
+        url=gate["controller_ip_address"], baudrate=gate["controller_port"]
+    )
 
     while True:
         data = await reader.read(1024)
@@ -123,6 +125,15 @@ async def read_controller(gate):
                     card_type = "UHF"
 
                 nomor_kartu = str(data).split(delimiter)[1].split("#")[0]
+
+                logging.debug(
+                    gate["nama"]
+                    + " : Card Detected "
+                    + str(int(nomor_kartu, 16))
+                    + " "
+                    + card_type
+                )
+
                 member = check_card(gate, str(int(nomor_kartu, 16)), card_type)
 
                 if not member:
@@ -150,7 +161,7 @@ async def read_controller(gate):
                 }
 
                 logging.info(
-                    gate["nama"] + " : Kartu terdeteksi :" + member["nomor_kartu"]
+                    gate["nama"] + " : Registered Card = " + member["nomor_kartu"]
                 )
 
             # tombol ditekan
@@ -159,6 +170,7 @@ async def read_controller(gate):
 
             # Reset
             elif b"IN3":
+                logging.info(gate["nama"] + " : Reset")
                 continue
 
             # tombol bantuan
@@ -195,9 +207,9 @@ async def read_controller(gate):
             counter = 0
 
             while counter < 5:
-                vehicle_in = reader.read(1024)
+                data = reader.read(1024)
 
-                if b"IN3OFF" in vehicle_in:
+                if b"IN3OFF" in data:
                     logging.info(gate["nama"] + " : Kendaraan masuk")
                     break
 
