@@ -102,9 +102,16 @@ def save_data(gate, data):
 
 
 async def read_controller(gate):
-    reader, writer = await open_serial_connection(
-        url=gate["controller_ip_address"], baudrate=gate["controller_port"]
-    )
+    connected = False
+
+    while not connected:
+        try:
+            reader, writer = await open_serial_connection(
+                url=gate["controller_ip_address"], baudrate=gate["controller_port"]
+            )
+            connected = True
+        except Exception as e:
+            logging.debug(gate["nama"] + " : Failed to connect to controller " + str(e))
 
     while True:
         data = await reader.read(1024)
