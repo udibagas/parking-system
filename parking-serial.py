@@ -7,6 +7,7 @@ from time import time
 from playsound import playsound
 import requests
 from serial_asyncio import open_serial_connection
+import time
 
 
 API_URL = "http://localhost/api"
@@ -112,7 +113,7 @@ async def read_controller(gate):
             )
             connected = True
         except Exception as e:
-            asyncio.sleep(3)
+            time.sleep(3)
             logging.debug(gate["nama"] + " : Failed to connect to controller " + str(e))
 
     while True:
