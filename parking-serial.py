@@ -117,6 +117,8 @@ async def read_controller(gate):
             logging.debug(gate["nama"] + " : Failed to connect to controller " + str(e))
 
     while True:
+        logging.debug(gate["nama"] + " : reading controller...")
+
         data = await reader.read(1024)
 
         # kendaraan terdeteksi
