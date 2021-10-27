@@ -123,12 +123,14 @@ async def read_controller(gate):
 
         # kendaraan terdeteksi
         if b"IN1ON" in data:
+            logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
             playsound("./audio/silakan-tekan-tombol.mp3")
 
             data = await reader.read(1024)
 
             # kalau tap kartu
             if b"W" in data or b"X" in data:
+                logging.debug(gate["nama"] + " : Tap kartu")
                 delimiter = "W"
                 card_type = "RFID"
 
@@ -149,21 +151,26 @@ async def read_controller(gate):
                 member = check_card(gate, str(int(nomor_kartu, 16)), card_type)
 
                 if not member:
+                    logging.debug(gate["nama"] + " : Kartu invalid")
                     playsound("./audio/kartu-invalid.mp3")
                     continue
 
                 if member["expired"]:
+                    logging.debug(gate["nama"] + " : Kartu expired")
                     playsound("./audio/kartu-expired.mp3")
                     continue
 
                 if member["unclosed"]:
+                    logging.debug(gate["nama"] + " : Transaksi belum selesai")
                     playsound("./audio/transaksi-belum-selesai.mp3")
                     continue
 
                 if not member["expired"] and member["expired_in"] <= 5:
+                    logging.debug(gate["nama"] + " : Kartu expired dalam 5 hari")
                     playsound("./audio/expired-dalam-5hari.mp3")
 
                 if not member["expired"] and member["expired_in"] == 1:
+                    logging.debug(gate["nama"] + " : Kartu expired dalam 1 hari")
                     playsound("./audio/expired-dalam-1hari.mp3")
 
                 data = {
@@ -187,6 +194,7 @@ async def read_controller(gate):
 
             # tombol bantuan
             elif b"IN4ON":
+                logging.debug(gate["nama"] + " : Tombol bantuan")
                 playsound("./audio/mohon-tunggu.mp3")
                 send_notification(
                     gate,
@@ -208,11 +216,14 @@ async def read_controller(gate):
             save_data(gate, data)
 
             if data["is_member"]:
+                logging.debug(gate["nama"] + " : Ambil tiket")
                 playsound("./audio/silakan-ambil-tiket.mp3")
             else:
+                logging.debug(gate["nama"] + " : Terimkasih")
                 playsound("./audio/terimakasih.mp3")
 
             # buka gate
+            logging.debug(gate["nama"] + " : Buka gate")
             writer.write("*TRIG1#".encode())
             await writer.drain()
 
@@ -222,10 +233,11 @@ async def read_controller(gate):
                 data = reader.read(1024)
 
                 if b"IN3OFF" in data:
-                    logging.info(gate["nama"] + " : Kendaraan masuk")
                     break
 
                 counter += 1
+
+            logging.info(gate["nama"] + " : Kendaraan masuk")
 
 
 if __name__ == "__main__":
