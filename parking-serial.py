@@ -8,6 +8,7 @@ import requests
 from serial import Serial
 import time
 from threading import Thread
+from multiprocessing import Process
 
 
 API_URL = "http://localhost/api"
@@ -127,9 +128,11 @@ def read_controller(gate):
         # kendaraan terdeteksi
         if b"IN1ON" in data:
             logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
-            play("./audio/silakan-tekan-tombol.mp3")
+            s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
+            s.start()
 
             data = ser.read_until(b"#")
+            s.terminate()
 
             # kalau tap kartu
             if b"W" in data or b"X" in data:
