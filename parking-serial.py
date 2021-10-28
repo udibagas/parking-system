@@ -7,7 +7,7 @@ from playsound import playsound
 import requests
 from serial import Serial
 import time
-import threading
+from threading import Thread
 
 
 API_URL = "http://localhost/api"
@@ -104,7 +104,7 @@ def save_data(gate, data):
 
 
 def play(file):
-    threading.Thread(target=playsound, args=(file,)).start()
+    Thread(target=playsound, args=(file,)).start()
 
 
 def read_controller(gate):
@@ -270,4 +270,4 @@ if __name__ == "__main__":
     logging.info("Memulai aplikasi...")
 
     for gate in gates:
-        threading.Thread(target=read_controller, args=(gate,)).start()
+        Thread(target=read_controller, args=(gate,)).start()
