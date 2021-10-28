@@ -130,9 +130,8 @@ def read_controller(gate):
             logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
             s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
             s.start()
-
             data = ser.read_until(b"#")
-            s.terminate()
+            s.kill()
 
             # kalau tap kartu
             if b"W" in data or b"X" in data:
