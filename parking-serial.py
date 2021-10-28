@@ -117,13 +117,11 @@ def read_controller(gate):
     while True:
         logging.debug(gate["nama"] + " : reading controller...")
 
-        ser.write(b"*STAT#")
         data = ser.read_until(b"#")
-
         logging.info(gate["nama"] + " : " + data.decode())
 
         # kendaraan terdeteksi
-        if b"IN1ON" in data or b"STAT1" in data:
+        if b"IN1ON" in data:
             logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
             playsound("./audio/silakan-tekan-tombol.mp3")
 
