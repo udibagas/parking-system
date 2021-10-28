@@ -240,9 +240,7 @@ def read_controller(gate):
                 counter += 1
 
             logging.info(gate["nama"] + " : Kendaraan masuk")
-
-        else:
-            time.sleep(1)
+            time.sleep(2)
 
 
 if __name__ == "__main__":
