@@ -117,15 +117,17 @@ def read_controller(gate):
     while True:
         logging.debug(gate["nama"] + " : reading controller...")
 
-        data = ser.read(1024)
-        logging.info(gate["nama"] + data.decode())
+        ser.write(b"*STAT#")
+        data = ser.read_until(b"#")
+
+        logging.info(gate["nama"] + " : " + data.decode())
 
         # kendaraan terdeteksi
-        if b"IN1ON" in data:
+        if b"IN1ON" in data or b"STAT1" in data:
             logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
             playsound("./audio/silakan-tekan-tombol.mp3")
 
-            data = ser.read(1024)
+            data = ser.read_until(b"#")
 
             # kalau tap kartu
             if b"W" in data or b"X" in data:
@@ -228,7 +230,7 @@ def read_controller(gate):
             counter = 0
 
             while counter < 5:
-                data = ser.read(1024)
+                data = ser.read_until(b"#")
 
                 if b"IN3OFF" in data:
                     break
@@ -236,6 +238,9 @@ def read_controller(gate):
                 counter += 1
 
             logging.info(gate["nama"] + " : Kendaraan masuk")
+
+        else:
+            time.sleep(1)
 
 
 if __name__ == "__main__":
