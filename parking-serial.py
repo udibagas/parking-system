@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 
-import asyncio
 import sys
 import logging
 from time import time
@@ -8,6 +7,7 @@ from playsound import playsound
 import requests
 from serial import Serial
 import time
+import threading
 
 
 API_URL = "http://localhost/api"
@@ -206,7 +206,7 @@ def read_controller(gate):
                 continue
 
             else:
-                asyncio.sleep(1)
+                time.sleep(1)
                 continue
 
             data["gate_in_id"] = gate["id"]
@@ -262,6 +262,4 @@ if __name__ == "__main__":
     logging.info("Memulai aplikasi...")
 
     for gate in gates:
-        # asyncio.get_event_loop().run_until_complete(read_controller, (gate,))
-        # asyncio.get_event_loop().run_forever()
-        asyncio.run(read_controller(gate))
+        threading.Thread(target=read_controller, args=(gate,)).start()
