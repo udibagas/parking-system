@@ -6,7 +6,7 @@ import logging
 from time import time
 from playsound import playsound
 import requests
-from serial_asyncio import open_serial_connection
+from serial import Serial
 import time
 
 
@@ -103,14 +103,12 @@ def save_data(gate, data):
     return r.json()
 
 
-async def read_controller(gate):
+def read_controller(gate):
     connected = False
 
     while not connected:
         try:
-            reader, writer = await open_serial_connection(
-                url=gate["controller_ip_address"], baudrate=gate["controller_port"]
-            )
+            ser = Serial(gate["controller_ip_address"], int(gate["controller_port"]))
             connected = True
         except Exception as e:
             time.sleep(3)
@@ -119,14 +117,14 @@ async def read_controller(gate):
     while True:
         logging.debug(gate["nama"] + " : reading controller...")
 
-        data = await reader.read(1024)
+        data = ser.read(1024)
 
         # kendaraan terdeteksi
         if b"IN1ON" in data:
             logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
             playsound("./audio/silakan-tekan-tombol.mp3")
 
-            data = await reader.read(1024)
+            data = ser.read(1024)
 
             # kalau tap kartu
             if b"W" in data or b"X" in data:
@@ -224,13 +222,12 @@ async def read_controller(gate):
 
             # buka gate
             logging.debug(gate["nama"] + " : Buka gate")
-            writer.write("*TRIG1#".encode())
-            await writer.drain()
+            ser.write("*TRIG1#".encode())
 
             counter = 0
 
             while counter < 5:
-                data = reader.read(1024)
+                data = ser.read(1024)
 
                 if b"IN3OFF" in data:
                     break
