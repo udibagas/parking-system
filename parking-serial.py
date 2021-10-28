@@ -118,6 +118,7 @@ def read_controller(gate):
         logging.debug(gate["nama"] + " : reading controller...")
 
         data = ser.read(1024)
+        logging.info(gate["nama"] + data.decode())
 
         # kendaraan terdeteksi
         if b"IN1ON" in data:
