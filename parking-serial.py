@@ -180,17 +180,17 @@ def read_controller(gate):
             logging.info(gate["nama"] + " : Registered Card = " + member["nomor_kartu"])
 
         # tombol ditekan
-        elif b"IN2ON":
+        elif b"IN2ON" in data:
             logging.info(gate["nama"] + " : Tombol tiket ditekan " + data.decode())
             trx = {"is_member": 0}
 
         # Reset
-        elif b"IN3":
+        elif b"IN3" in data:
             logging.info(gate["nama"] + " : Reset" + data.decode())
             continue
 
         # tombol bantuan
-        elif b"IN4ON":
+        elif b"IN4ON" in data:
             logging.debug(gate["nama"] + " : Tombol bantuan" + data.decode())
             playsound("./audio/mohon-tunggu.mp3", False)
             send_notification(
@@ -200,7 +200,7 @@ def read_controller(gate):
             continue
 
         # kendaraan balik arah
-        elif b"IN1OFF":
+        elif b"IN1OFF" in data:
             logging.info(gate["nama"] + " : Kendaraan balik arah " + data.decode())
             continue
 
