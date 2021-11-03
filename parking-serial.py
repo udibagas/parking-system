@@ -118,130 +118,116 @@ def read_controller(gate):
     while True:
         logging.debug(gate["nama"] + " : reading controller...")
 
-        data = ser.read_until(b"#")
+        # baca kontroller sampai kendaraan terdeteksi
+        data = ser.read_until(b"*IN1ON#")
         logging.info(gate["nama"] + " : " + data.decode())
 
-        # kendaraan terdeteksi
-        if b"IN1ON" in data:
-            logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
-            s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
-            s.start()
-            data = ser.read_until(b"#")
-            s.kill()
+        logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
+        s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
+        s.start()
+        data = ser.read_until(b"#")
+        s.kill()
 
-            # kalau tap kartu
-            if b"W" in data or b"X" in data:
-                logging.debug(gate["nama"] + " : Tap kartu")
-                delimiter = "W"
-                card_type = "RFID"
+        # kalau tap kartu
+        if b"W" in data or b"X" in data:
+            logging.debug(gate["nama"] + " : Tap kartu")
+            delimiter = "W"
+            card_type = "RFID"
 
-                if b"X" in data:
-                    delimiter = "X"
-                    card_type = "UHF"
+            if b"X" in data:
+                delimiter = "X"
+                card_type = "UHF"
 
-                nomor_kartu = str(data).split(delimiter)[1].split("#")[0]
+            nomor_kartu = str(data).split(delimiter)[1].split("#")[0]
 
-                logging.debug(
-                    gate["nama"]
-                    + " : Card Detected "
-                    + str(int(nomor_kartu, 16))
-                    + " "
-                    + card_type
-                )
+            logging.debug(
+                gate["nama"]
+                + " : Card Detected "
+                + str(int(nomor_kartu, 16))
+                + " "
+                + card_type
+            )
 
-                member = check_card(gate, str(int(nomor_kartu, 16)), card_type)
+            member = check_card(gate, str(int(nomor_kartu, 16)), card_type)
 
-                if not member:
-                    logging.debug(gate["nama"] + " : Kartu invalid")
-                    playsound("./audio/kartu-invalid.mp3", False)
-                    continue
-
-                if member["expired"]:
-                    logging.debug(gate["nama"] + " : Kartu expired")
-                    playsound("./audio/kartu-expired.mp3", False)
-                    continue
-
-                if member["unclosed"]:
-                    logging.debug(gate["nama"] + " : Transaksi belum selesai")
-                    playsound("./audio/transaksi-belum-selesai.mp3", False)
-                    continue
-
-                if not member["expired"] and member["expired_in"] <= 5:
-                    logging.debug(gate["nama"] + " : Kartu expired dalam 5 hari")
-                    playsound("./audio/expired-dalam-5hari.mp3", False)
-
-                if not member["expired"] and member["expired_in"] == 1:
-                    logging.debug(gate["nama"] + " : Kartu expired dalam 1 hari")
-                    playsound("./audio/expired-dalam-1hari.mp3", False)
-
-                data = {
-                    "is_member": 1,
-                    "nomor_kartu": member["nomor_kartu"],
-                    "member_id": member["id"],
-                }
-
-                logging.info(
-                    gate["nama"] + " : Registered Card = " + member["nomor_kartu"]
-                )
-
-            # tombol ditekan
-            elif b"IN2ON":
-                logging.info(gate["nama"] + " : Tombol tiket ditekan")
-                data = {"is_member": 0}
-
-            # Reset
-            elif b"IN3":
-                logging.info(gate["nama"] + " : Reset")
+            if not member:
+                logging.debug(gate["nama"] + " : Kartu invalid")
+                playsound("./audio/kartu-invalid.mp3", False)
                 continue
 
-            # tombol bantuan
-            elif b"IN4ON":
-                logging.debug(gate["nama"] + " : Tombol bantuan")
-                playsound("./audio/mohon-tunggu.mp3", False)
-                send_notification(
-                    gate,
-                    "Pengunjung di " + gate["nama"] + " membutuhkan bantuan Anda",
-                )
+            if member["expired"]:
+                logging.debug(gate["nama"] + " : Kartu expired")
+                playsound("./audio/kartu-expired.mp3", False)
                 continue
 
-            # kendaraan balik arah
-            elif b"IN1OFF":
-                logging.info(gate["nama"] + " : Kendaraan balik arah")
+            if member["unclosed"]:
+                logging.debug(gate["nama"] + " : Transaksi belum selesai")
+                playsound("./audio/transaksi-belum-selesai.mp3", False)
                 continue
 
-            else:
-                logging.info(gate["nama"] + " : Invalid input")
-                time.sleep(1)
-                continue
+            if not member["expired"] and member["expired_in"] <= 5:
+                logging.debug(gate["nama"] + " : Kartu expired dalam 5 hari")
+                playsound("./audio/expired-dalam-5hari.mp3", False)
 
-            data["gate_in_id"] = gate["id"]
-            data["jenis_kendaraan"] = gate["jenis_kendaraan"]
-            logging.debug(gate["nama"] + " : Simpan data")
-            save_data(gate, data)
+            if not member["expired"] and member["expired_in"] == 1:
+                logging.debug(gate["nama"] + " : Kartu expired dalam 1 hari")
+                playsound("./audio/expired-dalam-1hari.mp3", False)
 
-            if data["is_member"]:
-                logging.debug(gate["nama"] + " : Ambil tiket")
-                playsound("./audio/silakan-ambil-tiket.mp3", False)
-            else:
-                logging.debug(gate["nama"] + " : Terimkasih")
-                playsound("./audio/terimakasih.mp3", False)
+            data = {
+                "is_member": 1,
+                "nomor_kartu": member["nomor_kartu"],
+                "member_id": member["id"],
+            }
 
-            # buka gate
-            logging.debug(gate["nama"] + " : Buka gate")
-            ser.write("*TRIG1#".encode())
+            logging.info(gate["nama"] + " : Registered Card = " + member["nomor_kartu"])
 
-            counter = 0
+        # tombol ditekan
+        elif b"IN2ON":
+            logging.info(gate["nama"] + " : Tombol tiket ditekan")
+            data = {"is_member": 0}
 
-            while counter < 5:
-                data = ser.read_until(b"#")
+        # Reset
+        elif b"IN3":
+            logging.info(gate["nama"] + " : Reset")
+            continue
 
-                if b"IN3OFF" in data:
-                    break
+        # tombol bantuan
+        elif b"IN4ON":
+            logging.debug(gate["nama"] + " : Tombol bantuan")
+            playsound("./audio/mohon-tunggu.mp3", False)
+            send_notification(
+                gate,
+                "Pengunjung di " + gate["nama"] + " membutuhkan bantuan Anda",
+            )
+            continue
 
-                counter += 1
+        # kendaraan balik arah
+        elif b"IN1OFF":
+            logging.info(gate["nama"] + " : Kendaraan balik arah")
+            continue
 
-            logging.info(gate["nama"] + " : Kendaraan masuk")
-            time.sleep(2)
+        else:
+            logging.info(gate["nama"] + " : Invalid input")
+            time.sleep(1)
+            continue
+
+        data["gate_in_id"] = gate["id"]
+        data["jenis_kendaraan"] = gate["jenis_kendaraan"]
+        logging.debug(gate["nama"] + " : Simpan data")
+        save_data(gate, data)
+
+        if data["is_member"]:
+            logging.debug(gate["nama"] + " : Ambil tiket")
+            playsound("./audio/silakan-ambil-tiket.mp3", False)
+        else:
+            logging.debug(gate["nama"] + " : Terimkasih")
+            playsound("./audio/terimakasih.mp3", False)
+
+        # buka gate
+        logging.debug(gate["nama"] + " : Buka gate")
+        ser.write("*TRIG1#".encode())
+        ser.read_until(b"*IN3OFF#")
+        logging.info(gate["nama"] + " : Kendaraan masuk")
 
 
 if __name__ == "__main__":
