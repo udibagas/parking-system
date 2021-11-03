@@ -120,9 +120,7 @@ def read_controller(gate):
 
         # baca kontroller sampai kendaraan terdeteksi
         data = ser.read_until(b"*IN1ON#")
-        logging.info(gate["nama"] + " : " + data.decode())
-
-        logging.debug(gate["nama"] + " : Kendaraan terdeteksi")
+        logging.debug(gate["nama"] + " : Kendaraan terdeteksi " + data.decode())
         s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
         s.start()
         data = ser.read_until(b"#")
@@ -130,7 +128,7 @@ def read_controller(gate):
 
         # kalau tap kartu
         if b"W" in data or b"X" in data:
-            logging.debug(gate["nama"] + " : Tap kartu")
+            logging.debug(gate["nama"] + " : Tap kartu " + data.decode())
             delimiter = "W"
             card_type = "RFID"
 
@@ -173,7 +171,7 @@ def read_controller(gate):
                 logging.debug(gate["nama"] + " : Kartu expired dalam 1 hari")
                 playsound("./audio/expired-dalam-1hari.mp3", False)
 
-            data = {
+            trx = {
                 "is_member": 1,
                 "nomor_kartu": member["nomor_kartu"],
                 "member_id": member["id"],
@@ -183,40 +181,40 @@ def read_controller(gate):
 
         # tombol ditekan
         elif b"IN2ON":
-            logging.info(gate["nama"] + " : Tombol tiket ditekan")
-            data = {"is_member": 0}
+            logging.info(gate["nama"] + " : Tombol tiket ditekan " + data.decode())
+            trx = {"is_member": 0}
 
         # Reset
         elif b"IN3":
-            logging.info(gate["nama"] + " : Reset")
+            logging.info(gate["nama"] + " : Reset" + data.decode())
             continue
 
         # tombol bantuan
         elif b"IN4ON":
-            logging.debug(gate["nama"] + " : Tombol bantuan")
+            logging.debug(gate["nama"] + " : Tombol bantuan" + data.decode())
             playsound("./audio/mohon-tunggu.mp3", False)
             send_notification(
                 gate,
-                "Pengunjung di " + gate["nama"] + " membutuhkan bantuan Anda",
+                "Pengunjung di " + gate["nama"] + " membutuhkan bantuan Anda ",
             )
             continue
 
         # kendaraan balik arah
         elif b"IN1OFF":
-            logging.info(gate["nama"] + " : Kendaraan balik arah")
+            logging.info(gate["nama"] + " : Kendaraan balik arah " + data.decode())
             continue
 
         else:
-            logging.info(gate["nama"] + " : Invalid input")
+            logging.info(gate["nama"] + " : Invalid input " + data.decode())
             time.sleep(1)
             continue
 
-        data["gate_in_id"] = gate["id"]
-        data["jenis_kendaraan"] = gate["jenis_kendaraan"]
+        trx["gate_in_id"] = gate["id"]
+        trx["jenis_kendaraan"] = gate["jenis_kendaraan"]
         logging.debug(gate["nama"] + " : Simpan data")
-        save_data(gate, data)
+        save_data(gate, trx)
 
-        if data["is_member"]:
+        if trx["is_member"]:
             logging.debug(gate["nama"] + " : Ambil tiket")
             playsound("./audio/silakan-ambil-tiket.mp3", False)
         else:
@@ -226,8 +224,8 @@ def read_controller(gate):
         # buka gate
         logging.debug(gate["nama"] + " : Buka gate")
         ser.write("*TRIG1#".encode())
-        ser.read_until(b"*IN3OFF#")
-        logging.info(gate["nama"] + " : Kendaraan masuk")
+        data = ser.read_until(b"*IN3OFF#")
+        logging.info(gate["nama"] + " : Kendaraan masuk " + data.decode())
 
 
 if __name__ == "__main__":
