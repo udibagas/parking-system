@@ -206,7 +206,6 @@ def read_controller(gate):
 
         else:
             logging.info(gate["nama"] + " : Invalid input " + data.decode())
-            time.sleep(1)
             continue
 
         trx["gate_in_id"] = gate["id"]
