@@ -104,10 +104,6 @@ def save_data(gate, data):
     return r.json()
 
 
-def play(file):
-    Thread(target=playsound, args=(file,)).start()
-
-
 def read_controller(gate):
     connected = False
 
@@ -157,26 +153,26 @@ def read_controller(gate):
 
                 if not member:
                     logging.debug(gate["nama"] + " : Kartu invalid")
-                    play("./audio/kartu-invalid.mp3")
+                    playsound("./audio/kartu-invalid.mp3", False)
                     continue
 
                 if member["expired"]:
                     logging.debug(gate["nama"] + " : Kartu expired")
-                    play("./audio/kartu-expired.mp3")
+                    playsound("./audio/kartu-expired.mp3", False)
                     continue
 
                 if member["unclosed"]:
                     logging.debug(gate["nama"] + " : Transaksi belum selesai")
-                    play("./audio/transaksi-belum-selesai.mp3")
+                    playsound("./audio/transaksi-belum-selesai.mp3", False)
                     continue
 
                 if not member["expired"] and member["expired_in"] <= 5:
                     logging.debug(gate["nama"] + " : Kartu expired dalam 5 hari")
-                    play("./audio/expired-dalam-5hari.mp3")
+                    playsound("./audio/expired-dalam-5hari.mp3", False)
 
                 if not member["expired"] and member["expired_in"] == 1:
                     logging.debug(gate["nama"] + " : Kartu expired dalam 1 hari")
-                    play("./audio/expired-dalam-1hari.mp3")
+                    playsound("./audio/expired-dalam-1hari.mp3", False)
 
                 data = {
                     "is_member": 1,
@@ -190,6 +186,7 @@ def read_controller(gate):
 
             # tombol ditekan
             elif b"IN2ON":
+                logging.info(gate["nama"] + " : Tombol tiket ditekan")
                 data = {"is_member": 0}
 
             # Reset
@@ -200,7 +197,7 @@ def read_controller(gate):
             # tombol bantuan
             elif b"IN4ON":
                 logging.debug(gate["nama"] + " : Tombol bantuan")
-                play("./audio/mohon-tunggu.mp3")
+                playsound("./audio/mohon-tunggu.mp3", False)
                 send_notification(
                     gate,
                     "Pengunjung di " + gate["nama"] + " membutuhkan bantuan Anda",
@@ -209,23 +206,25 @@ def read_controller(gate):
 
             # kendaraan balik arah
             elif b"IN1OFF":
-                logging.info(gate["nama"] + " : Vehicle turn back")
+                logging.info(gate["nama"] + " : Kendaraan balik arah")
                 continue
 
             else:
+                logging.info(gate["nama"] + " : Invalid input")
                 time.sleep(1)
                 continue
 
             data["gate_in_id"] = gate["id"]
             data["jenis_kendaraan"] = gate["jenis_kendaraan"]
+            logging.debug(gate["nama"] + " : Simpan data")
             save_data(gate, data)
 
             if data["is_member"]:
                 logging.debug(gate["nama"] + " : Ambil tiket")
-                play("./audio/silakan-ambil-tiket.mp3")
+                playsound("./audio/silakan-ambil-tiket.mp3", False)
             else:
                 logging.debug(gate["nama"] + " : Terimkasih")
-                play("./audio/terimakasih.mp3")
+                playsound("./audio/terimakasih.mp3", False)
 
             # buka gate
             logging.debug(gate["nama"] + " : Buka gate")
