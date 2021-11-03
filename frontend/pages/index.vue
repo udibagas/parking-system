@@ -45,7 +45,11 @@
 					</el-col>
 				</el-row>
 
-				<el-row :gutter="10" style="margin-bottom: 10px">
+				<el-row
+					v-if="jenisKendaraanList.length > 1"
+					:gutter="10"
+					style="margin-bottom: 10px"
+				>
 					<el-col :span="10">
 						<div class="label-big">[*] JENIS KENDARAAN</div>
 					</el-col>
@@ -501,7 +505,8 @@ export default {
 				})
 		},
 
-		cekTiket() {
+		// hasil akhir ini harusnya tergantung dia ada jenis kendaraan berapa
+		async cekTiket() {
 			if (this.formModel.nomor_barcode.length < 5) return
 
 			let now = this.$moment().format('YYYY-MM-DD HH:mm:ss')
@@ -509,114 +514,134 @@ export default {
 			if (this.formModel.nomor_barcode.toLowerCase() == 'xxxxx') {
 				this.formModel.time_in = this.$moment().format('YYYY-MM-DD')
 				this.formModel.time_out = now
+				if (this.jenisKendaraanList.length > 1) {
+					document.getElementById('jenis-kendaraan').focus()
+					return
+				}
+			}
+
+			try {
+				var data = await this.$axios.$get('/api/parkingTransaction/search', {
+					params: { nomor_barcode: this.formModel.nomor_barcode },
+				})
+			} catch (error) {
+				document.getElementById('nomor-tiket').focus()
+			}
+
+			this.snapshots = data.snapshots
+
+			const { id, gate_in_id, time_in, is_member } = data
+
+			this.formModel = {
+				...this.formModel,
+				id,
+				gate_in_id,
+				time_in,
+				is_member,
+				time_out: now,
+				tarif: 0,
+			}
+
+			// this.formModel.id = data.id
+			// this.formModel.gate_in_id = data.gate_in_id
+			// this.formModel.time_in = this.$moment(data.time_in).format(
+			// 	'YYYY-MM-DD HH:mm:ss'
+			// )
+			// this.formModel.is_member = data.is_member
+			// this.formModel.time_out = now
+			// this.formModel.tarif = 0
+
+			this.$forceUpdate()
+
+			// jika bukan member
+			if (!data.is_member && this.jenisKendaraanList.length > 1) {
 				document.getElementById('jenis-kendaraan').focus()
 				return
 			}
 
-			let params = { nomor_barcode: this.formModel.nomor_barcode }
-			this.$axios
-				.$get('/api/parkingTransaction/search', { params })
-				.then((r) => {
-					const data = r
-					this.snapshots = data.snapshots
-					this.formModel.id = data.id
-					this.formModel.gate_in_id = data.gate_in_id
-					this.formModel.time_in = this.$moment(data.time_in).format(
-						'YYYY-MM-DD HH:mm:ss'
-					)
-					this.formModel.is_member = data.is_member
-					this.formModel.time_out = now
-					this.formModel.tarif = 0
-					this.$forceUpdate()
+			if (!!data.member.expired) {
+				this.$alert('Kartu telah habis masa berlaku', 'Perhatian', {
+					type: 'warning',
+					center: true,
+					roundButton: true,
+					confirmButtonText: 'OK',
+					confirmButtonClass: 'bg-red',
+				})
+				this.formModel.is_member = 0
+				return false
+			}
 
-					if (!data.is_member) {
-						document.getElementById('jenis-kendaraan').focus()
-						return false
+			if (!data.member.expired && data.member.expired_in <= 5) {
+				this.$alert(
+					`Kartu akan habis masa berlaku dalam ${data.member.expired_in} hari`,
+					'Perhatian',
+					{
+						type: 'warning',
+						center: true,
+						roundButton: true,
+						confirmButtonText: 'OK',
+						confirmButtonClass: 'bg-red',
+					}
+				)
+			}
+
+			if (!!this.setting.disable_plat_nomor) {
+				const vehicle = data.member.vehicles[0]
+				this.formModel.jenis_kendaraan = vehicle.jenis_kendaraan
+				this.formModel.plat_nomor = vehicle.plat_nomor
+
+				// member auto open sesuai setingan
+				if (!!this.setting.member_auto_open) {
+					const gateOut = this.pos.gate_outs.find((g) => {
+						return g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan)
+					})
+
+					if (!gateOut) {
+						this.$message({
+							message: 'Tidak ada gate keluar untuk jenis kendaraan terkait',
+							type: 'error',
+						})
+						return
 					}
 
-					if (!!data.member.expired) {
-						this.$alert('Kartu telah habis masa berlaku', 'Perhatian', {
+					this.formModel.gate_out_id = gateOut.id
+
+					if (this.formModel.id) {
+						this.takeSnapshot()
+					}
+
+					this.save(false)
+				}
+			} else {
+				let vehicle = data.member.vehicles.find(
+					(v) => v.plat_nomor == this.formModel.plat_nomor
+				)
+
+				if (!vehicle) {
+					this.$alert(
+						'Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah ' +
+							data.member.vehicles.map((v) => v.plat_nomor).join(', '),
+						'Perhatian',
+						{
 							type: 'warning',
 							center: true,
 							roundButton: true,
 							confirmButtonText: 'OK',
 							confirmButtonClass: 'bg-red',
-						})
-						this.formModel.is_member = 0
-						return false
-					}
-
-					if (!data.member.expired && data.member.expired_in <= 5) {
-						this.$alert(
-							`Kartu akan habis masa berlaku dalam ${data.member.expired_in} hari`,
-							'Perhatian',
-							{
-								type: 'warning',
-								center: true,
-								roundButton: true,
-								confirmButtonText: 'OK',
-								confirmButtonClass: 'bg-red',
-							}
-						)
-					}
-
-					if (!!this.setting.disable_plat_nomor) {
-						const vehicle = data.member.vehicles[0]
-						this.formModel.jenis_kendaraan = vehicle.jenis_kendaraan
-						this.formModel.plat_nomor = vehicle.plat_nomor
-
-						// member auto open sesuai setingan
-						if (!!this.setting.member_auto_open) {
-							const gateOut = this.pos.gate_outs.find((g) => {
-								return g.jenis_kendaraan.includes(
-									this.formModel.jenis_kendaraan
-								)
-							})
-
-							if (!gateOut) {
-								this.$message({
-									message:
-										'Tidak ada gate keluar untuk jenis kendaraan terkait',
-									type: 'error',
-								})
-								return
-							}
-
-							this.formModel.gate_out_id = gateOut.id
-
-							if (this.formModel.id) {
-								this.takeSnapshot()
-							}
-
-							this.save(false)
 						}
-					} else {
-						let vehicle = data.member.vehicles.find(
-							(v) => v.plat_nomor == this.formModel.plat_nomor
-						)
-
-						if (!vehicle) {
-							this.$alert(
-								'Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah ' +
-									data.member.vehicles.map((v) => v.plat_nomor).join(', '),
-								'Perhatian',
-								{
-									type: 'warning',
-									center: true,
-									roundButton: true,
-									confirmButtonText: 'OK',
-									confirmButtonClass: 'bg-red',
-								}
-							)
-							document.getElementById('plat-nomor').focus()
-						} else {
-							document.getElementById('jenis-kendaraan').focus()
-						}
+					)
+					document.getElementById('plat-nomor').focus()
+				} else {
+					if (this.jenisKendaraanList.length > 1) {
+						document.getElementById('jenis-kendaraan').focus()
 					}
-				})
-				.catch((e) => {
-					document.getElementById('nomor-tiket').focus()
-				})
+				}
+			}
+
+			if (this.jenisKendaraanList.length == 1) {
+				this.formModel.jenis_kendaraan = this.jenisKendaraanList[0].nama
+				this.hitungTarif()
+			}
 		},
 
 		resetForm() {
