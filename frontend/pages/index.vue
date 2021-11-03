@@ -525,6 +525,15 @@ export default {
 					params: { nomor_barcode: this.formModel.nomor_barcode },
 				})
 			} catch (error) {
+				if (error.response.status == 404) {
+					this.$message({
+						message: error.response.data.message,
+						type: 'error',
+						center: true,
+						showClose: true,
+						duration: 3000,
+					})
+				}
 				document.getElementById('nomor-tiket').focus()
 			}
 
@@ -541,15 +550,6 @@ export default {
 				time_out: now,
 				tarif: 0,
 			}
-
-			// this.formModel.id = data.id
-			// this.formModel.gate_in_id = data.gate_in_id
-			// this.formModel.time_in = this.$moment(data.time_in).format(
-			// 	'YYYY-MM-DD HH:mm:ss'
-			// )
-			// this.formModel.is_member = data.is_member
-			// this.formModel.time_out = now
-			// this.formModel.tarif = 0
 
 			this.$forceUpdate()
 
