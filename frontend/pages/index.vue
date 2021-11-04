@@ -351,7 +351,7 @@ export default {
 			var timeOut = this.formModel.time_out
 				? this.$moment(this.formModel.time_out)
 				: this.$moment()
-			var durasiMenit = timeOut.diff(timeIn, 'minutes')
+			var durasiMenit = timeOut.diff(timeIn, 'minutes') || 1
 
 			var tarifMenitPertama = tarif.tarif_menit_pertama
 
