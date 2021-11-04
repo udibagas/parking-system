@@ -94,6 +94,7 @@ class SyncData extends Command
             ]);
 
             $body = $response->getBody();
+            $this->line($body);
             $json = json_decode($body);
 
             foreach ($json->tarif as $tarif) {
