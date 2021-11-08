@@ -132,6 +132,8 @@ def read_controller(gate):
         if s.is_alive():
             s.terminate()
 
+        s.close()
+
         # kalau tap kartu
         if b"W" in data or b"X" in data:
             logging.debug(gate["nama"] + " : Tap kartu " + data.decode())
