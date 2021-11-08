@@ -124,9 +124,8 @@ def read_controller(gate):
         data = ser.read_until(b"*IN1ON#")
         logging.debug(gate["nama"] + " : Kendaraan terdeteksi " + data.decode())
 
-        s = Process(
-            target=playsound, args=("./audio/silakan-tekan-tombol.mp3",)
-        ).start()
+        s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
+        s.start()
 
         data = ser.read_until(b"#")
 
