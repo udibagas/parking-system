@@ -125,7 +125,8 @@ def read_controller(gate):
         s.start()
         # playsound("./audio/silakan-tekan-tombol.mp3", False)
         data = ser.read_until(b"#")
-        s.kill()
+        s.terminate()
+        s.join()
         s.close()
 
         # kalau tap kartu
