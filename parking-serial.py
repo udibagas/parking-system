@@ -109,8 +109,10 @@ def read_controller(gate):
 
     while not connected:
         try:
+            logging.debug(gate["nama"] + " : connecting to controller...")
             ser = Serial(gate["controller_ip_address"], int(gate["controller_port"]))
             connected = True
+            logging.debug(gate["nama"] + " : controller connected")
         except Exception as e:
             time.sleep(3)
             logging.debug(gate["nama"] + " : Failed to connect to controller " + str(e))
@@ -123,7 +125,6 @@ def read_controller(gate):
         logging.debug(gate["nama"] + " : Kendaraan terdeteksi " + data.decode())
         s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
         s.start()
-        # playsound("./audio/silakan-tekan-tombol.mp3", False)
         data = ser.read_until(b"#")
         s.terminate()
         s.join()
