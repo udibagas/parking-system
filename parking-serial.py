@@ -121,11 +121,12 @@ def read_controller(gate):
         # baca kontroller sampai kendaraan terdeteksi
         data = ser.read_until(b"*IN1ON#")
         logging.debug(gate["nama"] + " : Kendaraan terdeteksi " + data.decode())
-        # s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
-        # s.start()
-        playsound("./audio/silakan-tekan-tombol.mp3", False)
+        s = Process(target=playsound, args=("./audio/silakan-tekan-tombol.mp3",))
+        s.start()
+        # playsound("./audio/silakan-tekan-tombol.mp3", False)
         data = ser.read_until(b"#")
-        # s.kill()
+        s.kill()
+        s.close()
 
         # kalau tap kartu
         if b"W" in data or b"X" in data:
