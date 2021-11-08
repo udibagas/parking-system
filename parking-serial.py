@@ -131,6 +131,7 @@ def read_controller(gate):
 
         if s.is_alive():
             s.terminate()
+            s.join()
 
         s.close()
 
