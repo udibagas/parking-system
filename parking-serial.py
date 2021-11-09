@@ -129,8 +129,10 @@ def read_controller(gate):
 
         data = ser.read_until(b"#")
 
-        s.terminate()
-        s.join()
+        if s.is_alive():
+            s.terminate()
+            s.join()
+
         s.close()
 
         # kalau tap kartu
