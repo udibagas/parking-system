@@ -2,10 +2,8 @@
 
 namespace App\Console\Commands;
 
-use App\ParkingTransaction;
-use App\Snapshot;
+use App\Models\Snapshot;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 
 class DeleteSnapshotCommand extends Command
