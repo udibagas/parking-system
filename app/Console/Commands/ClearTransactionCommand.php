@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\ParkingTransaction;
+use App\Models\ParkingTransaction;
 use Illuminate\Console\Command;
 
 class ClearTransactionCommand extends Command
