@@ -18,6 +18,7 @@ class Setting extends Model
         'disable_plat_nomor',
         'hapus_snapshot_dalam_hari',
         'hapus_transaksi_dalam_hari',
+        'orientasi_kamera',
         'id_pelanggan',
         'server_address'
     ];

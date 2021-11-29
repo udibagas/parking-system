@@ -63,6 +63,7 @@
 							{{ formErrors.plat_nomor_default[0] }}
 						</div>
 					</el-form-item>
+
 					<el-form-item
 						label="Jumlah Kendaraan Per Kartu"
 						:class="formErrors.jml_kendaraan_per_kartu ? 'is-error' : ''"
@@ -77,6 +78,27 @@
 							v-if="formErrors.jml_kendaraan_per_kartu"
 						>
 							{{ formErrors.jml_kendaraan_per_kartu[0] }}
+						</div>
+					</el-form-item>
+
+					<el-form-item
+						label="Orientasi Kamera"
+						:class="formErrors.orientasi_kamera ? 'is-error' : ''"
+					>
+						<el-select
+							placeholder="Orientasi Kamera"
+							v-model="formModel.orientasi_kamera"
+							style="width: 100%"
+						>
+							<el-option
+								v-for="(l, i) in ['LANDSCAPE', 'POTRAIT']"
+								:key="i"
+								:value="l"
+								:label="l"
+							></el-option>
+						</el-select>
+						<div class="el-form-item__error" v-if="formErrors.orientasi_kamera">
+							{{ formErrors.orientasi_kamera[0] }}
 						</div>
 					</el-form-item>
 				</el-col>
@@ -232,13 +254,8 @@ export default {
 			url: '/api/setting',
 			formErrors: {},
 			loading: false,
+			formModel: { ...this.$store.state.setting },
 		}
-	},
-
-	computed: {
-		formModel() {
-			return this.$store.state.setting
-		},
 	},
 
 	methods: {

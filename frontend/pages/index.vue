@@ -195,14 +195,18 @@
 				</el-row>
 			</div>
 
-			<div class="ml-5">
-				<img
+			<div
+				:class="{ 'ml-5': true, flex: setting.orientasi_kamera == 'POTRAIT' }"
+				style="width: 100%"
+			>
+				<div
+					class="mb-1"
+					style="width: 100%"
 					v-for="s in snapshots"
 					:key="s.id"
-					:src="s.url"
-					class="mx-auto mb-1 border"
-					style="width: 100%"
-				/>
+				>
+					<img :src="s.url" style="width: 100%" />
+				</div>
 			</div>
 
 			<TransactionFormBukaManual
@@ -260,7 +264,10 @@ export default {
 		return {
 			formModel: { nomor_barcode: '', tarif: '', denda: '' },
 			formErrors: {},
-			snapshots: [],
+			snapshots: [
+				// { id: 1, url: 'https://via.placeholder.com/150' },
+				// { id: 2, url: 'https://via.placeholder.com/150' },
+			],
 			showManualOpenForm: false,
 			ws: null,
 			updateTarifInterval: null,

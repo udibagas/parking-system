@@ -100,14 +100,24 @@
 					</tr>
 				</tbody>
 			</table>
-			<div v-if="trx.snapshots" class="flex-grow ml-3">
-				<img
+
+			<div
+				v-if="trx.snapshots"
+				:class="{
+					'ml-3': true,
+					'flex-grow': true,
+					flex: setting.orientasi_kamera == 'POTRAIT',
+				}"
+				style="width: 100%"
+			>
+				<div
+					class="mb-1"
+					style="width: 100%"
 					v-for="snapshot in trx.snapshots"
 					:key="snapshot.id"
-					:src="snapshot.url"
-					style="width: 500px"
-					class="mb-1"
-				/>
+				>
+					<img :src="s.url" style="width: 100%" />
+				</div>
 			</div>
 		</div>
 	</el-dialog>
