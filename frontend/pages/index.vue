@@ -526,6 +526,7 @@ export default {
 				if (this.jenisKendaraanList.length > 1) {
 					document.getElementById('jenis-kendaraan').focus()
 				} else {
+					this.formModel.jenis_kendaraan = this.jenisKendaraanList[0].nama
 					document.getElementById('time-in').focus()
 				}
 
