@@ -213,10 +213,12 @@ export default {
 				)
 			} else {
 				this.$axios
-					.$post(`api/report`, {
-						action: 'print',
-						printer_id,
-						dateRange: this.dateRange,
+					.$get(`api/report`, {
+						params: {
+							action: 'print',
+							printer_id,
+							dateRange: this.dateRange,
+						},
 					})
 					.then((r) => {
 						this.$message({
