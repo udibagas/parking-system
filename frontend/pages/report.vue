@@ -54,8 +54,19 @@
 				>
 				</el-date-picker>
 
-				<el-button type="primary" icon="el-icon-printer" @click="printReport">
-					PRINT LAPORAN
+				<el-button
+					type="primary"
+					icon="el-icon-printer"
+					@click="printReport(null)"
+				>
+					PRINT LAPORAN (A4)
+				</el-button>
+				<el-button
+					type="primary"
+					icon="el-icon-printer"
+					@click="showPrintDialog = true"
+				>
+					PRINT LAPORAN (STRUK)
 				</el-button>
 			</el-col>
 		</el-row>
@@ -157,6 +168,12 @@
 				</el-card>
 			</el-col>
 		</el-row>
+
+		<PrintDialog
+			:show="showPrintDialog"
+			@print="(printer_id) => printReport(printer_id)"
+			@close="showPrintDialog = false"
+		/>
 	</div>
 </template>
 
@@ -169,6 +186,7 @@ export default {
 			income: [],
 			parkedVehicle: [],
 			vehicleIn: [],
+			showPrintDialog: false,
 			dateRange: [
 				this.$moment().format('YYYY-MM-01'),
 				this.$moment().format('YYYY-MM-DD'),
@@ -182,16 +200,34 @@ export default {
 	},
 
 	methods: {
-		printReport() {
-			const params = new URLSearchParams()
-			params.append('action', 'print')
-			params.append('dateRange[]', this.dateRange[0])
-			params.append('dateRange[]', this.dateRange[1])
+		printReport(printer_id = null) {
+			if (printer_id == null) {
+				const params = new URLSearchParams()
+				params.append('action', 'print')
+				params.append('dateRange[]', this.dateRange[0])
+				params.append('dateRange[]', this.dateRange[1])
 
-			window.open(
-				`${this.$axios.defaults.baseURL}/api/report?${params}`,
-				'_blank'
-			)
+				window.open(
+					`${this.$axios.defaults.baseURL}/api/report?${params}`,
+					'_blank'
+				)
+			} else {
+				this.$axios
+					.$post(`api/report`, {
+						action: 'print',
+						printer_id,
+						dateRange: this.dateRange,
+					})
+					.then((r) => {
+						this.$message({
+							message: r.message,
+							type: 'success',
+						})
+					})
+					.finally(() => {
+						this.showPrintDialog = false
+					})
+			}
 		},
 
 		getTransaction() {

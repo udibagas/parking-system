@@ -8,6 +8,10 @@ use App\Models\Setting;
 use App\Models\Shift;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Printer as AppPrinter;
+use Mike42\Escpos\Printer;
+use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 
 class ReportController extends Controller
 {
@@ -142,7 +146,11 @@ class ReportController extends Controller
 
         if ($request->action == 'print') {
             $data['setting'] = Setting::first();
-            return view('print_report', $data);
+            if ($request->printer_id) {
+                return $this->printSlip($data, $request->printer_id);
+            } else {
+                return view('print_report', $data);
+            }
         } else if ($request->action == 'export') {
             return $data;
         } else {
@@ -202,5 +210,78 @@ class ReportController extends Controller
         SQL;
 
         return DB::select($sql, [...$request->date, $request->group]);
+    }
+
+    protected function printSlip($data, $printer_id)
+    {
+        $setting = Setting::first();
+
+        if (!$setting) {
+            return response(['message' => 'BELUM ADA SETTING'], 500);
+        }
+
+        if (!$setting->nama_lokasi) {
+            return response(['message' => 'LOKASI BELUM DISET'], 500);
+        }
+
+        $selectedPrinter = AppPrinter::find($printer_id);
+
+        try {
+            if (filter_var($selectedPrinter->ip_address, FILTER_VALIDATE_IP)) {
+                $connector = new NetworkPrintConnector($selectedPrinter->ip_address, $selectedPrinter->port ?: 9100);
+            } else {
+                $connector = new FilePrintConnector($selectedPrinter->ip_address);
+            }
+
+            $printer = new Printer($connector);
+        } catch (\Exception $e) {
+            return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+        }
+
+        try {
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("LAPORAN PENDAPATAN PARKIR\n");
+            $printer->text($setting->nama_lokasi . "\n");
+            $printer->text("\n\n");
+            $printer->text('Tanggal: ' . date('d-m-Y', strtotime($data['dateRange'][0])) . ' s/d ' . date('d-m-Y', strtotime($data['dateRange'][1])));
+            $printer->text("\n\n");
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+            $printer->text("LAPORAN PENDAPATAN PER JENIS KENDARAAN\n");
+
+            foreach ($data['perKendaraan'] as $d) {
+                $printer->text($d->jenis_kendaraan);
+                $printer->text("\n");
+                $printer->text(str_pad('+ Member', 15, ' ') . ' : ' . number_format($d->jumlah_member, 0, ',', '.'));
+                $printer->text("\n");
+                $printer->text(str_pad('+ Reguler', 15, ' ') . ' : ' . number_format($d->jumlah_reguler, 0, ',', '.'));
+                $printer->text("\n");
+                $printer->text(str_pad('+ Total', 15, ' ') . ' : ' . number_format($d->jumlah_member + $d->jumlah_reguler, 0, ',', '.'));
+                $printer->text("\n");
+                $printer->text(str_pad('+ Pendapatan', 15, ' ') . ' : Rp ' . number_format($d->pendapatan + $d->denda, 0, ',', '.'));
+                $printer->text("\n\n");
+            }
+
+            $printer->text("LAPORAN PENDAPATAN PER PETUGAS\n");
+
+            foreach ($data['perPetugas'] as $d) {
+                $printer->text($d->operator);
+                $printer->text("\n");
+                $printer->text(str_pad('+ Member', 15, ' ') . ' : ' . number_format($d->jumlah_member, 0, ',', '.'));
+                $printer->text("\n");
+                $printer->text(str_pad('+ Reguler', 15, ' ') . ' : ' . number_format($d->jumlah_reguler, 0, ',', '.'));
+                $printer->text("\n");
+                $printer->text(str_pad('+ Total', 15, ' ') . ' : ' . number_format($d->jumlah_member + $d->jumlah_reguler, 0, ',', '.'));
+                $printer->text("\n");
+                $printer->text(str_pad('+ Pendapatan', 15, ' ') . ' : Rp ' . number_format($d->pendapatan + $d->denda, 0, ',', '.'));
+                $printer->text("\n");
+            }
+
+            $printer->cut();
+            $printer->close();
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENCETAK SLIP.' . $e->getMessage()], 500);
+        }
+
+        return ['message' => 'SILAKAN AMBIL SLIP'];
     }
 }
