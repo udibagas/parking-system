@@ -11,7 +11,7 @@
 		"
 	>
 		<div class="flex flex-row">
-			<table class="table-auto" style="width: 360px">
+			<table class="table-auto" style="min-width: 360px">
 				<tbody>
 					<tr>
 						<td

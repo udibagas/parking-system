@@ -522,10 +522,12 @@ export default {
 				this.formModel.time_in = this.$moment().format('Y-MM-DD')
 				this.$forceUpdate()
 				this.formModel.time_out = now
+
 				if (this.jenisKendaraanList.length > 1) {
 					document.getElementById('jenis-kendaraan').focus()
-					return
 				}
+
+				return
 			}
 
 			try {
