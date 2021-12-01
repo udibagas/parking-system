@@ -116,7 +116,7 @@
 					v-for="snapshot in trx.snapshots"
 					:key="snapshot.id"
 				>
-					<img :src="s.url" style="width: 100%" />
+					<img :src="snapshot.url" style="width: 100%" />
 				</div>
 			</div>
 		</div>
