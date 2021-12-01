@@ -525,6 +525,8 @@ export default {
 
 				if (this.jenisKendaraanList.length > 1) {
 					document.getElementById('jenis-kendaraan').focus()
+				} else {
+					document.getElementById('time-in').focus()
 				}
 
 				return
