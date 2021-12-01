@@ -124,7 +124,13 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+
 export default {
 	props: ['trx', 'show'],
+
+	computed: {
+		...mapState(['setting']),
+	},
 }
 </script>
