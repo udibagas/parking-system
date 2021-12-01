@@ -242,37 +242,37 @@ class ReportController extends Controller
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("LAPORAN PENDAPATAN PARKIR\n");
             $printer->text($setting->nama_lokasi . "\n");
-            $printer->text("\n\n");
             $printer->text('Tanggal: ' . date('d-m-Y', strtotime($data['dateRange'][0])) . ' s/d ' . date('d-m-Y', strtotime($data['dateRange'][1])));
             $printer->text("\n\n");
+            $printer->text("LAPORAN PENDAPATAN PER JENIS KENDARAAN\n\n");
             $printer->setJustification(Printer::JUSTIFY_LEFT);
-            $printer->text("LAPORAN PENDAPATAN PER JENIS KENDARAAN\n");
 
             foreach ($data['perKendaraan'] as $d) {
-                $printer->text($d->jenis_kendaraan);
+                $printer->text("+ " . $d->jenis_kendaraan);
                 $printer->text("\n");
-                $printer->text(str_pad('+ Member', 15, ' ') . ' : ' . number_format($d->jumlah_member, 0, ',', '.'));
+                $printer->text(str_pad(' - Member', 15, ' ') . ' : ' . number_format($d->jumlah_member, 0, ',', '.'));
                 $printer->text("\n");
-                $printer->text(str_pad('+ Reguler', 15, ' ') . ' : ' . number_format($d->jumlah_reguler, 0, ',', '.'));
+                $printer->text(str_pad(' - Reguler', 15, ' ') . ' : ' . number_format($d->jumlah_reguler, 0, ',', '.'));
                 $printer->text("\n");
-                $printer->text(str_pad('+ Total', 15, ' ') . ' : ' . number_format($d->jumlah_member + $d->jumlah_reguler, 0, ',', '.'));
+                $printer->text(str_pad(' - Total', 15, ' ') . ' : ' . number_format($d->jumlah_member + $d->jumlah_reguler, 0, ',', '.'));
                 $printer->text("\n");
-                $printer->text(str_pad('+ Pendapatan', 15, ' ') . ' : Rp ' . number_format($d->pendapatan + $d->denda, 0, ',', '.'));
+                $printer->text(str_pad(' - Pendapatan', 15, ' ') . ' : Rp ' . number_format($d->pendapatan + $d->denda, 0, ',', '.'));
                 $printer->text("\n\n");
             }
 
-            $printer->text("LAPORAN PENDAPATAN PER PETUGAS\n");
-
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("LAPORAN PENDAPATAN PER PETUGAS\n\n");
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
             foreach ($data['perPetugas'] as $d) {
-                $printer->text($d->operator);
+                $printer->text("+ " . $d->operator);
                 $printer->text("\n");
-                $printer->text(str_pad('+ Member', 15, ' ') . ' : ' . number_format($d->jumlah_member, 0, ',', '.'));
+                $printer->text(str_pad(' - Member', 15, ' ') . ' : ' . number_format($d->jumlah_member, 0, ',', '.'));
                 $printer->text("\n");
-                $printer->text(str_pad('+ Reguler', 15, ' ') . ' : ' . number_format($d->jumlah_reguler, 0, ',', '.'));
+                $printer->text(str_pad(' - Reguler', 15, ' ') . ' : ' . number_format($d->jumlah_reguler, 0, ',', '.'));
                 $printer->text("\n");
-                $printer->text(str_pad('+ Total', 15, ' ') . ' : ' . number_format($d->jumlah_member + $d->jumlah_reguler, 0, ',', '.'));
+                $printer->text(str_pad(' - Total', 15, ' ') . ' : ' . number_format($d->jumlah_member + $d->jumlah_reguler, 0, ',', '.'));
                 $printer->text("\n");
-                $printer->text(str_pad('+ Pendapatan', 15, ' ') . ' : Rp ' . number_format($d->pendapatan + $d->denda, 0, ',', '.'));
+                $printer->text(str_pad(' - Pendapatan', 15, ' ') . ' : Rp ' . number_format($d->pendapatan + $d->denda, 0, ',', '.'));
                 $printer->text("\n");
             }
 
