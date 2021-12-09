@@ -41,6 +41,7 @@ export default {
 
 	mounted() {
 		this.$store.dispatch('getGroupMemberList')
+    this.$store.dispatch('getMemberList')
 	},
 }
 </script>
