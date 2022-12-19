@@ -75,7 +75,7 @@ class ParkingTransaction extends Model
 
     public static function setShift($timeIn)
     {
-        $shift = Shift::whereRaw('TIME(?) BETWEEN mulai AND selesai', [$timeIn, $timeIn])->first();
+        $shift = Shift::whereRaw('TIME(?) BETWEEN mulai AND selesai', [$timeIn])->first();
         return $shift ? $shift->id : null;
     }
 
