@@ -64,6 +64,7 @@ class PrintTicketOut implements ShouldQueue
             $p = new Printer($connector);
         } catch (\Exception $e) {
             $printer->notify(new PrintStrukFailedNotification($parkingTransaction, 'Koneksi ke printer gagal'));
+            return;
         }
 
         try {
