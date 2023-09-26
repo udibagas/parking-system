@@ -15,6 +15,7 @@ use App\Jobs\TakeSnapshot;
 use App\Models\Member;
 use App\Models\Pos;
 use Mike42\Escpos\PrintConnectors\NetworkPrintConnector;
+use Mike42\Escpos\PrintConnectors\FilePrintConnector;
 use Mike42\Escpos\Printer;
 use App\Models\Setting;
 use App\Models\User;
@@ -587,7 +588,11 @@ class ParkingTransactionController extends Controller
             ->first();
 
         try {
-            $connector = new NetworkPrintConnector($pos->printer->ip_address, $pos->printer->port ?: 9100);
+            if (filter_var($pos->printer->ip_address, FILTER_VALIDATE_IP)) {
+                $connector = new NetworkPrintConnector($pos->printer->ip_address, $pos->printer->port ?: 9100);
+            } else {
+                $connector = new FilePrintConnector($pos->printer->ip_address);
+            }
 
             $printer = new Printer($connector);
         } catch (\Exception $e) {
