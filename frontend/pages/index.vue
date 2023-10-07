@@ -205,7 +205,7 @@
 					v-for="s in snapshots"
 					:key="s.id"
 				>
-					<img :src="s.url" style="width: 100%" />
+					<img :src="s.url" style="width: 500px" />
 				</div>
 			</div>
 
