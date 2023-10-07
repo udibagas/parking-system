@@ -115,7 +115,7 @@
 
       <div :class="{ 'ml-5': true, flex: setting.orientasi_kamera == 'POTRAIT' }" style="width: 100%">
         <div class="mb-1" style="width: 100%" v-for="s in snapshots" :key="s.id">
-          <img :src="s.url" style="width: 650px" />
+          <img :src="s.url" style="width: 690px" />
         </div>
       </div>
 
