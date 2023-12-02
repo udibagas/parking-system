@@ -1,6 +1,9 @@
 export default {
   // Disable server-side rendering: https://go.nuxtjs.dev/ssr-mode
   ssr: false,
+  server: {
+    port: 4000,
+  },
 
   // Target: https://go.nuxtjs.dev/config-target
   target: 'static',
@@ -59,14 +62,29 @@ export default {
           csrf: { url: '/sanctum/csrf-cookie' },
         },
       },
+      // sesuaikan di login.vue kalau mau pakai ini
+      local: {
+        token: {
+          property: 'token',
+          global: true,
+          type: 'Bearer',
+        },
+        user: {
+          property: 'user',
+          // autoFetch: false,
+        },
+        endpoints: {
+          login: { url: '/api/auth/login', method: 'post' },
+        },
+      },
     },
   },
 
   // Axios module configuration: https://go.nuxtjs.dev/config-axios
   axios: {
-    credentials: true,
+    credentials: true, // change to true if use laravel
     // development
-    // baseURL: process.env.API_URL || 'http://localhost:8000',
+    // baseURL: process.env.API_URL || 'http://localhost:3000',
     // production
     baseURL: process.env.API_URL || '',
   },

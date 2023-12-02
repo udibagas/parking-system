@@ -506,7 +506,7 @@
 							>
 								<el-option
 									v-for="(t, i) in ['Nonaktif', 'Aktif']"
-									:value="i"
+									:value="Boolean(i)"
 									:label="t"
 									:key="i"
 								></el-option>
