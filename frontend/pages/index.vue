@@ -135,7 +135,6 @@
 
 <script>
 import { mapState } from 'vuex'
-import { hitungTarifProgressif } from '../helpers/tarif'
 
 export default {
   computed: {
@@ -307,9 +306,85 @@ export default {
           tarifMenitPertama + hariParkir * tarif.tarif_flat + tarifMenginap
       }
 
-      // tarif progresif (mengabaikan )
+      // tarif progresif
       if (tarif.mode_tarif == 1) {
-        this.formModel.tarif = hitungTarifProgressif(tarif, durasiMenit)
+        var tarifMaksimum = hariMenginap * tarif.tarif_maksimum
+
+        // menginap 24 jam
+        if (tarif.mode_menginap == 0) {
+          const sisaMenit = durasiMenit % (60 * 24)
+          var tarifHariTerakhir = 0
+
+          if (sisaMenit <= tarif.menit_pertama) {
+            tarifHariTerakhir = tarif.tarif_menit_pertama
+          } else {
+            tarifHariTerakhir =
+              tarif.tarif_menit_pertama +
+              Math.ceil(
+                (sisaMenit - tarif.menit_pertama) / tarif.menit_selanjutnya
+              ) *
+              tarif.tarif_menit_selanjutnya
+          }
+
+          if (tarifHariTerakhir > tarif.tarif_maksimum) {
+            tarifHariTerakhir = tarif.tarif_maksimum
+          }
+
+          this.formModel.tarif =
+            tarifMaksimum + tarifHariTerakhir + tarifMenginap
+        }
+
+        // menginap lewat lengahmalam
+        if (tarif.mode_menginap == 1) {
+          if (hariParkir > 1) {
+            var menitHariPertama =
+              this.$moment(timeIn.format('YYYY-MM-DD') + ' 24:00:00').diff(
+                timeIn,
+                'minutes'
+              ) - tarif.menit_pertama
+
+            var menitHariTerakhir = timeOut.diff(
+              this.$moment(timeOut.format('YYYY-MM-DD') + ' 00:00:00'),
+              'minutes'
+            )
+
+            var tarifHariPertama =
+              Math.ceil(menitHariPertama / tarif.menit_selanjutnya) *
+              tarif.tarif_menit_selanjutnya
+            tarifHariTerakhir =
+              Math.ceil(menitHariTerakhir / tarif.menit_selanjutnya) *
+              tarif.tarif_menit_selanjutnya
+
+            if (tarifHariPertama > tarif.tarif_maksimum) {
+              tarifHariPertama = tarif.tarif_maksimum
+            }
+
+            if (tarifHariTerakhir > tarif.tarif_maksimum) {
+              tarifHariTerakhir = tarif.tarif_maksimum
+            }
+
+            if (hariParkir <= 2) {
+              tarifMaksimum = 0
+            }
+
+            this.formModel.tarif =
+              tarifMenitPertama +
+              tarifMaksimum +
+              tarifHariPertama +
+              tarifHariTerakhir +
+              tarifMenginap
+          } else {
+            tarifHariPertama =
+              Math.ceil(durasiReal / tarif.menit_selanjutnya) *
+              tarif.tarif_menit_selanjutnya
+
+            if (tarifHariPertama > tarif.tarif_maksimum) {
+              tarifHariPertama = tarif.tarif_maksimum
+            }
+
+            this.formModel.tarif = tarifMenitPertama + tarifHariPertama
+          }
+        }
       }
 
       if (this.formModel.nomor_barcode.toLowerCase() == 'xxxxx') {
