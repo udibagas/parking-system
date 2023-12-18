@@ -38,7 +38,7 @@ export default {
   methods: {
     login() {
       this.$auth
-        .loginWith('local', {
+        .loginWith('cookie', {
           data: {
             email: this.email,
             password: this.password,
