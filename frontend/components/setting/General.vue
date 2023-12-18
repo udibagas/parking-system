@@ -52,7 +52,7 @@
         <el-col :span="12">
           <el-form-item label="Mode Transaksi Member" :class="formErrors.must_checkout ? 'is-error' : ''">
             <el-select placeholder="Mode Transaksi Member" v-model="formModel.must_checkout" style="width: 100%">
-              <el-option v-for="(l, i) in ['Tidak harus check out', 'Harus check out']" :key="i" :value="Boolean(i)"
+              <el-option v-for="(l, i) in ['Tidak harus check out', 'Harus check out']" :key="i" :value="i"
                 :label="l"></el-option>
             </el-select>
             <div class="el-form-item__error" v-if="formErrors.must_checkout">
@@ -65,7 +65,7 @@
               <el-option v-for="(l, i) in [
                 'Ketik Plat Nomor (Buka oleh operator)',
                 'Tempel Kartu (Otomatis)',
-              ]" :key="i" :value="Boolean(i)" :label="l"></el-option>
+              ]" :key="i" :value="i" :label="l"></el-option>
             </el-select>
             <div class="el-form-item__error" v-if="formErrors.member_auto_open">
               {{ formErrors.member_auto_open[0] }}
@@ -75,7 +75,7 @@
           <el-form-item label="Disable Plat Nomor di Pos Keluar" :class="formErrors.disable_plat_nomor ? 'is-error' : ''">
             <el-select placeholder="Disable Plat Nomor di Pos Keluar" v-model="formModel.disable_plat_nomor"
               style="width: 100%">
-              <el-option v-for="(l, i) in ['Tidak', 'Ya']" :key="i" :value="Boolean(i)" :label="l"></el-option>
+              <el-option v-for="(l, i) in ['Tidak', 'Ya']" :key="i" :value="i" :label="l"></el-option>
             </el-select>
             <div class="el-form-item__error" v-if="formErrors.disable_plat_nomor">
               {{ formErrors.disable_plat_nomor[0] }}
