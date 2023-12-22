@@ -74,10 +74,6 @@ class KameraController extends Controller
                     $kamera->auth_type == 'digest' ? 'digest' : null
                 ]
             ]);
-
-            if ($response->getHeader('Content-Type')[0] != 'image/jpeg') {
-                return response(['message' => 'GAGAL MENGAMBIL GAMBAR. URL SNAPSHOT KAMERA TIDAK SESUAI'], 500);
-            }
         } catch (\Exception $e) {
             return response(['message' => 'GAGAL MENGAMBIL GAMBAR. ' . $e->getMessage()], 500);
         }
