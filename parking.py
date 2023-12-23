@@ -11,6 +11,7 @@ import logging
 
 API_URL = "http://localhost/api"
 API_HEADERS = None
+SETTING = False
 
 
 def login():
@@ -105,12 +106,62 @@ def save_data(gate, data):
 def running_text(s, text):
     line = text.split("|")
     s.sendall(
-        b"\xa6DSD913003" + line[0].encode() + b"|13003" + line[1].encode() + b"\xa9"
+        b"\xa6DSD913003" + line[0].encode() + b"|13003" +
+        line[1].encode() + b"\xa9"
     )
 
 
 def reset_running_text(s):
     s.sendall(b"\xa6DSU\xa9")
+
+
+def get_setting():
+    try:
+        r = requests.get(API_URL + '/setting', timeout=3, headers=API_HEADERS)
+    except Exception as e:
+        logging.error('Failed to get setting ' + str(e))
+        return False
+
+    if r.status_code == 200:
+        return r.json()
+
+    return False
+
+
+def print_ticket(gate, data, s):
+    command = [
+        '\xa6PR3',  # start print command, baudrate 9600
+        '\x1b\x61\x01TIKET PARKIR\n',  # align center
+        '\x1b\x21\x10' + SETTING['location_name'] + '\n\n',  # double height
+        '\x1b\x21\x00',  # normal height
+        '\x1b\x61\x00',  # align left
+        'GATE         : ' + gate['name'] + '/' + gate['vehicle_type'] + '\n',
+        'TANGGAL      : ' + \
+        datetime.datetime.strptime(
+            data['time_in'][:10], '%Y-%m-%d').strftime('%d %b %Y') + '\n',
+        'JAM          : ' + data['time_in'][11:] + '\n\n',
+        '\x1b\x61\x01',  # align center
+        '\x1dhd',  # set barcode height = 100, GS h 100
+        '\x1dH\x02',  # set barcode text = below, GS H 2
+        '\x1dkE',  # GS k 69
+        chr(len(data['barcode_number'])),  # barcode length
+        data['barcode_number'],  # barcode content
+        '\n' + SETTING['additional_info_ticket'] + '\n',
+        '\x1d\x56A',  # full cut, add 3 lines: GS V 65
+        '\xa9'  # end command
+    ]
+
+    try:
+        s.sendall(str.encode(''.join(command)))
+        logging.debug(gate['name'] + ' : ' + str(s.recv(1024)))
+    except Exception as e:
+        logging.error(gate['name'] + ' : Failed to print ticket ' +
+                      data['barcode_number'] + ' ' + str(e))
+        send_notification(gate, 'Pengunjung di ' +
+                          gate['name'] + ' gagal print tiket. Informasikan nomor barcode kepada pengunjung. ' + data['barcode_number'])
+        return
+
+    logging.info(gate['name'] + ' : Ticket printed ' + data['barcode_number'])
 
 
 def gate_in_thread(gate):
@@ -127,7 +178,8 @@ def gate_in_thread(gate):
             )
 
             try:
-                s.connect((gate["controller_ip_address"], gate["controller_port"]))
+                s.connect((gate["controller_ip_address"],
+                          gate["controller_port"]))
             except Exception:
                 time.sleep(3)
                 continue
@@ -143,12 +195,14 @@ def gate_in_thread(gate):
                     logging.error(
                         gate["nama"] + " : Failed to detect vehicle " + str(e)
                     )
-                    send_notification(gate, gate["nama"] + " : Gagal deteksi kendaraan")
+                    send_notification(
+                        gate, gate["nama"] + " : Gagal deteksi kendaraan")
                     # keluar dari loop cek kendaraan untuk sambung ulang controller
                     break
 
                 logging.debug(
-                    gate["nama"] + " : Detecting vehicle " + str(vehicle_detection)
+                    gate["nama"] + " : Detecting vehicle " +
+                    str(vehicle_detection)
                 )
 
                 if b"IN1ON" in vehicle_detection or b"STAT1" in vehicle_detection:
@@ -163,10 +217,12 @@ def gate_in_thread(gate):
                         # logging.debug(gate['nama'] + ' : ' + str(s.recv(1024)))
                     except Exception as e:
                         logging.error(
-                            gate["nama"] + " : Failed to play Selamat Datang " + str(e)
+                            gate["nama"] +
+                            " : Failed to play Selamat Datang " + str(e)
                         )
                         send_notification(
-                            gate, gate["nama"] + " : Gagal play Selamat Datang "
+                            gate, gate["nama"] +
+                            " : Gagal play Selamat Datang "
                         )
                         # keluar dari loop cek kendaraan untuk sambung ulang controller
                         break
@@ -188,7 +244,8 @@ def gate_in_thread(gate):
                             gate["nama"] + " : Failed to sense button and card"
                         )
                         send_notification(
-                            gate, gate["nama"] + " : Gagal mendeteksi tombol tiket"
+                            gate, gate["nama"] +
+                            " : Gagal mendeteksi tombol tiket"
                         )
                         error = True
                         break
@@ -213,7 +270,8 @@ def gate_in_thread(gate):
                             .split("\\xa9")[0]
                         )
 
-                        member = check_card(gate, str(int(nomor_kartu, 16)), card_type)
+                        member = check_card(
+                            gate, str(int(nomor_kartu, 16)), card_type)
                         time.sleep(0.1)  # kasih jeda biar audio bisa play
 
                         if not member:
@@ -228,7 +286,8 @@ def gate_in_thread(gate):
                                 )
                                 send_notification(
                                     gate,
-                                    gate["nama"] + " : Gagal merespon kartu invalid",
+                                    gate["nama"] +
+                                    " : Gagal merespon kartu invalid",
                                 )
                                 error = True
                                 break
@@ -238,7 +297,8 @@ def gate_in_thread(gate):
                         if member["expired"]:
                             try:
                                 s.sendall(b"\xa6MT00013\xa9")
-                                running_text(s, "MAAF|KARTU HABIS MASA BERLAKU")
+                                running_text(
+                                    s, "MAAF|KARTU HABIS MASA BERLAKU")
                             except Exception as e:
                                 logging.error(
                                     gate["nama"]
@@ -247,7 +307,8 @@ def gate_in_thread(gate):
                                 )
                                 send_notification(
                                     gate,
-                                    gate["nama"] + " : Gagal merespon kartu expired",
+                                    gate["nama"] +
+                                    " : Gagal merespon kartu expired",
                                 )
                                 error = True
                                 break
@@ -257,7 +318,8 @@ def gate_in_thread(gate):
                         if member["unclosed"]:
                             try:
                                 s.sendall(b"\xa6MT00014\xa9")
-                                running_text(s, "MAAF|KARTU BELUM SELESAI TRANSAKSI")
+                                running_text(
+                                    s, "MAAF|KARTU BELUM SELESAI TRANSAKSI")
                             except Exception as e:
                                 logging.error(
                                     gate["nama"]
@@ -277,7 +339,8 @@ def gate_in_thread(gate):
                         if not member["expired"] and member["expired_in"] == 5:
                             try:
                                 s.sendall(b"\xa6MT00011\xa9")
-                                running_text(s, "MASA BERLAKU KARTU HABIS DALAM|5 HARI")
+                                running_text(
+                                    s, "MASA BERLAKU KARTU HABIS DALAM|5 HARI")
                                 time.sleep(6)
                             except Exception as e:
                                 logging.error(
@@ -296,7 +359,8 @@ def gate_in_thread(gate):
                         if not member["expired"] and member["expired_in"] == 1:
                             try:
                                 s.sendall(b"\xa6MT00012\xa9")
-                                running_text(s, "MASA BERLAKU KARTU HABIS DALAM|1 HARI")
+                                running_text(
+                                    s, "MASA BERLAKU KARTU HABIS DALAM|1 HARI")
                                 time.sleep(6)
                             except Exception as e:
                                 logging.error(
@@ -343,7 +407,8 @@ def gate_in_thread(gate):
                             time.sleep(0.1)
                             s.sendall(b"\xa6MT00005\xa9")
                             time.sleep(10)
-                            running_text(s, "MOHON TUNGGU|PETUGAS AKAN MEMBANTU ANDA")
+                            running_text(
+                                s, "MOHON TUNGGU|PETUGAS AKAN MEMBANTU ANDA")
                         except Exception as e:
                             logging.error(
                                 gate["nama"]
@@ -351,12 +416,14 @@ def gate_in_thread(gate):
                                 + str(e)
                             )
                             send_notification(
-                                gate, gate["nama"] + " : Gagal merespon tombol bantuan"
+                                gate, gate["nama"] +
+                                " : Gagal merespon tombol bantuan"
                             )
                             error = True
                             break
 
-                        logging.info(gate["nama"] + " : Tombol bantuan ditekan")
+                        logging.info(gate["nama"] +
+                                     " : Tombol bantuan ditekan")
                         send_notification(
                             gate,
                             "Pengunjung di "
@@ -395,23 +462,30 @@ def gate_in_thread(gate):
                         s.sendall(b"\xa6MT00002\xa9")
                         running_text(s, "SELAMAT DATANG|SILAKAN AMBIL TIKET")
                         logging.debug(gate["nama"] + " : " + str(s.recv(1024)))
+                        if gate['printer']['type'] == 'local':
+                            print_ticket(gate, data, s)
                     except Exception as e:
                         logging.error(
-                            gate["nama"] + " : Gagal play silakan ambil tiket" + str(e)
+                            gate["nama"] +
+                            " : Gagal play silakan ambil tiket" + str(e)
                         )
                         send_notification(
-                            gate, gate["nama"] + " : Gagal play silakan ambil tiket"
+                            gate, gate["nama"] +
+                            " : Gagal play silakan ambil tiket"
                         )
                         break
 
                 # play terimakasih
                 try:
                     s.sendall(b"\xa6MT00006\xa9")
-                    running_text(s, "TERIMAKASIH|SIMPAN DENGAN BAIK TIKET PARKIR ANDA")
+                    running_text(
+                        s, "TERIMAKASIH|SIMPAN DENGAN BAIK TIKET PARKIR ANDA")
                     logging.debug(gate["nama"] + " : " + str(s.recv(1024)))
                 except Exception:
-                    logging.error(gate["nama"] + " : Gagal play terimakasih" + str(e))
-                    send_notification(gate, gate["nama"] + " : Gagal play terimakasih")
+                    logging.error(
+                        gate["nama"] + " : Gagal play terimakasih" + str(e))
+                    send_notification(
+                        gate, gate["nama"] + " : Gagal play terimakasih")
                     break
 
                 time.sleep(1)
@@ -421,8 +495,10 @@ def gate_in_thread(gate):
                     s.sendall(b"\xa6TRIG1\xa9")
                     logging.debug(gate["nama"] + " : " + str(s.recv(1024)))
                 except Exception as e:
-                    logging.error(gate["nama"] + " : Gagal membuka gate " + str(e))
-                    send_notification(gate, gate["nama"] + " : Gagal membuka gate")
+                    logging.error(
+                        gate["nama"] + " : Gagal membuka gate " + str(e))
+                    send_notification(
+                        gate, gate["nama"] + " : Gagal membuka gate")
                     break
 
                 logging.info(gate["nama"] + " : Gate terbuka")
@@ -450,7 +526,8 @@ def gate_in_thread(gate):
                         )
                         send_notification(
                             gate,
-                            gate["nama"] + " : Gagal deteksi kendaraan sudah masuk",
+                            gate["nama"] +
+                            " : Gagal deteksi kendaraan sudah masuk",
                         )
                         error = True
                         # break sensing loop 2
@@ -470,12 +547,14 @@ def gate_in_thread(gate):
 
 
 def start_app():
+    global SETTING
     auth = login()
 
     if auth == False:
         logging.info("Gagal login. Keluar dari aplikasi")
         sys.exit()
 
+    SETTING = get_setting()
     gates = get_gates()
 
     if gates == False:

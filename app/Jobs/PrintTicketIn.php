@@ -49,7 +49,7 @@ class PrintTicketIn implements ShouldQueue
 
         $printer = $parkingTransaction->gateIn->printer;
 
-        if (!$printer) {
+        if (!$printer || $printer->type == 'local') {
             return;
         }
 

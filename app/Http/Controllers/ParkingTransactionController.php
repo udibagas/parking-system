@@ -192,7 +192,7 @@ class ParkingTransactionController extends Controller
         TakeSnapshot::dispatch($parkingTransaction->gateIn, $parkingTransaction);
 
         if (!$parkingTransaction->is_member) {
-            PrintTicketIn::dispatch($parkingTransaction);
+            PrintTicketIn::dispatchSync($parkingTransaction);
         }
 
         return [

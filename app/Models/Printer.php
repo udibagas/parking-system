@@ -16,9 +16,16 @@ class Printer extends Model
         'status'
     ];
 
+    protected $appends = ['type'];
+
     public function scopeActive($q)
     {
         return $q->where('status', 1);
+    }
+
+    public function getTypeAttribute()
+    {
+        return filter_var($this->ip_address, FILTER_VALIDATE_IP) ? 'network' : 'local';
     }
 
     /**
