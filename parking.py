@@ -565,7 +565,8 @@ def start_app():
     logging.info("Memulai aplikasi...")
 
     for g in gates:
-        threading.Thread(target=gate_in_thread, args=(g,)).start()
+        if gates['port'].isnumeric():
+            threading.Thread(target=gate_in_thread, args=(g,)).start()
 
 
 if __name__ == "__main__":

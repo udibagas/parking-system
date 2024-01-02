@@ -202,6 +202,7 @@ class ParkingTransactionController extends Controller
         return [
             'message' => 'Data berhasil disimpan. Silakan ambil tiket.',
             'data' => $parkingTransaction,
+            'gateIn' => $gateIn
         ];
     }
 
