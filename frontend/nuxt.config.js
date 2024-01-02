@@ -62,21 +62,6 @@ export default {
           csrf: { url: '/sanctum/csrf-cookie' },
         },
       },
-      // sesuaikan di login.vue kalau mau pakai ini
-      local: {
-        token: {
-          property: 'token',
-          global: true,
-          type: 'Bearer',
-        },
-        user: {
-          property: 'user',
-          // autoFetch: false,
-        },
-        endpoints: {
-          login: { url: '/api/auth/login', method: 'post' },
-        },
-      },
     },
   },
 

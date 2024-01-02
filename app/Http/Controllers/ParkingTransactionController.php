@@ -21,6 +21,7 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserLog;
 use Carbon\Carbon;
+use Error;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -175,17 +176,20 @@ class ParkingTransactionController extends Controller
     // untuk handle waktu gate in tertrigger
     public function apiStore(Request $request)
     {
-        $request->validate([
-            'gate_in_id' => 'required',
-            'jenis_kendaraan' => 'required',
-        ]);
+        // kalau tidak ada infirmasi gate_in, ambil dari ip-nya
+        if (!$request->gate_in_id) {
+            $gateIn = GateIn::where('controller_ip_address', $request->ip())->first();
+            if (!$gateIn) throw new Error('Invalid Gate In');
+        }
 
         $timeIn = now();
 
         $input = array_merge($request->all(), [
             'nomor_barcode' => Str::random(5),
             'shift_id' => ParkingTransaction::setShift($timeIn),
-            'time_in' => $timeIn
+            'time_in' => $timeIn,
+            'gate_in_id' => $gateIn->id,
+            'jenis_kendaraan' => $gateIn->jenis_kendaraan
         ]);
 
         $parkingTransaction = ParkingTransaction::create($input);
@@ -196,7 +200,7 @@ class ParkingTransactionController extends Controller
         }
 
         return [
-            'message' => 'Data berhasil disimpan',
+            'message' => 'Data berhasil disimpan. Silakan ambil tiket.',
             'data' => $parkingTransaction,
         ];
     }

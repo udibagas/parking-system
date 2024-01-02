@@ -814,6 +814,18 @@ export default {
           this.$forceUpdate()
         })
     },
+
+    openGateIn() {
+      this.$axios
+        .$post(`/api/parkingTransaction/apiStore`)
+        .then(r => {
+          this.$message({
+            message: r.message,
+            type: 'success',
+            showClose: true,
+          })
+        })
+    }
   },
 
   async mounted() {
@@ -871,6 +883,11 @@ export default {
       if (e.key == 'F12') {
         e.preventDefault()
         this.printLastTrx()
+      }
+
+      if (e.key == 'F9') {
+        e.preventDefault();
+        this.openGateIn()
       }
     })
 
