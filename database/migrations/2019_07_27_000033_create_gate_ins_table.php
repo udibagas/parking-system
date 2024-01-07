@@ -18,7 +18,7 @@ class CreateGateInsTable extends Migration
             $table->string('nama');
             $table->string('jenis_kendaraan');
             $table->string('controller_ip_address', 15)->nullable();
-            $table->string('controller_port')->nullable();
+            $table->integer('controller_port')->nullable();
             $table->string('shortcut_key', 1)->nullable();
             $table->unsignedBigInteger('printer_id');
             $table->json('kamera')->nullable()->comment('allow attach multiple camera on 1 gate');
