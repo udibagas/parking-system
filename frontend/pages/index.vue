@@ -815,30 +815,30 @@ export default {
         })
     },
 
-    openGateIn() {
-      this.$axios
-        .$post(`/api/parkingTransaction/apiStore`)
-        .then(r => {
-          const { gateIn } = r
-          const { device, baudrate, open_command, close_command } = gateIn.port.split(';')
+    // openGateIn() {
+    //   this.$axios
+    //     .$post(`/api/parkingTransaction/apiStore`)
+    //     .then(r => {
+    //       const { gateIn } = r
+    //       const { device, baudrate, open_command, close_command } = gateIn.port.split(';')
 
-          this.ws.send(
-            [
-              'open',
-              device,
-              baudrate,
-              open_command,
-              close_command,
-            ].join(';')
-          )
+    //       this.ws.send(
+    //         [
+    //           'open',
+    //           device,
+    //           baudrate,
+    //           open_command,
+    //           close_command,
+    //         ].join(';')
+    //       )
 
-          this.$message({
-            message: r.message,
-            type: 'success',
-            showClose: true,
-          })
-        })
-    }
+    //       this.$message({
+    //         message: r.message,
+    //         type: 'success',
+    //         showClose: true,
+    //       })
+    //     })
+    // }
   },
 
   async mounted() {
@@ -898,10 +898,10 @@ export default {
         this.printLastTrx()
       }
 
-      if (e.key == 'F9') {
-        e.preventDefault();
-        this.openGateIn()
-      }
+      // if (e.key == 'F9') {
+      //   e.preventDefault();
+      //   this.openGateIn()
+      // }
     })
 
     this.updateTarifInterval = setInterval(
