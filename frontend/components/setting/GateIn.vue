@@ -104,7 +104,7 @@
         </el-form-item>
 
         <el-form-item label="Port Kontroler" :class="formErrors.controller_port ? 'is-error' : ''">
-          <el-input placeholder="Port Kontroler" v-model="formModel.controller_port"></el-input>
+          <el-input type="number" placeholder="Port Kontroler" v-model="formModel.controller_port"></el-input>
           <div class="el-form-item__error" v-if="formErrors.controller_port">
             {{ formErrors.controller_port[0] }}
           </div>
