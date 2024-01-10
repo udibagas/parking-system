@@ -180,7 +180,7 @@ def gate_in_thread(gate):
             try:
                 s.connect((gate["controller_ip_address"],
                           gate["controller_port"]))
-            except Exception:
+            except Exception as e:
                 time.sleep(3)
                 continue
 
@@ -239,7 +239,7 @@ def gate_in_thread(gate):
                         time.sleep(0.1)
                         s.sendall(b"\xa6STAT\xa9")
                         push_button_or_card = s.recv(1024)
-                    except Exception:
+                    except Exception as e:
                         logging.error(
                             gate["nama"] + " : Failed to sense button and card"
                         )
@@ -481,7 +481,7 @@ def gate_in_thread(gate):
                     running_text(
                         s, "TERIMAKASIH|SIMPAN DENGAN BAIK TIKET PARKIR ANDA")
                     logging.debug(gate["nama"] + " : " + str(s.recv(1024)))
-                except Exception:
+                except Exception as e:
                     logging.error(
                         gate["nama"] + " : Gagal play terimakasih" + str(e))
                     send_notification(
