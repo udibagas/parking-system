@@ -176,20 +176,17 @@ class ParkingTransactionController extends Controller
     // untuk handle waktu gate in tertrigger
     public function apiStore(Request $request)
     {
-        // kalau tidak ada infirmasi gate_in, ambil dari ip-nya
-        if (!$request->gate_in_id) {
-            $gateIn = GateIn::where('controller_ip_address', $request->ip())->first();
-            if (!$gateIn) throw new Error('Invalid Gate In');
-        }
+        $request->validate([
+            'gate_in_id' => 'required',
+            'jenis_kendaraan' => 'required',
+        ]);
 
         $timeIn = now();
 
         $input = array_merge($request->all(), [
             'nomor_barcode' => Str::random(5),
             'shift_id' => ParkingTransaction::setShift($timeIn),
-            'time_in' => $timeIn,
-            'gate_in_id' => $gateIn->id,
-            'jenis_kendaraan' => $gateIn->jenis_kendaraan
+            'time_in' => $timeIn
         ]);
 
         $parkingTransaction = ParkingTransaction::create($input);
@@ -202,7 +199,6 @@ class ParkingTransactionController extends Controller
         return [
             'message' => 'Data berhasil disimpan. Silakan ambil tiket.',
             'data' => $parkingTransaction,
-            'gateIn' => $gateIn
         ];
     }
 
