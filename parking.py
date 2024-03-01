@@ -256,7 +256,7 @@ def gate_in_thread(gate):
                         + str(push_button_or_card)
                     )
 
-                    if b"W" in push_button_or_card or b"X" in push_button_or_card:
+                    if b"W" in push_button_or_card or b"X" in push_button_or_card or b"PT" in push_button_or_card:
                         delimiter = "W"
                         card_type = "RFID"
 
@@ -264,14 +264,22 @@ def gate_in_thread(gate):
                             delimiter = "X"
                             card_type = "UHF"
 
+                        if b"PT" in push_button_or_card:
+                            delimiter = "PT"
+                            card_type = "RFID"
+
                         nomor_kartu = (
                             str(push_button_or_card)
                             .split(delimiter)[1]
                             .split("\\xa9")[0]
                         )
 
-                        member = check_card(
-                            gate, str(int(nomor_kartu, 16)), card_type)
+                        if b"PT" in push_button_or_card:
+                            nomor_kartu_str = str(nomor_kartu)
+                        else:
+                            nomor_kartu_str = str(int(nomor_kartu, 16))
+
+                        member = check_card(gate, nomor_kartu_str, card_type)
                         time.sleep(0.1)  # kasih jeda biar audio bisa play
 
                         if not member:
