@@ -750,11 +750,7 @@ export default {
           type: 'success',
         })
 
-        // DISABLE
-        setTimeout(() => {
-          this.openGate(this.formModel.gate_out_id)
-        }, 4000)
-
+        this.openGate(this.formModel.gate_out_id)
         this.resetForm()
       })
     },
