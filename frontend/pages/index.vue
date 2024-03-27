@@ -749,7 +749,12 @@ export default {
           message: r.data.message,
           type: 'success',
         })
-        this.openGate(this.formModel.gate_out_id)
+
+        // DISABLE
+        setTimeout(() => {
+          this.openGate(this.formModel.gate_out_id)
+        }, 4000)
+
         this.resetForm()
       })
     },
