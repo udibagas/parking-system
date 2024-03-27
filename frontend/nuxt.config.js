@@ -69,7 +69,7 @@ export default {
   axios: {
     credentials: true, // change to true if use laravel
     // development
-    // baseURL: process.env.API_URL || 'http://localhost:3000',
+    // baseURL: process.env.API_URL || 'http://localhost:8000',
     // production
     baseURL: process.env.API_URL || '',
   },

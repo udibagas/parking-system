@@ -6,13 +6,24 @@
           {{ pos.nama }}
         </h1>
 
-        <el-row v-if="!setting.disable_plat_nomor" :gutter="10" style="margin-bottom: 10px">
+        <el-row
+          v-if="!setting.disable_plat_nomor"
+          :gutter="10"
+          style="margin-bottom: 10px"
+        >
           <el-col :span="10">
             <div class="label-big">[-] NO. PLAT</div>
           </el-col>
           <el-col :span="14">
-            <input id="plat-nomor" autocomplete="off" @keyup.enter="cekPlatNomor" type="text" placeholder="NO. PLAT"
-              v-model="formModel.plat_nomor" class="my-input" />
+            <input
+              id="plat-nomor"
+              autocomplete="off"
+              @keyup.enter="cekPlatNomor"
+              type="text"
+              placeholder="NO. PLAT"
+              v-model="formModel.plat_nomor"
+              class="my-input"
+            />
           </el-col>
         </el-row>
 
@@ -21,42 +32,82 @@
             <div class="label-big">[+] NO. TIKET/KARTU</div>
           </el-col>
           <el-col :span="14">
-            <input id="nomor-tiket" autocomplete="off" @keyup.enter="cekTiket" @keydown.tab="cekTiket" type="text"
-              placeholder="NO. TIKET/KARTU" v-model="formModel.nomor_barcode" class="my-input" />
+            <input
+              id="nomor-tiket"
+              autocomplete="off"
+              @keyup.enter="cekTiket"
+              @keydown.tab="cekTiket"
+              type="text"
+              placeholder="NO. TIKET/KARTU"
+              v-model="formModel.nomor_barcode"
+              class="my-input"
+            />
           </el-col>
         </el-row>
 
-        <el-row v-if="jenisKendaraanList.length > 1" :gutter="10" style="margin-bottom: 10px">
+        <el-row
+          v-if="jenisKendaraanList.length > 1"
+          :gutter="10"
+          style="margin-bottom: 10px"
+        >
           <el-col :span="10">
             <div class="label-big">[*] JENIS KENDARAAN</div>
           </el-col>
           <el-col :span="14">
-            <select @change="hitungTarif" v-model="formModel.jenis_kendaraan" id="jenis-kendaraan" class="my-input"
-              placeholder="JENIS KENDARAAN">
-              <option v-for="g in jenisKendaraanList" :value="g.nama" :key="g.id">
+            <select
+              @change="hitungTarif"
+              v-model="formModel.jenis_kendaraan"
+              id="jenis-kendaraan"
+              class="my-input"
+              placeholder="JENIS KENDARAAN"
+            >
+              <option
+                v-for="g in jenisKendaraanList"
+                :value="g.nama"
+                :key="g.id"
+              >
                 {{ g.shortcut_key }} - {{ g.nama }}
               </option>
             </select>
           </el-col>
         </el-row>
 
-        <el-row v-show="formModel.nomor_barcode == 'xxxxx'" :gutter="10" style="margin-bottom: 10px">
+        <el-row
+          v-show="formModel.nomor_barcode == 'xxxxx'"
+          :gutter="10"
+          style="margin-bottom: 10px"
+        >
           <el-col :span="10">
             <div class="label-big">[*] JAM MASUK</div>
           </el-col>
           <el-col :span="14">
-            <input @keyup.enter="toGateIn" @change="hitungTarif" id="time-in" v-mask="'####-##-## ##:##'"
-              v-model="formModel.time_in" class="my-input" />
+            <input
+              @keyup.enter="toGateIn"
+              @change="hitungTarif"
+              id="time-in"
+              v-mask="'####-##-## ##:##'"
+              v-model="formModel.time_in"
+              class="my-input"
+            />
           </el-col>
         </el-row>
 
-        <el-row v-show="formModel.nomor_barcode == 'xxxxx'" v-if="gateInList.length > 1" :gutter="10"
-          style="margin-bottom: 10px">
+        <el-row
+          v-show="formModel.nomor_barcode == 'xxxxx'"
+          v-if="gateInList.length > 1"
+          :gutter="10"
+          style="margin-bottom: 10px"
+        >
           <el-col :span="10">
             <div class="label-big">GATE MASUK</div>
           </el-col>
           <el-col :span="14">
-            <select @change="toSubmit" v-model="formModel.gate_in_id" id="gate-in" class="my-input">
+            <select
+              @change="toSubmit"
+              v-model="formModel.gate_in_id"
+              id="gate-in"
+              class="my-input"
+            >
               <option v-for="g in gateInList" :value="g.id" :key="g.id">
                 {{ g.shortcut_key }} - {{ g.nama }}
               </option>
@@ -69,32 +120,59 @@
             <div class="label-big">TARIF</div>
           </el-col>
           <el-col :span="14">
-            <input disabled v-model="formModel.tarif" class="my-input bg-red-700 text-white" />
+            <input
+              disabled
+              v-model="formModel.tarif"
+              class="my-input bg-red-700 text-white"
+            />
           </el-col>
         </el-row>
 
-        <el-row v-if="formModel.nomor_barcode == 'xxxxx'" :gutter="10" style="margin-bottom: 10px">
+        <el-row
+          v-if="formModel.nomor_barcode == 'xxxxx'"
+          :gutter="10"
+          style="margin-bottom: 10px"
+        >
           <el-col :span="10">
             <div class="label-big">TARIF + DENDA</div>
           </el-col>
           <el-col :span="14">
-            <input disabled :value="Number(formModel.tarif) + Number(formModel.denda)"
-              class="my-input bg-red-700 text-white" />
+            <input
+              disabled
+              :value="Number(formModel.tarif) + Number(formModel.denda)"
+              class="my-input bg-red-700 text-white"
+            />
           </el-col>
         </el-row>
 
-        <button id="submit-btn" @keyup.right="nextBtn" @keyup.down="nextBtn" @keydown.enter="submit(false)"
-          class="my-big-btn" @click="submit(false)">
+        <button
+          id="submit-btn"
+          @keyup.right="nextBtn"
+          @keyup.down="nextBtn"
+          @keydown.enter="submit(true)"
+          class="my-big-btn"
+          @click="submit(true)"
+        >
           BUKA GATE
         </button>
-        <button id="submit-btn1" @keyup.left="prevBtn" @keyup.up="prevBtn" @keydown.enter="printLastTrx"
-          class="my-big-btn" @click="printLastTrx">
+        <button
+          id="submit-btn1"
+          @keyup.left="prevBtn"
+          @keyup.up="prevBtn"
+          @keydown.enter="printLastTrx"
+          class="my-big-btn"
+          @click="printLastTrx"
+        >
           [F12] PRINT STRUK TRANSAKSI TERAKHIR
         </button>
 
         <el-row :gutter="10">
           <el-col :span="12">
-            <button @keydown.enter="printReport" class="my-big-btn" @click="printReport">
+            <button
+              @keydown.enter="printReport"
+              class="my-big-btn"
+              @click="printReport"
+            >
               [F10] PRINT LAPORAN
             </button>
             <!-- <button
@@ -106,26 +184,46 @@
 						</button> -->
           </el-col>
           <el-col :span="12">
-            <button class="my-big-btn" @keydown.enter="showManualOpenForm = true" @click="showManualOpenForm = true">
+            <button
+              class="my-big-btn"
+              @keydown.enter="showManualOpenForm = true"
+              @click="showManualOpenForm = true"
+            >
               [F11] BUKA GATE MANUAL
             </button>
           </el-col>
         </el-row>
       </div>
 
-      <div :class="{ 'ml-5': true, flex: setting.orientasi_kamera == 'POTRAIT' }" style="width: 100%">
-        <div class="mb-1" style="width: 100%" v-for="s in snapshots" :key="s.id">
+      <div
+        :class="{ 'ml-5': true, flex: setting.orientasi_kamera == 'POTRAIT' }"
+        style="width: 100%"
+      >
+        <div
+          class="mb-1"
+          style="width: 100%"
+          v-for="s in snapshots"
+          :key="s.id"
+        >
           <img :src="s.url" style="width: 700px" />
         </div>
       </div>
 
-      <TransactionFormBukaManual :show="showManualOpenForm" @close="showManualOpenForm = false"
-        :gateOutList="pos.gate_outs" @open-gate="(gate_out_id) => openGate(gate_out_id)" />
+      <TransactionFormBukaManual
+        :show="showManualOpenForm"
+        @close="showManualOpenForm = false"
+        :gateOutList="pos.gate_outs"
+        @open-gate="(gate_out_id) => openGate(gate_out_id)"
+      />
 
       <NotificationMessage />
     </div>
 
-    <div v-else class="flex flex-row justify-content-center align-items-center" style="height: calc(100vh - 145px)">
+    <div
+      v-else
+      class="flex flex-row justify-content-center align-items-center"
+      style="height: calc(100vh - 145px)"
+    >
       <div class="text-center text-5xl text-danger">
         KOMPUTER INI TIDAK TERDAFTAR SEBAGAI POS
       </div>
@@ -323,7 +421,7 @@ export default {
               Math.ceil(
                 (sisaMenit - tarif.menit_pertama) / tarif.menit_selanjutnya
               ) *
-              tarif.tarif_menit_selanjutnya
+                tarif.tarif_menit_selanjutnya
           }
 
           if (tarifHariTerakhir > tarif.tarif_maksimum) {
@@ -536,7 +634,7 @@ export default {
           if (!vehicle) {
             this.$alert(
               'Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah ' +
-              data.member.vehicles.map((v) => v.plat_nomor).join(', '),
+                data.member.vehicles.map((v) => v.plat_nomor).join(', '),
               'Perhatian',
               {
                 type: 'warning',
