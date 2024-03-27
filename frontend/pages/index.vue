@@ -750,7 +750,14 @@ export default {
           type: 'success',
         })
 
-        this.openGate(this.formModel.gate_out_id)
+        const openGate = this.openGate
+        const gate_out_id = this.formModel.gate_out_id
+
+        setTimeout(() => {
+          openGate(gate_out_id)
+        }, 4000)
+
+        // this.openGate(this.formModel.gate_out_id)
         this.resetForm()
       })
     },
