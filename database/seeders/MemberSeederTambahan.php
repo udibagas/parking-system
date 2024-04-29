@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\GroupMember;
+use App\Models\Member;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
@@ -683,6 +684,14 @@ class MemberSeederTambahan extends Seeder
                 $g = GroupMember::updateOrCreate(['nama' => $nama]);
                 $insertedGroups[$nama] = $g->id;
             }
+
+            $existing_members = Member::all()->map(function ($item) {
+                return $item->nomor_kartu;
+            })->toArray();
+
+            $members = array_filter($members, function ($item) use ($existing_members) {
+                return !in_array($item[0], $existing_members);
+            });
 
             $members = array_map(function ($item) use ($insertedGroups) {
                 [$nomor_kartu, $group, $nama] = $item;
