@@ -13,6 +13,7 @@
         "guzzlehttp/guzzle": "^7.0.1",
         "ifsnop/mysqldump-php": "^2.8",
         "laravel/framework": "^11.0",
+        "laravel/pulse": "^1.1",
         "laravel/reverb": "@beta",
         "laravel/sanctum": "^4.0",
         "laravel/tinker": "^2.5",
