@@ -752,14 +752,15 @@ export default {
 
         const openGate = this.openGate
         const gate_out_id = this.formModel.gate_out_id
-
-        if (this.formModel.is_member) {
-          this.openGate(this.formModel.gate_out_id)
-        } else {
-          setTimeout(() => {
-            openGate(gate_out_id)
-          }, 4000)
-        }
+        openGate(gate_out_id)
+        // ini lupa buat yg mana
+        // if (this.formModel.is_member) {
+        //   this.openGate(this.formModel.gate_out_id)
+        // } else {
+        //   setTimeout(() => {
+        //     openGate(gate_out_id)
+        //   }, 4000)
+        // }
 
         this.resetForm()
       })
