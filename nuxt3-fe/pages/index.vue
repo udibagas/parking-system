@@ -232,375 +232,389 @@
 </template>
 
 <script>
-import { mapState } from "pinia";
+import { ElAlert } from "element-plus";
+import moment from "moment";
+definePageMeta({ layout: "default" });
+const store = useWebsiteStore();
+const api = useApi();
+const instance = getCurrentInstance();
 
-export default {
-  computed: {
-    totalBayar() {
-      return Number(this.formModel.tarif) + Number(this.formModel.denda);
-    },
+const formModel = reactive({ nomor_barcode: "", tarif: "", denda: "" });
+const formErrors = ref({});
+const snapshots = ref([]);
+const showManualOpenForm = ref(false);
+const ws = ref(null);
+const updateTarifInterval = ref(null);
 
-    duration() {
-      if (!this.formModel.time_in || !this.formModel.time_out) {
-        return "00:00:00";
-      }
+const pos = toRef(store.pos);
+const setting = toRef(store.setting);
+const gateInList = toRef(store.gateInList);
+const jenisKendaraanList = toRef(store.jenisKendaraanList);
 
-      let time_in = this.$moment(this.formModel.time_in);
-      let time_out = this.$moment(this.formModel.time_out);
-      let day = time_out.diff(time_in, "days");
-      let hour = time_out.diff(time_in, "hours");
-      let minute = time_out.diff(time_in, "minutes");
-      let second = time_out.diff(time_in, "seconds");
+const duration = computed(() => {
+  if (!formModel.time_in || !formModel.time_out) {
+    return "00:00:00";
+  }
 
-      return `${day}HR ${String(hour % 24).padStart(2, "0")}:${String(
-        minute % 60
-      ).padStart(2, "0")}`;
-    },
+  // todo
+  let time_in = moment(formModel.time_in);
+  let time_out = moment(formModel.time_out);
+  let day = time_out.diff(time_in, "days");
+  let hour = time_out.diff(time_in, "hours");
+  let minute = time_out.diff(time_in, "minutes");
+  let second = time_out.diff(time_in, "seconds");
 
-    ...mapState(useWebsiteStore, {
-      pos: "pos",
-      setting: "setting",
-      gateInList: "gateInList",
-      jenisKendaraanList: "jenisKendaraanList",
-    }),
-  },
+  return `${day}HR ${String(hour % 24).padStart(2, "0")}:${String(
+    minute % 60
+  ).padStart(2, "0")}`;
+});
 
-  data() {
-    return {
-      formModel: { nomor_barcode: "", tarif: "", denda: "" },
-      formErrors: {},
-      snapshots: [
-        // { id: 1, url: 'https://via.placeholder.com/150' },
-        // { id: 2, url: 'https://via.placeholder.com/150' },
-      ],
-      showManualOpenForm: false,
-      ws: null,
-      updateTarifInterval: null,
-    };
-  },
+const totalBayar = computed(() => {
+  return Number(formModel.tarif) + Number(formModel.denda);
+});
 
-  methods: {
-    toSubmit() {
-      this.runningText(
-        `${this.duration}|Rp${this.totalBayar.toLocaleString("id-ID")}`
-      );
-      document.querySelector("#submit-btn").focus();
-    },
+const toSubmit = () => {
+  runningText(`${duration}|Rp${totalBayar.toLocaleString("id-ID")}`);
+  document.querySelector("#submit-btn").focus();
+};
 
-    toGateIn() {
-      if (this.gateInList.length == 1) {
-        this.formModel.gate_in_id = this.gateInList[0].id;
-      }
+const toGateIn = () => {
+  if (gateInList.value.length == 1) {
+    formModel.gate_in_id = gateInList.value[0].id;
+  }
 
-      if (!this.formModel.gate_in_id) {
-        document.querySelector("#gate-in").focus();
+  if (!formModel.gate_in_id) {
+    document.querySelector("#gate-in").focus();
+  } else {
+    document.querySelector("#submit-btn").focus();
+  }
+
+  runningText(`${duration}|Rp${totalBayar.toLocaleString("id-ID")}`);
+};
+
+const nextBtn = () => {
+  document.querySelector("#submit-btn1").focus();
+};
+
+const prevBtn = () => {
+  document.querySelector("#submit-btn").focus();
+};
+
+const hitungTarif = () => {
+  formModel.group = jenisKendaraanList.value.find(
+    (k) => k.nama == formModel.jenis_kendaraan
+  ).group;
+
+  const gateOut = pos.value.gate_outs.find((g) => {
+    return g.jenis_kendaraan.includes(formModel.jenis_kendaraan);
+  });
+
+  if (!gateOut) {
+    ElMessage({
+      message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
+      type: "error",
+    });
+    return;
+  }
+
+  formModel.gate_out_id = gateOut.id;
+
+  if (formModel.id) {
+    takeSnapshot();
+  }
+
+  if (formModel.is_member) {
+    formModel.tarif = 0;
+    document.querySelector("#submit-btn").focus();
+    return;
+  }
+
+  const tarif = jenisKendaraanList.value.find(
+    (v) => v.nama == formModel.jenis_kendaraan
+  );
+
+  if (!tarif) {
+    ElMessage({
+      message:
+        "Tarif tidak ditemukan untuk jenis kendaraan " +
+        formModel.jenis_kendaraan,
+      type: "error",
+      showClose: true,
+    });
+
+    formModel.tarif = 0;
+    return;
+  }
+
+  if (formModel.nomor_barcode.toLowerCase() == "xxxxx") {
+    formModel.denda = Number(tarif.denda_tiket_hilang);
+  } else {
+    formModel.denda = 0;
+  }
+
+  let timeIn = moment(formModel.time_in);
+  let timeOut = formModel.time_out ? moment(formModel.time_out) : moment();
+  let durasiMenit = timeOut.diff(timeIn, "minutes") || 1;
+
+  let tarifMenitPertama = tarif.tarif_menit_pertama;
+
+  // tak peduli flat atau progressif berlaku seperti ini
+  if (durasiMenit <= tarif.menit_pertama) {
+    formModel.tarif = tarifMenitPertama;
+    document.querySelector("#submit-btn").focus();
+    runningText(`${duration}|Rp${totalBayar.toLocaleString("id-ID")}`);
+    return;
+  }
+
+  let durasiReal = durasiMenit - tarif.menit_pertama;
+
+  // mode menginap 24 jam
+  if (tarif.mode_menginap == 0) {
+    let hariParkir = Math.ceil(durasiMenit / (60 * 24));
+
+    // mode tarif flat
+    if (hariParkir == 0 && tarif.mode_tarif == 0) {
+      hariParkir = 1;
+    }
+  }
+
+  // mode menginap lewat tengah malam
+  if (tarif.mode_menginap == 1) {
+    let hariIn = moment(timeIn.format("YYYY-MM-DD"));
+    let hariOut = moment(timeOut.format("YYYY-MM-DD"));
+    let hariParkir = 0;
+
+    if (durasiMenit >= 60) {
+      hariParkir = hariOut.diff(hariIn, "days") + 1;
+    } else {
+      hariParkir = 1;
+    }
+  }
+
+  let hariMenginap = hariParkir >= 1 ? hariParkir - 1 : 0;
+  let tarifMenginap = hariMenginap * tarif.tarif_menginap;
+
+  // tarif flat per hari, kena tarif menginap, kena tarif maximal
+  if (tarif.mode_tarif == 0) {
+    formModel.tarif =
+      tarifMenitPertama + hariParkir * tarif.tarif_flat + tarifMenginap;
+  }
+
+  // tarif progresif
+  if (tarif.mode_tarif == 1) {
+    let tarifMaksimum = hariMenginap * tarif.tarif_maksimum;
+
+    // menginap 24 jam
+    if (tarif.mode_menginap == 0) {
+      const sisaMenit = durasiMenit % (60 * 24);
+      let tarifHariTerakhir = 0;
+
+      if (sisaMenit <= tarif.menit_pertama) {
+        tarifHariTerakhir = tarif.tarif_menit_pertama;
       } else {
-        document.querySelector("#submit-btn").focus();
+        tarifHariTerakhir =
+          tarif.tarif_menit_pertama +
+          Math.ceil(
+            (sisaMenit - tarif.menit_pertama) / tarif.menit_selanjutnya
+          ) *
+            tarif.tarif_menit_selanjutnya;
       }
 
-      this.runningText(
-        `${this.duration}|Rp${this.totalBayar.toLocaleString("id-ID")}`
-      );
-    },
-
-    nextBtn() {
-      document.querySelector("#submit-btn1").focus();
-    },
-
-    prevBtn() {
-      document.querySelector("#submit-btn").focus();
-    },
-
-    hitungTarif() {
-      this.formModel.group = this.jenisKendaraanList.find(
-        (k) => k.nama == this.formModel.jenis_kendaraan
-      ).group;
-
-      const gateOut = this.pos.gate_outs.find((g) => {
-        return g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan);
-      });
-
-      if (!gateOut) {
-        this.$message({
-          message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
-          type: "error",
-        });
-        return;
+      if (tarifHariTerakhir > tarif.tarif_maksimum) {
+        tarifHariTerakhir = tarif.tarif_maksimum;
       }
 
-      this.formModel.gate_out_id = gateOut.id;
+      formModel.tarif = tarifMaksimum + tarifHariTerakhir + tarifMenginap;
+    }
 
-      if (this.formModel.id) {
-        this.takeSnapshot();
-      }
+    // menginap lewat lengahmalam
+    if (tarif.mode_menginap == 1) {
+      if (hariParkir > 1) {
+        let menitHariPertama =
+          moment(timeIn.format("YYYY-MM-DD") + " 24:00:00").diff(
+            timeIn,
+            "minutes"
+          ) - tarif.menit_pertama;
 
-      if (this.formModel.is_member) {
-        this.formModel.tarif = 0;
-        document.querySelector("#submit-btn").focus();
-        return;
-      }
-
-      const tarif = this.jenisKendaraanList.find(
-        (v) => v.nama == this.formModel.jenis_kendaraan
-      );
-
-      if (!tarif) {
-        this.$message({
-          message:
-            "Tarif tidak ditemukan untuk jenis kendaraan " +
-            this.formModel.jenis_kendaraan,
-          type: "error",
-          showClose: true,
-        });
-
-        this.formModel.tarif = 0;
-        return;
-      }
-
-      if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
-        this.formModel.denda = Number(tarif.denda_tiket_hilang);
-      } else {
-        this.formModel.denda = 0;
-      }
-
-      var timeIn = this.$moment(this.formModel.time_in);
-      var timeOut = this.formModel.time_out
-        ? this.$moment(this.formModel.time_out)
-        : this.$moment();
-      var durasiMenit = timeOut.diff(timeIn, "minutes") || 1;
-
-      var tarifMenitPertama = tarif.tarif_menit_pertama;
-
-      // tak peduli flat atau progressif berlaku seperti ini
-      if (durasiMenit <= tarif.menit_pertama) {
-        this.formModel.tarif = tarifMenitPertama;
-        document.querySelector("#submit-btn").focus();
-        this.runningText(
-          `${this.duration}|Rp${this.totalBayar.toLocaleString("id-ID")}`
+        let menitHariTerakhir = timeOut.diff(
+          moment(timeOut.format("YYYY-MM-DD") + " 00:00:00"),
+          "minutes"
         );
-        return;
-      }
 
-      var durasiReal = durasiMenit - tarif.menit_pertama;
+        let tarifHariPertama =
+          Math.ceil(menitHariPertama / tarif.menit_selanjutnya) *
+          tarif.tarif_menit_selanjutnya;
+        tarifHariTerakhir =
+          Math.ceil(menitHariTerakhir / tarif.menit_selanjutnya) *
+          tarif.tarif_menit_selanjutnya;
 
-      // mode menginap 24 jam
-      if (tarif.mode_menginap == 0) {
-        var hariParkir = Math.ceil(durasiMenit / (60 * 24));
-
-        // mode tarif flat
-        if (hariParkir == 0 && tarif.mode_tarif == 0) {
-          hariParkir = 1;
-        }
-      }
-
-      // mode menginap lewat tengah malam
-      if (tarif.mode_menginap == 1) {
-        var hariIn = this.$moment(timeIn.format("YYYY-MM-DD"));
-        var hariOut = this.$moment(timeOut.format("YYYY-MM-DD"));
-        var hariParkir = 0;
-
-        if (durasiMenit >= 60) {
-          hariParkir = hariOut.diff(hariIn, "days") + 1;
-        } else {
-          hariParkir = 1;
-        }
-      }
-
-      var hariMenginap = hariParkir >= 1 ? hariParkir - 1 : 0;
-      var tarifMenginap = hariMenginap * tarif.tarif_menginap;
-
-      // tarif flat per hari, kena tarif menginap, kena tarif maximal
-      if (tarif.mode_tarif == 0) {
-        this.formModel.tarif =
-          tarifMenitPertama + hariParkir * tarif.tarif_flat + tarifMenginap;
-      }
-
-      // tarif progresif
-      if (tarif.mode_tarif == 1) {
-        var tarifMaksimum = hariMenginap * tarif.tarif_maksimum;
-
-        // menginap 24 jam
-        if (tarif.mode_menginap == 0) {
-          const sisaMenit = durasiMenit % (60 * 24);
-          var tarifHariTerakhir = 0;
-
-          if (sisaMenit <= tarif.menit_pertama) {
-            tarifHariTerakhir = tarif.tarif_menit_pertama;
-          } else {
-            tarifHariTerakhir =
-              tarif.tarif_menit_pertama +
-              Math.ceil(
-                (sisaMenit - tarif.menit_pertama) / tarif.menit_selanjutnya
-              ) *
-                tarif.tarif_menit_selanjutnya;
-          }
-
-          if (tarifHariTerakhir > tarif.tarif_maksimum) {
-            tarifHariTerakhir = tarif.tarif_maksimum;
-          }
-
-          this.formModel.tarif =
-            tarifMaksimum + tarifHariTerakhir + tarifMenginap;
+        if (tarifHariPertama > tarif.tarif_maksimum) {
+          tarifHariPertama = tarif.tarif_maksimum;
         }
 
-        // menginap lewat lengahmalam
-        if (tarif.mode_menginap == 1) {
-          if (hariParkir > 1) {
-            var menitHariPertama =
-              this.$moment(timeIn.format("YYYY-MM-DD") + " 24:00:00").diff(
-                timeIn,
-                "minutes"
-              ) - tarif.menit_pertama;
-
-            var menitHariTerakhir = timeOut.diff(
-              this.$moment(timeOut.format("YYYY-MM-DD") + " 00:00:00"),
-              "minutes"
-            );
-
-            var tarifHariPertama =
-              Math.ceil(menitHariPertama / tarif.menit_selanjutnya) *
-              tarif.tarif_menit_selanjutnya;
-            tarifHariTerakhir =
-              Math.ceil(menitHariTerakhir / tarif.menit_selanjutnya) *
-              tarif.tarif_menit_selanjutnya;
-
-            if (tarifHariPertama > tarif.tarif_maksimum) {
-              tarifHariPertama = tarif.tarif_maksimum;
-            }
-
-            if (tarifHariTerakhir > tarif.tarif_maksimum) {
-              tarifHariTerakhir = tarif.tarif_maksimum;
-            }
-
-            if (hariParkir <= 2) {
-              tarifMaksimum = 0;
-            }
-
-            this.formModel.tarif =
-              tarifMenitPertama +
-              tarifMaksimum +
-              tarifHariPertama +
-              tarifHariTerakhir +
-              tarifMenginap;
-          } else {
-            tarifHariPertama =
-              Math.ceil(durasiReal / tarif.menit_selanjutnya) *
-              tarif.tarif_menit_selanjutnya;
-
-            if (tarifHariPertama > tarif.tarif_maksimum) {
-              tarifHariPertama = tarif.tarif_maksimum;
-            }
-
-            this.formModel.tarif = tarifMenitPertama + tarifHariPertama;
-          }
+        if (tarifHariTerakhir > tarif.tarif_maksimum) {
+          tarifHariTerakhir = tarif.tarif_maksimum;
         }
-      }
 
-      if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
-        document.querySelector("#time-in").focus();
+        if (hariParkir <= 2) {
+          tarifMaksimum = 0;
+        }
+
+        formModel.tarif =
+          tarifMenitPertama +
+          tarifMaksimum +
+          tarifHariPertama +
+          tarifHariTerakhir +
+          tarifMenginap;
       } else {
-        document.querySelector("#submit-btn").focus();
-      }
+        tarifHariPertama =
+          Math.ceil(durasiReal / tarif.menit_selanjutnya) *
+          tarif.tarif_menit_selanjutnya;
 
-      this.runningText(
-        `${this.duration}|Rp${this.totalBayar.toLocaleString("id-ID")}`
-      );
-    },
-
-    cekPlatNomor() {
-      let params = { plat_nomor: this.formModel.plat_nomor };
-      this.$axios
-        .$get("/api/member/search", { params: params })
-        .then((r) => {
-          this.formModel.is_member = 1;
-          this.formModel.tarif = 0;
-        })
-        .catch((e) => {
-          this.formModel.is_member = 0;
-        })
-        .finally(() => {
-          console.log("chekPlatNomor");
-          document.querySelector("#nomor-tiket").focus();
-          this.$forceUpdate();
-        });
-    },
-
-    // hasil akhir ini harusnya tergantung dia ada jenis kendaraan berapa
-    async cekTiket() {
-      if (this.formModel.nomor_barcode.length < 5) return;
-
-      let now = this.$moment().format("YYYY-MM-DD HH:mm:ss");
-
-      if (this.formModel.nomor_barcode.toLowerCase() == "xxxxx") {
-        this.formModel.time_in = this.$moment().format("Y-MM-DD");
-        this.$forceUpdate();
-        this.formModel.time_out = now;
-
-        if (this.jenisKendaraanList.length > 1) {
-          document.querySelector("#jenis-kendaraan").focus();
-        } else {
-          this.formModel.jenis_kendaraan = this.jenisKendaraanList[0].nama;
-          document.querySelector("#time-in").focus();
+        if (tarifHariPertama > tarif.tarif_maksimum) {
+          tarifHariPertama = tarif.tarif_maksimum;
         }
 
-        return;
+        formModel.tarif = tarifMenitPertama + tarifHariPertama;
       }
+    }
+  }
 
-      try {
-        var data = await this.$axios.$get("/api/parkingTransaction/search", {
-          params: { nomor_barcode: this.formModel.nomor_barcode },
+  if (formModel.nomor_barcode.toLowerCase() == "xxxxx") {
+    document.querySelector("#time-in").focus();
+  } else {
+    document.querySelector("#submit-btn").focus();
+  }
+
+  runningText(`${duration}|Rp${totalBayar.toLocaleString("id-ID")}`);
+};
+
+const cekPlatNomor = () => {
+  let query = { plat_nomor: formModel.plat_nomor };
+  api("/api/member/search", { method: "get", query })
+    .then((r) => {
+      formModel.is_member = 1;
+      formModel.tarif = 0;
+    })
+    .catch((e) => {
+      formModel.is_member = 0;
+    })
+    .finally(() => {
+      document.querySelector("#nomor-tiket").focus();
+      instance?.proxy?.$forceUpdate();
+    });
+};
+
+// hasil akhir ini harusnya tergantung dia ada jenis kendaraan berapa
+const cekTiket = async () => {
+  if (formModel.nomor_barcode.length < 5) return;
+
+  let now = moment().format("YYYY-MM-DD HH:mm:ss");
+
+  if (formModel.nomor_barcode.toLowerCase() == "xxxxx") {
+    formModel.time_in = moment().format("Y-MM-DD");
+    instance?.proxy?.$forceUpdate();
+    formModel.time_out = now;
+
+    if (jenisKendaraanList.value.length > 1) {
+      document.querySelector("#jenis-kendaraan").focus();
+    } else {
+      formModel.jenis_kendaraan = jenisKendaraanList.value[0].nama;
+      document.querySelector("#time-in").focus();
+    }
+
+    return;
+  }
+
+  try {
+    let data = await api("/api/parkingTransaction/search", {
+      query: { nomor_barcode: formModel.nomor_barcode },
+    });
+
+    snapshots.value = data.snapshots;
+    const { id, gate_in_id, time_in, is_member } = data;
+
+    formModel = {
+      ...formModel,
+      id,
+      gate_in_id,
+      time_in,
+      is_member,
+      time_out: now,
+      tarif: 0,
+    };
+
+    instance?.proxy?.$forceUpdate();
+
+    // jika bukan member
+    if (!data.is_member && jenisKendaraanList.value.length > 1) {
+      document.querySelector("#jenis-kendaraan").focus();
+      return;
+    }
+
+    if (data.is_member) {
+      if (!!data.member.expired) {
+        ElAlert("Kartu telah habis masa berlaku", "Perhatian", {
+          type: "warning",
+          center: true,
+          roundButton: true,
+          confirmButtonText: "OK",
+          confirmButtonClass: "bg-red",
         });
-      } catch (error) {
-        if (error.response.status == 404) {
-          this.$message({
-            message: error.response.data.message,
-            type: "error",
-            center: true,
-            showClose: true,
-            duration: 3000,
-          });
-        }
-        document.querySelector("#nomor-tiket").focus();
+        formModel.is_member = 0;
+        return false;
       }
 
-      this.snapshots = data.snapshots;
-
-      const { id, gate_in_id, time_in, is_member } = data;
-
-      this.formModel = {
-        ...this.formModel,
-        id,
-        gate_in_id,
-        time_in,
-        is_member,
-        time_out: now,
-        tarif: 0,
-      };
-
-      this.$forceUpdate();
-
-      // jika bukan member
-      if (!data.is_member && this.jenisKendaraanList.length > 1) {
-        document.querySelector("#jenis-kendaraan").focus();
-        return;
-      }
-
-      if (data.is_member) {
-        if (!!data.member.expired) {
-          this.$alert("Kartu telah habis masa berlaku", "Perhatian", {
+      if (!data.member.expired && data.member.expired_in <= 5) {
+        ElAlert(
+          `Kartu akan habis masa berlaku dalam ${data.member.expired_in} hari`,
+          "Perhatian",
+          {
             type: "warning",
             center: true,
             roundButton: true,
             confirmButtonText: "OK",
             confirmButtonClass: "bg-red",
-          });
-          this.formModel.is_member = 0;
-          return false;
-        }
+          }
+        );
+      }
 
-        if (!data.member.expired && data.member.expired_in <= 5) {
-          this.$alert(
-            `Kartu akan habis masa berlaku dalam ${data.member.expired_in} hari`,
+      if (!!setting.disable_plat_nomor) {
+        const vehicle = data.member.vehicles[0];
+        formModel.jenis_kendaraan = vehicle.jenis_kendaraan;
+        formModel.plat_nomor = vehicle.plat_nomor;
+
+        // member auto open sesuai setingan
+        if (!!setting.member_auto_open) {
+          const gateOut = pos.gate_outs.find((g) => {
+            return g.jenis_kendaraan.includes(formModel.jenis_kendaraan);
+          });
+
+          if (!gateOut) {
+            ElMessage({
+              message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
+              type: "error",
+            });
+            return;
+          }
+
+          formModel.gate_out_id = gateOut.id;
+
+          if (formModel.id) {
+            takeSnapshot();
+          }
+
+          save(false);
+        }
+      } else {
+        let vehicle = data.member.vehicles.find(
+          (v) => v.plat_nomor == formModel.plat_nomor
+        );
+
+        if (!vehicle) {
+          ElAlert(
+            "Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
+              data.member.vehicles.map((v) => v.plat_nomor).join(", "),
             "Perhatian",
             {
               type: "warning",
@@ -610,437 +624,362 @@ export default {
               confirmButtonClass: "bg-red",
             }
           );
-        }
-
-        if (!!this.setting.disable_plat_nomor) {
-          const vehicle = data.member.vehicles[0];
-          this.formModel.jenis_kendaraan = vehicle.jenis_kendaraan;
-          this.formModel.plat_nomor = vehicle.plat_nomor;
-
-          // member auto open sesuai setingan
-          if (!!this.setting.member_auto_open) {
-            const gateOut = this.pos.gate_outs.find((g) => {
-              return g.jenis_kendaraan.includes(this.formModel.jenis_kendaraan);
-            });
-
-            if (!gateOut) {
-              this.$message({
-                message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
-                type: "error",
-              });
-              return;
-            }
-
-            this.formModel.gate_out_id = gateOut.id;
-
-            if (this.formModel.id) {
-              this.takeSnapshot();
-            }
-
-            this.save(false);
-          }
+          document.querySelector("#plat-nomor").focus();
         } else {
-          let vehicle = data.member.vehicles.find(
-            (v) => v.plat_nomor == this.formModel.plat_nomor
-          );
-
-          if (!vehicle) {
-            this.$alert(
-              "Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
-                data.member.vehicles.map((v) => v.plat_nomor).join(", "),
-              "Perhatian",
-              {
-                type: "warning",
-                center: true,
-                roundButton: true,
-                confirmButtonText: "OK",
-                confirmButtonClass: "bg-red",
-              }
-            );
-            document.querySelector("#plat-nomor").focus();
-          } else {
-            if (this.jenisKendaraanList.length > 1) {
-              document.querySelector("#jenis-kendaraan").focus();
-            }
+          if (jenisKendaraanList.value.length > 1) {
+            document.querySelector("#jenis-kendaraan").focus();
           }
         }
       }
-
-      if (this.jenisKendaraanList.length == 1) {
-        this.formModel.jenis_kendaraan = this.jenisKendaraanList[0].nama;
-        this.hitungTarif();
-      }
-    },
-
-    resetForm() {
-      this.resetRunningText();
-      this.formModel.tarif = "";
-      this.formModel.denda = "";
-      this.formModel.gate_in_id = null;
-      this.formModel.gate_out_id = null;
-      this.formModel.jenis_kendaraan = null;
-      this.formModel.plat_nomor = this.setting.plat_nomor_default;
-      this.formModel.nomor_barcode = "";
-      this.formModel.time_out = "";
-      this.formModel.time_in = "";
-      this.formModel.duration = "";
-
-      this.snapshots = [];
-      this.$forceUpdate();
-
-      if (this.setting.disable_plat_nomor) {
-        console.log("ke nomor tiket");
-        document.querySelector("#nomor-tiket").focus();
-      } else {
-        console.log("ke plat nomor");
-        document.querySelector("#plat-nomor").focus();
-      }
-    },
-
-    submit(ticket) {
-      // kalau tiket hilang harus isi time in dulu
-      if (
-        this.formModel.nomor_barcode.toLowerCase() == "xxxxx" &&
-        !this.formModel.time_in
-      ) {
-        document.querySelector("#time-in").focus();
-        return;
-      } else {
-        document.querySelector("#submit-btn").blur();
-      }
-
-      if (this.gateInList.length == 1) {
-        this.formModel.gate_in_id = this.gateInList[0].id;
-      }
-
-      if (!this.formModel.gate_in_id) {
-        this.$message({
-          message: "MOHON ISI GATE IN",
-          type: "error",
-          showClose: true,
-        });
-        return;
-      }
-
-      if (
-        !this.formModel.nomor_barcode ||
-        !this.formModel.gate_out_id ||
-        !this.formModel.jenis_kendaraan ||
-        !this.formModel.time_out ||
-        !this.formModel.time_in
-      ) {
-        return;
-      }
-
-      if (this.formModel.time_in.length < 16) {
-        this.$message({
-          message: "FORMAT TIME IN SALAH",
-          type: "error",
-          showClose: true,
-        });
-        return;
-      }
-
-      if (this.formModel.time_in.length == 16) {
-        this.formModel.time_in += ":00";
-      }
-
-      this.save(ticket);
-    },
-
-    save(ticket) {
-      this.formModel.ticket = ticket;
-
-      this.$axios({
-        method: this.formModel.id ? "put" : "post",
-        url: this.formModel.id
-          ? `/api/parkingTransaction/${this.formModel.id}`
-          : "/api/parkingTransaction",
-        data: this.formModel,
-      }).then((r) => {
-        this.$message({
-          message: r.data.message,
-          type: "success",
-        });
-
-        const openGate = this.openGate;
-        const gate_out_id = this.formModel.gate_out_id;
-        openGate(gate_out_id);
-        // ini lupa buat yg mana
-        // if (this.formModel.is_member) {
-        //   this.openGate(this.formModel.gate_out_id)
-        // } else {
-        //   setTimeout(() => {
-        //     openGate(gate_out_id)
-        //   }, 4000)
-        // }
-
-        this.resetForm();
-      });
-    },
-
-    async connectPos() {
-      this.ws = new WebSocket(`ws://${this.pos.ip_address}:5678/`);
-
-      this.ws.onerror = (event) => {
-        this.$message({
-          message: "KONEKSI KE POS GAGAL",
-          type: "error",
-        });
-      };
-
-      this.ws.onopen = (event) => {
-        console.log("POS TEKONEKSI");
-      };
-
-      this.ws.onmessage = (event) => {
-        let data = JSON.parse(event.data);
-        console.error(data);
-        // this.$message({
-        // 	message: data.message,
-        // 	type: data.status ? 'success' : 'error',
-        // })
-      };
-    },
-
-    openGate(gate_out_id) {
-      const gate = this.pos.gate_outs.find((g) => g.id == gate_out_id);
-
-      this.ws.send(
-        [
-          "open",
-          gate.device,
-          gate.baudrate,
-          gate.open_command,
-          gate.close_command,
-        ].join(";")
-      );
-
-      setTimeout(this.resetForm, 3000);
-    },
-
-    openGateMemberUHF() {
-      // asumsi gate out cuma 1
-      const gate_id = this.pos.gate_outs[0].id;
-      this.openGate(gate_id);
-      this.$axios.$post(`/api/takeSnapshot/${gate_id}`).then((r) => {
-        this.snapshots = r;
-        this.$forceUpdate();
-      });
-    },
-
-    runningText(text) {
-      const gate = this.pos.gate_outs.find(
-        (g) => g.id == this.formModel.gate_out_id
-      );
-
-      if (!gate) {
-        return;
-      }
-
-      if (!gate.running_text_device || !gate.running_text_baudrate) {
-        return;
-      }
-
-      this.ws.send(
-        ["rt", gate.running_text_device, gate.running_text_baudrate, text].join(
-          ";"
-        )
-      );
-    },
-
-    resetRunningText() {
-      const gate = this.pos.gate_outs.find(
-        (g) => g.id == this.formModel.gate_out_id
-      );
-
-      if (!gate) {
-        return;
-      }
-
-      if (!gate.running_text_device || !gate.running_text_baudrate) {
-        return;
-      }
-
-      this.ws.send(
-        ["rrt", gate.running_text_device, gate.running_text_baudrate].join(";")
-      );
-    },
-
-    printLastTrx() {
-      this.$axios
-        .$post("/api/parkingTransaction/printLastTransaction", {
-          pos_id: this.formModel.pos_id,
-        })
-        .then((r) => {
-          this.$message({
-            message: r.message,
-            type: "success",
-            showClose: true,
-          });
-        });
-    },
-
-    printReport() {
-      if (this.HIDE_PRINT_REPORT) {
-        return;
-      }
-
-      let payload = {
-        pos_id: this.formModel.pos_id,
-        date: this.$moment().format("YYYY-MM-DD"),
-      };
-
-      this.$axios
-        .$post("/api/parkingTransaction/printReport", payload)
-        .then((r) => {
-          this.$message({
-            message: "SILAKAN AMBIL STRUK",
-            type: "success",
-            showClose: true,
-          });
-        });
-    },
-
-    async initialize() {
-      await this.$store.dispatch("getPos");
-
-      if (!this.pos) {
-        return;
-      }
-
-      this.formModel.pos_id = this.pos.id;
-
-      if (this.pos.gate_outs.length == 1) {
-        this.formModel.gate_out_id = this.pos.gate_outs[0].id;
-      }
-
-      this.formModel.plat_nomor = this.setting.plat_nomor_default;
-
-      if (this.setting.disable_plat_nomor) {
-        document.querySelector("#nomor-tiket").focus();
-      } else {
-        document.querySelector("#plat-nomor").focus();
-      }
-
-      await this.connectPos();
-      // todo: kasih popup bahwa tidak terkoneksi dengan pos sehingga tidak bisa buka gate
-    },
-
-    takeSnapshot() {
-      this.$axios
-        .$post(`/api/parkingTransaction/takeSnapshot/${this.formModel.id}`, {
-          gate_out_id: this.formModel.gate_out_id,
-        })
-        .then((r) => {
-          this.snapshots = r;
-          this.$forceUpdate();
-        });
-    },
-
-    // openGateIn() {
-    //   this.$axios
-    //     .$post(`/api/parkingTransaction/apiStore`)
-    //     .then(r => {
-    //       const { gateIn } = r
-    //       const { device, baudrate, open_command, close_command } = gateIn.port.split(';')
-
-    //       this.ws.send(
-    //         [
-    //           'open',
-    //           device,
-    //           baudrate,
-    //           open_command,
-    //           close_command,
-    //         ].join(';')
-    //       )
-
-    //       this.$message({
-    //         message: r.message,
-    //         type: 'success',
-    //         showClose: true,
-    //       })
-    //     })
-    // }
-  },
-
-  async mounted() {
-    await this.initialize();
-
-    if (!this.pos) {
-      return;
     }
 
-    document.querySelector("#gate-out-app").addEventListener("keydown", (e) => {
-      // console.log(e.key)
-      // ke field nomor plat
-      if (e.key == "-") {
-        e.preventDefault();
-        this.resetForm();
-        this.$forceUpdate();
-      }
+    if (jenisKendaraanList.value.length == 1) {
+      formModel.jenis_kendaraan = jenisKendaraanList.value[0].nama;
+      hitungTarif();
+    }
+  } catch (error) {
+    if (error.response.status == 404) {
+      ElMessage({
+        message: error.response.data.message,
+        type: "error",
+        center: true,
+        showClose: true,
+        duration: 3000,
+      });
+    }
+    document.querySelector("#nomor-tiket").focus();
+  }
+};
 
-      // ke field nomor tiket
-      if (e.key == "+") {
-        e.preventDefault();
-        this.formModel.nomor_barcode = "";
-        this.formModel.time_out = "";
-        this.formModel.jenis_kendaraan = "";
-        this.formModel.tarif = "";
-        document.querySelector("#nomor-tiket").focus();
-      }
+const resetForm = () => {
+  resetRunningText();
+  formModel.tarif = "";
+  formModel.denda = "";
+  formModel.gate_in_id = null;
+  formModel.gate_out_id = null;
+  formModel.jenis_kendaraan = null;
+  formModel.plat_nomor = setting.value.plat_nomor_default;
+  formModel.nomor_barcode = "";
+  formModel.time_out = "";
+  formModel.time_in = "";
+  formModel.duration = "";
 
-      // ke field jenis kendaraan
-      if (e.key == "*") {
-        e.preventDefault();
-        this.formModel.jenis_kendaraan = "";
-        this.formModel.tarif = "";
-        document.querySelector("#jenis-kendaraan").focus();
-      }
+  snapshots.value = [];
+  instance?.proxy?.$forceUpdate();
 
-      // ke field time in
-      if (e.key == "/") {
-        e.preventDefault();
-        this.formModel.time_in = "";
-        document.querySelector("#time-in").focus();
-      }
+  if (setting.value.disable_plat_nomor) {
+    console.log("ke nomor tiket");
+    document.querySelector("#nomor-tiket").focus();
+  } else {
+    console.log("ke plat nomor");
+    document.querySelector("#plat-nomor").focus();
+  }
+};
 
-      if (e.key == "F10") {
-        e.preventDefault();
-        this.printReport();
-        // this.openGateMemberUHF()
-      }
+const submit = (ticket) => {
+  // kalau tiket hilang harus isi time in dulu
+  if (formModel.nomor_barcode.toLowerCase() == "xxxxx" && !formModel.time_in) {
+    document.querySelector("#time-in").focus();
+    return;
+  } else {
+    document.querySelector("#submit-btn").blur();
+  }
 
-      if (e.key == "F11") {
-        e.preventDefault();
-        this.showManualOpenForm = true;
-      }
+  if (gateInList.value.length == 1) {
+    formModel.gate_in_id = gateInList.value[0].id;
+  }
 
-      if (e.key == "F12") {
-        e.preventDefault();
-        this.printLastTrx();
-      }
+  if (!formModel.gate_in_id) {
+    ElMessage({
+      message: "MOHON ISI GATE IN",
+      type: "error",
+      showClose: true,
+    });
+    return;
+  }
 
-      // if (e.key == 'F9') {
-      //   e.preventDefault();
-      //   this.openGateIn()
-      // }
+  if (
+    !formModel.nomor_barcode ||
+    !formModel.gate_out_id ||
+    !formModel.jenis_kendaraan ||
+    !formModel.time_out ||
+    !formModel.time_in
+  ) {
+    return;
+  }
+
+  if (formModel.time_in.length < 16) {
+    ElMessage({
+      message: "FORMAT TIME IN SALAH",
+      type: "error",
+      showClose: true,
+    });
+    return;
+  }
+
+  if (formModel.time_in.length == 16) {
+    formModel.time_in += ":00";
+  }
+
+  save(ticket);
+};
+
+const save = (ticket) => {
+  formModel.ticket = ticket;
+
+  this.$axios({
+    method: formModel.id ? "put" : "post",
+    url: formModel.id
+      ? `/api/parkingTransaction/${formModel.id}`
+      : "/api/parkingTransaction",
+    data: formModel,
+  }).then((r) => {
+    ElMessage({
+      message: r.data.message,
+      type: "success",
     });
 
-    this.updateTarifInterval = setInterval(
-      this.$store.dispatch("getJenisKendaraanList"),
-      60000
-    );
-  },
+    const gate_out_id = formModel.gate_out_id;
+    openGate(gate_out_id);
+    // ini lupa buat yg mana
+    // if (formModel.is_member) {
+    //   openGate(formModel.gate_out_id)
+    // } else {
+    //   setTimeout(() => {
+    //     openGate(gate_out_id)
+    //   }, 4000)
+    // }
 
-  destroyed() {
-    if (this.ws) {
-      this.ws.close();
+    resetForm();
+  });
+};
+
+const connectPos = async () => {
+  ws.value = new WebSocket(`ws://${this.pos.ip_address}:5678/`);
+
+  ws.value.onerror = (event) => {
+    ElMessage({
+      message: "KONEKSI KE POS GAGAL",
+      type: "error",
+    });
+  };
+
+  ws.value.onopen = (event) => {
+    console.log("POS TEKONEKSI");
+  };
+
+  ws.value.onmessage = (event) => {
+    let data = JSON.parse(event.data);
+    console.error(data);
+    // ElMessage({
+    // 	message: data.message,
+    // 	type: data.status ? 'success' : 'error',
+    // })
+  };
+};
+
+const openGate = (gate_out_id) => {
+  const gate = pos.value.gate_outs.find((g) => g.id == gate_out_id);
+
+  ws.value.send(
+    [
+      "open",
+      gate.device,
+      gate.baudrate,
+      gate.open_command,
+      gate.close_command,
+    ].join(";")
+  );
+
+  setTimeout(resetForm, 3000);
+};
+
+const openGateMemberUHF = () => {
+  // asumsi gate out cuma 1
+  const gate_id = pos.value.gate_outs[0].id;
+  openGate(gate_id);
+  api(`/api/takeSnapshot/${gate_id}`).then((r) => {
+    snapshots.value = r;
+    instance?.proxy?.$forceUpdate();
+  });
+};
+
+const runningText = (text) => {
+  const gate = pos.value.gate_outs.find((g) => g.id == formModel.gate_out_id);
+
+  if (!gate) {
+    return;
+  }
+
+  if (!gate.running_text_device || !gate.running_text_baudrate) {
+    return;
+  }
+
+  ws.value.send(
+    ["rt", gate.running_text_device, gate.running_text_baudrate, text].join(";")
+  );
+};
+
+const resetRunningText = () => {
+  const gate = pos.value.gate_outs.find((g) => g.id == formModel.gate_out_id);
+
+  if (!gate) {
+    return;
+  }
+
+  if (!gate.running_text_device || !gate.running_text_baudrate) {
+    return;
+  }
+
+  ws.value.send(
+    ["rrt", gate.running_text_device, gate.running_text_baudrate].join(";")
+  );
+};
+
+const printLastTrx = () => {
+  this.$axios
+    .$post("/api/parkingTransaction/printLastTransaction", {
+      pos_id: formModel.pos_id,
+    })
+    .then((r) => {
+      ElMessage({
+        message: r.message,
+        type: "success",
+        showClose: true,
+      });
+    });
+};
+
+const printReport = () => {
+  if (this.HIDE_PRINT_REPORT) {
+    return;
+  }
+
+  let payload = {
+    pos_id: formModel.pos_id,
+    date: moment().format("YYYY-MM-DD"),
+  };
+
+  this.$axios
+    .$post("/api/parkingTransaction/printReport", payload)
+    .then((r) => {
+      ElMessage({
+        message: "SILAKAN AMBIL STRUK",
+        type: "success",
+        showClose: true,
+      });
+    });
+};
+
+const initialize = async () => {
+  await this.$store.dispatch("getPos");
+
+  if (!this.pos) {
+    return;
+  }
+
+  formModel.pos_id = this.pos.id;
+
+  if (this.pos.gate_outs.length == 1) {
+    formModel.gate_out_id = this.pos.gate_outs[0].id;
+  }
+
+  formModel.plat_nomor = this.setting.plat_nomor_default;
+
+  if (this.setting.disable_plat_nomor) {
+    document.querySelector("#nomor-tiket").focus();
+  } else {
+    document.querySelector("#plat-nomor").focus();
+  }
+
+  await this.connectPos();
+  // todo: kasih popup bahwa tidak terkoneksi dengan pos sehingga tidak bisa buka gate
+};
+
+const takeSnapshot = () => {
+  this.$axios
+    .$post(`/api/parkingTransaction/takeSnapshot/${formModel.id}`, {
+      gate_out_id: formModel.gate_out_id,
+    })
+    .then((r) => {
+      snapshots.value = r;
+      instance?.proxy?.$forceUpdate();
+    });
+};
+
+onMounted(async () => {
+  await this.initialize();
+
+  if (!this.pos) {
+    return;
+  }
+
+  document.querySelector("#gate-out-app").addEventListener("keydown", (e) => {
+    // console.log(e.key)
+    // ke field nomor plat
+    if (e.key == "-") {
+      e.preventDefault();
+      resetForm();
+      instance?.proxy?.$forceUpdate();
     }
 
-    clearInterval(this.updateTarifInterval);
-  },
-};
+    // ke field nomor tiket
+    if (e.key == "+") {
+      e.preventDefault();
+      formModel.nomor_barcode = "";
+      formModel.time_out = "";
+      formModel.jenis_kendaraan = "";
+      formModel.tarif = "";
+      document.querySelector("#nomor-tiket").focus();
+    }
+
+    // ke field jenis kendaraan
+    if (e.key == "*") {
+      e.preventDefault();
+      formModel.jenis_kendaraan = "";
+      formModel.tarif = "";
+      document.querySelector("#jenis-kendaraan").focus();
+    }
+
+    // ke field time in
+    if (e.key == "/") {
+      e.preventDefault();
+      formModel.time_in = "";
+      document.querySelector("#time-in").focus();
+    }
+
+    if (e.key == "F10") {
+      e.preventDefault();
+      printReport();
+      // openGateMemberUHF()
+    }
+
+    if (e.key == "F11") {
+      e.preventDefault();
+      showManualOpenForm.value = true;
+    }
+
+    if (e.key == "F12") {
+      e.preventDefault();
+      printLastTrx();
+    }
+
+    // if (e.key == 'F9') {
+    //   e.preventDefault();
+    //   openGateIn()
+    // }
+  });
+
+  updateTarifInterval.value = setInterval(store.getJenisKendaraanList, 60000);
+});
+
+onDeactivated(() => {
+  if (ws) {
+    ws.close();
+  }
+
+  clearInterval(updateTarifInterval);
+});
 </script>
 
 <style lang="css" scoped>

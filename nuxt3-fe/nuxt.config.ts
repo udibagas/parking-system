@@ -9,6 +9,8 @@ export default defineNuxtConfig({
     },
     css: ["@/assets/app.css"],
 
+    plugins: ["@/plugins/mask.js"],
+
     runtimeConfig: {
         public: {
             sanctum: {
