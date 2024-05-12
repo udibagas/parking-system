@@ -229,7 +229,7 @@
         header-align="center"
       >
         <template slot="header">
-          <el-button type="text" @click="refreshData" icon="el-icon-refresh">
+          <el-button link @click="refreshData" icon="el-icon-refresh">
           </el-button>
         </template>
         <template slot-scope="scope">

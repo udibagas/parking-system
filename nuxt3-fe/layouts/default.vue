@@ -39,7 +39,7 @@
         <el-row>
           <el-col :span="12">
             <el-button
-              type="text"
+              link
               class="btn-big text-white"
               @click.prevent="collapse = !collapse"
               :icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
@@ -75,17 +75,12 @@
 
 <script>
 import { mapStores, mapState } from "pinia";
-// const { user, logout } = useSanctumAuth();
-
-definePageMeta({
-  middleware: "sanctum:auth",
-});
+const { user, logout } = useSanctumAuth();
 
 export default {
   middleware: ["auth"],
 
   computed: {
-    user: {},
     ...mapState(useWebsiteStore, {
       navigationList: "navigationList",
     }),
@@ -94,6 +89,9 @@ export default {
 
   data() {
     return {
+      user: {
+        name: "Dummy",
+      },
       collapse: true,
       showProfile: false,
     };

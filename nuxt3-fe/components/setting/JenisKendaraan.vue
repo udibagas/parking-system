@@ -105,7 +105,7 @@
       </el-table-column>
       <el-table-column width="40px" align="center" header-align="center">
         <template slot="header">
-          <el-button type="text" @click="requestData" icon="el-icon-refresh">
+          <el-button link @click="requestData" icon="el-icon-refresh">
           </el-button>
         </template>
         <template slot-scope="scope">
