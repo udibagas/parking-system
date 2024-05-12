@@ -46,6 +46,13 @@ const password = ref();
 const year = new Date().getFullYear();
 
 const doLogin = async () => {
-  await login({ email: email.value, password: password.value });
+  try {
+    await login({ email: email.value, password: password.value });
+  } catch (error) {
+    ElMessage({
+      message: error.response?._data.message,
+      type: "error",
+    });
+  }
 };
 </script>
