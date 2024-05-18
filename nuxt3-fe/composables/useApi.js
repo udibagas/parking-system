@@ -1,8 +1,9 @@
 const token = useCookie("XSRF-TOKEN");
+const config = useRuntimeConfig();
 
 export default () => {
   return $fetch.create({
-    baseURL: "http://localhost:9000",
+    baseURL: config.public.apiBase,
     credentials: "include",
     headers: {
       "Content-Type": "application/json",

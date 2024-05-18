@@ -13,6 +13,8 @@ export default defineNuxtConfig({
 
     runtimeConfig: {
         public: {
+            apiBase:
+                process.env.NUXT_PUBLIC_API_BASE || "http://localhost:9000",
             sanctum: {
                 baseUrl:
                     process.env.NUXT_PUBLIC_SANCTUM_BASE_URL ||

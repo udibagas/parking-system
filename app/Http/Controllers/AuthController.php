@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\UserLog;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
@@ -16,7 +17,7 @@ class AuthController extends Controller
                     ->orWhere('email', $request->email);
             })->first();
 
-        if ($user && password_verify($request->password, $user->password)) {
+        if ($user && Auth::attempt($request->only(['email', 'password']), true)) {
             // simpan log
             UserLog::create([
                 'user_id' => $user->id,
@@ -24,11 +25,12 @@ class AuthController extends Controller
             ]);
 
             $request->session()->regenerate();
+            return 'OK';
+        } else {
+            return response()->json([
+                'message' => 'Username atau password salah',
+            ], 401);
         }
-
-        return response()->json([
-            'message' => 'Username atau password salah',
-        ], 401);
     }
 
     public function logout(Request $request)
@@ -44,8 +46,6 @@ class AuthController extends Controller
 
     public function me(Request $request)
     {
-        return response()->json([
-            'data' => $request->user()
-        ]);
+        return response()->json($request->user());
     }
 }

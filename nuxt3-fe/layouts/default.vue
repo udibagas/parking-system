@@ -73,53 +73,36 @@
   </el-container>
 </template>
 
-<script>
-import { mapStores, mapState } from "pinia";
+<script setup>
+import { ElPopconfirm } from "element-plus";
+import { onBeforeMount } from "vue";
 const { user, logout } = useSanctumAuth();
 
-export default {
-  middleware: ["auth"],
+const store = useWebsiteStore();
+const collapse = ref(true);
+const showProfile = ref(false);
+const navigationList = computed(() => store.navigationList);
 
-  computed: {
-    ...mapState(useWebsiteStore, {
-      navigationList: "navigationList",
-    }),
-    ...mapStores(useWebsiteStore),
-  },
-
-  data() {
-    return {
-      user: {
-        name: "Dummy",
-      },
-      collapse: true,
-      showProfile: false,
-    };
-  },
-
-  methods: {
-    goBack() {
-      window.history.back();
-    },
-
-    handleCommand(command) {
-      if (command === "logout") {
-        this.$confirm("Anda yakin ingin keluar?", "Konfirmasi", {
-          type: "warning",
-        }).then(() => false);
-      }
-
-      if (command === "profile") {
-        this.showProfile = true;
-      }
-    },
-  },
-
-  async created() {
-    await this.websiteStore.getNavigationList();
-    await this.websiteStore.getSetting();
-    await this.websiteStore.getGateInList();
-    await this.websiteStore.getJenisKendaraanList();
-  },
+const goBack = () => {
+  window.history.back();
 };
+
+const handleCommand = (command) => {
+  if (command === "logout") {
+    ElPopconfirm("Anda yakin ingin keluar?", "Konfirmasi", {
+      type: "warning",
+    }).then(() => logout());
+  }
+
+  if (command === "profile") {
+    showProfile.value = true;
+  }
+};
+
+onBeforeMount(async () => {
+  await store.getNavigationList();
+  await store.getSetting();
+  await store.getGateInList();
+  await store.getJenisKendaraanList();
+});
 </script>

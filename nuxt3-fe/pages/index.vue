@@ -231,7 +231,7 @@
   </el-card>
 </template>
 
-<script>
+<script setup>
 import { ElAlert } from "element-plus";
 import moment from "moment";
 definePageMeta({ layout: "default" });
@@ -724,16 +724,19 @@ const submit = (ticket) => {
   save(ticket);
 };
 
-const save = (ticket) => {
+const save = async (ticket) => {
   formModel.ticket = ticket;
 
-  this.$axios({
-    method: formModel.id ? "put" : "post",
-    url: formModel.id
-      ? `/api/parkingTransaction/${formModel.id}`
-      : "/api/parkingTransaction",
-    data: formModel,
-  }).then((r) => {
+  const url = formModel.id
+    ? `/api/parkingTransaction/${formModel.id}`
+    : "/api/parkingTransaction";
+
+  try {
+    const r = await api(url, {
+      method: formModel.id ? "put" : "post",
+      body: formModel,
+    });
+
     ElMessage({
       message: r.data.message,
       type: "success",
@@ -751,11 +754,17 @@ const save = (ticket) => {
     // }
 
     resetForm();
-  });
+  } catch (error) {
+    ElMessage({
+      message: error.response._data.message,
+      type: "error",
+      showClose: true,
+    });
+  }
 };
 
 const connectPos = async () => {
-  ws.value = new WebSocket(`ws://${this.pos.ip_address}:5678/`);
+  ws.value = new WebSocket(`ws://${pos.value.ip_address}:5678/`);
 
   ws.value.onerror = (event) => {
     ElMessage({
@@ -836,81 +845,104 @@ const resetRunningText = () => {
   );
 };
 
-const printLastTrx = () => {
-  this.$axios
-    .$post("/api/parkingTransaction/printLastTransaction", {
-      pos_id: formModel.pos_id,
-    })
-    .then((r) => {
-      ElMessage({
-        message: r.message,
-        type: "success",
-        showClose: true,
-      });
+const printLastTrx = async () => {
+  try {
+    const r = await api("/api/parkingTransaction/printLastTransaction", {
+      method: "post",
+      body: {
+        pos_id: formModel.pos_id,
+      },
     });
+
+    ElMessage({
+      message: r.message,
+      type: "success",
+      showClose: true,
+    });
+  } catch (error) {
+    ElMessage({
+      message: error.response._data.message,
+      type: "error",
+      showClose: true,
+    });
+  }
 };
 
-const printReport = () => {
-  if (this.HIDE_PRINT_REPORT) {
-    return;
-  }
-
+const printReport = async () => {
   let payload = {
     pos_id: formModel.pos_id,
     date: moment().format("YYYY-MM-DD"),
   };
 
-  this.$axios
-    .$post("/api/parkingTransaction/printReport", payload)
-    .then((r) => {
-      ElMessage({
-        message: "SILAKAN AMBIL STRUK",
-        type: "success",
-        showClose: true,
-      });
+  try {
+    await api("/api/parkingTransaction/printReport", {
+      method: "post",
+      body: payload,
     });
+    ElMessage({
+      message: "SILAKAN AMBIL STRUK",
+      type: "success",
+      showClose: true,
+    });
+  } catch (error) {
+    ElMessage({
+      message: error.response._data.message,
+      type: "error",
+      showClose: true,
+    });
+  }
 };
 
 const initialize = async () => {
-  await this.$store.dispatch("getPos");
+  await store.getPos();
 
-  if (!this.pos) {
+  if (!pos.value) {
     return;
   }
 
-  formModel.pos_id = this.pos.id;
+  formModel.pos_id = pos.value.id;
 
-  if (this.pos.gate_outs.length == 1) {
-    formModel.gate_out_id = this.pos.gate_outs[0].id;
+  if (pos.value.gate_outs.length == 1) {
+    formModel.gate_out_id = pos.value.gate_outs[0].id;
   }
 
-  formModel.plat_nomor = this.setting.plat_nomor_default;
+  formModel.plat_nomor = setting.value.plat_nomor_default;
 
-  if (this.setting.disable_plat_nomor) {
+  if (setting.value.disable_plat_nomor) {
     document.querySelector("#nomor-tiket").focus();
   } else {
     document.querySelector("#plat-nomor").focus();
   }
 
-  await this.connectPos();
-  // todo: kasih popup bahwa tidak terkoneksi dengan pos sehingga tidak bisa buka gate
+  await connectPos();
 };
 
-const takeSnapshot = () => {
-  this.$axios
-    .$post(`/api/parkingTransaction/takeSnapshot/${formModel.id}`, {
-      gate_out_id: formModel.gate_out_id,
-    })
-    .then((r) => {
-      snapshots.value = r;
-      instance?.proxy?.$forceUpdate();
+const takeSnapshot = async () => {
+  try {
+    const r = await api(
+      `/api/parkingTransaction/takeSnapshot/${formModel.id}`,
+      {
+        method: "post",
+        body: {
+          gate_out_id: formModel.gate_out_id,
+        },
+      }
+    );
+    snapshots.value = r;
+    instance?.proxy?.$forceUpdate();
+  } catch (error) {
+    ElMessage({
+      message: error.response._data.message,
+      type: "error",
+      showClose: true,
     });
+  }
 };
 
 onMounted(async () => {
-  await this.initialize();
+  await initialize();
 
-  if (!this.pos) {
+  if (pos.value) {
     return;
   }
 
