@@ -29,7 +29,7 @@
         active-text-color="#cc0000"
       >
         <el-menu-item v-for="(m, i) in navigationList" :index="m.path" :key="i">
-          <i :class="m.icon"></i>
+          <el-icon><component :is="icon[m.icon2]" /></el-icon>
           <span slot="title">{{ m.label }}</span>
         </el-menu-item>
       </el-menu>
@@ -42,7 +42,7 @@
               link
               class="btn-big text-white"
               @click.prevent="collapse = !collapse"
-              :icon="collapse ? 'el-icon-s-unfold' : 'el-icon-s-fold'"
+              :icon="collapse ? Expand : Fold"
             ></el-button>
             <span class="brand">MITRATEKNIK PARKING SYSTEM</span>
           </el-col>
@@ -75,13 +75,36 @@
 
 <script setup>
 import { ElPopconfirm } from "element-plus";
-import { onBeforeMount } from "vue";
 const { user, logout } = useSanctumAuth();
+import {
+  Fold,
+  Expand,
+  User,
+  HomeFilled,
+  Bell,
+  Operation,
+  DocumentCopy,
+  CreditCard,
+  DataAnalysis,
+} from "@element-plus/icons-vue";
+
+const icon = {
+  User,
+  HomeFilled,
+  Bell,
+  Operation,
+  DocumentCopy,
+  CreditCard,
+  DataAnalysis,
+};
 
 const store = useWebsiteStore();
 const collapse = ref(true);
 const showProfile = ref(false);
 const navigationList = computed(() => store.navigationList);
+useHead({
+  title: "MITRATEKNIK PARKING SYSTEM",
+});
 
 const goBack = () => {
   window.history.back();
@@ -99,7 +122,7 @@ const handleCommand = (command) => {
   }
 };
 
-onBeforeMount(async () => {
+onMounted(async () => {
   await store.getNavigationList();
   await store.getSetting();
   await store.getGateInList();

@@ -30,16 +30,16 @@ class AppController extends Controller
     public function getNavigation(Request $request)
     {
         $nav = [
-            ['label' => 'Home', 'icon' => 'el-icon-s-home', 'path' => '/'],
-            ['label' => 'Transaksi', 'icon' => 'el-icon-document-copy', 'path' => '/transaksi'],
-            ['label' => 'Keanggotaan', 'icon' => 'el-icon-bank-card', 'path' => '/member'],
+            ['label' => 'Home', 'icon' => 'el-icon-s-home', 'icon2' => 'HomeFilled', 'path' => '/'],
+            ['label' => 'Transaksi', 'icon' => 'el-icon-document-copy', 'icon2' => 'DocumentCopy',  'path' => '/transaksi'],
+            ['label' => 'Keanggotaan', 'icon' => 'el-icon-bank-card', 'icon2' => 'CreditCard',  'path' => '/member'],
         ];
 
         $adminNav = [
-            ['label' => 'Laporan', 'icon' => 'el-icon-data-analysis', 'path' => '/report'],
-            ['label' => 'User', 'icon' => 'el-icon-user', 'path' => '/user'],
-            ['label' => 'Log', 'icon' => 'el-icon-bell', 'path' => '/notification'],
-            ['label' => 'Pengaturan', 'icon' => 'el-icon-setting', 'path' => '/setting'],
+            ['label' => 'Laporan', 'icon' => 'el-icon-data-analysis', 'icon2' => 'DataAnalysis', 'path' => '/report'],
+            ['label' => 'User', 'icon' => 'el-icon-user', 'icon2' => 'User',  'path' => '/user'],
+            ['label' => 'Log', 'icon' => 'el-icon-bell', 'icon2' => 'Bell',  'path' => '/notification'],
+            ['label' => 'Pengaturan', 'icon' => 'el-icon-setting', 'icon2' => 'Operation', 'path' => '/setting'],
         ];
 
         return $request->user()->role == 1 ? array_merge($nav, $adminNav) : $nav;
