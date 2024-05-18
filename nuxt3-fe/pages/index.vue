@@ -246,10 +246,10 @@ const showManualOpenForm = ref(false);
 const ws = ref(null);
 const updateTarifInterval = ref(null);
 
-const pos = toRef(store.pos);
-const setting = toRef(store.setting);
-const gateInList = toRef(store.gateInList);
-const jenisKendaraanList = toRef(store.jenisKendaraanList);
+const pos = toRef(() => store.pos);
+const setting = toRef(() => store.setting);
+const gateInList = toRef(() => store.gateInList);
+const jenisKendaraanList = toRef(() => store.jenisKendaraanList);
 
 const duration = computed(() => {
   if (!formModel.time_in || !formModel.time_out) {
