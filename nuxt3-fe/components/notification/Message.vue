@@ -24,54 +24,52 @@
   </el-dialog>
 </template>
 
-<script>
+<script setup>
 import Echo from "laravel-echo";
-import { mapState } from "pinia";
+import Pusher from "pusher-js";
+window.Pusher = Pusher;
 
-export default {
-  data() {
-    return {
-      show: false,
-      notification: {},
-      echo: null,
-    };
-  },
+const store = useWebsiteStore();
+const show = ref(false);
+const notification = ref({});
+const echo = ref(null);
+const setting = computed(() => store.setting);
+const api = useApi();
 
-  computed: {
-    ...mapState(useWebsiteStore, { setting: "setting" }),
-  },
+onMounted(async () => {
+  await store.getSetting();
+  console.log(setting.value.server_address, "<<< server address");
+  echo.value = new Echo({
+    broadcaster: "reverb",
+    key: "g2iix2c1zwlt3dgvo35h",
+    wsHost: setting.value.server_address,
+    wsPort: 8080,
+    forceTLS: false,
+    disableStats: true,
+    authorizer: (channel, options) => {
+      return {
+        authorize: (socketId, callback) => {
+          api("/api/broadcasting/auth", {
+            method: "POST",
+            body: JSON.stringify({
+              socket_id: socketId,
+              channel_name: channel.name,
+            }),
+          })
+            .then((response) => callback(false, response))
+            .catch((error) => callback(true, error));
+        },
+      };
+    },
+  });
 
-  mounted() {
-    this.echo = new Echo({
-      broadcaster: "reverb",
-      key: "ini diisi",
-      wsHost: this.setting.server_address,
-      wsPort: 8080,
-      forceTLS: false,
-      disableStats: true,
-      authorizer: (channel, options) => {
-        return {
-          authorize: (socketId, callback) => {
-            $axios
-              .$post("/api/broadcasting/auth", {
-                socket_id: socketId,
-                channel_name: channel.name,
-              })
-              .then((response) => callback(false, response))
-              .catch((error) => callback(true, error));
-          },
-        };
-      },
-    });
+  echo.value.private("notification").notification((notification) => {
+    notification.value = notification;
+    show.value = true;
+  });
+});
 
-    this.echo.private("notification").notification((notification) => {
-      this.notification = notification;
-      this.show = true;
-    });
-  },
-
-  destroyed() {
-    this.echo.leave("log");
-  },
-};
+onUnmounted(() => {
+  echo.value.leave("log");
+});
 </script>
