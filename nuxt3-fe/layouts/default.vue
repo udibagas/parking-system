@@ -36,33 +36,36 @@
     </el-aside>
     <el-container>
       <el-header>
-        <el-row>
-          <el-col :span="12">
-            <el-button
-              link
-              class="btn-big text-white"
-              @click.prevent="collapse = !collapse"
-              :icon="collapse ? Expand : Fold"
-            ></el-button>
-            <span class="brand">MITRATEKNIK PARKING SYSTEM</span>
-          </el-col>
-          <el-col :span="12" class="text-right">
-            <el-dropdown @command="handleCommand">
-              <span class="el-dropdown-link text-white" style="cursor: pointer"
-                >Selamat Datang, {{ user.name }}!</span
-              >
-              <el-dropdown-menu slot="dropdown">
-                <el-dropdown-item icon="el-icon-user" command="profile">
+        <div class="flex align-items-center">
+          <el-button
+            link
+            class="btn-big text-white"
+            @click.prevent="collapse = !collapse"
+            :icon="collapse ? Expand : Fold"
+            size="large"
+          ></el-button>
+          <div class="brand" style="flex-grow: 1">
+            MITRATEKNIK PARKING SYSTEM
+          </div>
+
+          <el-dropdown @command="handleCommand">
+            <span class="el-dropdown-link text-white" style="cursor: pointer"
+              >Selamat Datang, {{ user.name }}!</span
+            >
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item :icon="User" command="profile">
                   Profil Saya
                 </el-dropdown-item>
-                <el-dropdown-item icon="el-icon-arrow-right" command="logout">
+                <el-dropdown-item :icon="ArrowRight" command="logout">
                   Keluar
                 </el-dropdown-item>
               </el-dropdown-menu>
-            </el-dropdown>
-          </el-col>
-        </el-row>
+            </template>
+          </el-dropdown>
+        </div>
       </el-header>
+
       <el-main
         style="padding: 20px; height: calc(100vh - 60px); overflow: auto"
       >
@@ -86,6 +89,7 @@ import {
   DocumentCopy,
   CreditCard,
   DataAnalysis,
+  ArrowRight,
 } from "@element-plus/icons-vue";
 
 const icon = {
