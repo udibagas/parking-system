@@ -37,13 +37,15 @@
     <el-container>
       <el-header>
         <div class="flex align-items-center">
-          <el-button
-            link
-            class="btn-big text-white"
+          <el-icon
+            :size="24"
             @click.prevent="collapse = !collapse"
-            :icon="collapse ? Expand : Fold"
-            size="large"
-          ></el-button>
+            style="cursor: pointer"
+          >
+            <Expand v-if="collapse" />
+            <Fold v-else />
+          </el-icon>
+
           <div class="brand" style="flex-grow: 1">
             MITRATEKNIK PARKING SYSTEM
           </div>
@@ -70,14 +72,13 @@
         style="padding: 20px; height: calc(100vh - 60px); overflow: auto"
       >
         <slot @back="goBack" />
-        <Profile :show="showProfile" @close="showProfile = false" />
       </el-main>
     </el-container>
   </el-container>
+  <Profile :show="showProfile" @close="showProfile = false" />
 </template>
 
 <script setup>
-import { ElPopconfirm } from "element-plus";
 const { user, logout } = useSanctumAuth();
 import {
   Fold,
@@ -116,7 +117,9 @@ const goBack = () => {
 
 const handleCommand = (command) => {
   if (command === "logout") {
-    ElPopconfirm("Anda yakin ingin keluar?", "Konfirmasi", {
+    ElMessageBox.confirm("Anda yakin ingin keluar?", "Konfirmasi", {
+      confirmButtonText: "Ya",
+      cancelButtonText: "Tidak",
       type: "warning",
     }).then(() => logout());
   }
@@ -126,7 +129,7 @@ const handleCommand = (command) => {
   }
 };
 
-onMounted(async () => {
+onBeforeMount(async () => {
   await store.getNavigationList();
   await store.getSetting();
   await store.getGateInList();
