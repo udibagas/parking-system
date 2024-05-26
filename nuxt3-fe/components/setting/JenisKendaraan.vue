@@ -151,37 +151,28 @@
       width="700px"
     >
       <el-form label-width="200px" label-position="left">
-        <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.nama">
-            {{ formErrors.nama[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item label="Group" :class="formErrors.group ? 'is-error' : ''">
+        <el-form-item label="Group" :error="formErrors.group?.join(', ')">
           <el-input placeholder="Group" v-model="formModel.group"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.group">
-            {{ formErrors.group[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Shortcut Key"
-          :class="formErrors.shortcut_key ? 'is-error' : ''"
+          :error="formErrors.shortcut_key?.join(', ')"
         >
           <el-input
             maxlength="1"
             placeholder="Shortcut Key"
             v-model="formModel.shortcut_key"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.shortcut_key">
-            {{ formErrors.shortcut_key[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Mode Inap"
-          :class="formErrors.mode_menginap ? 'is-error' : ''"
+          :error="formErrors.mode_menginap?.join(', ')"
         >
           <el-select
             placeholder="Mode Inap"
@@ -191,29 +182,22 @@
             <el-option :value="0" label="24 JAM DARI CHECK IN"></el-option>
             <el-option :value="1" label="LEWAT TENGAH MALAM"></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.mode_menginap">
-            {{ formErrors.mode_menginap[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Tarif menginap per hari (Rp)"
-          :class="{ 'is-error': formErrors.tarif_menginap }"
+          :error="formErrors.tarif_menginap?.join(', ')"
         >
           <el-input
             type="number"
             placeholder="Tarif menginap per hari (Rp)"
             v-model="formModel.tarif_menginap"
           ></el-input>
-
-          <div class="el-form-item__error" v-if="formErrors.tarif_menginap">
-            {{ formErrors.tarif_menginap[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Denda Tiket Hilang (Rp)"
-          :class="formErrors.denda_tiket_hilang ? 'is-error' : ''"
+          :error="formErrors.denda_tiket_hilang?.join(', ')"
         >
           <el-input
             type="number"
@@ -221,14 +205,11 @@
             placeholder="Denda Tiket Hilang (Rp)"
             v-model="formModel.denda_tiket_hilang"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.denda_tiket_hilang">
-            {{ formErrors.denda_tiket_hilang[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Mode Tarif"
-          :class="formErrors.mode_tarif ? 'is-error' : ''"
+          :error="formErrors.mode_tarif?.join(', ')"
         >
           <el-select
             placeholder="FLAT/PROGRESIF"
@@ -238,15 +219,12 @@
             <el-option :value="0" label="FLAT"></el-option>
             <el-option :value="1" label="PROGRESIF"></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.mode_tarif">
-            {{ formErrors.mode_tarif[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           v-show="formModel.mode_tarif === 0"
           label="Tarif Flat (Rp)"
-          :class="formErrors.tarif_flat ? 'is-error' : ''"
+          :error="formErrors.tarif_flat?.join(', ')"
         >
           <el-input
             type="number"
@@ -254,25 +232,18 @@
             placeholder="Tarif Flat (Rp)"
             v-model="formModel.tarif_flat"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.tarif_flat">
-            {{ formErrors.tarif_flat[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Tarif maksimal per hari (Rp)"
           v-show="formModel.mode_tarif === 1"
-          :class="{ 'is-error': formErrors.tarif_maksimum }"
+          :error="formErrors.tarif_maksimum?.join(', ')"
         >
           <el-input
             type="number"
             placeholder="Tarif maksimal per hari (Rp)"
             v-model="formModel.tarif_maksimum"
           ></el-input>
-
-          <div class="el-form-item__error" v-if="formErrors.tarif_maksimum">
-            {{ formErrors.tarif_maksimum[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
