@@ -121,7 +121,9 @@ const handleCommand = (command) => {
       confirmButtonText: "Ya",
       cancelButtonText: "Tidak",
       type: "warning",
-    }).then(() => logout());
+    })
+      .then(() => logout())
+      .catch(() => console.log("Action cancelled"));
   }
 
   if (command === "profile") {
