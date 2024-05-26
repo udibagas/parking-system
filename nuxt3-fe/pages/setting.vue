@@ -22,7 +22,7 @@ import {
   SettingKamera,
   SettingPrinter,
   SettingPos,
-  // SettingGateIn,
+  SettingGateIn,
   // SettingGateOut,
   // SettingBackup,
 } from "#components";
@@ -58,10 +58,10 @@ const components = [
   //   label: "Gate Keluar",
   //   component: SettingGateOut,
   // },
-  // {
-  //   label: "Gate Masuk",
-  //   component: SettingGateIn,
-  // },
+  {
+    label: "Gate Masuk",
+    component: SettingGateIn,
+  },
   // {
   //   label: "Area Parkir",
   //   component: SettingAreaParkir,

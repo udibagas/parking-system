@@ -1,20 +1,16 @@
 <template>
   <div>
     <div class="text-right">
-      <el-button
-        type="primary"
-        icon="el-icon-plus"
-        @click="openForm()"
-        size="small"
-        >TAMBAH GATE MASUK</el-button
-      >
+      <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
+        TAMBAH GATE MASUK
+      </el-button>
     </div>
 
     <br />
 
     <el-table
       :data="tableData.data"
-      height="calc(100vh - 300px)"
+      height="calc(100vh - 285px)"
       v-loading="loading"
     >
       <el-table-column
@@ -25,13 +21,14 @@
         header-align="center"
       ></el-table-column>
       <el-table-column min-width="100" label="Status" prop="status">
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-tag
             effect="dark"
-            :type="scope.row.status ? 'success' : 'info'"
+            :type="row.status ? 'success' : 'info'"
             size="small"
-            >{{ scope.row.status ? "Aktif" : "Tidak Aktif" }}</el-tag
           >
+            {{ row.status ? "Aktif" : "Tidak Aktif" }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="nama" label="Nama" min-width="100px">
@@ -48,17 +45,13 @@
         min-width="150px"
         show-overflow-tooltip
       >
-        <template slot-scope="scope">
-          <span v-if="!!scope.row.controller_ip_address">
-            {{ scope.row.controller_ip_address }}:{{
-              scope.row.controller_port
-            }}
+        <template #default="{ row }">
+          <span v-if="!!row.controller_ip_address">
+            {{ row.controller_ip_address }}:{{ row.controller_port }}
           </span>
-          <br v-if="!!scope.row.controller_ip_address" />
-          <span v-if="!!scope.row.controller_device">
-            {{ scope.row.controller_device }}:{{
-              scope.row.controller_baudrate
-            }}
+          <br v-if="!!row.controller_ip_address" />
+          <span v-if="!!row.controller_device">
+            {{ row.controller_device }}:{{ row.controller_baudrate }}
           </span>
         </template>
       </el-table-column>
@@ -69,42 +62,47 @@
       ></el-table-column>
 
       <el-table-column min-width="150" label="Kamera">
-        <template slot-scope="scope">
+        <template #default="{ row }">
           {{
-            scope.row.kameraList
-              ? scope.row.kameraList.map((k) => k.nama).join(",")
-              : ""
+            row.kameraList ? row.kameraList.map((k) => k.nama).join(",") : ""
           }}
         </template>
       </el-table-column>
 
       <el-table-column
         fixed="right"
-        width="40px"
+        width="60px"
         align="center"
         header-align="center"
       >
-        <template slot="header">
-          <el-button link @click="requestData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="requestData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-edit-outline"
-                @click.native.prevent="openForm(scope.row)"
-                >Edit</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-                >Hapus</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                >
+                  Edit
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="
+                    deleteData(row.id, store.getGateInList)
+                  "
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -113,7 +111,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -127,76 +125,58 @@
       v-loading="loading"
       title="GATE MASUK"
       :close-on-click-modal="false"
-      :visible.sync="showForm"
+      v-model="showForm"
     >
       <el-form label-position="left" label-width="150px">
-        <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.nama">
-            {{ formErrors.nama[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Shortcut Key"
-          :class="formErrors.shortcut_key ? 'is-error' : ''"
+          :error="formErrors.shortcut_key?.join(', ')"
         >
           <el-input
             maxlength="1"
             placeholder="Shortcut Key"
             v-model="formModel.shortcut_key"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.shortcut_key">
-            {{ formErrors.shortcut_key[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Jenis Kendaraan"
-          :class="formErrors.jenis_kendaraan ? 'is-error' : ''"
+          :error="formErrors.jenis_kendaraan?.join(', ')"
         >
           <el-input
             placeholder="Jenis Kendaraan"
             v-model="formModel.jenis_kendaraan"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.jenis_kendaraan">
-            {{ formErrors.jenis_kendaraan[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Alamat IP Kontroler"
-          :class="formErrors.controller_ip_address ? 'is-error' : ''"
+          :error="formErrors.controller_ip_address?.join(', ')"
         >
           <el-input
             placeholder="Alamat IP Kontroler"
             v-model="formModel.controller_ip_address"
           ></el-input>
-          <div
-            class="el-form-item__error"
-            v-if="formErrors.controller_ip_address"
-          >
-            {{ formErrors.controller_ip_address[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Port Kontroler"
-          :class="formErrors.controller_port ? 'is-error' : ''"
+          :error="formErrors.controller_port?.join(', ')"
         >
           <el-input
             type="number"
             placeholder="Port Kontroler"
             v-model="formModel.controller_port"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.controller_port">
-            {{ formErrors.controller_port[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Printer"
-          :class="formErrors.printer_id ? 'is-error' : ''"
+          :error="formErrors.printer_id?.join(', ')"
         >
           <el-select
             v-model="formModel.printer_id"
@@ -210,15 +190,9 @@
               :key="printer.id"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.printer_id">
-            {{ formErrors.printer_id[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Kamera"
-          :class="formErrors.kamera ? 'is-error' : ''"
-        >
+        <el-form-item label="Kamera" :error="formErrors.kamera?.join(', ')">
           <el-select
             v-model="formModel.kamera"
             placeholder="Kamera"
@@ -232,15 +206,9 @@
               :key="kamera.id"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.kamera">
-            {{ formErrors.kamera[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Status"
-          :class="formErrors.status ? 'is-error' : ''"
-        >
+        <el-form-item label="Status" :error="formErrors.status?.join(', ')">
           <el-select
             v-model="formModel.status"
             placeholder="Status"
@@ -253,52 +221,57 @@
               :key="i"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.status">
-            {{ formErrors.status[0] }}
-          </div>
         </el-form-item>
       </el-form>
 
-      <div slot="footer">
-        <el-button icon="el-icon-error" @click="closeForm">BATAL</el-button>
-        <el-button type="primary" icon="el-icon-success" @click="save"
-          >SIMPAN</el-button
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button
+          :icon="SuccessFilled"
+          type="primary"
+          @click="save(store.getGateInList)"
         >
-      </div>
+          SIMPAN
+        </el-button>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
-import { mapState, mapStores } from "pinia";
+<script setup>
+const store = useWebsiteStore();
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
+const {
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/gateIn");
 
-  data() {
-    return {
-      url: "/api/gateIn",
-    };
-  },
+const printerList = computed(() => store.printerList);
+const kameraList = computed(() => store.kameraList);
 
-  methods: {
-    afterSave() {
-      this.websiteStore.getGateInList();
-    },
-
-    afterDelete() {
-      this.websiteStore.getGateInList();
-    },
-  },
-
-  computed: {
-    ...mapStores(useWebsiteStore),
-    ...mapState({
-      jenisKendaraanList: "jenisKendaraanList",
-      printerList: "printerList",
-      kameraList: "kameraList",
-    }),
-  },
-};
+onMounted(() => {
+  requestData();
+});
 </script>
