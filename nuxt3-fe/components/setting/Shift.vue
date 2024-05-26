@@ -84,14 +84,11 @@
       :close-on-click-modal="false"
     >
       <el-form label-width="100px" label-position="left">
-        <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.nama">
-            {{ formErrors.nama[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item label="Mulai" :class="{ 'is-error': formErrors.mulai }">
+        <el-form-item label="Mulai" :error="formErrors.mulai?.join(', ')">
           <el-time-select
             style="width: 100%"
             v-model="formModel.mulai"
@@ -99,16 +96,9 @@
             placeholder="Mulai"
           >
           </el-time-select>
-
-          <div class="el-form-item__error" v-if="formErrors.mulai">
-            {{ formErrors.mulai[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Selesai"
-          :class="{ 'is-error': formErrors.selesai }"
-        >
+        <el-form-item label="Selesai" :error="formErrors.selesai?.join(', ')">
           <el-time-select
             style="width: 100%"
             v-model="formModel.selesai"
@@ -116,10 +106,6 @@
             placeholder="Selesai"
           >
           </el-time-select>
-
-          <div class="el-form-item__error" v-if="formErrors.selesai">
-            {{ formErrors.selesai[0] }}
-          </div>
         </el-form-item>
       </el-form>
       <template #footer>
