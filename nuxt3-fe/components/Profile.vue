@@ -1,15 +1,10 @@
 <template>
-  <el-dialog
-    title="PROFIL SAYA"
-    v-loading="loading"
-    :visible="show"
-    :show-close="false"
-  >
+  <el-dialog title="PROFIL SAYA" v-loading="loading" :model-value="show">
     <el-form label-width="180px" label-position="left">
       <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
         <el-input placeholder="Nama" v-model="formModel.name"></el-input>
         <div class="el-form-item__error" v-if="formErrors.name">
-          {{ formErrors.name[0] }}
+          {{ formErrors.name }}
         </div>
       </el-form-item>
 
@@ -45,51 +40,50 @@
         ></el-input>
       </el-form-item>
     </el-form>
-    <span slot="footer">
-      <el-button @click="$emit('close')" icon="el-icon-error">TUTUP</el-button>
-      <el-button type="primary" @click="save" icon="el-icon-success">
+    <template #footer>
+      <el-button @click="$emit('close')" :icon="CircleCloseFilled">
+        TUTUP
+      </el-button>
+      <el-button type="primary" @click="save" :icon="SuccessFilled">
         SIMPAN
       </el-button>
-    </span>
+    </template>
   </el-dialog>
 </template>
 
-<script>
-// const { user } = useSanctumAuth();
+<script setup>
+const api = useApi();
+import { SuccessFilled, CircleCloseFilled } from "@element-plus/icons-vue";
+const { user } = useSanctumAuth();
+const { show } = defineProps(["show"]);
 
-export default {
-  props: ["show"],
-  data() {
-    return {
-      formModel: {},
-      loading: false,
-      formErrors: {},
-    };
-  },
-  methods: {
-    save() {
-      this.loading = true;
-      this.$axios
-        .$put(`/api/user/${this.formModel.id}`, this.formModel)
-        .then((response) => {
-          this.$message({
-            message: "Data berhasil diupdate",
-            type: "success",
-            showClose: true,
-          });
-          this.$store.state.user = response;
-        })
-        .catch((e) => {
-          if (e.response.status == 422) {
-            this.formErrors = e.response.data.errors;
-          } else {
-            this.formErrors = {};
-          }
-        })
-        .finally(() => {
-          this.loading = false;
-        });
-    },
-  },
+const formModel = ref({ ...user.value });
+const loading = ref(false);
+const formErrors = ref({});
+
+const save = () => {
+  loading.value = true;
+
+  api(`/api/user/${formModel.value.id}`, {
+    method: "PUT",
+    body: formModel.value,
+  })
+    .then((_) => {
+      ElMessage({
+        message: "Data berhasil diupdate",
+        type: "success",
+        showClose: true,
+      });
+    })
+    .catch((e) => {
+      if (e.response.status == 422) {
+        formErrors.value = e.response._data.errors;
+      } else {
+        formErrors.value = {};
+      }
+    })
+    .finally(() => {
+      loading.value = false;
+    });
 };
 </script>
