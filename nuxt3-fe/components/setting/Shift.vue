@@ -1,13 +1,9 @@
 <template>
   <div>
     <div class="text-right">
-      <el-button
-        size="small"
-        icon="el-icon-plus"
-        @click="openForm()"
-        type="primary"
-        >TAMBAH SHIFT</el-button
-      >
+      <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
+        TAMBAH SHIFT
+      </el-button>
     </div>
 
     <br />
@@ -15,7 +11,7 @@
     <el-table
       :data="tableData.data"
       stripe
-      height="calc(100vh - 300px)"
+      height="calc(100vh - 285px)"
       v-loading="loading"
     >
       <el-table-column
@@ -34,29 +30,35 @@
         header-align="center"
         align="center"
       >
-        <template slot="header">
+        <template #header>
           <el-button link @click="refreshData" icon="el-icon-refresh">
           </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-edit-outline"
-                @click.native.prevent="openForm(scope.row)"
-              >
-                Edit
-              </el-dropdown-item>
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-              >
-                Hapus
-              </el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                >
+                  Edit
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="
+                    deleteData(row.id, getJenisKendaraanList)
+                  "
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -65,7 +67,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -76,9 +78,10 @@
     ></el-pagination>
 
     <el-dialog
-      :visible.sync="showForm"
+      v-model="showForm"
       title="SHIFT"
       v-loading="loading"
+      width="450px"
       :close-on-click-modal="false"
     >
       <el-form label-width="100px" label-position="left">
@@ -120,33 +123,51 @@
           </div>
         </el-form-item>
       </el-form>
-      <span slot="footer">
-        <el-button icon="el-icon-error" @click="closeForm">BATAL</el-button>
-        <el-button type="primary" icon="el-icon-success" @click="save">
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button
+          :icon="SuccessFilled"
+          type="primary"
+          @click="save(getShiftList)"
+        >
           SIMPAN
         </el-button>
-      </span>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
+<script setup>
+const { getShiftList } = useWebsiteStore();
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
-  data() {
-    return { url: "/api/shift" };
-  },
+const {
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/shift");
 
-  methods: {
-    afterSave() {
-      this.$store.dispatch("getShiftList");
-    },
-
-    afterDelete() {
-      this.$store.dispatch("getShiftList");
-    },
-  },
-};
+onMounted(() => {
+  requestData();
+});
 </script>

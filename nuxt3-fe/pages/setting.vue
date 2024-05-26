@@ -18,7 +18,7 @@
 import {
   SettingGeneral,
   SettingJenisKendaraan,
-  // SettingShift,
+  SettingShift,
   // SettingKamera,
   // SettingPrinter,
   // SettingPos,
@@ -38,10 +38,10 @@ const components = [
     label: "Jenis Kendaraan & Tarif",
     component: SettingJenisKendaraan,
   },
-  // {
-  //   label: "Shift",
-  //   component: SettingShift,
-  // },
+  {
+    label: "Shift",
+    component: SettingShift,
+  },
   // {
   //   label: "Kamera",
   //   component: SettingKamera,
