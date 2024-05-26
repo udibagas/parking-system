@@ -125,42 +125,27 @@
       width="600px"
     >
       <el-form label-position="left" label-width="150px">
-        <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.nama">
-            {{ formErrors.nama[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Username"
-          :class="formErrors.username ? 'is-error' : ''"
-        >
+        <el-form-item label="Username" :error="formErrors.username?.join(', ')">
           <el-input
             placeholder="Username"
             v-model="formModel.username"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.username">
-            {{ formErrors.username[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Password"
-          :class="formErrors.password ? 'is-error' : ''"
-        >
+        <el-form-item label="Password" :error="formErrors.password?.join(', ')">
           <el-input
             placeholder="Password"
             v-model="formModel.password"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.password">
-            {{ formErrors.password[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Otentifikasi"
-          :class="formErrors.auth_type ? 'is-error' : ''"
+          :error="formErrors.auth_type?.join(', ')"
         >
           <el-select
             v-model="formModel.auth_type"
@@ -174,29 +159,19 @@
               :key="i"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.auth_type">
-            {{ formErrors.auth_type[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="URL Snapshot"
-          :class="formErrors.snapshot_url ? 'is-error' : ''"
+          :error="formErrors.snapshot_url?.join(', ')"
         >
           <el-input
             placeholder="URL Snapshot"
             v-model="formModel.snapshot_url"
           ></el-input>
-
-          <div class="el-form-item__error" v-if="formErrors.snapshot_url">
-            {{ formErrors.snapshot_url[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Status"
-          :class="formErrors.status ? 'is-error' : ''"
-        >
+        <el-form-item label="Status" :error="formErrors.status?.join(', ')">
           <el-select
             v-model="formModel.status"
             placeholder="Status"
@@ -209,9 +184,6 @@
               :key="i"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.status">
-            {{ formErrors.status[0] }}
-          </div>
         </el-form-item>
       </el-form>
 
