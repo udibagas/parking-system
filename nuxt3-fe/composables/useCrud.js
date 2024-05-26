@@ -171,6 +171,7 @@ export default (url) => {
   };
 
   return {
+    api,
     showForm,
     formErrors,
     formModel,
