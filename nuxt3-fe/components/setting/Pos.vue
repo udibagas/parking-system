@@ -59,9 +59,7 @@
                 </el-dropdown-item>
                 <el-dropdown-item
                   :icon="Delete"
-                  @click.native.prevent="
-                    deleteData(row.id, getJenisKendaraanList)
-                  "
+                  @click.native.prevent="deleteData(row.id, onAfterSave)"
                 >
                   Hapus
                 </el-dropdown-item>
@@ -133,7 +131,7 @@
         <el-button
           :icon="SuccessFilled"
           type="primary"
-          @click="save(getShiftList)"
+          @click="save(onAfterSave)"
         >
           SIMPAN
         </el-button>
