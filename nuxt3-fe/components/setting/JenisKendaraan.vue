@@ -1,13 +1,9 @@
 <template>
   <div>
     <div class="text-right">
-      <el-button
-        size="small"
-        icon="el-icon-plus"
-        @click="openForm()"
-        type="primary"
-        >TAMBAH JENIS KENDARAAN</el-button
-      >
+      <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
+        TAMBAH JENIS KENDARAAN
+      </el-button>
     </div>
 
     <br />
@@ -15,7 +11,7 @@
     <el-table
       :data="tableData.data"
       stripe
-      height="calc(100vh - 300px)"
+      height="calc(100vh - 285px)"
       v-loading="loading"
     >
       <el-table-column
@@ -50,8 +46,8 @@
         header-align="center"
         min-width="120px"
       >
-        <template slot-scope="scope">
-          {{ scope.row.mode_tarif ? "PROGRESIF" : "FLAT" }}
+        <template #default="{ row }">
+          {{ row.mode_tarif ? "PROGRESIF" : "FLAT" }}
         </template>
       </el-table-column>
       <el-table-column
@@ -60,11 +56,9 @@
         header-align="center"
         min-width="120px"
       >
-        <template slot-scope="scope">
+        <template #default="{ row }">
           {{
-            scope.row.mode_menginap
-              ? "LEWAT TENGAH MALAM"
-              : "24 JAM DARI CHECK IN"
+            row.mode_menginap ? "LEWAT TENGAH MALAM" : "24 JAM DARI CHECK IN"
           }}
         </template>
       </el-table-column>
@@ -75,21 +69,20 @@
         header-align="center"
         min-width="120px"
       >
-        <template slot-scope="scope">
-          Rp {{ scope.row.tarif_flat.toLocaleString("id-ID") }}
+        <template #default="{ row }">
+          {{ toRupiah(row.tarif_flat) }}
         </template>
       </el-table-column>
       <el-table-column label="Tarif Non Flat" min-width="250px">
-        <template slot-scope="scope">
-          Tarif {{ scope.row.menit_pertama }} menit pertama = Rp
-          {{ scope.row.tarif_menit_pertama.toLocaleString("id-ID") }} <br />
-          Tarif {{ scope.row.menit_selanjutnya }} menit selanjutnya = Rp
-          {{ scope.row.tarif_maksimu.toLocaleString("id-ID") }} <br />
-          {{ scope.row.tarif_menit_selanjutnya. }} <br />
-          Tarif maksimal per hari = Rp
-          {{ scope.row.tarif_maksimum.toLocaleString("id-ID") }} <br />
-          Tarif menginap per hari = Rp
-          {{ scope.row.tarif_menginap.toLocaleString("id-ID") }} <br />
+        <template #default="{ row }">
+          Tarif {{ row.menit_pertama }} menit pertama =
+          {{ toRupiah(row.tarif_menit_pertama) }} <br />
+          Tarif {{ row.menit_selanjutnya }} menit selanjutnya =
+          {{ toRupiah(row.tarif_menit_selanjutnya) }} <br />
+          Tarif maksimal per hari = {{ toRupiah(row.tarif_maksimum) }}
+          <br />
+          Tarif menginap per hari = {{ toRupiah(row.tarif_menginap) }}
+          <br />
         </template>
       </el-table-column>
       <el-table-column
@@ -99,34 +92,39 @@
         header-align="center"
         min-width="150px"
       >
-        <template slot-scope="scope">
-          Rp {{ scope.row.denda_tiket_hilang.toLocaleString("id-ID") }}
+        <template #default="{ row }">
+          {{ toRupiah(row.denda_tiket_hilang) }}
         </template>
       </el-table-column>
-      <el-table-column width="40px" align="center" header-align="center">
-        <template slot="header">
-          <el-button link @click="requestData" icon="el-icon-refresh">
-          </el-button>
+      <el-table-column width="60px" align="center" header-align="center">
+        <template #header>
+          <el-button link @click="requestData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-edit-outline"
-                @click.native.prevent="openForm(scope.row)"
-              >
-                Edit
-              </el-dropdown-item>
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-              >
-                Hapus
-              </el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                >
+                  Edit
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="
+                    deleteData(row.id, getJenisKendaraanList)
+                  "
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -135,7 +133,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -147,7 +145,7 @@
 
     <el-dialog
       v-loading="loading"
-      :visible.sync="showForm"
+      v-model="showForm"
       title="JENIS KENDARAAN"
       :close-on-click-modal="false"
       width="700px"
@@ -313,36 +311,52 @@
         </el-form-item>
       </el-form>
 
-      <div slot="footer">
-        <el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-        <el-button icon="el-icon-success" type="primary" @click="save">
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button
+          :icon="SuccessFilled"
+          type="primary"
+          @click="save(getJenisKendaraanList)"
+        >
           SIMPAN
         </el-button>
-      </div>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
+<script setup>
+const { getJenisKendaraanList } = useWebsiteStore();
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
+const {
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+  toRupiah,
+} = useCrud("/api/jenisKendaraan");
 
-  data() {
-    return {
-      url: "/api/jenisKendaraan",
-    };
-  },
-
-  methods: {
-    afterSave() {
-      this.$store.dispatch("getJenisKendaraanList");
-    },
-
-    afterDelete() {
-      this.$store.dispatch("getJenisKendaraanList");
-    },
-  },
-};
+onMounted(() => {
+  requestData();
+});
 </script>
