@@ -26,13 +26,12 @@
 
       <el-table-column
         fixed="right"
-        width="40px"
+        width="60px"
         header-align="center"
         align="center"
       >
         <template #header>
-          <el-button link @click="refreshData" icon="el-icon-refresh">
-          </el-button>
+          <el-button link @click="refreshData" :icon="Refresh"> </el-button>
         </template>
         <template #default="{ row }">
           <el-dropdown>

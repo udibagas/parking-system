@@ -1,18 +1,14 @@
 <template>
   <div>
     <div class="text-right">
-      <el-button
-        type="primary"
-        icon="el-icon-plus"
-        @click="openForm()"
-        size="small"
-        >TAMBAH KAMERA</el-button
-      >
+      <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
+        TAMBAH KAMERA
+      </el-button>
     </div>
 
     <br />
 
-    <el-table :data="tableData.data" stripe height="calc(100vh - 300px)">
+    <el-table :data="tableData.data" stripe height="calc(100vh - 285px)">
       <el-table-column
         type="index"
         :index="tableData.from"
@@ -53,14 +49,15 @@
         align="center"
         header-align="center"
       >
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-tag
             effect="dark"
-            :type="scope.row.status ? 'success' : 'info'"
+            :type="row.status ? 'success' : 'info'"
             size="small"
             style="width: 100%"
-            >{{ scope.row.status ? "Aktif" : "Tidak Aktif" }}</el-tag
           >
+            {{ row.status ? "Aktif" : "Tidak Aktif" }}
+          </el-tag>
         </template>
       </el-table-column>
 
@@ -70,35 +67,38 @@
         align="center"
         header-align="center"
       >
-        <template slot="header">
-          <el-button link @click="requestData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="requestData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-camera"
-                @click.native.prevent="testKamera(scope.row.id)"
-              >
-                Test Kamera
-              </el-dropdown-item>
-              <el-dropdown-item
-                icon="el-icon-edit"
-                @click.native.prevent="openForm(scope.row)"
-              >
-                Edit
-              </el-dropdown-item>
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-              >
-                Hapus
-              </el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Camera"
+                  @click.native.prevent="testKamera(row.id)"
+                >
+                  Test Kamera
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                >
+                  Edit
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="deleteData(row.id, getKameraList)"
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -107,7 +107,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -121,7 +121,8 @@
       v-loading="loading"
       title="KAMERA"
       :close-on-click-modal="false"
-      :visible.sync="showForm"
+      v-model="showForm"
+      width="600px"
     >
       <el-form label-position="left" label-width="150px">
         <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
@@ -214,48 +215,67 @@
         </el-form-item>
       </el-form>
 
-      <div slot="footer">
-        <el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-        <el-button type="primary" icon="el-icon-success" @click="save">
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button
+          :icon="SuccessFilled"
+          type="primary"
+          @click="save(getKameraList)"
+        >
           SIMPAN
         </el-button>
-      </div>
+      </template>
     </el-dialog>
 
-    <el-dialog title="SNAPSHOT KAMERA" center :visible.sync="showSnapshot">
+    <el-dialog title="SNAPSHOT KAMERA" center v-model="showSnapshot">
       <img :src="snapshot" alt="" style="width: 100%" />
     </el-dialog>
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
+<script setup>
+const { getKameraList } = useWebsiteStore();
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+  Camera,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
+const {
+  api,
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/kamera");
 
-  data() {
-    return {
-      url: "/api/kamera",
-      showSnapshot: false,
-      snapshot: null,
-    };
-  },
-  methods: {
-    afterSave() {
-      this.$store.dispatch("getKameraList");
-    },
+const showSnapshot = ref(false);
+const snapshot = ref(null);
 
-    afterDelete() {
-      this.$store.dispatch("getKameraList");
-    },
-
-    testKamera(id) {
-      this.$axios.$get(`/api/kamera/test/${id}`).then((response) => {
-        this.snapshot = "data:image/jpeg;base64," + response.snapshot;
-        this.showSnapshot = true;
-      });
-    },
-  },
+const testKamera = (id) => {
+  api(`/api/kamera/test/${id}`).then((response) => {
+    snapshot.value = "data:image/jpeg;base64," + response.snapshot;
+    showSnapshot.value = true;
+  });
 };
+
+onMounted(() => {
+  requestData();
+});
 </script>

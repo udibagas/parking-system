@@ -19,7 +19,7 @@ import {
   SettingGeneral,
   SettingJenisKendaraan,
   SettingShift,
-  // SettingKamera,
+  SettingKamera,
   // SettingPrinter,
   // SettingPos,
   // SettingGateIn,
@@ -42,10 +42,10 @@ const components = [
     label: "Shift",
     component: SettingShift,
   },
-  // {
-  //   label: "Kamera",
-  //   component: SettingKamera,
-  // },
+  {
+    label: "Kamera",
+    component: SettingKamera,
+  },
   // {
   //   label: "Printer",
   //   component: SettingPrinter,
