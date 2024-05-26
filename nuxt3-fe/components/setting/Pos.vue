@@ -1,18 +1,14 @@
 <template>
   <div>
     <div class="text-right">
-      <el-button
-        type="primary"
-        icon="el-icon-plus"
-        @click="openForm()"
-        size="small"
-        >TAMBAH POS</el-button
-      >
+      <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
+        TAMBAH POS
+      </el-button>
     </div>
 
     <br />
 
-    <el-table :data="tableData.data" stripe height="calc(100vh - 300px)">
+    <el-table :data="tableData.data" stripe height="calc(100vh - 285px)">
       <el-table-column
         type="index"
         :index="tableData.from"
@@ -40,32 +36,37 @@
       <el-table-column
         fixed="right"
         width="60px"
-        align="center"
         header-align="center"
+        align="center"
       >
-        <template slot="header">
-          <el-button link @click="requestData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="refreshData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-edit"
-                @click.native.prevent="openForm(scope.row)"
-              >
-                Edit
-              </el-dropdown-item>
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-              >
-                Hapus
-              </el-dropdown-item>
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                >
+                  Edit
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="
+                    deleteData(row.id, getJenisKendaraanList)
+                  "
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -74,7 +75,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -88,32 +89,27 @@
       v-loading="loading"
       title="POS"
       :close-on-click-modal="false"
-      :visible.sync="showForm"
+      v-model="showForm"
+      width="500px"
     >
       <el-form label-position="left" label-width="150px">
-        <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.nama">
-            {{ formErrors.nama[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Alamat IP"
-          :class="formErrors.ip_address ? 'is-error' : ''"
+          :error="formErrors.ip_address?.join(', ')"
         >
           <el-input
             placeholder="Alamat IP"
             v-model="formModel.ip_address"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.ip_address">
-            {{ formErrors.ip_address[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Printer"
-          :class="formErrors.printer_id ? 'is-error' : ''"
+          :error="formErrors.printer_id?.join(', ')"
         >
           <el-select
             v-model="formModel.printer_id"
@@ -127,49 +123,61 @@
               :key="printer.id"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.printer_id">
-            {{ formErrors.printer_id[0] }}
-          </div>
         </el-form-item>
       </el-form>
 
-      <div slot="footer">
-        <el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-        <el-button type="primary" icon="el-icon-success" @click="save">
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button
+          :icon="SuccessFilled"
+          type="primary"
+          @click="save(getShiftList)"
+        >
           SIMPAN
         </el-button>
-      </div>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
-import { mapState, mapStores } from "pinia";
+<script setup>
+const store = useWebsiteStore();
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
-  data() {
-    return {
-      url: "/api/pos",
-    };
-  },
+const {
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/pos");
 
-  computed: {
-    ...mapStores(useWebsiteStore),
-    ...mapState(useWebsiteStore, { printerList: "printerList" }),
-  },
+const printerList = computed(() => store.printerList);
 
-  methods: {
-    afterSave() {
-      this.websiteStore.getPosList();
-      this.websiteStore.getPos();
-    },
-
-    afterDelete() {
-      this.websiteStore.getPosList();
-      this.websiteStore.getPos();
-    },
-  },
+const onAfterSave = () => {
+  store.getPosList();
+  store.getPos();
 };
+
+onMounted(() => {
+  requestData();
+});
 </script>

@@ -21,7 +21,7 @@ import {
   SettingShift,
   SettingKamera,
   SettingPrinter,
-  // SettingPos,
+  SettingPos,
   // SettingGateIn,
   // SettingGateOut,
   // SettingBackup,
@@ -50,10 +50,10 @@ const components = [
     label: "Printer",
     component: SettingPrinter,
   },
-  // {
-  //   label: "Pos",
-  //   component: SettingPos,
-  // },
+  {
+    label: "Pos",
+    component: SettingPos,
+  },
   // {
   //   label: "Gate Keluar",
   //   component: SettingGateOut,
