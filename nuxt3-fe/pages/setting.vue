@@ -23,7 +23,7 @@ import {
   SettingPrinter,
   SettingPos,
   SettingGateIn,
-  // SettingGateOut,
+  SettingGateOut,
   // SettingBackup,
 } from "#components";
 
@@ -54,10 +54,10 @@ const components = [
     label: "Pos",
     component: SettingPos,
   },
-  // {
-  //   label: "Gate Keluar",
-  //   component: SettingGateOut,
-  // },
+  {
+    label: "Gate Keluar",
+    component: SettingGateOut,
+  },
   {
     label: "Gate Masuk",
     component: SettingGateIn,

@@ -1,18 +1,14 @@
 <template>
   <div>
     <div class="text-right">
-      <el-button
-        type="primary"
-        icon="el-icon-plus"
-        @click="openForm()"
-        size="small"
-        >TAMBAH GATE KELUAR</el-button
-      >
+      <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
+        TAMBAH GATE KELUAR
+      </el-button>
     </div>
 
     <br />
 
-    <el-table :data="tableData.data" stripe height="calc(100vh - 300px)">
+    <el-table :data="tableData.data" stripe height="calc(100vh - 285px)">
       <el-table-column
         type="index"
         :index="tableData.from"
@@ -20,13 +16,14 @@
       ></el-table-column>
 
       <el-table-column min-width="100" label="Status" prop="status">
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-tag
             effect="dark"
-            :type="scope.row.status ? 'success' : 'info'"
+            :type="row.status ? 'success' : 'info'"
             size="small"
-            >{{ scope.row.status ? "Aktif" : "Tidak Aktif" }}</el-tag
           >
+            {{ row.status ? "Aktif" : "Tidak Aktif" }}
+          </el-tag>
         </template>
       </el-table-column>
 
@@ -55,18 +52,14 @@
         label="Jenis Kendaraan"
         prop="jenis_kendaraan"
       >
-        <template slot-scope="scope">
-          {{
-            scope.row.jenis_kendaraan
-              ? scope.row.jenis_kendaraan.join(", ")
-              : ""
-          }}
+        <template #default="{ row }">
+          {{ row.jenis_kendaraan ? row.jenis_kendaraan.join(", ") : "" }}
         </template>
       </el-table-column>
 
       <el-table-column min-width="150" label="Controller Device">
-        <template slot-scope="scope">
-          {{ scope.row.device }}:{{ scope.row.baudrate }}
+        <template #default="{ row }">
+          {{ row.device }}:{{ row.baudrate }}
         </template>
       </el-table-column>
 
@@ -83,27 +76,21 @@
       ></el-table-column>
 
       <el-table-column min-width="200" label="UHF Reader">
-        <template slot-scope="scope">
-          {{ scope.row.uhf_reader_host || "-" }}:{{
-            scope.row.uhf_reader_port || "-"
-          }}
+        <template #default="{ row }">
+          {{ row.uhf_reader_host || "-" }}:{{ row.uhf_reader_port || "-" }}
         </template>
       </el-table-column>
 
       <el-table-column min-width="200" label="Running Text Device">
-        <template slot-scope="scope">
-          {{ scope.row.running_text_device }}:{{
-            scope.row.running_text_baudrate
-          }}
+        <template #default="{ row }">
+          {{ row.running_text_device }}:{{ row.running_text_baudrate }}
         </template>
       </el-table-column>
 
       <el-table-column min-width="150" label="Kamera">
-        <template slot-scope="scope">
+        <template #default="{ row }">
           {{
-            scope.row.kameraList
-              ? scope.row.kameraList.map((k) => k.nama).join(",")
-              : ""
+            row.kameraList ? row.kameraList.map((k) => k.nama).join(",") : ""
           }}
         </template>
       </el-table-column>
@@ -114,37 +101,45 @@
         align="center"
         header-align="center"
       >
-        <template slot="header">
-          <el-button link @click="requestData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="requestData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-minus"
-                @click.native.prevent="testGate(scope.row)"
-                >Test Gate</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-chat-dot-square"
-                @click.native.prevent="testRunningText(scope.row)"
-                >Test Running Text</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-edit"
-                @click.native.prevent="openForm(scope.row)"
-                >Edit</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-                >Hapus</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Minus"
+                  @click.native.prevent="testGate(row)"
+                  >Test Gate</el-dropdown-item
+                >
+                <el-dropdown-item
+                  :icon="ChatDotSquare"
+                  @click.native.prevent="testRunningText(row)"
+                >
+                  Test Running Text
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                >
+                  Edit
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="
+                    deleteData(row.id, store.getGateInList)
+                  "
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -153,7 +148,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -167,32 +162,27 @@
       v-loading="loading"
       title="GATE KELUAR"
       :close-on-click-modal="false"
-      :visible.sync="showForm"
+      v-model="showForm"
+      width="500px"
     >
       <el-form label-position="left" label-width="150px">
-        <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.nama">
-            {{ formErrors.nama[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Shortcut Key"
-          :class="formErrors.shortcut_key ? 'is-error' : ''"
+          :error="formErrors.shortcut_key?.join(', ')"
         >
           <el-input
             placeholder="Shortcut Key"
             v-model="formModel.shortcut_key"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.shortcut_key">
-            {{ formErrors.shortcut_key[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Jenis Kendaraan"
-          :class="formErrors.jenis_kendaraan ? 'is-error' : ''"
+          :error="formErrors.jenis_kendaraan?.join(', ')"
         >
           <el-select
             v-model="formModel.jenis_kendaraan"
@@ -207,15 +197,9 @@
               :key="k.id"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.jenis_kendaraan">
-            {{ formErrors.jenis_kendaraan[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Controller"
-          :class="formErrors.device ? 'is-error' : ''"
-        >
+        <el-form-item label="Controller" :error="formErrors.device?.join(', ')">
           <div class="flex">
             <el-input
               class="mr-2"
@@ -227,14 +211,6 @@
               placeholder="Baudrate"
               v-model="formModel.baudrate"
             ></el-input>
-          </div>
-
-          <div class="el-form-item__error" v-if="formErrors.device">
-            {{ formErrors.device[0] }}
-          </div>
-
-          <div class="el-form-item__error" v-if="formErrors.baudrate">
-            {{ formErrors.baudrate[0] }}
           </div>
         </el-form-item>
 
@@ -270,33 +246,25 @@
 
         <el-form-item
           label="Perintah Buka"
-          :class="formErrors.open_command ? 'is-error' : ''"
+          :error="formErrors.open_command?.join(', ')"
         >
           <el-input
             placeholder="Perintah Buka"
             v-model="formModel.open_command"
           ></el-input>
-
-          <div class="el-form-item__error" v-if="formErrors.open_command">
-            {{ formErrors.open_command[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Perintah Tutup"
-          :class="formErrors.close_command ? 'is-error' : ''"
+          :error="formErrors.close_command?.join(', ')"
         >
           <el-input
             placeholder="Perintah Tutup"
             v-model="formModel.close_command"
           ></el-input>
-
-          <div class="el-form-item__error" v-if="formErrors.close_command">
-            {{ formErrors.close_command[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item label="Pos" :class="formErrors.pos_id ? 'is-error' : ''">
+        <el-form-item label="Pos" :error="formErrors.pos_id?.join(', ')">
           <el-select
             v-model="formModel.pos_id"
             placeholder="Pos"
@@ -309,15 +277,9 @@
               :key="pos.id"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.pos_id">
-            {{ formErrors.pos_id[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Kamera"
-          :class="formErrors.kamera ? 'is-error' : ''"
-        >
+        <el-form-item label="Kamera" :error="formErrors.kamera?.join(', ')">
           <el-select
             v-model="formModel.kamera"
             placeholder="Kamera"
@@ -331,15 +293,9 @@
               :key="kamera.id"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.kamera">
-            {{ formErrors.kamera[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Status"
-          :class="formErrors.status ? 'is-error' : ''"
-        >
+        <el-form-item label="Status" :error="formErrors.status?.join(', ')">
           <el-select
             v-model="formModel.status"
             placeholder="Status"
@@ -352,133 +308,139 @@
               :key="i"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.status">
-            {{ formErrors.status[0] }}
-          </div>
         </el-form-item>
       </el-form>
 
-      <div slot="footer">
-        <el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-        <el-button type="primary" icon="el-icon-success" @click="save">
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button
+          :icon="SuccessFilled"
+          type="primary"
+          @click="save(store.getGateInList)"
+        >
           SIMPAN
         </el-button>
-      </div>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
-import { mapState, mapStores } from "pinia";
+<script setup>
+const store = useWebsiteStore();
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+  ChatDotSquare,
+  Minus,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
+const {
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/gateOut");
 
-  data() {
-    return {
-      url: "/api/gateOut",
-      ws: null,
-    };
-  },
+const jenisKendaraanList = computed(() => store.jenisKendaraanList);
+const kameraList = computed(() => store.kameraList);
+const posList = computed(() => store.posList);
 
-  created() {
-    this.websiteStore.getPosList();
-  },
+onBeforeMount(async () => {
+  await store.getPosList();
+});
 
-  computed: {
-    ...mapStores(useWebsiteStore),
-    ...mapState({
-      jenisKendaraanList: "jenisKendaraanList",
-      printerList: "printerList",
-      kameraList: "kameraList",
-      posList: "posList",
-    }),
-  },
+onMounted(() => {
+  requestData();
+});
 
-  methods: {
-    afterSave() {
-      this.websiteStore.getGateOutList();
-    },
+const testGate = (gate) => {
+  console.log(`connecting to ${gate.pos.ip_address}:5678`);
+  const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
 
-    afterDelete() {
-      this.websiteStore.getGateOutList();
-    },
+  ws.onerror = (event) => {
+    ElMessage({
+      message: "KONEKSI KE POS GAGAL",
+      type: "error",
+    });
+  };
 
-    testGate(gate) {
-      console.log(`connecting to ${gate.pos.ip_address}:5678`);
-      const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
+  ws.onopen = (event) => {
+    console.log(`connected to ${gate.pos.ip_address}:5678`);
+    ws.send(
+      [
+        "open",
+        gate.device,
+        gate.baudrate,
+        gate.open_command,
+        gate.close_command,
+      ].join(";")
+    );
+  };
 
-      ws.onerror = (event) => {
-        this.$message({
-          message: "KONEKSI KE POS GAGAL",
-          type: "error",
-        });
-      };
+  ws.onmessage = (event) => {
+    let data = JSON.parse(event.data);
+    ElMessage({
+      message: data.message,
+      type: data.status ? "success" : "error",
+    });
+    ws.close();
+  };
+};
 
-      ws.onopen = (event) => {
-        console.log(`connected to ${gate.pos.ip_address}:5678`);
-        ws.send(
-          [
-            "open",
-            gate.device,
-            gate.baudrate,
-            gate.open_command,
-            gate.close_command,
-          ].join(";")
-        );
-      };
+const testRunningText = (gate) => {
+  if (!gate.running_text_device || !gate.running_text_baudrate) {
+    ElMessage({
+      message: "RUNNING TEXT TIDAK TERPASANG",
+      type: "error",
+    });
+    return;
+  }
 
-      ws.onmessage = (event) => {
-        let data = JSON.parse(event.data);
-        this.$message({
-          message: data.message,
-          type: data.status ? "success" : "error",
-        });
-        ws.close();
-      };
-    },
+  console.log(`connecting to ${gate.pos.ip_address}:5678`);
+  const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
 
-    testRunningText(gate) {
-      if (!gate.running_text_device || !gate.running_text_baudrate) {
-        this.$message({
-          message: "RUNNING TEXT TIDAK TERPASANG",
-          type: "error",
-        });
-        return;
-      }
+  ws.onerror = (event) => {
+    ElMessage({
+      message: "KONEKSI KE POS GAGAL",
+      type: "error",
+    });
+  };
 
-      console.log(`connecting to ${gate.pos.ip_address}:5678`);
-      const ws = new WebSocket(`ws://${gate.pos.ip_address}:5678/`);
+  ws.onopen = (event) => {
+    console.log(`connected to ${gate.pos.ip_address}:5678`);
+    ws.send(
+      [
+        "rt",
+        gate.running_text_device,
+        gate.running_text_baudrate,
+        `TEST|${gate.nama}`,
+      ].join(";")
+    );
+  };
 
-      ws.onerror = (event) => {
-        this.$message({
-          message: "KONEKSI KE POS GAGAL",
-          type: "error",
-        });
-      };
-
-      ws.onopen = (event) => {
-        console.log(`connected to ${gate.pos.ip_address}:5678`);
-        ws.send(
-          [
-            "rt",
-            gate.running_text_device,
-            gate.running_text_baudrate,
-            `TEST|${gate.nama}`,
-          ].join(";")
-        );
-      };
-
-      ws.onmessage = (event) => {
-        let data = JSON.parse(event.data);
-        this.$message({
-          message: data.message,
-          type: data.status ? "success" : "error",
-        });
-        ws.close();
-      };
-    },
-  },
+  ws.onmessage = (event) => {
+    let data = JSON.parse(event.data);
+    ElMessage({
+      message: data.message,
+      type: data.status ? "success" : "error",
+    });
+    ws.close();
+  };
 };
 </script>
