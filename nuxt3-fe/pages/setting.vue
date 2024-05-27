@@ -24,6 +24,7 @@ import {
   SettingPos,
   SettingGateIn,
   SettingGateOut,
+  SettingAreaParkir,
   // SettingBackup,
 } from "#components";
 
@@ -62,10 +63,10 @@ const components = [
     label: "Gate Masuk",
     component: SettingGateIn,
   },
-  // {
-  //   label: "Area Parkir",
-  //   component: SettingAreaParkir,
-  // },
+  {
+    label: "Area Parkir",
+    component: SettingAreaParkir,
+  },
   // {
   //   label: "Backup & Restore",
   //   component: SettingBackup,

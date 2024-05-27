@@ -1,18 +1,14 @@
 <template>
   <div>
     <div class="text-right">
-      <el-button
-        type="primary"
-        icon="el-icon-plus"
-        @click="openForm({})"
-        size="small"
-        >TAMBAH AREA PARKIR</el-button
-      >
+      <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
+        TAMBAH AREA PARKIR
+      </el-button>
     </div>
 
     <br />
 
-    <el-table :data="tableData.data" stripe height="calc(100vh - 300px)">
+    <el-table :data="tableData.data" stripe height="calc(100vh - 285px)">
       <el-table-column
         type="index"
         :index="tableData.from"
@@ -31,8 +27,8 @@
       ></el-table-column>
 
       <el-table-column min-width="100" label="Jenis Kendaraan">
-        <template slot-scope="scope">
-          {{ scope.row.jenis_kendaraan.join(", ") }}
+        <template #default="{ row }">
+          {{ row.jenis_kendaraan.join(", ") }}
         </template>
       </el-table-column>
 
@@ -58,27 +54,32 @@
         align="center"
         header-align="center"
       >
-        <template slot="header">
-          <el-button link @click="requestData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="requestData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-edit"
-                @click.native.prevent="openForm(scope.row)"
-                >Edit</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-                >Hapus</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                >
+                  Edit
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="deleteData(row.id)"
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -87,7 +88,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -98,35 +99,30 @@
     ></el-pagination>
 
     <el-dialog
-      :visible.sync="showForm"
+      v-model="showForm"
       title="AREA PARKIR"
       v-loading="loading"
       :close-on-click-modal="false"
+      width="500px"
     >
       <el-form label-width="150px" label-position="left">
-        <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.nama">
-            {{ formErrors.nama[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Keterangan"
-          :class="formErrors.keterangan ? 'is-error' : ''"
+          :error="formErrors.keterangan?.join(', ')"
         >
           <el-input
             placeholder="Keterangan"
             v-model="formModel.keterangan"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.keterangan">
-            {{ formErrors.keterangan[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Jenis Kendaraan"
-          :class="formErrors.jenis_kendaraan ? 'is-error' : ''"
+          :error="formErrors.jenis_kendaraan?.join(', ')"
         >
           <el-select
             v-model="formModel.jenis_kendaraan"
@@ -141,64 +137,71 @@
               :key="k.id"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.jenis_kendaraan">
-            {{ formErrors.jenis_kendaraan[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Kapasitas"
-          :class="formErrors.kapasitas ? 'is-error' : ''"
+          :error="formErrors.kapasitas?.join(', ')"
         >
           <el-input
             type="number"
             placeholder="Kapasitas"
             v-model="formModel.kapasitas"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.kapasitas">
-            {{ formErrors.kapasitas[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Terisi"
-          :class="formErrors.terisi ? 'is-error' : ''"
-        >
+        <el-form-item label="Terisi" :error="formErrors.terisi?.join(', ')">
           <el-input
             type="number"
             placeholder="Terisi"
             v-model="formModel.terisi"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.terisi">
-            {{ formErrors.terisi[0] }}
-          </div>
         </el-form-item>
       </el-form>
-      <span slot="footer">
-        <el-button icon="el-icon-error" type="plain" @click="closeForm">
+
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
           BATAL
         </el-button>
-        <el-button type="primary" icon="el-icon-success" @click="save">
+        <el-button :icon="SuccessFilled" type="primary" @click="save()">
           SIMPAN
         </el-button>
-      </span>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import { mapState } from "pinia";
-import crud from "@/mixins/crud";
+<script setup>
+const store = useWebsiteStore();
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
+const {
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/areaParkir");
 
-  data() {
-    return { url: "/api/areaParkir" };
-  },
+const jenisKendaraanList = computed(() => store.jenisKendaraanList);
 
-  computed: {
-    ...mapState(useWebsiteStore, { jenisKendaraanList: "jenisKendaraanList" }),
-  },
-};
+onMounted(() => {
+  requestData();
+});
 </script>
