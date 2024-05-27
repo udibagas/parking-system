@@ -34,7 +34,7 @@ class PrintStrukFailedNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['database', 'broadcast'];
+        return ['broadcast'];
     }
 
     /**

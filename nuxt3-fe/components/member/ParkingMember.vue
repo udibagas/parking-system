@@ -6,7 +6,7 @@
           size="small"
           @click="openForm({ vehicles: [], register_date: now, tarif: 0 })"
           type="primary"
-          icon="el-icon-plus"
+          :icon="Plus"
           >TAMBAH MEMBER</el-button
         >
       </el-form-item>
@@ -15,7 +15,7 @@
           size="small"
           v-model="keyword"
           placeholder="Cari"
-          prefix-icon="el-icon-search"
+          prefix-:icon="Search"
           :clearable="true"
           @change="searchData"
         >
@@ -24,13 +24,13 @@
       <el-form-item>
         <el-button-group>
           <el-button
-            icon="el-icon-download"
+            :icon="Download"
             size="small"
             type="primary"
             @click="exportData('member-parkir')"
           ></el-button>
           <el-button
-            icon="el-icon-printer"
+            :icon="Printer"
             size="small"
             type="primary"
             @click="print"
@@ -71,13 +71,13 @@
         header-align="center"
         align="center"
       >
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-tag
             size="small"
             effect="dark"
             style="width: 100%"
-            :type="scope.row.status ? 'success' : 'info'"
-            >{{ scope.row.status ? "Aktif" : "Nonaktif" }}</el-tag
+            :type="row.status ? 'success' : 'info'"
+            >{{ row.status ? "Aktif" : "Nonaktif" }}</el-tag
           >
         </template>
       </el-table-column>
@@ -103,8 +103,8 @@
         align="center"
         header-align="center"
       >
-        <template slot-scope="scope">
-          {{ scope.row.berbayar ? "BERBAYAR" : "GRATIS" }}
+        <template #default="{ row }">
+          {{ row.berbayar ? "BERBAYAR" : "GRATIS" }}
         </template>
       </el-table-column>
 
@@ -133,8 +133,8 @@
         show-overflow-tooltip
         min-width="150px"
       >
-        <template slot-scope="scope">
-          {{ scope.row.vehicles.map((v) => v.plat_nomor).join(", ") }}
+        <template #default="{ row }">
+          {{ row.vehicles.map((v) => v.plat_nomor).join(", ") }}
         </template>
       </el-table-column>
       <el-table-column
@@ -145,8 +145,8 @@
         align="center"
         header-align="center"
       >
-        <template slot-scope="scope">
-          {{ $moment(scope.row.register_date).format("DD-MMM-YYYY") }}
+        <template #default="{ row }">
+          {{ moment(row.register_date).format("DD-MMM-YYYY") }}
         </template>
       </el-table-column>
       <el-table-column
@@ -157,8 +157,8 @@
         align="center"
         header-align="center"
       >
-        <template slot-scope="scope">
-          {{ $moment(scope.row.expiry_date).format("DD-MMM-YYYY") }}
+        <template #default="{ row }">
+          {{ moment(row.expiry_date).format("DD-MMM-YYYY") }}
         </template>
       </el-table-column>
       <el-table-column
@@ -169,8 +169,8 @@
         header-align="right"
         align="right"
       >
-        <template slot-scope="scope">
-          Rp. {{ scope.row.tarif.toLocaleString("id-ID") }}
+        <template #default="{ row }">
+          Rp. {{ row.tarif.toLocaleString("id-ID") }}
         </template>
       </el-table-column>
       <el-table-column
@@ -179,12 +179,9 @@
         sortable="custom"
         min-width="130px"
       >
-        <template slot-scope="scope">
-          {{ scope.row.siklus_pembayaran }}
-          {{
-            siklus.find((s) => s.value == scope.row.siklus_pembayaran_unit)
-              .label
-          }}
+        <template #default="{ row }">
+          {{ row.siklus_pembayaran }}
+          {{ siklus.find((s) => s.value == row.siklus_pembayaran_unit).label }}
         </template>
       </el-table-column>
       <el-table-column
@@ -201,10 +198,10 @@
         sortable="custom"
         min-width="150px"
       >
-        <template slot-scope="scope">
+        <template #default="{ row }">
           {{
-            scope.row.last_transaction
-              ? $moment(scope.row.last_transaction).format("DD-MMM-YYYY")
+            row.last_transaction
+              ? moment(row.last_transaction).format("DD-MMM-YYYY")
               : ""
           }}
         </template>
@@ -224,13 +221,13 @@
         header-align="center"
         align="center"
       >
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-tag
             size="small"
             effect="dark"
             style="width: 100%"
-            :type="scope.row.expired ? 'danger' : 'success'"
-            >{{ scope.row.expired ? "Ya" : "Tidak" }}</el-tag
+            :type="row.expired ? 'danger' : 'success'"
+            >{{ row.expired ? "Ya" : "Tidak" }}</el-tag
           >
         </template>
       </el-table-column>
@@ -240,38 +237,41 @@
         align="center"
         header-align="center"
       >
-        <template slot="header">
-          <el-button link @click="refreshData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="refreshData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-zoom-in"
-                @click.native.prevent="
-                  () => {
-                    selectedData = scope.row;
-                    showDetail = true;
-                  }
-                "
-                >Lihat Detail</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-edit-outline"
-                @click.native.prevent="openForm(scope.row)"
-                >Edit</el-dropdown-item
-              >
-              <el-dropdown-item
-                v-if="$auth.user.role == 1"
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-                >Hapus</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="ZoomIn"
+                  @click.native.prevent="
+                    () => {
+                      selectedData = row;
+                      showDetail = true;
+                    }
+                  "
+                  >Lihat Detail</el-dropdown-item
+                >
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                  >Edit</el-dropdown-item
+                >
+                <el-dropdown-item
+                  v-if="$auth.user.role == 1"
+                  :icon="Delete"
+                  @click.native.prevent="deleteData(row.id)"
+                  >Hapus</el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -280,7 +280,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -521,10 +521,10 @@
 
       <el-table :data="formModel.vehicles">
         <el-table-column label="Jenis Kendaraan">
-          <template slot-scope="scope">
+          <template #default="{ row }">
             <el-select
               size="small"
-              v-model="scope.row.jenis_kendaraan"
+              v-model="row.jenis_kendaraan"
               placeholder="Jenis Kendaraan"
               style="width: 100%"
             >
@@ -538,68 +538,68 @@
           </template>
         </el-table-column>
         <el-table-column label="Plat Nomor">
-          <template slot-scope="scope">
+          <template #default="{ row }">
             <el-input
-              v-model="scope.row.plat_nomor"
+              v-model="row.plat_nomor"
               placeholder="Plat Nomor"
               size="small"
             ></el-input>
           </template>
         </el-table-column>
         <el-table-column label="Merk">
-          <template slot-scope="scope">
+          <template #default="{ row }">
             <el-input
-              v-model="scope.row.merk"
+              v-model="row.merk"
               placeholder="Merk"
               size="small"
             ></el-input>
           </template>
         </el-table-column>
         <el-table-column label="Tipe">
-          <template slot-scope="scope">
+          <template #default="{ row }">
             <el-input
-              v-model="scope.row.tipe"
+              v-model="row.tipe"
               placeholder="Tipe"
               size="small"
             ></el-input>
           </template>
         </el-table-column>
         <el-table-column label="Tahun">
-          <template slot-scope="scope">
+          <template #default="{ row }">
             <el-input
               type="number"
-              v-model="scope.row.tahun"
+              v-model="row.tahun"
               placeholder="Tahun"
               size="small"
             ></el-input>
           </template>
         </el-table-column>
         <el-table-column label="Warna">
-          <template slot-scope="scope">
+          <template #default="{ row }">
             <el-input
-              v-model="scope.row.warna"
+              v-model="row.warna"
               placeholder="Warna"
               size="small"
             ></el-input>
           </template>
         </el-table-column>
         <el-table-column width="70px" align="right" header-align="right">
-          <template slot="header">
+          <template #header>
             <el-button
               :disabled="
                 setting.jml_kendaraan_per_kartu > 0 &&
                 formModel.vehicles.length >= setting.jml_kendaraan_per_kartu
               "
-              icon="el-icon-plus"
+              :icon="Plus"
               @click="addVehicle"
               size="small"
               type="primary"
             ></el-button>
           </template>
-          <template slot-scope="scope">
+          <template #default="{ row }">
             <el-button
-              @click="deleteVehicle(scope.$index, scope.row.id)"
-              icon="el-icon-delete"
+              @click="deleteVehicle(scope.$index, row.id)"
+              :icon="Delete"
               size="small"
               type="danger"
               plain
@@ -609,8 +609,10 @@
       </el-table>
 
       <span slot="footer" class="dialog-footer">
-        <el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-        <el-button type="primary" icon="el-icon-success" @click="submit">
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button type="primary" :icon="SuccessFilled" @click="submit">
           SIMPAN
         </el-button>
       </span>
@@ -621,6 +623,7 @@
 <script>
 import { mapState, mapStores } from "pinia";
 import crud from "@/mixins/crud";
+import type { ZoomIn } from "@element-plus/icons-vue";
 
 export default {
   mixins: [crud],
@@ -628,7 +631,7 @@ export default {
   computed: {
     expiry_date() {
       try {
-        return this.$moment(this.formModel.register_date, "YYYY-MM-DD")
+        return moment(this.formModel.register_date, "YYYY-MM-DD")
           .add(
             this.formModel.siklus_pembayaran,
             this.formModel.siklus_pembayaran_unit
@@ -661,7 +664,7 @@ export default {
       formModel: { vehicles: [] },
       selectedData: { vehicles: [] },
       showDetail: false,
-      now: this.$moment().format("YYYY-MM-DD"),
+      now: moment().format("YYYY-MM-DD"),
     };
   },
 

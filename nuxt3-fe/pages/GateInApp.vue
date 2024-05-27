@@ -138,7 +138,7 @@ export default {
           this.formModel.member_id = null;
         })
         .finally(() => {
-          this.formModel.time_in = this.$moment().format("YYYY-MM-DD HH:mm:ss");
+          this.formModel.time_in = moment().format("YYYY-MM-DD HH:mm:ss");
           this.$axios.$post("/parkingTransaction", this.formModel);
         });
     },

@@ -1,14 +1,10 @@
 <template>
   <div>
     <el-form inline class="text-right" @submit.native.prevent>
-      <el-form-item v-if="$auth.user.role == 1">
-        <el-button
-          size="small"
-          @click="openForm({})"
-          type="primary"
-          icon="el-icon-plus"
-          >TAMBAH GROUP</el-button
-        >
+      <el-form-item v-if="user.role == 1">
+        <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
+          TAMBAH GROUP
+        </el-button>
       </el-form-item>
 
       <el-form-item>
@@ -16,7 +12,7 @@
           size="small"
           v-model="keyword"
           placeholder="Cari"
-          prefix-icon="el-icon-search"
+          :prefix-icon="Search"
           :clearable="true"
           @change="searchData"
         >
@@ -55,30 +51,33 @@
         width="40px"
         header-align="center"
         align="center"
-        v-if="$auth.user.role == 1"
+        v-if="user.role == 1"
       >
-        <template slot="header">
-          <el-button link @click="refreshData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="refreshData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-edit-outline"
-                @click.native.prevent="openForm(scope.row)"
-                >Edit</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-              >
-                Hapus</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                  >Edit</el-dropdown-item
+                >
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="deleteData(row.id)"
+                >
+                  Hapus</el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -87,7 +86,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -98,64 +97,75 @@
     ></el-pagination>
 
     <el-dialog
-      :visible.sync="showForm"
+      v-model="showForm"
       :title="!!formModel.id ? 'EDIT GROUP MEMBER' : 'TAMBAH GROUP MEMBER'"
       width="500px"
       v-loading="loading"
       :close-on-click-modal="false"
     >
       <el-form label-width="150px" label-position="left">
-        <el-form-item label="Nama" :class="formErrors.nama ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.nama">
-            {{ formErrors.nama[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Keterangan"
-          :class="formErrors.keterangan ? 'is-error' : ''"
+          :error="formErrors.keterangan?.join(', ')"
         >
           <el-input
             placeholder="Keterangan"
             v-model="formModel.keterangan"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.keterangan">
-            {{ formErrors.keterangan[0] }}
-          </div>
         </el-form-item>
       </el-form>
-      <span slot="footer">
-        <el-button icon="el-icon-error" @click="showForm = false">
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
           BATAL
         </el-button>
-        <el-button type="primary" icon="el-icon-success" @click="save">
+        <el-button
+          :icon="SuccessFilled"
+          type="primary"
+          @click="save(getGroupMemberList)"
+        >
           SIMPAN
         </el-button>
-      </span>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
+<script setup>
+const { getGroupMemberList } = useWebsiteStore();
+const { user } = useSanctumAuth();
 
-export default {
-  mixins: [crud],
-  data() {
-    return {
-      url: "/api/groupMember",
-    };
-  },
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+  Search,
+} from "@element-plus/icons-vue";
 
-  methods: {
-    afterSave() {
-      this.$store.dispatch("getGroupMemberList");
-    },
+const {
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/groupMember");
 
-    afterDelete() {
-      this.$store.dispatch("getGroupMemberList");
-    },
-  },
-};
+onMounted(() => {
+  requestData();
+});
 </script>

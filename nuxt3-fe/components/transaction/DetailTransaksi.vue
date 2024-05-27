@@ -63,7 +63,7 @@
           <tr>
             <td class="border bg-blue-700 text-white px-4 py-1">Waktu Masuk</td>
             <td class="border bg-blue-100 px-4 py-1">
-              {{ $moment(trx.time_in).format("DD-MMM-YYYY HH:mm:ss") }}
+              {{ moment(trx.time_in).format("DD-MMM-YYYY HH:mm:ss") }}
             </td>
           </tr>
           <tr>
@@ -73,7 +73,7 @@
             <td class="border bg-blue-100 px-4 py-1">
               {{
                 trx.time_out
-                  ? $moment(trx.time_out).format("DD-MMM-YYYY HH:mm:ss")
+                  ? moment(trx.time_out).format("DD-MMM-YYYY HH:mm:ss")
                   : ""
               }}
             </td>

@@ -54,16 +54,12 @@
         >
         </el-date-picker>
 
-        <el-button
-          type="primary"
-          icon="el-icon-printer"
-          @click="printReport(null)"
-        >
+        <el-button type="primary" :icon="Printer" @click="printReport(null)">
           PRINT LAPORAN (A4)
         </el-button>
         <el-button
           type="primary"
-          icon="el-icon-printer"
+          :icon="Printer"
           @click="showPrintDialog = true"
         >
           PRINT LAPORAN (STRUK)
@@ -80,7 +76,7 @@
           class="bg-purple-600 text-white mb-3"
           :body-style="{ padding: '0' }"
         >
-          <div slot="header">Kendaraan Masuk</div>
+          <div #header>Kendaraan Masuk</div>
 
           <table class="table min-w-full">
             <tbody>
@@ -98,7 +94,7 @@
           class="bg-blue-600 text-white mb-3"
           :body-style="{ padding: '0' }"
         >
-          <div slot="header">Transaksi</div>
+          <div #header>Transaksi</div>
           <table class="table min-w-full">
             <tbody>
               <tr v-for="(t, id) in transaction" :key="id">
@@ -115,7 +111,7 @@
           class="bg-green-600 text-white mb-3"
           :body-style="{ padding: '0' }"
         >
-          <div slot="header">Pendapatan</div>
+          <div #header>Pendapatan</div>
           <table class="table min-w-full">
             <tbody>
               <tr v-for="(t, id) in income" :key="id">
@@ -137,7 +133,7 @@
           :body-style="{ padding: '0' }"
           v-if="parkedVehicle.length > 0"
         >
-          <div slot="header">Kendaraan Masih Terparkir</div>
+          <div #header>Kendaraan Masih Terparkir</div>
           <table class="table min-w-full">
             <thead>
               <tr>
@@ -190,10 +186,7 @@ export default {
       parkedVehicle: [],
       vehicleIn: [],
       showPrintDialog: false,
-      dateRange: [
-        this.$moment().format("YYYY-MM-01"),
-        this.$moment().format("YYYY-MM-DD"),
-      ],
+      dateRange: [moment().format("YYYY-MM-01"), moment().format("YYYY-MM-DD")],
       report: null,
     };
   },

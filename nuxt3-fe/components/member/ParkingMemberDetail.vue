@@ -84,7 +84,7 @@
             <td class="border bg-blue-100 py-1 px-3">
               {{
                 member.last_in
-                  ? $moment(member.last_in).format("DD-MMM-YYYY HH:mm:ss")
+                  ? moment(member.last_in).format("DD-MMM-YYYY HH:mm:ss")
                   : ""
               }}
             </td>
@@ -96,7 +96,7 @@
             <td class="border bg-blue-100 py-1 px-3">
               {{
                 member.last_out
-                  ? $moment(member.last_out).format("DD-MMM-YYYY HH:mm:ss")
+                  ? moment(member.last_out).format("DD-MMM-YYYY HH:mm:ss")
                   : ""
               }}
             </td>

@@ -240,7 +240,7 @@
       style="width: 100%"
       type="primary"
       @click="save"
-      icon="el-icon-success"
+      :icon="SuccessFilled"
     >
       SIMPAN
     </el-button>

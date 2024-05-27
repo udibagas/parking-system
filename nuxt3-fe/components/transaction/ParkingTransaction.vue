@@ -5,7 +5,7 @@
         <el-button
           size="small"
           type="primary"
-          icon="el-icon-plus"
+          :icon="Plus"
           @click="
             () => {
               formModel = {};
@@ -13,12 +13,12 @@
               showForm = true;
             }
           "
-          >TRANSAKSI MANUAL</el-button
         >
+          TRANSAKSI MANUAL
+        </el-button>
       </el-form-item>
       <el-form-item>
         <el-date-picker
-          style="margin-top: 5px"
           size="small"
           @change="requestData"
           v-model="filters.dateRange"
@@ -31,7 +31,7 @@
         >
         </el-date-picker>
       </el-form-item>
-      <el-form-item v-if="$auth.user.role == 1">
+      <el-form-item v-if="user.role == 1">
         <el-tooltip
           class="item"
           effect="dark"
@@ -41,7 +41,7 @@
           <el-button
             size="small"
             type="danger"
-            icon="el-icon-finished"
+            :icon="Finished"
             @click="setSudahKeluarSemua"
           ></el-button>
         </el-tooltip>
@@ -51,7 +51,7 @@
           size="small"
           v-model="keyword"
           placeholder="Cari"
-          prefix-icon="el-icon-search"
+          prefix-:icon="Search"
           :clearable="true"
           @change="searchData"
           style="width: 150px"
@@ -64,13 +64,13 @@
       :data="tableData.data"
       stripe
       @row-dblclick="
-        (row, column, event) => {
+        (row) => {
           trx = row;
           showTrxDetail = true;
         }
       "
       @filter-change="filterChange"
-      height="calc(100vh - 310px)"
+      height="calc(100vh - 285px)"
       v-loading="loading"
       @sort-change="sortChange"
     >
@@ -84,7 +84,7 @@
         min-width="150"
         show-overflow-tooltip
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           <strong>{{ row.nomor_barcode }}</strong
           ><br />
           {{ row.jenis_kendaraan }}
@@ -101,8 +101,8 @@
         column-key="gate_in_id"
         :filters="gateInList.map((g) => ({ value: g.id, text: g.nama }))"
       >
-        <template slot-scope="{ row }">
-          {{ $moment(row.time_in).format("DD/MMM/YY HH:mm") }} <br />
+        <template #default="{ row }">
+          {{ moment(row.time_in).format("DD/MMM/YY HH:mm") }} <br />
           {{ row.gate_in.nama }}
         </template>
       </el-table-column>
@@ -116,9 +116,9 @@
         column-key="gate_out_id"
         :filters="gateOutList.map((g) => ({ value: g.id, text: g.nama }))"
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           {{
-            row.time_out ? $moment(row.time_out).format("DD/MMM/YY HH:mm") : ""
+            row.time_out ? moment(row.time_out).format("DD/MMM/YY HH:mm") : ""
           }}
           <br />
           {{ row.gate_out ? row.gate_out.nama : "-" }}
@@ -132,16 +132,16 @@
         sortable="custom"
         min-width="100px"
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           {{ row.durasi }}
-          <div v-if="$auth.user.role == 1" style="font-weight: bold">
-            Rp. {{ row.tarif.toLocaleString("id-ID") }}
+          <div v-if="user.role == 1" style="font-weight: bold">
+            {{ toRupiah(row.tarif) }}
           </div>
         </template>
       </el-table-column>
 
       <el-table-column
-        v-if="$auth.user.role == 1"
+        v-if="user.role == 1"
         prop="denda"
         label="Denda"
         align="right"
@@ -154,8 +154,8 @@
         header-align="right"
         min-width="100px"
       >
-        <template slot-scope="scope">
-          Rp. {{ scope.row.denda.toLocaleString("id-ID") }}
+        <template #default="{ row }">
+          {{ toRupiah(row.denda) }}
         </template>
       </el-table-column>
 
@@ -165,7 +165,7 @@
         show-overflow-tooltip
         min-width="120"
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           <strong> {{ row.member ? row.member.nama : "" }} </strong> <br />
           {{ row.nomor_kartu }}
         </template>
@@ -199,7 +199,7 @@
         :filter-multiple="false"
         min-width="100px"
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           {{ row.edit ? "YA" : "TIDAK" }} <br />
           {{ row.edit_by }}
         </template>
@@ -217,67 +217,71 @@
         :filter-multiple="false"
         min-width="100px"
       >
-        <template slot-scope="scope">
-          {{ scope.row.manual ? "YA" : "TIDAK" }}
+        <template #default="{ row }">
+          {{ row.manual ? "YA" : "TIDAK" }}
         </template>
       </el-table-column>
 
       <el-table-column
         fixed="right"
-        width="40px"
+        width="60px"
         align="center"
         header-align="center"
       >
-        <template slot="header">
-          <el-button link @click="refreshData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="refreshData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-zoom-in"
-                @click.native.prevent="
-                  () => {
-                    trx = scope.row;
-                    showTrxDetail = true;
-                  }
-                "
-                >Lihat Detail</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-check"
-                v-if="!scope.row.time_out && $auth.user.role == 1"
-                @click.native.prevent="setSudahKeluar(scope.row.id)"
-                >Set Sudah Keluar</el-dropdown-item
-              >
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="ZoomIn"
+                  @click.native.prevent="
+                    () => {
+                      trx = row;
+                      showTrxDetail = true;
+                    }
+                  "
+                >
+                  Lihat Detail
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Check"
+                  v-if="!row.time_out && user.role == 1"
+                  @click.native.prevent="setSudahKeluar(row.id)"
+                >
+                  Set Sudah Keluar
+                </el-dropdown-item>
 
-              <el-dropdown-item
-                icon="el-icon-edit"
-                v-if="
-                  !scope.row.is_member && !scope.row.edit && !scope.row.manual
-                "
-                @click.native.prevent="
-                  () => {
-                    formModel = { ...scope.row };
-                    formErrors = {};
-                    showForm = true;
-                  }
-                "
-              >
-                Edit
-              </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Edit"
+                  v-if="!row.is_member && !row.edit && !row.manual"
+                  @click.native.prevent="
+                    () => {
+                      formModel = { ...row };
+                      formErrors = {};
+                      showForm = true;
+                    }
+                  "
+                >
+                  Edit
+                </el-dropdown-item>
 
-              <el-dropdown-item
-                icon="el-icon-printer"
-                v-if="!scope.row.is_member && !!scope.row.time_out"
-                @click.native.prevent="printTicket(scope.row.id)"
-                >Print Tiket Keluar</el-dropdown-item
-              >
-            </el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Printer"
+                  v-if="!row.is_member && !!row.time_out"
+                  @click.native.prevent="printTicket(row.id)"
+                >
+                  Print Tiket Keluar
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -286,7 +290,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -313,85 +317,97 @@
   </div>
 </template>
 
-<script>
-import { mapState, mapStores } from "pinia";
-import crud from "@/mixins/crud";
+<script setup>
+import moment from "moment";
+const store = useWebsiteStore();
+const { user } = useSanctumAuth();
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+  ZoomIn,
+  Check,
+  Printer,
+  Finished,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
-  computed: {
-    ...mapStores(useWebsiteStore),
-    ...mapState(useWebsiteStore, {
-      jenisKendaraanList: "jenisKendaraanList",
-      gateInList: "gateInList",
-      gateOutList: "gateOutList",
-      user: "user",
-      shiftList: "shiftList",
-    }),
-  },
+const {
+  api,
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  requestData,
+  toRupiah,
+} = useCrud("/api/parkingTransaction");
 
-  created() {
-    this.websiteStore.getShiftList();
-  },
+const jenisKendaraanList = computed(() => store.jenisKendaraanList);
+const gateInList = computed(() => store.gateInList);
+const gateOutList = computed(() => store.gateOutList);
+const shiftList = computed(() => store.shiftList);
 
-  data() {
-    return {
-      url: "/api/parkingTransaction",
-      trx: null,
-      showTrxDetail: false,
-      date: this.$moment().format("YYYY-MM-DD"),
-      formModel: {},
-      formErrors: {},
-      showForm: false,
-      filters: { dateRange: null },
-    };
-  },
+const trx = ref(null);
+const showTrxDetail = ref(null);
+const filters = ref({ dateRange: null });
 
-  methods: {
-    setSudahKeluar(id) {
-      this.$confirm("Anda yakin?", "Confirm", { type: "warning" })
-        .then(() => {
-          this.$axios
-            .$put(`/api/parkingTransaction/setSudahKeluar/${id}`)
-            .then((r) => {
-              this.$message({
-                message: r.message,
-                type: "success",
-              });
-              this.requestData();
-            });
-        })
-        .catch(() => console.log(e));
-    },
+onBeforeMount(() => {
+  store.getShiftList();
+});
 
-    setSudahKeluarSemua() {
-      this.$confirm("Anda yakin?", "Confirm", { type: "warning" })
-        .then(() => {
-          this.$axios
-            .$put("/api/parkingTransaction/setSudahKeluarSemua", {
-              dateRange: this.filters.dateRange,
-            })
-            .then((r) => {
-              this.$message({
-                message: r.message,
-                type: "success",
-              });
-              this.requestData();
-            });
-        })
-        .catch((e) => console.log(e));
-    },
+onMounted(() => {
+  requestData();
+});
 
-    printTicket(id) {
-      this.$axios
-        .post(`/api/parkingTransaction/printTicketOut/${id}`)
-        .then((r) => {
-          this.$message({
-            message: r.message,
-            type: "success",
-          });
-        });
-    },
-  },
+const setSudahKeluar = (id) => {
+  ElMessageBox.confirm("Anda yakin?", "Confirm", { type: "warning" })
+    .then(() => {
+      return api(`/api/parkingTransaction/setSudahKeluar/${id}`, {
+        method: "PUT",
+      });
+    })
+    .then((r) => {
+      ElMessage({
+        message: r.message,
+        type: "success",
+      });
+      requestData();
+    });
+};
+
+const setSudahKeluarSemua = () => {
+  ElMessageBox.confirm("Anda yakin?", "Confirm", { type: "warning" })
+    .then(() => {
+      return api("/api/parkingTransaction/setSudahKeluarSemua", {
+        method: "PUT",
+        body: { dateRange: this.filters.dateRange },
+      });
+    })
+    .then((r) => {
+      ElMessage({
+        message: r.message,
+        type: "success",
+      });
+      this.requestData();
+    })
+    .catch((e) => console.log(e));
+};
+
+const printTicket = (id) => {
+  api(`/api/parkingTransaction/printTicketOut/${id}`, { method: "POST" }).then(
+    (r) => {
+      ElMessage({
+        message: r.message,
+        type: "success",
+      });
+    }
+  );
 };
 </script>

@@ -177,8 +177,10 @@
     </el-form>
 
     <div slot="footer">
-      <el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-      <el-button type="primary" icon="el-icon-success" @click="save">
+      <el-button :icon="CircleCloseFilled" @click="closeForm">
+        BATAL
+      </el-button>
+      <el-button type="primary" :icon="SuccessFilled" @click="save">
         SIMPAN
       </el-button>
     </div>
@@ -197,10 +199,10 @@ export default {
     },
 
     durasi() {
-      var date1 = this.$moment(this.formModel.time_in);
-      var date2 = this.$moment(this.formModel.time_out);
-      var duration = this.$moment.duration(date2.diff(date1));
-      return this.$moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+      var date1 = moment(this.formModel.time_in);
+      var date2 = moment(this.formModel.time_out);
+      var duration = moment.duration(date2.diff(date1));
+      return moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
     },
     ...mapState(useWebsiteStore, {
       posList: "posList",

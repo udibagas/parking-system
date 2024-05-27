@@ -16,7 +16,7 @@
         <el-button
           size="small"
           type="primary"
-          icon="el-icon-printer"
+          :icon="Printer"
           @click="showPrintDialog = true"
           >PRINT LAPORAN</el-button
         >
@@ -25,8 +25,8 @@
 
     <el-table show-summary stripe :data="report" :summary-method="getSummaries">
       <el-table-column label="Tanggal" header-align="center" align="center">
-        <template slot-scope="scope">
-          {{ $moment(scope.row.created_at).format("DD-MMM-YYYY HH:mm") }}
+        <template #default="{ row }">
+          {{ moment(row.created_at).format("DD-MMM-YYYY HH:mm") }}
         </template>
       </el-table-column>
       <el-table-column prop="member.nama" label="Nama"></el-table-column>
@@ -37,13 +37,13 @@
         align="center"
       ></el-table-column>
       <el-table-column label="Plat Nomor" header-align="center" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.member.vehicles.map((v) => v.plate_number).join(", ") }}
+        <template #default="{ row }">
+          {{ row.member.vehicles.map((v) => v.plate_number).join(", ") }}
         </template>
       </el-table-column>
       <el-table-column label="Jumlah" header-align="right" align="right">
-        <template slot-scope="scope">
-          Rp. {{ scope.row.jumlah.toLocaleString("id-ID") }}
+        <template #default="{ row }">
+          Rp. {{ row.jumlah.toLocaleString("id-ID") }}
         </template>
       </el-table-column>
     </el-table>
@@ -60,7 +60,7 @@
 export default {
   data() {
     return {
-      date: this.$moment().format("YYYY-MM-DD"),
+      date: moment().format("YYYY-MM-DD"),
       report: [],
       loading: false,
       showPrintDialog: false,

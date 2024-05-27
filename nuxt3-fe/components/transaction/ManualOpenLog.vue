@@ -21,7 +21,7 @@
           size="small"
           v-model="keyword"
           placeholder="Cari"
-          prefix-icon="el-icon-search"
+          prefix-:icon="Search"
           clearable
           @change="searchData"
         >
@@ -55,8 +55,8 @@
         show-overflow-tooltip
         width="180px"
       >
-        <template slot-scope="scope">
-          {{ $moment(scope.row.created_at).format("DD-MMM-YYYY HH:mm:ss") }}
+        <template #default="{ row }">
+          {{ moment(row.created_at).format("DD-MMM-YYYY HH:mm:ss") }}
         </template>
       </el-table-column>
 
@@ -89,27 +89,30 @@
         align="center"
         header-align="center"
       >
-        <template slot="header">
-          <el-button link @click="refreshData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="refreshData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-camera"
-                @click.native.prevent="
-                  () => {
-                    snapshots = scope.row.snapshots;
-                    showSnapshot = true;
-                  }
-                "
-                >Lihat Snapshot</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Camera"
+                  @click.native.prevent="
+                    () => {
+                      snapshots = row.snapshots;
+                      showSnapshot = true;
+                    }
+                  "
+                  >Lihat Snapshot</el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>

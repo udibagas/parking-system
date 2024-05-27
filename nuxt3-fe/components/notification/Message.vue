@@ -17,7 +17,7 @@
       <div slot="footer">
         <el-button
           type="primary"
-          icon="el-icon-circle-close"
+          :icon="CircleCloseFilled"
           @click="show = false"
           >TUTUP</el-button
         >
@@ -27,6 +27,7 @@
 </template>
 
 <script setup>
+import { CircleCloseFilled } from "@element-plus/icons-vue";
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
 window.Pusher = Pusher;

@@ -3,7 +3,7 @@
     <el-form inline class="text-right" @submit.native.prevent>
       <el-form-item>
         <el-button
-          icon="el-icon-plus"
+          :icon="Plus"
           size="small"
           @click="openForm({})"
           type="primary"
@@ -33,7 +33,7 @@
           size="small"
           v-model="keyword"
           placeholder="Cari"
-          prefix-icon="el-icon-search"
+          prefix-:icon="Search"
           clearable
           @change="searchData"
           style="width: 150px"
@@ -61,8 +61,8 @@
         sortable="custom"
         min-width="180"
       >
-        <template slot-scope="scope">
-          {{ $moment(scope.row.created_at).format("DD-MMM-YYYY HH:mm:ss") }}
+        <template #default="{ row }">
+          {{ moment(row.created_at).format("DD-MMM-YYYY HH:mm:ss") }}
         </template>
       </el-table-column>
 
@@ -90,8 +90,8 @@
         align="center"
         header-align="center"
       >
-        <template slot-scope="scope">
-          {{ $moment(scope.row.dari_tanggal).format("DD-MMM-YYYY") }}
+        <template #default="{ row }">
+          {{ moment(row.dari_tanggal).format("DD-MMM-YYYY") }}
         </template>
       </el-table-column>
 
@@ -103,8 +103,8 @@
         align="center"
         header-align="center"
       >
-        <template slot-scope="scope">
-          {{ $moment(scope.row.sampai_tanggal).format("DD-MMM-YYYY") }}
+        <template #default="{ row }">
+          {{ moment(row.sampai_tanggal).format("DD-MMM-YYYY") }}
         </template>
       </el-table-column>
 
@@ -116,8 +116,8 @@
         header-align="right"
         min-width="120"
       >
-        <template slot-scope="scope">
-          Rp. {{ scope.row.jumlah.toLocaleString("id-ID") }}
+        <template #default="{ row }">
+          Rp. {{ row.jumlah.toLocaleString("id-ID") }}
         </template>
       </el-table-column>
 
@@ -134,39 +134,42 @@
         align="center"
         header-align="center"
       >
-        <template slot="header">
-          <el-button link @click="refreshData" icon="el-icon-refresh">
-          </el-button>
+        <template #header>
+          <el-button link @click="refreshData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-printer"
-                @click.native.prevent="
-                  () => {
-                    selectedData = scope.row;
-                    showPrintDialog = true;
-                  }
-                "
-                >Print Slip</el-dropdown-item
-              >
-              <el-dropdown-item
-                v-if="$auth.user.role == 1"
-                icon="el-icon-edit-outline"
-                @click.native.prevent="openForm(scope.row)"
-                >Edit</el-dropdown-item
-              >
-              <el-dropdown-item
-                v-if="$auth.user.role == 1"
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-                >Hapus</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Printer"
+                  @click.native.prevent="
+                    () => {
+                      selectedData = row;
+                      showPrintDialog = true;
+                    }
+                  "
+                  >Print Slip</el-dropdown-item
+                >
+                <el-dropdown-item
+                  v-if="$auth.user.role == 1"
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                  >Edit</el-dropdown-item
+                >
+                <el-dropdown-item
+                  v-if="$auth.user.role == 1"
+                  :icon="Delete"
+                  @click.native.prevent="deleteData(row.id)"
+                  >Hapus</el-dropdown-item
+                >
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -294,8 +297,10 @@
         </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
-        <el-button icon="el-icon-error" @click="closeForm"> BATAL </el-button>
-        <el-button icon="el-icon-success" type="primary" @click="submit">
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button :icon="SuccessFilled" type="primary" @click="submit">
           SIMPAN
         </el-button>
       </span>
@@ -327,7 +332,7 @@ export default {
   computed: {
     sampai_tanggal() {
       try {
-        return this.$moment(this.formModel.dari_tanggal, "YYYY-MM-DD")
+        return moment(this.formModel.dari_tanggal, "YYYY-MM-DD")
           .add(
             this.formModel.siklus_pembayaran,
             this.formModel.siklus_pembayaran_unit

@@ -20,7 +20,7 @@
         <el-button
           size="small"
           type="primary"
-          icon="el-icon-printer"
+          :icon="Printer"
           @click="showPrintDialog = true"
           >PRINT LAPORAN</el-button
         >
@@ -29,18 +29,18 @@
 
     <el-table show-summary stripe :data="report" :summary-method="getSummaries">
       <el-table-column label="Tanggal" header-align="center" align="center">
-        <template slot-scope="scope">
-          {{ $moment(scope.row.tanggal).format("DD/MMM/YYYY") }}
+        <template #default="{ row }">
+          {{ moment(row.tanggal).format("DD/MMM/YYYY") }}
         </template>
       </el-table-column>
       <el-table-column label="Jumlah" header-align="center" align="center">
-        <template slot-scope="scope">
-          {{ scope.row.jumlah.toLocaleString("id-ID") }}
+        <template #default="{ row }">
+          {{ row.jumlah.toLocaleString("id-ID") }}
         </template>
       </el-table-column>
       <el-table-column label="Pendapatan" header-align="right" align="right">
-        <template slot-scope="scope">
-          Rp. {{ scope.row.pendapatan.toLocaleString("id-ID") }}
+        <template #default="{ row }">
+          Rp. {{ row.pendapatan.toLocaleString("id-ID") }}
         </template>
       </el-table-column>
     </el-table>
@@ -57,10 +57,7 @@
 export default {
   data() {
     return {
-      dateRange: [
-        this.$moment().format("YYYY-MM-01"),
-        this.$moment().format("YYYY-MM-DD"),
-      ],
+      dateRange: [moment().format("YYYY-MM-01"), moment().format("YYYY-MM-DD")],
       report: [],
       loading: false,
       showPrintDialog: false,
