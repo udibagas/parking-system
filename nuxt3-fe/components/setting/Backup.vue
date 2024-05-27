@@ -6,17 +6,18 @@
           :disabled="selectedFiles.length == 0"
           @click="deleteFiles"
           type="danger"
-          icon="el-icon-delete"
+          :icon="Delete"
           size="small"
           title="Hapus File Backup"
-          >HAPUS FILE BACKUP</el-button
         >
+          HAPUS FILE BACKUP
+        </el-button>
       </el-form-item>
       <el-form-item>
         <el-button
           @click="triggerOpenFile"
           type="primary"
-          icon="el-icon-upload2"
+          :icon="Upload"
           size="small"
           title="Upload File Backup"
           >UPLOAD FILE BACKUP</el-button
@@ -33,12 +34,13 @@
         <el-button
           @click="backup"
           type="primary"
-          icon="el-icon-plus"
+          :icon="Plus"
           size="small"
           title="Generate Backup"
           :loading="processing"
-          >GENERATE BACKUP</el-button
         >
+          GENERATE BACKUP
+        </el-button>
       </el-form-item>
     </el-form>
 
@@ -46,7 +48,7 @@
       :data="tableData"
       v-loading="loading"
       stripe
-      height="calc(100vh - 260px)"
+      height="calc(100vh - 240px)"
       @selection-change="handleSelectionChange"
     >
       <el-table-column
@@ -76,36 +78,38 @@
       </el-table-column>
 
       <el-table-column width="60" align="center" header-align="center">
-        <template slot="header">
-          <el-button
-            type="text"
-            @click="getData"
-            icon="el-icon-refresh"
-          ></el-button>
+        <template #header>
+          <el-button type="text" @click="getData" :icon="Refresh"></el-button>
         </template>
 
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-download"
-                @click.native.prevent="download(scope.row.url)"
-                >Download</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-refresh"
-                @click.native.prevent="restore(scope.row.file)"
-                >Restore</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.file)"
-                >Hapus</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Download"
+                  @click.native.prevent="download(row.url)"
+                  >Download</el-dropdown-item
+                >
+                <el-dropdown-item
+                  :icon="Refresh"
+                  @click.native.prevent="restore(row.file)"
+                >
+                  Restore
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="deleteData(row.file)"
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -113,124 +117,131 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      tableData: [],
-      loading: false,
-      processing: false,
-      selectedFiles: [],
-    };
-  },
+<script setup>
+import {
+  Refresh,
+  Plus,
+  Delete,
+  MoreFilled,
+  Download,
+  Upload,
+} from "@element-plus/icons-vue";
 
-  mounted() {
-    this.getData();
-  },
+const api = useApi();
+const tableData = ref([]);
+const loading = ref(false);
+const processing = ref(false);
+const selectedFiles = ref([]);
 
-  methods: {
-    getData() {
-      this.loading = true;
-      this.$axios
-        .$get("/api/backup")
-        .then((response) => {
-          this.tableData = response;
-        })
-        .finally(() => (this.loading = false));
-    },
+onMounted(() => {
+  getData();
+});
 
-    deleteData(file) {
-      this.$confirm("Anda yakin akan menghapus file ini?", "Konfirmasi", {
-        type: "warning",
-      })
-        .then(() => {
-          const params = { file };
-          this.$axios.$delete("/api/backup", { params }).then((response) => {
-            this.$message({
-              message: response.message,
-              type: "success",
-              showClose: true,
-            });
-            this.getData();
-          });
-        })
-        .catch((e) => console.log(e));
-    },
+const getData = () => {
+  loading.value = true;
+  api("/api/backup")
+    .then((response) => {
+      tableData.value = response;
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+};
 
-    backup() {
-      this.processing = true;
-      this.$axios
-        .$post("/api/backup")
-        .then((response) => {
-          this.$message({
-            message: response.message,
-            type: "success",
-            showClose: true,
-          });
-          this.getData();
-        })
-        .finally(() => (this.processing = false));
-    },
+const deleteData = (file) => {
+  ElMessageBox.confirm("Anda yakin akan menghapus file ini?", "Konfirmasi", {
+    type: "warning",
+  })
+    .then(() => {
+      const params = { file };
+      return api("/api/backup", { method: "DELETE", params });
+    })
+    .then((response) => {
+      ElMessage({
+        message: response.message,
+        type: "success",
+        showClose: true,
+      });
+      getData();
+    });
+};
 
-    restore(file) {
-      this.$confirm("Anda yakin akan me-restore database?", "Konfirmasi", {
-        type: "warning",
-      })
-        .then(() => {
-          this.loading = true;
-          this.$axios
-            .$put("/api/backup", { file })
-            .then((response) => {
-              this.$message({
-                message: response.message,
-                type: "success",
-                showClose: true,
-              });
-              this.getData();
-            })
-            .finally(() => (this.loading = false));
-        })
-        .catch((e) => console.log(e));
-    },
+const backup = () => {
+  processing.value = true;
+  api("/api/backup", { method: "POST" })
+    .then((response) => {
+      ElMessage({
+        message: response.message,
+        type: "success",
+        showClose: true,
+      });
+      getData();
+    })
+    .finally(() => {
+      processing.value = false;
+    });
+};
 
-    triggerOpenFile() {
-      const f = document.querySelector("#input-file");
-      f.click();
-    },
+const restore = (file) => {
+  ElMessageBox.confirm("Anda yakin akan me-restore database?", "Konfirmasi", {
+    type: "warning",
+  })
+    .then(() => {
+      loading.value = true;
+      return api("/api/backup", { method: "PUT", body: { file } });
+    })
+    .then((response) => {
+      ElMessage({
+        message: response.message,
+        type: "success",
+        showClose: true,
+      });
+      getData();
+    })
+    .finally(() => {
+      loading.value = false;
+    });
+};
 
-    uploadFile(event) {
-      var formData = new FormData();
-      formData.append("file", event.target.files[0]);
+const triggerOpenFile = () => {
+  const f = document.querySelector("#input-file");
+  f.click();
+};
 
-      this.$axios
-        .$post("/api/backup", formData, {
-          headers: { "Content-Type": "multipart/form-data" },
-        })
-        .then((response) => {
-          this.$message({
-            message: response.message,
-            type: "success",
-            showClose: true,
-          });
-          this.getData();
-        })
-        .finally(() => {
-          this.loading = false;
-          document.querySelector("#input-file").value = "";
-        });
-    },
+const uploadFile = (event) => {
+  var formData = new FormData();
+  formData.append("file", event.target.files[0]);
 
-    handleSelectionChange(val) {
-      this.selectedFiles = val.map((v) => v.file);
-    },
+  api(
+    "/api/backup",
+    { method: "POST", body: formData },
+    {
+      headers: { "Content-Type": "multipart/form-data" },
+    }
+  )
+    .then((response) => {
+      ElMessage({
+        message: response.message,
+        type: "success",
+        showClose: true,
+      });
+      getData();
+    })
+    .finally(() => {
+      loading.value = false;
+      document.querySelector("#input-file").value = "";
+    });
+};
 
-    deleteFiles() {
-      this.deleteData(this.selectedFiles);
-    },
+const handleSelectionChange = (val) => {
+  selectedFiles.value = val.map((v) => v.file);
+};
 
-    download(url) {
-      window.open(url, "_blank");
-    },
-  },
+const deleteFiles = () => {
+  deleteData(selectedFiles.value);
+};
+
+const download = (url) => {
+  window.open(url, "_blank");
 };
 </script>
