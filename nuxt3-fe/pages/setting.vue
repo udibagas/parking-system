@@ -8,7 +8,6 @@
         :label="c.label.toUpperCase()"
       >
         <component :is="c.component"></component>
-        <!-- <SettingGeneral /> -->
       </el-tab-pane>
     </el-tabs>
   </el-card>
@@ -25,7 +24,7 @@ import {
   SettingGateIn,
   SettingGateOut,
   SettingAreaParkir,
-  // SettingBackup,
+  SettingBackup,
 } from "#components";
 
 const store = useWebsiteStore();
@@ -67,10 +66,10 @@ const components = [
     label: "Area Parkir",
     component: SettingAreaParkir,
   },
-  // {
-  //   label: "Backup & Restore",
-  //   component: SettingBackup,
-  // },
+  {
+    label: "Backup & Restore",
+    component: SettingBackup,
+  },
 ];
 
 onMounted(async () => {
