@@ -8,16 +8,17 @@
             size="small"
             @click="openForm({ role: 0, password: '' })"
             type="primary"
-            icon="el-icon-plus"
-            >TAMBAH USER</el-button
+            :icon="Plus"
           >
+            TAMBAH USER
+          </el-button>
         </el-form-item>
         <el-form-item style="margin-bottom: 0">
           <el-input
             size="small"
             v-model="keyword"
             placeholder="Cari"
-            prefix-icon="el-icon-search"
+            :prefix-icon="Search"
             :clearable="true"
             @change="searchData"
           >
@@ -30,7 +31,7 @@
 
     <el-table
       stripe
-      height="calc(100vh - 255px)"
+      height="calc(100vh - 240px)"
       v-loading="loading"
       :data="tableData.data"
       @sort-change="sortChange"
@@ -46,8 +47,8 @@
         sortable="custom"
       ></el-table-column>
       <el-table-column prop="role" label="Level" sortable="custom">
-        <template slot-scope="scope">
-          {{ scope.row.role ? "Admin" : "Operator" }}
+        <template #default="{ row }">
+          {{ row.role ? "Admin" : "Operator" }}
         </template>
       </el-table-column>
       <el-table-column
@@ -58,40 +59,45 @@
         header-align="center"
         width="100"
       >
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-tag
-            :type="scope.row.status ? 'success' : 'info'"
+            :type="row.status ? 'success' : 'info'"
             size="mini"
             style="width: 100%"
             effect="dark"
           >
-            {{ scope.row.status ? "Aktif" : "Nonaktif" }}
+            {{ row.status ? "Aktif" : "Nonaktif" }}
           </el-tag>
         </template>
       </el-table-column>
 
-      <el-table-column width="40px" align="center" header-align="center">
-        <template slot="header">
-          <el-button link @click="refreshData" icon="el-icon-refresh">
-          </el-button>
+      <el-table-column width="60px" align="center" header-align="center">
+        <template #header>
+          <el-button link @click="refreshData" :icon="Refresh"> </el-button>
         </template>
-        <template slot-scope="scope">
+        <template #default="{ row }">
           <el-dropdown>
             <span class="el-dropdown-link">
-              <i class="el-icon-more"></i>
+              <el-icon>
+                <MoreFilled />
+              </el-icon>
             </span>
-            <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item
-                icon="el-icon-edit-outline"
-                @click.native.prevent="openForm(scope.row)"
-                >Edit</el-dropdown-item
-              >
-              <el-dropdown-item
-                icon="el-icon-delete"
-                @click.native.prevent="deleteData(scope.row.id)"
-                >Hapus</el-dropdown-item
-              >
-            </el-dropdown-menu>
+            <template #dropdown>
+              <el-dropdown-menu>
+                <el-dropdown-item
+                  :icon="Edit"
+                  @click.native.prevent="openForm(row)"
+                >
+                  Edit
+                </el-dropdown-item>
+                <el-dropdown-item
+                  :icon="Delete"
+                  @click.native.prevent="deleteData(row.id)"
+                >
+                  Hapus
+                </el-dropdown-item>
+              </el-dropdown-menu>
+            </template>
           </el-dropdown>
         </template>
       </el-table-column>
@@ -100,7 +106,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -111,21 +117,18 @@
     ></el-pagination>
 
     <el-dialog
-      :visible.sync="showForm"
+      v-model="showForm"
       :title="!!formModel.id ? 'EDIT USER' : 'TAMBAH USER'"
       width="500px"
       v-loading="loading"
       :close-on-click-modal="false"
     >
       <el-form label-width="160px" label-position="left">
-        <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
+        <el-form-item label="Nama" :error="formErrors.name?.join(', ')">
           <el-input placeholder="Nama" v-model="formModel.name"></el-input>
-          <div class="el-form-item__error" v-if="formErrors.name">
-            {{ formErrors.name[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item label="Level" :class="formErrors.role ? 'is-error' : ''">
+        <el-form-item label="Level" :error="formErrors.role?.join(', ')">
           <el-select
             v-model="formModel.role"
             placeholder="Level"
@@ -142,28 +145,19 @@
             >
             </el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.type">
-            {{ formErrors.role[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Password"
-          :class="formErrors.password ? 'is-error' : ''"
-        >
+        <el-form-item label="Password" :error="formErrors.password?.join(', ')">
           <el-input
             type="password"
             placeholder="Password"
             v-model="formModel.password"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.password">
-            {{ formErrors.password[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Konfirmasi Password"
-          :class="formErrors.password ? 'is-error' : ''"
+          :error="formErrors.password?.join(', ')"
         >
           <el-input
             type="password"
@@ -172,10 +166,7 @@
           ></el-input>
         </el-form-item>
 
-        <el-form-item
-          label="Status"
-          :class="formErrors.status ? 'is-error' : ''"
-        >
+        <el-form-item label="Status" :error="formErrors.status?.join(', ')">
           <el-switch
             :active-value="true"
             :inactive-value="false"
@@ -187,37 +178,53 @@
             :type="formModel.status ? 'success' : 'info'"
             size="small"
             style="margin-left: 10px"
-            >{{ !!formModel.status ? "Aktif" : "Nonaktif" }}</el-tag
           >
-
-          <div class="el-form-item__error" v-if="formErrors.status">
-            {{ formErrors.status[0] }}
-          </div>
+            {{ !!formModel.status ? "Aktif" : "Nonaktif" }}
+          </el-tag>
         </el-form-item>
       </el-form>
 
-      <span slot="footer" class="dialog-footer">
-        <el-button icon="el-icon-error" @click="showForm = false"
-          >BATAL</el-button
-        >
-        <el-button type="primary" icon="el-icon-success" @click="save">
+      <template #footer>
+        <el-button :icon="CircleCloseFilled" @click="closeForm">
+          BATAL
+        </el-button>
+        <el-button :icon="SuccessFilled" type="primary" @click="save()">
           SIMPAN
         </el-button>
-      </span>
+      </template>
     </el-dialog>
   </el-card>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
+<script setup>
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+  Search,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
+const {
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/user");
 
-  data() {
-    return {
-      url: "/api/user",
-    };
-  },
-};
+onMounted(() => {
+  requestData();
+});
 </script>
