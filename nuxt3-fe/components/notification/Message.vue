@@ -1,27 +1,29 @@
 <template>
-  <el-dialog
-    :visible.sync="show"
-    center
-    :close-on-click-modal="false"
-    :show-close="false"
-  >
-    <div class="text-center" style="font-size: 50px; color: orange">
-      <i class="el-icon-warning-outline"></i>
-    </div>
+  <div>
+    <el-dialog
+      :visible.sync="show"
+      center
+      :close-on-click-modal="false"
+      :show-close="false"
+    >
+      <div class="text-center" style="font-size: 50px; color: orange">
+        <i class="el-icon-warning-outline"></i>
+      </div>
 
-    <div class="text-center" style="font-size: 24px; margin-top: 20px">
-      {{ notification.message }}
-    </div>
+      <div class="text-center" style="font-size: 24px; margin-top: 20px">
+        {{ notification.message }}
+      </div>
 
-    <div slot="footer">
-      <el-button
-        type="primary"
-        icon="el-icon-circle-close"
-        @click="show = false"
-        >TUTUP</el-button
-      >
-    </div>
-  </el-dialog>
+      <div slot="footer">
+        <el-button
+          type="primary"
+          icon="el-icon-circle-close"
+          @click="show = false"
+          >TUTUP</el-button
+        >
+      </div>
+    </el-dialog>
+  </div>
 </template>
 
 <script setup>
@@ -37,7 +39,6 @@ const setting = computed(() => store.setting);
 const api = useApi();
 
 onMounted(async () => {
-  await store.getSetting();
   echo.value = new Echo({
     broadcaster: "reverb",
     key: "g2iix2c1zwlt3dgvo35h",
