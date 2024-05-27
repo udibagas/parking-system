@@ -126,6 +126,7 @@
       title="GATE MASUK"
       :close-on-click-modal="false"
       v-model="showForm"
+      width="500px"
     >
       <el-form label-position="left" label-width="150px">
         <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
