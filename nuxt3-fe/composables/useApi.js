@@ -10,5 +10,12 @@ export default () => {
       Accept: "application/json",
       "X-XSRF-TOKEN": token.value,
     },
+    onResponseError: (error) => {
+      ElMessage({
+        message: error.response._data.message,
+        type: "error",
+        showClose: true,
+      });
+    },
   });
 };
