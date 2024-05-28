@@ -1,5 +1,10 @@
 <template>
-  <el-dialog title="PROFIL SAYA" v-loading="loading" :model-value="show">
+  <el-dialog
+    title="PROFIL SAYA"
+    v-loading="loading"
+    :model-value="show"
+    width="500px"
+  >
     <el-form label-width="180px" label-position="left">
       <el-form-item label="Nama" :error="formErrors.name?.join(', ')">
         <el-input placeholder="Nama" v-model="formModel.name"></el-input>
