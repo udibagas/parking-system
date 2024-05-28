@@ -29,8 +29,8 @@ export default (url) => {
     }
   };
 
-  const currentChange = (page) => {
-    page.value = page;
+  const currentChange = (p) => {
+    page.value = p;
     requestData();
   };
 
