@@ -2,7 +2,7 @@
   <el-card>
     <div style="display: flex; justify-content: space-between">
       <div style="font-size: 1.2em; line-height: 41px">KELOLA USER</div>
-      <el-form inline class="text-right" @submit.native.prevent>
+      <el-form inline class="text-right" @submit.native.prevent="searchData">
         <el-form-item style="margin-bottom: 0">
           <el-button
             size="small"
@@ -20,7 +20,6 @@
             placeholder="Cari"
             :prefix-icon="Search"
             :clearable="true"
-            @change="searchData"
           >
           </el-input>
         </el-form-item>
@@ -215,6 +214,7 @@ const {
   pageSize,
   tableData,
   loading,
+  keyword,
   currentChange,
   sizeChange,
   openForm,
@@ -222,6 +222,7 @@ const {
   deleteData,
   closeForm,
   requestData,
+  searchData,
 } = useCrud("/api/user");
 
 onMounted(() => {
