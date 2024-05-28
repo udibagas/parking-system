@@ -25,12 +25,17 @@ class AuthController extends Controller
             ]);
 
             $request->session()->regenerate();
-            return 'OK';
-        } else {
+            Auth::login($user, true);
+
             return response()->json([
-                'message' => 'Username atau password salah',
-            ], 401);
+                'token' => $user->createToken($request->device_name ?: 'web')->plainTextToken,
+                'user' => $user
+            ]);
         }
+
+        return response()->json([
+            'message' => 'Username atau password salah',
+        ], 401);
     }
 
     public function logout(Request $request)
@@ -42,6 +47,7 @@ class AuthController extends Controller
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
+        return 'OK';
     }
 
     public function me(Request $request)
