@@ -1,6 +1,6 @@
 <template>
   <div>
-    <el-form inline class="text-right" @submit.native.prevent>
+    <el-form inline class="text-right" @submit.native.prevent="searchData">
       <el-form-item v-if="user.role == 1">
         <el-button size="small" :icon="Plus" @click="openForm()" type="primary">
           TAMBAH GROUP
@@ -14,7 +14,7 @@
           placeholder="Cari"
           :prefix-icon="Search"
           :clearable="true"
-          @change="searchData"
+          @clear="requestData"
         >
         </el-input>
       </el-form-item>
@@ -48,7 +48,7 @@
 
       <el-table-column
         fixed="right"
-        width="40px"
+        width="60px"
         header-align="center"
         align="center"
         v-if="user.role == 1"
@@ -156,6 +156,7 @@ const {
   pageSize,
   tableData,
   loading,
+  keyword,
   currentChange,
   sizeChange,
   openForm,
@@ -163,6 +164,7 @@ const {
   deleteData,
   closeForm,
   requestData,
+  searchData,
 } = useCrud("/api/groupMember");
 
 onMounted(() => {
