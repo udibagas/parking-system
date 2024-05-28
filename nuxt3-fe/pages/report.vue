@@ -76,7 +76,7 @@
           class="bg-purple-600 text-white mb-3"
           :body-style="{ padding: '0' }"
         >
-          <div #header>Kendaraan Masuk</div>
+          <template #header>Kendaraan Masuk</template>
 
           <table class="table min-w-full">
             <tbody>
@@ -94,7 +94,7 @@
           class="bg-blue-600 text-white mb-3"
           :body-style="{ padding: '0' }"
         >
-          <div #header>Transaksi</div>
+          <template #header>Transaksi</template>
           <table class="table min-w-full">
             <tbody>
               <tr v-for="(t, id) in transaction" :key="id">
@@ -111,7 +111,7 @@
           class="bg-green-600 text-white mb-3"
           :body-style="{ padding: '0' }"
         >
-          <div #header>Pendapatan</div>
+          <template #header>Pendapatan</template>
           <table class="table min-w-full">
             <tbody>
               <tr v-for="(t, id) in income" :key="id">
@@ -133,7 +133,7 @@
           :body-style="{ padding: '0' }"
           v-if="parkedVehicle.length > 0"
         >
-          <div #header>Kendaraan Masih Terparkir</div>
+          <template #header>Kendaraan Masih Terparkir</template>
           <table class="table min-w-full">
             <thead>
               <tr>
@@ -217,7 +217,7 @@ export default {
             },
           })
           .then((r) => {
-            this.$message({
+            ElMessage({
               message: r.message,
               type: "success",
             });

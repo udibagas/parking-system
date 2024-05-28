@@ -85,7 +85,7 @@ export default {
       this.$axios
         .$get("/api/memberRenewal/reportDaily", { params })
         .then((r) => {
-          this.$message({
+          ElMessage({
             message: "Silakan ambil slip",
             type: "success",
             showClose: false,

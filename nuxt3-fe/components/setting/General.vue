@@ -5,20 +5,17 @@
         <el-col :span="12">
           <el-form-item
             label="Nama Lokasi"
-            :class="formErrors.nama_lokasi ? 'is-error' : ''"
+            :error="formErrors.nama_lokasi?.join(', ')"
           >
             <el-input
               placeholder="Nama Lokasi"
               v-model="formModel.nama_lokasi"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.nama_lokasi">
-              {{ formErrors.nama_lokasi[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Alamat Lokasi"
-            :class="formErrors.alamat_lokasi ? 'is-error' : ''"
+            :error="formErrors.alamat_lokasi?.join(', ')"
           >
             <el-input
               placeholder="Alamat Lokasi"
@@ -26,14 +23,11 @@
               rows="3"
               v-model="formModel.alamat_lokasi"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.alamat_lokasi">
-              {{ formErrors.alamat_lokasi[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Info Tambahan Tiket"
-            :class="formErrors.info_tambahan_tiket ? 'is-error' : ''"
+            :error="formErrors.info_tambahan_tiket?.join(', ')"
           >
             <el-input
               placeholder="Info Tambahan Tiket"
@@ -41,49 +35,32 @@
               rows="3"
               v-model="formModel.info_tambahan_tiket"
             ></el-input>
-            <div
-              class="el-form-item__error"
-              v-if="formErrors.info_tambahan_tiket"
-            >
-              {{ formErrors.info_tambahan_tiket[0] }}
-            </div>
           </el-form-item>
+
           <el-form-item
             label="Plat Nomor Default"
-            :class="formErrors.plat_nomor_default ? 'is-error' : ''"
+            :error="formErrors.plat_nomor_default?.join(', ')"
           >
             <el-input
               placeholder="Plat Nomor Default"
               v-model="formModel.plat_nomor_default"
             ></el-input>
-            <div
-              class="el-form-item__error"
-              v-if="formErrors.plat_nomor_default"
-            >
-              {{ formErrors.plat_nomor_default[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Jumlah Kendaraan Per Kartu"
-            :class="formErrors.jml_kendaraan_per_kartu ? 'is-error' : ''"
+            :error="formErrors.jml_kendaraan_per_kartu?.join(', ')"
           >
             <el-input
               type="number"
               placeholder="Jumlah Kendaraan Per Kartu (0 untuk tak terbatas)"
               v-model="formModel.jml_kendaraan_per_kartu"
             ></el-input>
-            <div
-              class="el-form-item__error"
-              v-if="formErrors.jml_kendaraan_per_kartu"
-            >
-              {{ formErrors.jml_kendaraan_per_kartu[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Orientasi Kamera"
-            :class="formErrors.orientasi_kamera ? 'is-error' : ''"
+            :error="formErrors.orientasi_kamera?.join(', ')"
           >
             <el-select
               placeholder="Orientasi Kamera"
@@ -97,16 +74,13 @@
                 :label="l"
               ></el-option>
             </el-select>
-            <div class="el-form-item__error" v-if="formErrors.orientasi_kamera">
-              {{ formErrors.orientasi_kamera[0] }}
-            </div>
           </el-form-item>
         </el-col>
 
         <el-col :span="12">
           <el-form-item
             label="Mode Transaksi Member"
-            :class="formErrors.must_checkout ? 'is-error' : ''"
+            :error="formErrors.must_checkout?.join(', ')"
           >
             <el-select
               placeholder="Mode Transaksi Member"
@@ -120,14 +94,11 @@
                 :label="l"
               ></el-option>
             </el-select>
-            <div class="el-form-item__error" v-if="formErrors.must_checkout">
-              {{ formErrors.must_checkout[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Mode Buka Gate Untuk Member"
-            :class="formErrors.member_auto_open ? 'is-error' : ''"
+            :error="formErrors.member_auto_open?.join(', ')"
           >
             <el-select
               placeholder="Mode Buka Gate Untuk Member"
@@ -144,14 +115,11 @@
                 :label="l"
               ></el-option>
             </el-select>
-            <div class="el-form-item__error" v-if="formErrors.member_auto_open">
-              {{ formErrors.member_auto_open[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Disable Plat Nomor di Pos Keluar"
-            :class="formErrors.disable_plat_nomor ? 'is-error' : ''"
+            :error="formErrors.disable_plat_nomor?.join(', ')"
           >
             <el-select
               placeholder="Disable Plat Nomor di Pos Keluar"
@@ -165,72 +133,48 @@
                 :label="l"
               ></el-option>
             </el-select>
-            <div
-              class="el-form-item__error"
-              v-if="formErrors.disable_plat_nomor"
-            >
-              {{ formErrors.disable_plat_nomor[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Hapus Snapshot dalam x hari"
-            :class="formErrors.hapus_snapshot_dalam_hari ? 'is-error' : ''"
+            :error="formErrors.hapus_snapshot_dalam_hari?.join(', ')"
           >
             <el-input
               type="number"
               placeholder="Hapus Snapshot dalam x hari (0 untuk hapus manual)"
               v-model="formModel.hapus_snapshot_dalam_hari"
             ></el-input>
-            <div
-              class="el-form-item__error"
-              v-if="formErrors.hapus_snapshot_dalam_hari"
-            >
-              {{ formErrors.hapus_snapshot_dalam_hari[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Hapus Transaksi dalam x hari"
-            :class="formErrors.hapus_transaksi_dalam_hari ? 'is-error' : ''"
+            :error="formErrors.hapus_transaksi_dalam_hari?.join(', ')"
           >
             <el-input
               type="number"
               placeholder="Hapus Transaksi dalam x hari"
               v-model="formModel.hapus_transaksi_dalam_hari"
             ></el-input>
-            <div
-              class="el-form-item__error"
-              v-if="formErrors.hapus_transaksi_dalam_hari"
-            >
-              {{ formErrors.hapus_transaksi_dalam_hari[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="Server Address"
-            :class="{ 'is-error': formErrors.server_address }"
+            :error="formErrors.server_address?.join(', ')"
           >
             <el-input
               placeholder="Server Address"
               v-model="formModel.server_address"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.server_address">
-              {{ formErrors.server_address[0] }}
-            </div>
           </el-form-item>
 
           <el-form-item
             label="ID Pelanggan"
-            :class="{ 'is-error': formErrors.id_pelanggan }"
+            :error="formErrors.id_pelanggan?.join(', ')"
           >
             <el-input
               placeholder="ID Pelanggan"
               v-model="formModel.id_pelanggan"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.id_pelanggan">
-              {{ formErrors.id_pelanggan[0] }}
-            </div>
           </el-form-item>
         </el-col>
       </el-row>

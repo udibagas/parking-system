@@ -8,7 +8,7 @@
     <el-form label-position="left" label-width="200px">
       <el-form-item
         label="Alasan buka manual"
-        :class="{ 'is-error': formErrors.alasan }"
+        :error="formErrors.alasan?.join(', ')"
       >
         <el-input
           autofocus
@@ -17,15 +17,12 @@
           rows="3"
           placeholder="Alasan buka manual"
         ></el-input>
-        <div class="el-form-item__error" v-if="formErrors.alasan">
-          {{ formErrors.alasan[0] }}
-        </div>
       </el-form-item>
 
       <el-form-item
         v-if="this.gateOutList.length > 1"
         label="Gate Keluar"
-        :class="{ 'is-error': formErrors.gate_out_id }"
+        :error="formErrors.gate_out_id?.join(', ')"
       >
         <el-select
           v-model="formModel.gate_out_id"
@@ -39,34 +36,28 @@
             :value="gate.id"
           ></el-option>
         </el-select>
-        <div class="el-form-item__error" v-if="formErrors.gate_out_id">
-          {{ formErrors.gate_out_id[0] }}
-        </div>
       </el-form-item>
 
       <el-form-item
         label="Masukkan password Admin"
-        :class="formErrors.password ? 'is-error' : ''"
+        :error="formErrors.password?.join(', ')"
       >
         <el-input
           type="password"
           v-model="formModel.password"
           placeholder="Password"
         ></el-input>
-        <div class="el-form-item__error" v-if="formErrors.password">
-          {{ formErrors.password[0] }}
-        </div>
       </el-form-item>
     </el-form>
 
-    <div slot="footer">
+    <template #footer>
       <el-button :icon="CircleCloseFilled" @click="closeForm">
         BATAL
       </el-button>
       <el-button :icon="SuccessFilled" type="primary" @click="save">
         SIMPAN
       </el-button>
-    </div>
+    </template>
   </el-dialog>
 </template>
 
@@ -95,7 +86,7 @@ export default {
     },
 
     save() {
-      this.$confirm(
+      ElMessageBox.confirm(
         "Aksi ini akan dicatat oleh sistem. Anda yakin?",
         "Peringatan",
         { type: "warning" }
@@ -104,7 +95,7 @@ export default {
           this.$axios
             .$post("/api/manualOpenLog", this.formModel)
             .then((r) => {
-              this.$message({
+              ElMessage({
                 message: r.message,
                 type: "success",
               });

@@ -15,19 +15,16 @@
         <el-col :span="12">
           <el-form-item
             label="Plat Nomor"
-            :class="formErrors.plat_nomor ? 'is-error' : ''"
+            :error="formErrors.plat_nomor?.join(', ')"
           >
             <el-input
               placeholder="Plat Nomor"
               v-model="formModel.plat_nomor"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.plat_nomor">
-              {{ formErrors.plat_nomor[0] }}
-            </div>
           </el-form-item>
           <el-form-item
             label="Gate Masuk"
-            :class="formErrors.gate_in_id ? 'is-error' : ''"
+            :error="formErrors.gate_in_id?.join(', ')"
           >
             <el-select
               v-model="formModel.gate_in_id"
@@ -41,13 +38,11 @@
                 :key="i"
               ></el-option>
             </el-select>
-            <div class="el-form-item__error" v-if="formErrors.gate_in_id">
-              {{ formErrors.gate_in_id[0] }}
-            </div>
           </el-form-item>
+
           <el-form-item
             label="Waktu Masuk"
-            :class="formErrors.time_in ? 'is-error' : ''"
+            :error="formErrors.time_in?.join(', ')"
           >
             <el-date-picker
               type="datetime"
@@ -57,41 +52,32 @@
               placeholder="Waktu Masuk"
               v-model="formModel.time_in"
             ></el-date-picker>
-            <div class="el-form-item__error" v-if="formErrors.time_in">
-              {{ formErrors.time_in[0] }}
-            </div>
           </el-form-item>
           <el-form-item
             label="Tarif (Rp)"
-            :class="formErrors.tarif ? 'is-error' : ''"
+            :error="formErrors.tarif?.join(', ')"
           >
             <el-input
               type="number"
               placeholder="Tarif"
               v-model="formModel.tarif"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.tarif">
-              {{ formErrors.tarif[0] }}
-            </div>
           </el-form-item>
           <el-form-item
             label="User Admin"
-            :class="formErrors.username ? 'is-error' : ''"
+            :error="formErrors.username?.join(', ')"
           >
             <el-input
               placeholder="User Admin"
               v-model="formModel.username"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.username">
-              {{ formErrors.username[0] }}
-            </div>
           </el-form-item>
         </el-col>
 
         <el-col :span="12">
           <el-form-item
             label="Jenis Kendaraan"
-            :class="formErrors.jenis_kendaraan ? 'is-error' : ''"
+            :error="formErrors.jenis_kendaraan?.join(', ')"
           >
             <el-select
               v-model="formModel.jenis_kendaraan"
@@ -105,13 +91,11 @@
                 :key="i"
               ></el-option>
             </el-select>
-            <div class="el-form-item__error" v-if="formErrors.jenis_kendaraan">
-              {{ formErrors.jenis_kendaraan[0] }}
-            </div>
           </el-form-item>
+
           <el-form-item
             label="Gate Keluar"
-            :class="formErrors.gate_out_id ? 'is-error' : ''"
+            :error="formErrors.gate_out_id?.join(', ')"
           >
             <el-select
               v-model="formModel.gate_out_id"
@@ -125,13 +109,11 @@
                 :key="i"
               ></el-option>
             </el-select>
-            <div class="el-form-item__error" v-if="formErrors.gate_out_id">
-              {{ formErrors.gate_out_id[0] }}
-            </div>
           </el-form-item>
+
           <el-form-item
             label="Waktu Keluar"
-            :class="formErrors.time_out ? 'is-error' : ''"
+            :error="formErrors.time_out?.join(', ')"
           >
             <el-date-picker
               type="datetime"
@@ -142,48 +124,40 @@
               placeholder="Waktu Keluar"
               v-model="formModel.time_out"
             ></el-date-picker>
-            <div class="el-form-item__error" v-if="formErrors.time_out">
-              {{ formErrors.time_out[0] }}
-            </div>
           </el-form-item>
           <el-form-item
             label="Denda (Rp)"
-            :class="formErrors.denda ? 'is-error' : ''"
+            :error="formErrors.denda?.join(', ')"
           >
             <el-input
               type="number"
               placeholder="Denda"
               v-model="formModel.denda"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.denda">
-              {{ formErrors.denda[0] }}
-            </div>
           </el-form-item>
+
           <el-form-item
             label="Password Admin"
-            :class="formErrors.password ? 'is-error' : ''"
+            :error="formErrors.password?.join(', ')"
           >
             <el-input
               type="password"
               placeholder="Password Admin"
               v-model="formModel.password"
             ></el-input>
-            <div class="el-form-item__error" v-if="formErrors.password">
-              {{ formErrors.password[0] }}
-            </div>
           </el-form-item>
         </el-col>
       </el-row>
     </el-form>
 
-    <div slot="footer">
+    <template #footer>
       <el-button :icon="CircleCloseFilled" @click="closeForm">
         BATAL
       </el-button>
       <el-button type="primary" :icon="SuccessFilled" @click="save">
         SIMPAN
       </el-button>
-    </div>
+    </template>
   </el-dialog>
 </template>
 
@@ -232,7 +206,7 @@ export default {
       this.$axios
         .$post("/api/parkingTransaction", this.formModel)
         .then((r) => {
-          this.$message({
+          ElMessage({
             message: "Data berhasil disimpan",
             type: "success",
             showClose: true,
@@ -258,7 +232,7 @@ export default {
       const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
 
       ws.onerror = (event) => {
-        this.$message({
+        ElMessage({
           message: "KONEKSI KE POS GAGAL",
           type: "error",
         });
@@ -278,7 +252,7 @@ export default {
 
       ws.onmessage = (event) => {
         let data = JSON.parse(event.data);
-        this.$message({
+        ElMessage({
           message: data.message,
           type: data.status ? "success" : "error",
         });

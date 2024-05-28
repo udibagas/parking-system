@@ -1,11 +1,8 @@
 <template>
   <el-dialog title="PROFIL SAYA" v-loading="loading" :model-value="show">
     <el-form label-width="180px" label-position="left">
-      <el-form-item label="Nama" :class="formErrors.name ? 'is-error' : ''">
+      <el-form-item label="Nama" :error="formErrors.name?.join(', ')">
         <el-input placeholder="Nama" v-model="formModel.name"></el-input>
-        <div class="el-form-item__error" v-if="formErrors.name">
-          {{ formErrors.name }}
-        </div>
       </el-form-item>
 
       <el-form-item label="Level">
@@ -15,23 +12,17 @@
         ></el-input>
       </el-form-item>
 
-      <el-form-item
-        label="Password"
-        :class="formErrors.password ? 'is-error' : ''"
-      >
+      <el-form-item label="Password" :error="formErrors.password?.join(', ')">
         <el-input
           type="password"
           placeholder="Password"
           v-model="formModel.password"
         ></el-input>
-        <div class="el-form-item__error" v-if="formErrors.password">
-          {{ formErrors.password[0] }}
-        </div>
       </el-form-item>
 
       <el-form-item
         label="Konfirmasi Password"
-        :class="formErrors.password ? 'is-error' : ''"
+        :error="formErrors.password?.join(', ')"
       >
         <el-input
           type="password"

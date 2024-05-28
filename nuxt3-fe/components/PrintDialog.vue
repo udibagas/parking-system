@@ -27,7 +27,7 @@
       </el-form-item>
     </el-form>
 
-    <div slot="footer">
+    <template #footer>
       <el-button :icon="CircleCloseFilled" @click="$emit('close')">
         BATAL
       </el-button>
@@ -39,7 +39,7 @@
       >
         CETAK STRUK
       </el-button>
-    </div>
+    </template>
   </el-dialog>
 </template>
 

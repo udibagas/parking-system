@@ -199,10 +199,7 @@
       :close-on-click-modal="false"
     >
       <el-form label-width="180px" label-position="left">
-        <el-form-item
-          label="Member"
-          :class="formErrors.member_id ? 'is-error' : ''"
-        >
+        <el-form-item label="Member" :error="formErrors.member_id?.join(', ')">
           <el-select
             filterable
             default-first-option
@@ -218,14 +215,11 @@
               :key="i"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.member_id">
-            {{ formErrors.member_id[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Siklus Pembayaran"
-          :class="formErrors.siklus_pembayaran ? 'is-error' : ''"
+          :error="formErrors.siklus_pembayaran?.join(', ')"
         >
           <el-input
             type="number"
@@ -244,14 +238,11 @@
               :key="i"
             ></el-option>
           </el-select>
-          <div class="el-form-item__error" v-if="formErrors.siklus_pembayaran">
-            {{ formErrors.siklus_pembayaran[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Dari Tanggal"
-          :class="formErrors.dari_tanggal ? 'is-error' : ''"
+          :error="formErrors.dari_tanggal?.join(', ')"
         >
           <el-date-picker
             format="dd-MMM-yyyy"
@@ -260,14 +251,11 @@
             v-model="formModel.dari_tanggal"
             style="width: 100%"
           ></el-date-picker>
-          <div class="el-form-item__error" v-if="formErrors.dari_tanggal">
-            {{ formErrors.dari_tanggal[0] }}
-          </div>
         </el-form-item>
 
         <el-form-item
           label="Sampai Tanggal"
-          :class="formErrors.sampai_tanggal ? 'is-error' : ''"
+          :error="formErrors.sampai_tanggal?.join(', ')"
         >
           <el-date-picker
             disabled
@@ -277,33 +265,24 @@
             v-model="sampai_tanggal"
             style="width: 100%"
           ></el-date-picker>
-          <div class="el-form-item__error" v-if="formErrors.sampai_tanggal">
-            {{ formErrors.sampai_tanggal[0] }}
-          </div>
         </el-form-item>
 
-        <el-form-item
-          label="Jumlah"
-          :class="formErrors.jumlah ? 'is-error' : ''"
-        >
+        <el-form-item label="Jumlah" :error="formErrors.jumlah?.join(', ')">
           <el-input
             type="number"
             placeholder="Jumlah"
             v-model="formModel.jumlah"
           ></el-input>
-          <div class="el-form-item__error" v-if="formErrors.jumlah">
-            {{ formErrors.jumlah[0] }}
-          </div>
         </el-form-item>
       </el-form>
-      <span slot="footer" class="dialog-footer">
+      <template #footer>
         <el-button :icon="CircleCloseFilled" @click="closeForm">
           BATAL
         </el-button>
         <el-button :icon="SuccessFilled" type="primary" @click="submit">
           SIMPAN
         </el-button>
-      </span>
+      </template>
     </el-dialog>
 
     <PrintDialog
@@ -361,7 +340,7 @@ export default {
           printer_id,
         })
         .then((r) => {
-          this.$message({
+          ElMessage({
             message: r.message,
             type: "success",
           });

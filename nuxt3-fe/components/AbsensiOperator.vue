@@ -3,7 +3,6 @@
     <el-form inline class="text-right" @submit.native.prevent>
       <el-form-item>
         <el-date-picker
-          style="margin-top: 5px"
           size="small"
           @change="searchData"
           v-model="filters.date"
@@ -21,7 +20,7 @@
           size="small"
           v-model="filters.keyword"
           placeholder="Cari"
-          prefix-:icon="Search"
+          :prefix-:icon="Search"
           clearable
           @change="searchData"
         >
@@ -52,7 +51,7 @@
         show-overflow-tooltip
         min-width="150px"
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           {{ moment(row.created_at).format("DD/MMM/YY") }}
         </template>
       </el-table-column>
@@ -63,7 +62,7 @@
         show-overflow-tooltip
         min-width="150px"
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           {{ row.user.name }}
         </template>
       </el-table-column>
@@ -75,7 +74,7 @@
         show-overflow-tooltip
         min-width="150px"
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           {{ moment(row.login).format("DD/MMM/YY HH:mm:ss") }}
         </template>
       </el-table-column>
@@ -87,7 +86,7 @@
         show-overflow-tooltip
         min-width="150px"
       >
-        <template slot-scope="{ row }">
+        <template #default="{ row }">
           {{
             row.logout ? moment(row.logout).format("DD/MMM/YY HH:mm:ss") : ""
           }}
@@ -106,7 +105,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -118,24 +117,18 @@
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
+<script setup>
+import moment from "moment";
+const { date } = defineProps(["date"]);
+import { Refresh } from "@element-plus/icons-vue";
+const { pageSize, tableData, loading, currentChange, sizeChange, requestData } =
+  useCrud("/api/absensiOperator");
 
-export default {
-  mixins: [crud],
+onMounted(() => {
+  requestData();
+});
 
-  props: ["date"],
-
-  watch: {
-    range(v) {
-      this.requestData();
-    },
-  },
-
-  data() {
-    return {
-      url: "/api/absensiOperator",
-    };
-  },
-};
+watch(range, (v, o) => {
+  requestData();
+});
 </script>

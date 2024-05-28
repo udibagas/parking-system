@@ -14,14 +14,14 @@
         {{ notification.message }}
       </div>
 
-      <div slot="footer">
+      <template #footer>
         <el-button
           type="primary"
           :icon="CircleCloseFilled"
           @click="show = false"
           >TUTUP</el-button
         >
-      </div>
+      </template>
     </el-dialog>
   </div>
 </template>

@@ -335,51 +335,34 @@
               </div>
             </el-form-item>
 
-            <el-form-item
-              label="Nama"
-              :class="formErrors.nama ? 'is-error' : ''"
-            >
+            <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">
               <el-input placeholder="Nama" v-model="formModel.nama"></el-input>
-              <div class="el-form-item__error" v-if="formErrors.nama">
-                {{ formErrors.nama[0] }}
-              </div>
             </el-form-item>
-
-            <!-- <el-form-item label="Alamat Email" :class="formErrors.email ? 'is-error' : ''">
-                            <el-input placeholder="Alamat Email" v-model="formModel.email"></el-input>
-                            <div class="el-form-item__error" v-if="formErrors.email">{{formErrors.email[0]}}</div>
-                        </el-form-item> -->
 
             <el-form-item
               label="Nomor HP"
-              :class="formErrors.phone ? 'is-error' : ''"
+              :error="formErrors.phone?.join(', ')"
             >
               <el-input
                 placeholder="Nomor HP"
                 v-model="formModel.phone"
               ></el-input>
-              <div class="el-form-item__error" v-if="formErrors.phone">
-                {{ formErrors.phone[0] }}
-              </div>
             </el-form-item>
 
             <el-form-item
               label="Nomor Kartu"
-              :class="formErrors.nomor_kartu ? 'is-error' : ''"
+              :error="formErrors.nomor_kartu?.join(', ')"
             >
               <el-input
                 placeholder="Nomor Kartu"
                 v-model="formModel.nomor_kartu"
               ></el-input>
-              <div class="el-form-item__error" v-if="formErrors.nomor_kartu">
-                {{ formErrors.nomor_kartu[0] }}
-              </div>
             </el-form-item>
             <!-- DISINI -->
 
             <el-form-item
               label="Jenis Kartu"
-              :class="formErrors.card_type ? 'is-error' : ''"
+              :error="formErrors.card_type?.join(', ')"
             >
               <el-select
                 v-model="formModel.card_type"
@@ -393,16 +376,13 @@
                   :key="i"
                 ></el-option>
               </el-select>
-              <div class="el-form-item__error" v-if="formErrors.card_type">
-                {{ formErrors.card_type[0] }}
-              </div>
             </el-form-item>
           </el-col>
 
           <el-col :span="8">
             <el-form-item
               label="Tanggal Daftar"
-              :class="formErrors.register_date ? 'is-error' : ''"
+              :error="formErrors.register_date?.join(', ')"
             >
               <el-date-picker
                 format="dd-MMM-yyyy"
@@ -411,14 +391,11 @@
                 v-model="formModel.register_date"
                 style="width: 100%"
               ></el-date-picker>
-              <div class="el-form-item__error" v-if="formErrors.register_date">
-                {{ formErrors.register_date[0] }}
-              </div>
             </el-form-item>
 
             <el-form-item
               label="Jenis Anggota"
-              :class="formErrors.berbayar ? 'is-error' : ''"
+              :error="formErrors.berbayar?.join(', ')"
             >
               <el-select
                 v-model="formModel.berbayar"
@@ -432,14 +409,11 @@
                   :key="i"
                 ></el-option>
               </el-select>
-              <div class="el-form-item__error" v-if="formErrors.berbayar">
-                {{ formErrors.berbayar[0] }}
-              </div>
             </el-form-item>
 
             <el-form-item
               label="Tarif (Rp)"
-              :class="formErrors.tarif ? 'is-error' : ''"
+              :error="formErrors.tarif?.join(', ')"
             >
               <el-input
                 :disabled="!formModel.berbayar"
@@ -447,15 +421,12 @@
                 placeholder="Tarif (Rp)"
                 v-model="formModel.tarif"
               ></el-input>
-              <div class="el-form-item__error" v-if="formErrors.tarif">
-                {{ formErrors.tarif[0] }}
-              </div>
             </el-form-item>
           </el-col>
           <el-col :span="8">
             <el-form-item
               label="Siklus Pembayaran"
-              :class="formErrors.siklus_pembayaran ? 'is-error' : ''"
+              :error="formErrors.siklus_pembayaran?.join(', ')"
             >
               <el-input
                 type="number"
@@ -473,17 +444,11 @@
                   :key="i"
                 ></el-option>
               </el-select>
-              <div
-                class="el-form-item__error"
-                v-if="formErrors.siklus_pembayaran"
-              >
-                {{ formErrors.siklus_pembayaran[0] }}
-              </div>
             </el-form-item>
 
             <el-form-item
               label="Tanggal Kedaluarsa"
-              :class="formErrors.expiry_date ? 'is-error' : ''"
+              :error="formErrors.expiry_date?.join(', ')"
             >
               <el-date-picker
                 disabled
@@ -493,12 +458,9 @@
                 v-model="expiry_date"
                 style="width: 100%"
               ></el-date-picker>
-              <div class="el-form-item__error" v-if="formErrors.expiry_date">
-                {{ formErrors.expiry_date[0] }}
-              </div>
             </el-form-item>
 
-            <el-form-item label="Status">
+            <el-form-item label="Status" :error="formErrors.status?.join(', ')">
               <el-select
                 v-model="formModel.status"
                 placeholder="Status"
@@ -511,9 +473,6 @@
                   :key="i"
                 ></el-option>
               </el-select>
-              <div class="el-form-item__error" v-if="formErrors.status">
-                {{ formErrors.status[0] }}
-              </div>
             </el-form-item>
           </el-col>
         </el-row>
@@ -608,131 +567,134 @@
         </el-table-column>
       </el-table>
 
-      <span slot="footer" class="dialog-footer">
+      <template #footer>
         <el-button :icon="CircleCloseFilled" @click="closeForm">
           BATAL
         </el-button>
         <el-button type="primary" :icon="SuccessFilled" @click="submit">
           SIMPAN
         </el-button>
-      </span>
+      </template>
     </el-dialog>
   </div>
 </template>
 
-<script>
-import { mapState, mapStores } from "pinia";
-import crud from "@/mixins/crud";
-import type { ZoomIn } from "@element-plus/icons-vue";
+<script setup>
+import moment from "moment";
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+  ZoomIn,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
+const store = useWebsiteStore();
 
-  computed: {
-    expiry_date() {
-      try {
-        return moment(this.formModel.register_date, "YYYY-MM-DD")
-          .add(
-            this.formModel.siklus_pembayaran,
-            this.formModel.siklus_pembayaran_unit
-          )
-          .format("YYYY-MM-DD");
-      } catch (error) {
-        return "";
-      }
-    },
-    ...mapState(useWebsiteStore, {
-      groupMemberList: "groupMemberList",
-      siklus: "siklus",
-      setting: "setting",
-      jenisKendaraanList: "jenisKendaraanList",
-    }),
-    ...mapStores(useWebsiteStore),
-  },
+const {
+  showForm,
+  formErrors,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  requestData,
+} = useCrud("/api/member");
 
-  watch: {
-    "formModel.berbayar"(v) {
-      if (!v) {
-        this.formModel.tarif = 0;
-      }
-    },
-  },
+onMounted(() => {
+  requestData();
+});
 
-  data() {
-    return {
-      url: "/api/member",
-      formModel: { vehicles: [] },
-      selectedData: { vehicles: [] },
-      showDetail: false,
-      now: moment().format("YYYY-MM-DD"),
-    };
-  },
+const expiry_date = computed(() => {
+  try {
+    return moment(formModel.value.register_date, "YYYY-MM-DD")
+      .add(
+        formModel.value.siklus_pembayaran,
+        formModel.value.siklus_pembayaran_unit
+      )
+      .format("YYYY-MM-DD");
+  } catch (error) {
+    return "";
+  }
+});
 
-  methods: {
-    closeForm() {
-      this.showForm = false;
-      this.formModel = { vehicles: [] };
-      this.formErrors = {};
-    },
+const selectedData = ref({ vehicles: [] });
+const formModel = ref({ vehicles: [] });
+const showDetail = ref(false);
+const now = ref(moment().format("YYYY-MM-DD"));
 
-    submit() {
-      this.formModel.expiry_date = this.expiry_date;
-      this.save();
-    },
+const groupMemberList = computed(() => store.groupMemberList);
+const jenisKendaraanList = computed(() => store.jenisKendaraanList);
+const siklus = computed(() => store.siklus);
+const setting = computed(() => store.setting);
 
-    print() {
-      const params = {
-        sort_prop: this.sort_prop || "nama",
-        sort_order: this.sort_order || "asc",
-        action: "print",
-        ...this.filters,
-      };
+watch(formModel.berbayar, (v, o) => {
+  if (!v) {
+    formModel.value.tarif = 0;
+  }
+});
 
-      const querystring = new URLSearchParams(params).toString();
-      window.open(
-        `${this.$axios.defaults.baseURL}/api/member?${querystring}`,
-        "_blank"
-      );
-    },
+const closeForm = () => {
+  showForm.value = false;
+  formModel.value = { vehicles: [] };
+  formErrors.value = {};
+};
 
-    addVehicle() {
-      if (
-        this.formModel.vehicles.length < this.setting.jml_kendaraan_per_kartu ||
-        this.setting.jml_kendaraan_per_kartu == 0
-      ) {
-        this.formModel.vehicles.push({
-          plat_nomor: "",
-          jenis_kendaraan: "",
-          tipe: "",
-          merk: "",
-          tahun: "",
-          warna: "",
-        });
-      } else {
-        this.$message({
-          message: `Jumlah maksimal kendaraan per kartu adalah ${this.setting.jml_kendaraan_per_kartu}`,
-          type: "error",
-        });
-      }
-    },
+const submit = () => {
+  formModel.value.expiry_date = expiry_date;
+  save();
+};
 
-    deleteVehicle(index, id) {
-      if (!id) {
-        this.formModel.vehicles.splice(index, 1);
-      } else {
-        this.$axios.$delete(`/api/memberVehicle/${id}`).then((r) => {
-          this.formModel.vehicles.splice(index, 1);
-        });
-      }
-    },
+const print = () => {
+  const params = {
+    sort_prop: this.sort_prop || "nama",
+    sort_order: this.sort_order || "asc",
+    action: "print",
+    ...this.filters,
+  };
 
-    afterSave() {
-      this.websiteStore.getMemberList();
-    },
+  const querystring = new URLSearchParams(params).toString();
+  window.open(
+    `${this.$axios.defaults.baseURL}/api/member?${querystring}`,
+    "_blank"
+  );
+};
 
-    afterDelete() {
-      this.websiteStore.getMemberList();
-    },
-  },
+const addVehicle = () => {
+  if (
+    formModel.value.vehicles.length < setting.value.jml_kendaraan_per_kartu ||
+    setting.jml_kendaraan_per_kartu == 0
+  ) {
+    formModel.value.vehicles.push({
+      plat_nomor: "",
+      jenis_kendaraan: "",
+      tipe: "",
+      merk: "",
+      tahun: "",
+      warna: "",
+    });
+  } else {
+    ElMessage({
+      message: `Jumlah maksimal kendaraan per kartu adalah ${setting.jml_kendaraan_per_kartu}`,
+      type: "error",
+    });
+  }
+};
+
+const deleteVehicle = (index, id) => {
+  if (!id) {
+    formModel.value.vehicles.splice(index, 1);
+  } else {
+    this.$axios.$delete(`/api/memberVehicle/${id}`).then((r) => {
+      formModel.value.vehicles.splice(index, 1);
+    });
+  }
 };
 </script>
