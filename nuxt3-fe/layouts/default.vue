@@ -135,7 +135,7 @@ onBeforeMount(async () => {
   await store.getNavigationList();
   await store.getSetting();
   await store.getGateInList();
-  await store.gateOutList();
+  await store.getGateOutList();
   await store.getJenisKendaraanList();
 });
 </script>
