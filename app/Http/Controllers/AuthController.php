@@ -24,7 +24,7 @@ class AuthController extends Controller
                 'action' => 'LOGIN'
             ]);
 
-            $request->session()->regenerate();
+            // $request->session()->regenerate();
             // Auth::login($user, true);
 
             return response()->json([
