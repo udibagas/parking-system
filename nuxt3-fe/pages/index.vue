@@ -232,7 +232,6 @@
 </template>
 
 <script setup>
-import { ElAlert } from "element-plus";
 import moment from "moment";
 definePageMeta({ layout: "default" });
 const store = useWebsiteStore();
@@ -246,10 +245,10 @@ const showManualOpenForm = ref(false);
 const ws = ref(null);
 const updateTarifInterval = ref(null);
 
-const pos = toRef(() => store.pos);
-const setting = toRef(() => store.setting);
-const gateInList = toRef(() => store.gateInList);
-const jenisKendaraanList = toRef(() => store.jenisKendaraanList);
+const pos = computed(() => store.pos);
+const setting = computed(() => store.setting);
+const gateInList = computed(() => store.gateInList);
+const jenisKendaraanList = computed(() => store.jenisKendaraanList);
 
 const duration = computed(() => {
   if (!formModel.time_in || !formModel.time_out) {

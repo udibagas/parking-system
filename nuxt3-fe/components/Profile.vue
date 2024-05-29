@@ -37,7 +37,7 @@
       </el-form-item>
     </el-form>
     <template #footer>
-      <el-button @click="$emit('close')" :icon="CircleCloseFilled">
+      <el-button @click="emit('close')" :icon="CircleCloseFilled">
         TUTUP
       </el-button>
       <el-button type="primary" @click="save" :icon="SuccessFilled">
@@ -52,6 +52,7 @@ const api = useApi();
 import { SuccessFilled, CircleCloseFilled } from "@element-plus/icons-vue";
 const { user } = useSanctumAuth();
 const { show } = defineProps(["show"]);
+const emit = defineEmits(["close"]);
 
 const formModel = ref({ ...user.value });
 const loading = ref(false);

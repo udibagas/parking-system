@@ -6,7 +6,7 @@
         ? 'TRANSAKSI MANUAL'
         : 'EDIT TRANSAKSI ' + formModel.nomor_barcode
     "
-    :visible.sync="show"
+    :model-value="show"
     width="800px"
     :before-close="(done) => closeForm()"
   >
@@ -162,6 +162,8 @@
 </template>
 
 <script setup>
+import { CircleCloseFilled, SuccessFilled } from "@element-plus/icons-vue";
+
 const store = useWebsiteStore();
 const emit = defineEmits(["close", "reload"]);
 const { show, model } = defineProps(["show", "model"]);

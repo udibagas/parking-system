@@ -6,7 +6,7 @@
     width="500px"
     :before-close="
       (done) => {
-        $emit('close');
+        emit('close');
       }
     "
   >
@@ -28,12 +28,12 @@
     </el-form>
 
     <template #footer>
-      <el-button :icon="CircleCloseFilled" @click="$emit('close')">
+      <el-button :icon="CircleCloseFilled" @click="emit('close')">
         BATAL
       </el-button>
       <el-button
         :icon="Printer"
-        @click="$emit('print', printer_id)"
+        @click="emit('print', printer_id)"
         type="primary"
         :disabled="!printer_id"
       >

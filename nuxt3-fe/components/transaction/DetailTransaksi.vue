@@ -1,12 +1,12 @@
 <template>
   <el-dialog
     width="80%"
-    :visible.sync="show"
+    :model-value="show"
     center
     title="DETAIL TRANSAKSI"
     :before-close="
       (done) => {
-        $emit('close');
+        emit('close');
       }
     "
   >
@@ -127,4 +127,5 @@
 const { trx, show } = defineProps(["trx", "show"]);
 const store = useWebsiteStore();
 const setting = computed(() => store.setting);
+const emit = defineEmits(["close"]);
 </script>

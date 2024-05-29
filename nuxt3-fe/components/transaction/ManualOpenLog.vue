@@ -131,7 +131,7 @@
       :total="tableData.total"
     ></el-pagination>
 
-    <el-dialog center :visible.sync="showSnapshot" title="SNAPSHOT">
+    <el-dialog center v-model="showSnapshot" title="SNAPSHOT">
       <el-image
         v-for="(snapshot, i) in snapshots"
         :key="i"
@@ -149,7 +149,6 @@
 
 <script setup>
 import { Refresh, MoreFilled } from "@element-plus/icons-vue";
-const { getShiftList } = useWebsiteStore();
 const { range } = defineProops(["range"]);
 const { pageSize, tableData, loading, currentChange, sizeChange, requestData } =
   useCrud("/api/manualOpenLog");

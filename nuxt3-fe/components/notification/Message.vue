@@ -1,29 +1,24 @@
 <template>
-  <div>
-    <el-dialog
-      :visible.sync="show"
-      center
-      :close-on-click-modal="false"
-      :show-close="false"
-    >
-      <div class="text-center" style="font-size: 50px; color: orange">
-        <i class="el-icon-warning-outline"></i>
-      </div>
+  <el-dialog
+    :model-value="show"
+    center
+    :close-on-click-modal="false"
+    :show-close="false"
+  >
+    <div class="text-center" style="font-size: 50px; color: orange">
+      <i class="el-icon-warning-outline"></i>
+    </div>
 
-      <div class="text-center" style="font-size: 24px; margin-top: 20px">
-        {{ notification.message }}
-      </div>
+    <div class="text-center" style="font-size: 24px; margin-top: 20px">
+      {{ notification.message }}
+    </div>
 
-      <template #footer>
-        <el-button
-          type="primary"
-          :icon="CircleCloseFilled"
-          @click="show = false"
-          >TUTUP</el-button
-        >
-      </template>
-    </el-dialog>
-  </div>
+    <template #footer>
+      <el-button type="primary" :icon="CircleCloseFilled" @click="show = false"
+        >TUTUP</el-button
+      >
+    </template>
+  </el-dialog>
 </template>
 
 <script setup>

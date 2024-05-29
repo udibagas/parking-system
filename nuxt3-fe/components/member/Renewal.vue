@@ -187,7 +187,7 @@
     ></el-pagination>
 
     <el-dialog
-      :visible.sync="showForm"
+      v-model="showForm"
       :title="
         !!formModel.id
           ? 'EDIT PEMBAYARAN KEANGGOTAAN'

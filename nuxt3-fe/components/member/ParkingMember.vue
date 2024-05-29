@@ -293,7 +293,7 @@
       center
       fullscreen
       title="INFORMASI MEMBER"
-      :visible.sync="showDetail"
+      v-model="showDetail"
     >
       <MemberParkingMemberDetail :member="selectedData" />
     </el-dialog>
@@ -301,7 +301,7 @@
     <el-dialog
       fullscreen
       center
-      :visible.sync="showForm"
+      v-model="showForm"
       :title="!!formModel.id ? 'EDIT MEMBER' : 'TAMBAH MEMBER'"
       v-loading="loading"
       :close-on-click-modal="false"

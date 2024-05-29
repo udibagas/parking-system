@@ -2,7 +2,7 @@
   <el-dialog
     title="FORM BUKA MANUAL"
     center
-    :visible.sync="show"
+    :model-value="show"
     :before-close="closeForm"
   >
     <el-form label-position="left" label-width="200px">
@@ -62,6 +62,8 @@
 </template>
 
 <script setup>
+import { CircleCloseFilled, SuccessFilled } from "@element-plus/icons-vue";
+
 const { show, gateOutList } = defineProps(["show", "gateOutList"]);
 const { api, formModel, formErrors } = useCrud("/api/manualOpenLog");
 const emit = defineEmits(["close", "open-gate"]);
@@ -81,7 +83,7 @@ const save = () => {
     .then(() => {
       return api("/api/manualOpenLog", {
         method: "POST",
-        body: formModel,
+        body: formModel.value,
       });
     })
     .then((r) => {
@@ -100,8 +102,8 @@ const save = () => {
 };
 
 onMounted(() => {
-  if (gateOutList.value.length == 1) {
-    formModel.value.gate_out_id = gateOutList[0].value.id;
+  if (gateOutList.length == 1) {
+    formModel.value.gate_out_id = gateOutList[0].id;
   }
 });
 </script>
