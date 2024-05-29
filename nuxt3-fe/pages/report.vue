@@ -174,9 +174,10 @@
 </template>
 
 <script setup>
+import { Printer } from "@element-plus/icons-vue";
 import moment from "moment";
 const store = useWebsiteStore();
-const api = useApi();
+const { api, toRupiah } = useCrud();
 const config = useRuntimeConfig();
 
 const transaction = ref([]);

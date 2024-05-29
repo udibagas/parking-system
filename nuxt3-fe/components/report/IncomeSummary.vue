@@ -28,13 +28,14 @@
 </template>
 
 <script setup>
+const { toRupiah } = useCrud();
 const api = useApi();
 const summary = ref({});
 const getData = () => {
-  api("/api/summary").then((r) => (this.summary = r));
+  api("/api/summary").then((r) => (summary.value = r));
 };
 
-onBeforeMounted(() => {
+onBeforeMount(() => {
   getData();
 });
 </script>
