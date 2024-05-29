@@ -383,8 +383,8 @@
               :error="formErrors.register_date?.join(', ')"
             >
               <el-date-picker
-                format="dd-MMM-yyyy"
-                value-format="yyyy-MM-dd"
+                format="DD/MMM/YYYY"
+                value-format="YYYY-MM-DD"
                 placeholder="Tanggal Daftar"
                 v-model="formModel.register_date"
                 style="width: 100%"
@@ -450,8 +450,8 @@
             >
               <el-date-picker
                 disabled
-                format="dd-MMM-yyyy"
-                value-format="yyyy-MM-dd"
+                format="DD/MMM/YYYY"
+                value-format="YYYY-MM-DD"
                 placeholder="Tanggal Kedaluarsa"
                 v-model="expiry_date"
                 style="width: 100%"

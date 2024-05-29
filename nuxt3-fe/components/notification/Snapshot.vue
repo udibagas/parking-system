@@ -47,6 +47,9 @@
 </template>
 
 <script setup>
+import { Delete, Refresh } from "@element-plus/icons-vue";
+
+const api = useApi();
 const url = ref("");
 const show = ref(true);
 const checkedNodes = ref([]);
@@ -92,7 +95,7 @@ const refresh = () => {
   padding: 15px;
   border: 1px solid #ddd;
   width: 400px;
-  height: calc(100vh - 270px);
+  height: calc(100vh - 255px);
   overflow: auto;
   flex-shrink: 0;
 }

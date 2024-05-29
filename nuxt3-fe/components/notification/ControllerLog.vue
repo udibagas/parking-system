@@ -1,22 +1,23 @@
 <template>
   <div>
-    <el-form inline class="text-right">
-      <el-form-item>
-        <el-input
-          size="small"
-          autofocus
-          placeholder="Cari log"
-          v-model="keyword"
-          prefix-:icon="Search"
-          clearable
-        ></el-input>
-      </el-form-item>
-    </el-form>
+    <form action="" class="mb-3">
+      <el-input
+        size="small"
+        autofocus
+        placeholder="Cari log"
+        v-model="keyword"
+        :prefix-icon="Search"
+        clearable
+      ></el-input>
+    </form>
     <div class="log-container" v-html="log"></div>
   </div>
 </template>
 
 <script setup>
+import { Search } from "@element-plus/icons-vue";
+
+const api = useApi();
 const { url } = defineProps(["url"]);
 const log = ref("");
 const requestInterval = ref(null);
@@ -41,7 +42,7 @@ const getLog = () => {
 
 <style scoped>
 .log-container {
-  height: calc(100vh - 290px);
+  height: calc(100vh - 265px);
   background: black;
   color: white;
   padding: 15px;

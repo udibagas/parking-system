@@ -6,8 +6,8 @@
           size="small"
           @change="searchData"
           v-model="filters.date"
-          format="dd-MMM-yyyy"
-          value-format="yyyy-MM-dd"
+          format="DD/MMM/YYYY"
+          value-format="YYYY-MM-DD"
           type="daterange"
           range-separator="-"
           start-placeholder="Dari"
@@ -121,14 +121,17 @@
 import moment from "moment";
 const { date } = defineProps(["date"]);
 import { Refresh } from "@element-plus/icons-vue";
-const { pageSize, tableData, loading, currentChange, sizeChange, requestData } =
-  useCrud("/api/absensiOperator");
+const {
+  pageSize,
+  tableData,
+  loading,
+  filters,
+  currentChange,
+  sizeChange,
+  requestData,
+} = useCrud("/api/absensiOperator");
 
 onMounted(() => {
-  requestData();
-});
-
-watch(range, (v, o) => {
   requestData();
 });
 </script>

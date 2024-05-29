@@ -6,8 +6,8 @@
           size="small"
           @change="requestData"
           v-model="date"
-          format="dd/MMM/yyyy"
-          value-format="yyyy-MM-dd"
+          format="DD/MMM/YYYY"
+          value-format="YYYY-MM-DD"
           type="date"
         >
         </el-date-picker>

@@ -18,8 +18,8 @@
           size="small"
           @change="requestData"
           v-model="filters.dateRange"
-          format="dd/MMM/yyyy"
-          value-format="yyyy-MM-dd"
+          format="DD/MMM/YYYY"
+          value-format="YYYY-MM-DD"
           type="daterange"
           range-separator="-"
           start-placeholder="Dari tgl"
@@ -243,8 +243,8 @@
           :error="formErrors.dari_tanggal?.join(', ')"
         >
           <el-date-picker
-            format="dd-MMM-yyyy"
-            value-format="yyyy-MM-dd"
+            format="DD/MMM/YYYY"
+            value-format="YYYY-MM-DD"
             placeholder="Dari Tanggal"
             v-model="formModel.dari_tanggal"
             style="width: 100%"
@@ -257,8 +257,8 @@
         >
           <el-date-picker
             disabled
-            format="dd-MMM-yyyy"
-            value-format="yyyy-MM-dd"
+            format="DD/MMM/YYYY"
+            value-format="YYYY-MM-DD"
             placeholder="Sampai Tanggal"
             v-model="sampai_tanggal"
             style="width: 100%"

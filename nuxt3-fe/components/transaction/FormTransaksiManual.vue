@@ -47,8 +47,8 @@
             <el-date-picker
               type="datetime"
               style="width: 100%"
-              format="dd-MMM-yyyy HH:mm"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              format="DD-MMM-YYYY HH:mm"
+              value-format="YYYY-MM-DD HH:mm:ss"
               placeholder="Waktu Masuk"
               v-model="formModel.time_in"
             ></el-date-picker>
@@ -119,8 +119,8 @@
               type="datetime"
               :autocomplete="false"
               style="width: 100%"
-              format="dd-MMM-yyyy HH:mm"
-              value-format="yyyy-MM-dd HH:mm:ss"
+              format="DD-MMM-YYYY HH:mm"
+              value-format="YYYY-MM-DD HH:mm:ss"
               placeholder="Waktu Keluar"
               v-model="formModel.time_out"
             ></el-date-picker>

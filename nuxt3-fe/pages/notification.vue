@@ -19,8 +19,8 @@
               size="small"
               @change="requestData"
               v-model="filters.dateRange"
-              format="dd/MMM/yyyy"
-              value-format="yyyy-MM-dd"
+              format="DD/MMM/YYYY"
+              value-format="YYYY-MM-DD"
               type="daterange"
               range-separator="-"
               start-placeholder="Dari tgl"
@@ -46,7 +46,7 @@
         <el-table
           stripe
           :data="tableData.data"
-          height="calc(100vh - 315px)"
+          height="calc(100vh - 285px)"
           v-loading="loading"
           @sort-change="sortChange"
         >
@@ -73,13 +73,12 @@
           </el-table-column>
           <el-table-column width="70px" align="center" header-align="center">
             <template #header>
-              <el-button type="text" @click="refreshData" :icon="Refresh">
-              </el-button>
+              <el-button link @click="refreshData" :icon="Refresh"> </el-button>
             </template>
             <template #default="{ row }">
               <el-button
                 size="small"
-                type="text"
+                link
                 plain
                 :icon="Delete"
                 @click="deleteData(row.id)"
@@ -91,7 +90,7 @@
         <br />
 
         <el-pagination
-          class="text-right"
+          small
           background
           @current-change="currentChange"
           @size-change="sizeChange"
@@ -126,6 +125,7 @@
 </template>
 
 <script setup>
+import moment from "moment";
 import { Refresh, Delete, Search } from "@element-plus/icons-vue";
 
 const {
@@ -133,10 +133,15 @@ const {
   pageSize,
   tableData,
   loading,
+  filters,
+  keyword,
   currentChange,
+  sortChange,
   sizeChange,
   deleteData,
   requestData,
+  refreshData,
+  searchData,
 } = useCrud("/api/notification");
 
 onMounted(() => {
