@@ -85,13 +85,13 @@
           <tr v-if="$auth.user.role == 1">
             <td class="border bg-blue-700 text-white px-4 py-1">Tarif</td>
             <td class="border bg-blue-100 px-4 py-1">
-              Rp {{ trx.tarif.toLocaleString("id-ID") }}
+              {{ toRupiah(trx.tarif) }}
             </td>
           </tr>
           <tr v-if="$auth.user.role == 1">
             <td class="border bg-blue-700 text-white px-4 py-1">Denda</td>
             <td class="border bg-blue-100 px-4 py-1">
-              Rp {{ trx.denda.toLocaleString("id-ID") }}
+              {{ toRupiah(trx.denda) }}
             </td>
           </tr>
           <tr>
@@ -124,13 +124,6 @@
 </template>
 
 <script>
-import { mapState } from "pinia";
-
-export default {
-  props: ["trx", "show"],
-
-  computed: {
-    ...mapState(useWebsiteStore, { setting: "setting" }),
-  },
-};
+const { trx, show } = defineProps(["trx", "show"]);
+const { setting } = useWebsiteStore();
 </script>

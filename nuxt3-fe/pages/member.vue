@@ -20,17 +20,17 @@ const { getGroupMemberList, getMemberList } = useWebsiteStore();
 import {
   MemberParkingMember,
   MemberGroupMember,
-  MemberRenewal,
-  MemberMembershipReportDaily,
-  MemberMembershipReport,
+  // MemberRenewal,
+  // MemberMembershipReportDaily,
+  // MemberMembershipReport,
 } from "#components";
 
 const tabs = [
-  // { component: MemberParkingMember, label: "MEMBER", visible: true },
+  { component: MemberParkingMember, label: "MEMBER", visible: true },
   {
     component: MemberGroupMember,
     label: "GROUP MEMBER",
-    visible: user.role == 1,
+    visible: user.value.role == 1,
   },
   // { component: MemberRenewal, label: "PEMBAYARAN", visible: true },
   // {

@@ -147,23 +147,21 @@
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
+<script setup>
+import { Refresh, MoreFilled } from "@element-plus/icons-vue";
+const { getShiftList } = useWebsiteStore();
+const { range } = defineProops(["range"]);
+const { pageSize, tableData, loading, currentChange, sizeChange, requestData } =
+  useCrud("/api/manualOpenLog");
 
-export default {
-  mixins: [crud],
-  props: ["range"],
-  watch: {
-    range(v) {
-      this.requestData();
-    },
-  },
-  data() {
-    return {
-      url: "/api/manualOpenLog",
-      showSnapshot: false,
-      snapshots: [],
-    };
-  },
-};
+const showSnapshot = ref(false);
+const snapshots = ref([]);
+
+watch(range, (v) => {
+  requestData();
+});
+
+onMounted(() => {
+  requestData();
+});
 </script>

@@ -89,7 +89,7 @@ export default {
   methods: {
     getData() {
       const params = { date: this.date, group: this.group };
-      this.$axios.$get(this.url, { params }).then((res) => {
+      api(this.url, { params }).then((res) => {
         this.data = res;
         this.chartOption.legend.data = res.map((d) => d.name);
         this.chartOption.series[0].data = res;

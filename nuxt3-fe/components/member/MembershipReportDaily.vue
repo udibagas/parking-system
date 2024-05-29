@@ -18,8 +18,9 @@
           type="primary"
           :icon="Printer"
           @click="showPrintDialog = true"
-          >PRINT LAPORAN</el-button
         >
+          PRINT LAPORAN
+        </el-button>
       </el-form-item>
     </el-form>
 
@@ -42,9 +43,7 @@
         </template>
       </el-table-column>
       <el-table-column label="Jumlah" header-align="right" align="right">
-        <template #default="{ row }">
-          Rp. {{ row.jumlah.toLocaleString("id-ID") }}
-        </template>
+        <template #default="{ row }"> {{ toRupiah(row.jumlah) }} </template>
       </el-table-column>
     </el-table>
 
@@ -56,76 +55,70 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      date: moment().format("YYYY-MM-DD"),
-      report: [],
-      loading: false,
-      showPrintDialog: false,
-    };
-  },
+<script setup>
+import moment from "moment";
+import { Printer } from "@element-plus/icons-vue";
+const api = useApi();
 
-  methods: {
-    requestData() {
-      let params = { date: this.date };
-      this.loading = true;
+const date = ref(moment().format("YYYY-MM-DD"));
+const report = ref([]);
+const loading = ref(false);
+const showPrintDialog = ref(false);
 
-      this.$axios
-        .$get("/api/memberRenewal/reportDaily", { params })
-        .then((r) => (this.report = r))
-        .finally(() => (this.loading = false));
+const requestData = () => {
+      let params = { date: date.value };
+      loading.value = true;
+
+      api("/api/memberRenewal/reportDaily", { params })
+        .then((r) => (report.value = r))
+        .finally(() => (loading.value = false));
     },
 
-    printReport(printer_id) {
-      let params = { date: this.date, action: "print", printer_id };
-      this.loading = true;
+  printReport(printer_id) {
+    let params = { date: date.value, action: "print", printer_id };
+    loading.value = true;
 
-      this.$axios
-        .$get("/api/memberRenewal/reportDaily", { params })
-        .then((r) => {
-          ElMessage({
-            message: "Silakan ambil slip",
-            type: "success",
-            showClose: false,
-          });
-        })
-        .finally(() => {
-          this.loading = false;
-          this.showPrintDialog = false;
+    api("/api/memberRenewal/reportDaily", { params })
+      .then((r) => {
+        ElMessage({
+          message: "Silakan ambil slip",
+          type: "success",
+          showClose: false,
         });
-    },
-
-    getSummaries(param) {
-      const { columns, data } = param;
-      const sums = [];
-
-      columns.forEach((column, index) => {
-        if (index === 0) {
-          sums[index] = "TOTAL";
-          return;
-        }
-
-        if (index === 1 || index === 2 || index === 3) {
-          sums[index] = "";
-          return;
-        }
-
-        if (index === 4) {
-          let jumlah = this.report.reduce((prev, curr) => {
-            return prev + Number(curr.jumlah);
-          }, 0);
-          sums[index] = "Rp " + jumlah.toLocaleString("id-ID");
-        }
+      })
+      .finally(() => {
+        loading.value = false;
+        showPrintDialog.value = false;
       });
+  };
 
-      return sums;
-    },
-  },
+const getSummaries = (param) => {
+  const { columns, data } = param;
+  const sums = [];
 
-  mounted() {
-    this.requestData();
-  },
+  columns.forEach((column, index) => {
+    if (index === 0) {
+      sums[index] = "TOTAL";
+      return;
+    }
+
+    if (index === 1 || index === 2 || index === 3) {
+      sums[index] = "";
+      return;
+    }
+
+    if (index === 4) {
+      let jumlah = report.value.reduce((prev, curr) => {
+        return prev + Number(curr.jumlah);
+      }, 0);
+      sums[index] = toRupiah(jumlah);
+    }
+  });
+
+  return sums;
 };
+
+onMounted(() => {
+  requestData()
+})
 </script>

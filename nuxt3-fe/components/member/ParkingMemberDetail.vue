@@ -64,17 +64,13 @@
             </td>
             <td class="border bg-blue-100 py-1 px-3">
               {{ member.siklus_pembayaran }}
-              {{
-                $store.state.siklus.find(
-                  (s) => s.value == member.siklus_pembayaran_unit
-                ).label
-              }}
+              {{ getSiklus(member.siklus_pembayaran_unit) }}
             </td>
           </tr>
           <tr>
             <td class="border bg-blue-600 text-white py-1 px-3">Tarif</td>
             <td class="border bg-blue-100 py-1 px-3">
-              Rp {{ member.tarif.toLocaleString("id-ID") }}
+              {{ toRupiah(member.tarif) }}
             </td>
           </tr>
           <tr>
@@ -132,31 +128,21 @@
             <el-table-column prop="warna" label="Warna"></el-table-column>
           </el-table>
         </el-tab-pane>
-        <!-- <el-tab-pane label="Histori Transaksi">
-
-                </el-tab-pane>
-                <el-tab-pane label="Histori Pembayaran">
-
-                </el-tab-pane> -->
       </el-tabs>
     </el-col>
   </el-row>
 </template>
 
-<script>
-export default {
-  props: ["member"],
-  filters: {
-    getSiklus(v) {
-      const siklus = [
-        { days: "hari" },
-        { weeks: "minggu" },
-        { months: "bulan" },
-        { years: "tahun" },
-      ];
+<script setup>
+import moment from "moment";
+const { member } = defineProps(["member"]);
 
-      return siklus[v];
-    },
-  },
+const getSiklus = (k) => {
+  return [
+    { days: "hari" },
+    { weeks: "minggu" },
+    { months: "bulan" },
+    { years: "tahun" },
+  ][k];
 };
 </script>

@@ -274,7 +274,7 @@ const totalBayar = computed(() => {
 });
 
 const toSubmit = () => {
-  runningText(`${duration}|Rp${totalBayar.toLocaleString("id-ID")}`);
+  runningText(`${duration}|${toRupiah(totalBayar)}`);
   document.querySelector("#submit-btn").focus();
 };
 
@@ -289,7 +289,7 @@ const toGateIn = () => {
     document.querySelector("#submit-btn").focus();
   }
 
-  runningText(`${duration}|Rp${totalBayar.toLocaleString("id-ID")}`);
+  runningText(`${duration}|${toRupiah(totalBayar)}`);
 };
 
 const nextBtn = () => {
@@ -362,7 +362,7 @@ const hitungTarif = () => {
   if (durasiMenit <= tarif.menit_pertama) {
     formModel.tarif = tarifMenitPertama;
     document.querySelector("#submit-btn").focus();
-    runningText(`${duration}|Rp${totalBayar.toLocaleString("id-ID")}`);
+    runningText(`${duration}|${toRupiah(totalBayar)}`);
     return;
   }
 
@@ -486,7 +486,7 @@ const hitungTarif = () => {
     document.querySelector("#submit-btn").focus();
   }
 
-  runningText(`${duration}|Rp${totalBayar.toLocaleString("id-ID")}`);
+  runningText(`${duration}|${toRupiah(totalBayar)}`);
 };
 
 const cekPlatNomor = () => {

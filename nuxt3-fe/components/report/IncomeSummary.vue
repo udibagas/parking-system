@@ -4,7 +4,7 @@
       <el-card>
         Hari Ini
         <div class="text-5xl text-purple-700">
-          Rp. {{ summary.today.toLocaleString("id-ID") }}
+          {{ toRupiah(summary.today) }}
         </div>
       </el-card>
     </el-col>
@@ -12,7 +12,7 @@
       <el-card>
         Bulan Ini
         <div class="text-5xl text-blue-700">
-          Rp. {{ summary.this_month.toLocaleString("id-ID") }}
+          {{ toRupiah(summary.this_month) }}
         </div>
       </el-card>
     </el-col>
@@ -20,29 +20,21 @@
       <el-card>
         Total
         <div class="text-5xl text-orange-700">
-          Rp. {{ summary.total.toLocaleString("id-ID") }}
+          {{ toRupiah(summary.total) }}
         </div>
       </el-card>
     </el-col>
   </el-row>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      summary: {},
-    };
-  },
-
-  methods: {
-    getData() {
-      this.$axios.$get("/api/summary").then((r) => (this.summary = r));
-    },
-  },
-
-  created() {
-    this.getData();
-  },
+<script setup>
+const api = useApi();
+const summary = ref({});
+const getData = () => {
+  api("/api/summary").then((r) => (this.summary = r));
 };
+
+onBeforeMounted(() => {
+  getData();
+});
 </script>

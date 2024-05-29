@@ -116,9 +116,7 @@
         header-align="right"
         min-width="120"
       >
-        <template #default="{ row }">
-          Rp. {{ row.jumlah.toLocaleString("id-ID") }}
-        </template>
+        <template #default="{ row }"> {{ toRupiah(row.jumlah) }} </template>
       </el-table-column>
 
       <el-table-column
@@ -293,62 +291,78 @@
   </div>
 </template>
 
-<script>
-import crud from "@/mixins/crud";
-import { mapState, mapStores } from "pinia";
+<script setup>
+import {
+  Refresh,
+  Plus,
+  SuccessFilled,
+  CircleCloseFilled,
+  Edit,
+  Delete,
+  MoreFilled,
+} from "@element-plus/icons-vue";
 
-export default {
-  mixins: [crud],
+const {
+  api,
+  showForm,
+  formErrors,
+  formModel,
+  pageSize,
+  tableData,
+  loading,
+  currentChange,
+  sizeChange,
+  openForm,
+  save,
+  deleteData,
+  closeForm,
+  requestData,
+} = useCrud("/api/memberRenewal");
 
-  data() {
-    return {
-      url: "/api/memberRenewal",
-      showPrintDialog: false,
-      selectedData: {},
-    };
-  },
+const store = useWebsiteStore();
 
-  computed: {
-    sampai_tanggal() {
-      try {
-        return moment(this.formModel.dari_tanggal, "YYYY-MM-DD")
-          .add(
-            this.formModel.siklus_pembayaran,
-            this.formModel.siklus_pembayaran_unit
-          )
-          .format("YYYY-MM-DD");
-      } catch (error) {
-        return "";
-      }
+onMounted(() => {
+  requestData();
+});
+
+const selectedData = ref({});
+const showPrintDialog = ref(false);
+const memberList = computed(() => store.memberList);
+const siklus = computed(() => store.siklus);
+
+const sampai_tanggal = computed(() => {
+  try {
+    return moment(formModel.value.dari_tanggal, "YYYY-MM-DD")
+      .add(
+        formModel.value.siklus_pembayaran,
+        formModel.value.siklus_pembayaran_unit
+      )
+      .format("YYYY-MM-DD");
+  } catch (error) {
+    return "";
+  }
+});
+
+const submit = () => {
+  formModel.value.sampai_tanggal = sampai_tanggal;
+  save();
+};
+
+const printSlip = (printer_id) => {
+  api(`${this.url}/printSlip/${this.selectedData.id}`, {
+    method: "POST",
+    body: {
+      printer_id,
     },
-    ...mapState(useWebsiteStore, {
-      memberList: "memberList",
-      siklus: "siklus",
-    }),
-    ...mapStores(useWebsiteStore),
-  },
-
-  methods: {
-    submit() {
-      this.formModel.sampai_tanggal = this.sampai_tanggal;
-      this.save();
-    },
-
-    printSlip(printer_id) {
-      this.$axios
-        .$post(`${this.url}/printSlip/${this.selectedData.id}`, {
-          printer_id,
-        })
-        .then((r) => {
-          ElMessage({
-            message: r.message,
-            type: "success",
-          });
-        })
-        .finally(() => {
-          this.showPrintDialog = false;
-        });
-    },
-  },
+  })
+    .then((r) => {
+      ElMessage({
+        message: r.message,
+        type: "success",
+      });
+    })
+    .finally(() => {
+      showPrintDialog.value = false;
+    });
 };
 </script>

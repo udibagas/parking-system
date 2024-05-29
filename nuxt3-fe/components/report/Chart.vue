@@ -39,15 +39,6 @@
 </template>
 
 <script>
-import { mapState } from "pinia";
-
-export default {
-  props: ["date"],
-
-  computed: {
-    ...mapState(useWebsiteStore, {
-      groupJenisKendaraanList: "groupJenisKendaraanList",
-    }),
-  },
-};
+const { date } = defineProps(["date"]);
+const { groupJenisKendaraanList } = useWebsiteStore();
 </script>

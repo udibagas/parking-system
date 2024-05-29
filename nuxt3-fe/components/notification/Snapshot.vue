@@ -51,6 +51,7 @@ const url = ref("");
 const show = ref(true);
 const checkedNodes = ref([]);
 const props = ref({ label: "label", isLeaf: "isLeaf" });
+const instance = getCurrentInstance();
 
 const loadNode = (node, resolve) => {
   const params = {
@@ -82,8 +83,7 @@ const deleteSnapshot = () => {
 
 const refresh = () => {
   show.value = false;
-  // TODO
-  // this.$nextTick(() => (this.show = true));
+  instance?.proxy?.$nextTick(() => (show.value = true));
 };
 </script>
 

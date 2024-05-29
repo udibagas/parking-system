@@ -74,98 +74,94 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      formModel: {},
-      formErrors: {},
-      location: {},
-      parkingGateList: [],
-      vehicleTypeList: [],
-    };
-  },
+<script setup>
+import moment from "moment";
+const formModel = ref({});
+const formErrors = ref({});
+const location = ref({});
+const parkingGateList = ref([]);
+const vehicleTypeList = ref([]);
+const instance = getCurrentInstance();
 
-  methods: {
-    setFare() {
-      let vehicle = this.vehicleTypeList.find(
-        (vt) => vt.name == this.formModel.vehicle_type
-      );
+const setFare = () => {
+  let vehicle = vehicleTypeList.value.find(
+    (vt) => vt.name == formModel.value.vehicle_type
+  );
 
-      if (vehicle) {
-        this.formModel.fare = this.formModel.is_member ? 0 : vehicle.tarif_flat;
-        this.$forceUpdate();
-      }
+  if (vehicle) {
+    formModel.value.fare = formModel.value.is_member ? 0 : vehicle.tarif_flat;
+    instance?.proxy?.$forceUpdate();
+  }
 
-      document.querySelector("#plate-number").focus();
-    },
-
-    resetForm() {
-      let default_vehicle = this.vehicleTypeList.find((v) => v.is_default == 1);
-      this.formModel.plate_number = this.location.default_plate_number;
-
-      if (default_vehicle) {
-        this.formModel.vehicle_type = default_vehicle.name;
-        this.formModel.fare = default_vehicle.tarif_flat;
-      } else {
-        this.formModel.vehicle_type = "";
-        this.formModel.fare = "";
-      }
-
-      this.$forceUpdate();
-      document.querySelector("#plate-number").focus();
-    },
-
-    submit() {
-      if (
-        !this.formModel.gate_in_id ||
-        !this.formModel.plate_number ||
-        !this.formModel.vehicle_type
-      ) {
-        return;
-      }
-
-      let params = { plate_number: this.formModel.plate_number };
-      this.$axios
-        .$get("/parkingMember/search", { params: params })
-        .then((r) => {
-          this.formModel.fare = 0;
-          this.formModel.is_member = 1;
-          this.formModel.member_id = r.id;
-        })
-        .catch((e) => {
-          this.formModel.is_member = 0;
-          this.formModel.member_id = null;
-        })
-        .finally(() => {
-          this.formModel.time_in = moment().format("YYYY-MM-DD HH:mm:ss");
-          this.$axios.$post("/parkingTransaction", this.formModel);
-        });
-    },
-  },
-
-  mounted() {
-    document.querySelector("#plate-number").focus();
-
-    document.querySelector("#gate-in-app").onkeypress = (e) => {
-      // ke field nomor plat
-      if (e.key == "-") {
-        e.preventDefault();
-        this.resetForm();
-        this.$forceUpdate();
-        document.querySelector("#plate-number").focus();
-      }
-
-      // ke field jenis kendaraan
-      if (e.key == "*") {
-        e.preventDefault();
-        this.formModel.vehicle_type = "";
-        this.formModel.fare = "";
-        document.querySelector("#vehicle-type").focus();
-      }
-    };
-  },
+  document.querySelector("#plate-number").focus();
 };
+
+const resetForm = () => {
+  let default_vehicle = vehicleTypeList.value.find((v) => v.is_default == 1);
+  formModel.value.plate_number = location.value.default_plate_number;
+
+  if (default_vehicle) {
+    formModel.value.vehicle_type = default_vehicle.name;
+    formModel.value.fare = default_vehicle.tarif_flat;
+  } else {
+    formModel.value.vehicle_type = "";
+    formModel.value.fare = "";
+  }
+
+  instance?.proxy?.$forceUpdate();
+  document.querySelector("#plate-number").focus();
+};
+
+const submit = () => {
+  if (
+    !formModel.value.gate_in_id ||
+    !formModel.value.plate_number ||
+    !formModel.value.vehicle_type
+  ) {
+    return;
+  }
+
+  let params = { plate_number: formModel.value.plate_number };
+  api("/parkingMember/search", { params })
+    .then((r) => {
+      formModel.value.fare = 0;
+      formModel.value.is_member = 1;
+      formModel.value.member_id = r.id;
+    })
+    .catch((e) => {
+      formModel.value.is_member = 0;
+      formModel.value.member_id = null;
+    })
+    .finally(() => {
+      formModel.value.time_in = moment().format("YYYY-MM-DD HH:mm:ss");
+      api("/parkingTransaction", {
+        method: "POST",
+        body: formModel.value,
+      });
+    });
+};
+
+onMounted(() => {
+  document.querySelector("#plate-number").focus();
+
+  document.querySelector("#gate-in-app").onkeypress = (e) => {
+    // ke field nomor plat
+    if (e.key == "-") {
+      e.preventDefault();
+      resetForm();
+      instance?.proxy?.$forceUpdate();
+      document.querySelector("#plate-number").focus();
+    }
+
+    // ke field jenis kendaraan
+    if (e.key == "*") {
+      e.preventDefault();
+      formModel.value.vehicle_type = "";
+      formModel.value.fare = "";
+      document.querySelector("#vehicle-type").focus();
+    }
+  };
+});
 </script>
 
 <style lang="css" scoped>

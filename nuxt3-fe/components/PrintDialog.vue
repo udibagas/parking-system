@@ -2,7 +2,7 @@
   <el-dialog
     center
     title="PILIH PRINTER"
-    :visible.sync="show"
+    v-model="show"
     width="500px"
     :before-close="
       (done) => {
@@ -44,26 +44,12 @@
 </template>
 
 <script>
-import { mapState, mapStores } from "pinia";
+const emit = defineEmits()
+const store = useWebsiteStore();
+const { show } = defineProps(["show"]);
+const printerList = computed(() => store.printerList);
+const printer_id = ref(null);
 
-export default {
-  props: ["show"],
-
-  computed: {
-    ...mapState(useWebsiteStore, {
-      printerList: "printerList",
-    }),
-    ...mapStores(useWebsiteStore),
-  },
-
-  data() {
-    return {
-      printer_id: null,
-    };
-  },
-
-  mounted() {
-    this.websiteStore.getPrinterList();
-  },
-};
-</script>
+onMounted(() => {
+  store.getPrinterList()
+})

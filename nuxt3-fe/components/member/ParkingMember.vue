@@ -169,9 +169,7 @@
         header-align="right"
         align="right"
       >
-        <template #default="{ row }">
-          Rp. {{ row.tarif.toLocaleString("id-ID") }}
-        </template>
+        <template #default="{ row }"> {{ toRupiah(row.tarif) }} </template>
       </el-table-column>
       <el-table-column
         prop="siklus_pembayaran"
@@ -581,6 +579,8 @@
 
 <script setup>
 import moment from "moment";
+const config = useRuntimeConfig();
+
 import {
   Refresh,
   Plus,
@@ -595,17 +595,20 @@ import {
 const store = useWebsiteStore();
 
 const {
+  api,
   showForm,
   formErrors,
   pageSize,
   tableData,
   loading,
+  keyword,
   currentChange,
   sizeChange,
   openForm,
   save,
   deleteData,
   requestData,
+  searchData,
 } = useCrud("/api/member");
 
 onMounted(() => {
@@ -635,11 +638,14 @@ const jenisKendaraanList = computed(() => store.jenisKendaraanList);
 const siklus = computed(() => store.siklus);
 const setting = computed(() => store.setting);
 
-watch(formModel.berbayar, (v, o) => {
-  if (!v) {
-    formModel.value.tarif = 0;
+watch(
+  () => formModel.value.berbayar,
+  (berbayar) => {
+    if (!berbayar) {
+      formModel.value.tarif = 0;
+    }
   }
-});
+);
 
 const closeForm = () => {
   showForm.value = false;
@@ -661,10 +667,7 @@ const print = () => {
   };
 
   const querystring = new URLSearchParams(params).toString();
-  window.open(
-    `${this.$axios.defaults.baseURL}/api/member?${querystring}`,
-    "_blank"
-  );
+  window.open(`${config.public.apiBase}/api/member?${querystring}`, "_blank");
 };
 
 const addVehicle = () => {
@@ -692,7 +695,7 @@ const deleteVehicle = (index, id) => {
   if (!id) {
     formModel.value.vehicles.splice(index, 1);
   } else {
-    this.$axios.$delete(`/api/memberVehicle/${id}`).then((r) => {
+    api(`/api/memberVehicle/${id}`, { method: "DELETE" }).then((r) => {
       formModel.value.vehicles.splice(index, 1);
     });
   }

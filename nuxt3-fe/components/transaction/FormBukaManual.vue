@@ -61,55 +61,47 @@
   </el-dialog>
 </template>
 
-<script>
-export default {
-  props: ["show", "gateOutList"],
+<script setup>
+const { show, gateOutList } = defineProps(["show", "gateOutList"]);
+const { api, formModel, formErrors } = useCrud("/api/manualOpenLog");
+const emit = defineEmit();
 
-  data() {
-    return {
-      formModel: {},
-      formErrors: {},
-    };
-  },
-
-  mounted() {
-    if (this.gateOutList.length == 1) {
-      this.formModel.gate_out_id = this.gateOutList[0].id;
-    }
-  },
-
-  methods: {
-    closeForm() {
-      this.formModel = {};
-      this.formErrors = {};
-      this.$emit("close");
-    },
-
-    save() {
-      ElMessageBox.confirm(
-        "Aksi ini akan dicatat oleh sistem. Anda yakin?",
-        "Peringatan",
-        { type: "warning" }
-      )
-        .then(() => {
-          this.$axios
-            .$post("/api/manualOpenLog", this.formModel)
-            .then((r) => {
-              ElMessage({
-                message: r.message,
-                type: "success",
-              });
-              this.$emit("open-gate", this.formModel.gate_out_id);
-              this.closeForm();
-            })
-            .catch((e) => {
-              if (e.response.status == 422) {
-                this.formErrors = e.response.data.errors;
-              }
-            });
-        })
-        .catch((e) => console.log(e));
-    },
-  },
+const closeForm() => {
+  formModel.value = {};
+  formErrors.value = {};
+  emit("close");
 };
+
+const save = () => {
+  ElMessageBox.confirm(
+    "Aksi ini akan dicatat oleh sistem. Anda yakin?",
+    "Peringatan",
+    { type: "warning" }
+  )
+    .then(() => {
+      return api("/api/manualOpenLog", {
+        method: "POST",
+        body: formModel,
+      });
+    })
+    .then((r) => {
+      ElMessage({
+        message: r.message,
+        type: "success",
+      });
+      emit("open-gate", formModel.value.gate_out_id);
+      closeForm();
+    })
+    .catch((e) => {
+      if (e.response?.status == 422) {
+        formErrors.value = e.response._data.errors;
+      }
+    });
+};
+
+onMounted(() => {
+  if (gateOutList.value.length == 1) {
+      formModel.value.gate_out_id = gateOutList[0].value.id;
+    }
+})
 </script>

@@ -22,8 +22,9 @@
           type="primary"
           :icon="Printer"
           @click="showPrintDialog = true"
-          >PRINT LAPORAN</el-button
         >
+          PRINT LAPORAN
+        </el-button>
       </el-form-item>
     </el-form>
 
@@ -40,7 +41,7 @@
       </el-table-column>
       <el-table-column label="Pendapatan" header-align="right" align="right">
         <template #default="{ row }">
-          Rp. {{ row.pendapatan.toLocaleString("id-ID") }}
+          {{ toRupiah(row.pendapatan) }}
         </template>
       </el-table-column>
     </el-table>
@@ -53,76 +54,75 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      dateRange: [moment().format("YYYY-MM-01"), moment().format("YYYY-MM-DD")],
-      report: [],
-      loading: false,
-      showPrintDialog: false,
-    };
-  },
-  methods: {
-    requestData() {
-      let params = { dateRange: this.dateRange };
-      this.loading = true;
+<script setup>
+import moment from "moment";
+import { Printer } from "@element-plus/icons-vue";
 
-      this.$axios
-        .$get("/api/memberRenewal/report", { params })
-        .then((r) => (this.report = r))
-        .finally(() => (this.loading = false));
-    },
+const api = useApi();
 
-    printReport(printer_id) {
-      let params = { dateRange: this.dateRange, action: "print", printer_id };
-      this.loading = true;
+const dateRange = ref([
+  moment().format("YYYY-MM-01"),
+  moment().format("YYYY-MM-DD"),
+]);
+const report = ref([]);
+const loading = ref(false);
+const showPrintDialog = ref(false);
 
-      this.$axios
-        .$get("/api/memberRenewal/report", { params })
-        .then((r) => {
-          ElMessage({
-            message: "Silakan ambil slip",
-            type: "success",
-            showClose: false,
-          });
-        })
-        .finally(() => {
-          this.loading = false;
-          this.showPrintDialog = false;
-        });
-    },
+const requestData = () => {
+  let params = { dateRange: this.dateRange };
+  this.loading = true;
 
-    getSummaries(param) {
-      const { columns, data } = param;
-      const sums = [];
-
-      columns.forEach((column, index) => {
-        if (index === 0) {
-          sums[index] = "TOTAL";
-          return;
-        }
-
-        if (index === 1) {
-          sums[index] = this.report.reduce((prev, curr) => {
-            return prev + Number(curr.jumlah);
-          }, 0);
-        }
-
-        if (index === 2) {
-          let pendapatan = this.report.reduce((prev, curr) => {
-            return prev + Number(curr.pendapatan);
-          }, 0);
-          sums[index] = "Rp " + pendapatan.toLocaleString("id-ID");
-        }
-      });
-
-      return sums;
-    },
-  },
-
-  mounted() {
-    this.requestData();
-  },
+  api("/api/memberRenewal/report", { params })
+    .then((r) => (this.report = r))
+    .finally(() => (this.loading = false));
 };
+
+const printReport = (printer_id) => {
+  let params = { dateRange: this.dateRange, action: "print", printer_id };
+  this.loading = true;
+
+  api("/api/memberRenewal/report", { params })
+    .then((r) => {
+      ElMessage({
+        message: "Silakan ambil slip",
+        type: "success",
+        showClose: false,
+      });
+    })
+    .finally(() => {
+      this.loading = false;
+      this.showPrintDialog = false;
+    });
+};
+
+const getSummaries = (param) => {
+  const { columns, data } = param;
+  const sums = [];
+
+  columns.forEach((column, index) => {
+    if (index === 0) {
+      sums[index] = "TOTAL";
+      return;
+    }
+
+    if (index === 1) {
+      sums[index] = this.report.reduce((prev, curr) => {
+        return prev + Number(curr.jumlah);
+      }, 0);
+    }
+
+    if (index === 2) {
+      let pendapatan = this.report.reduce((prev, curr) => {
+        return prev + Number(curr.pendapatan);
+      }, 0);
+      sums[index] = toRupiah(pendapatan);
+    }
+  });
+
+  return sums;
+};
+
+onMounted(() => {
+  requestData();
+});
 </script>

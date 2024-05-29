@@ -162,103 +162,87 @@
 </template>
 
 <script>
-import { mapState } from "pinia";
+const store = useWebsiteStore();
+const emit = defineEmit();
+const { show, model } = defineProps(["show", "model"]);
 
-export default {
-  props: ["show", "model"],
+const loading = ref(false);
+const formErrors = ref({});
 
-  computed: {
-    formModel() {
-      return this.model;
-    },
+const formModel = computed(() => model);
+const posList = computed(() => store.posList);
+const gateOutList = computed(() => store.gateOutList);
+const gateInList = computed(() => store.gateInList);
+const jenisKendaraanList = computed(() => store.jenisKendaraanList);
+const durasi = computed(() => {
+  var date1 = moment(formModel.value.time_in);
+  var date2 = moment(formModel.value.time_out);
+  var duration = moment.duration(date2.diff(date1));
+  return moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
+});
 
-    durasi() {
-      var date1 = moment(this.formModel.time_in);
-      var date2 = moment(this.formModel.time_out);
-      var duration = moment.duration(date2.diff(date1));
-      return moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
-    },
-    ...mapState(useWebsiteStore, {
-      posList: "posList",
-      gateOutList: "gateOutList",
-      gateInList: "gateInList",
-      jenisKendaraanList: "jenisKendaraanList",
-    }),
-  },
+const closeForm = () => {
+  formErrors.value = {};
+  emit("close");
+};
 
-  data() {
-    return {
-      formErrors: {},
-      loading: false,
-    };
-  },
+const save = () => {
+  loading.value = true;
+  formModel.value.manual = 1;
 
-  methods: {
-    closeForm() {
-      this.formErrors = {};
-      this.$emit("close");
-    },
+  api("/api/parkingTransaction", { method: "POST", body: formModel })
+    .then((r) => {
+      ElMessage({
+        message: "Data berhasil disimpan",
+        type: "success",
+        showClose: true,
+      });
 
-    save() {
-      this.loading = true;
-      this.formModel.manual = 1;
+      closeForm();
+      emit("reload");
+      // TODO: handle if this error
+      openGate(formModel.value.gate_out_id);
+    })
+    .catch((e) => {
+      if (e.response.status == 422) {
+        formErrors.value = e.response.data.errors;
+      }
+    })
+    .finally(() => (loading.value = false));
+};
 
-      this.$axios
-        .$post("/api/parkingTransaction", this.formModel)
-        .then((r) => {
-          ElMessage({
-            message: "Data berhasil disimpan",
-            type: "success",
-            showClose: true,
-          });
+const openGate = (gate_out_id) => {
+  const pos = posList.value.find((p) => p.id == formModel.value.pos_id);
+  const gate = gateOutList.value.find((g) => g.id == gate_out_id);
 
-          this.closeForm();
-          this.$emit("reload");
-          // TODO: handle if this error
-          this.openGate(this.formModel.gate_out_id);
-        })
-        .catch((e) => {
-          if (e.response.status == 422) {
-            this.formErrors = e.response.data.errors;
-          }
-        })
-        .finally(() => (this.loading = false));
-    },
+  const ws = new WebSocket(`ws://${pos.value.ip_address}:5678/`);
 
-    openGate(gate_out_id) {
-      const pos = this.posList.find((p) => p.id == this.formModel.pos_id);
-      const gate = this.gateOutList.find((g) => g.id == gate_out_id);
+  ws.onerror = (event) => {
+    ElMessage({
+      message: "KONEKSI KE POS GAGAL",
+      type: "error",
+    });
+  };
 
-      const ws = new WebSocket(`ws://${pos.ip_address}:5678/`);
+  ws.onopen = (event) => {
+    ws.send(
+      [
+        "open",
+        gate.device,
+        gate.baudrate,
+        gate.open_command,
+        gate.close_command,
+      ].join(";")
+    );
+  };
 
-      ws.onerror = (event) => {
-        ElMessage({
-          message: "KONEKSI KE POS GAGAL",
-          type: "error",
-        });
-      };
-
-      ws.onopen = (event) => {
-        ws.send(
-          [
-            "open",
-            gate.device,
-            gate.baudrate,
-            gate.open_command,
-            gate.close_command,
-          ].join(";")
-        );
-      };
-
-      ws.onmessage = (event) => {
-        let data = JSON.parse(event.data);
-        ElMessage({
-          message: data.message,
-          type: data.status ? "success" : "error",
-        });
-        ws.close();
-      };
-    },
-  },
+  ws.onmessage = (event) => {
+    let data = JSON.parse(event.data);
+    ElMessage({
+      message: data.message,
+      type: data.status ? "success" : "error",
+    });
+    ws.close();
+  };
 };
 </script>

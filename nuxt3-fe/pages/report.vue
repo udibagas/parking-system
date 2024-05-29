@@ -117,10 +117,7 @@
               <tr v-for="(t, id) in income" :key="id">
                 <td class="border-b px-3 py-1">{{ t.jenis_kendaraan }}</td>
                 <td class="border-b px-3 py-1 text-right">
-                  Rp.
-                  {{
-                    (Number(t.total) + Number(t.denda)).toLocaleString("id-ID")
-                  }}
+                  {{ toRupiah(Number(t.total) + Number(t.denda)) }}
                 </td>
               </tr>
             </tbody>
@@ -176,126 +173,118 @@
   </div>
 </template>
 
-<script>
-import { mapState } from "pinia";
-export default {
-  data() {
-    return {
-      transaction: [],
-      income: [],
-      parkedVehicle: [],
-      vehicleIn: [],
-      showPrintDialog: false,
-      dateRange: [moment().format("YYYY-MM-01"), moment().format("YYYY-MM-DD")],
-      report: null,
-    };
-  },
+<script setup>
+import moment from "moment";
+const store = useWebsiteStore();
+const api = useApi();
+const config = useRuntimeConfig();
 
-  computed: {
-    ...mapState(useWebsiteStore, { areaParkirList: "areaParkirList" }),
-  },
+const transaction = ref([]);
+const income = ref([]);
+const parkedVehicle = ref([]);
+const vehicleIn = ref([]);
+const showPrintDialog = ref(false);
+const dateRange = ref([
+  moment().format("YYYY-MM-01"),
+  moment().format("YYYY-MM-DD"),
+]);
+const report = ref(null);
+const areaParkirList = computed(() => store.areaParkirList);
 
-  methods: {
-    printReport(printer_id = null) {
-      if (printer_id == null) {
-        const params = new URLSearchParams();
-        params.append("action", "print");
-        params.append("dateRange[]", this.dateRange[0]);
-        params.append("dateRange[]", this.dateRange[1]);
+const printReport = (printer_id = null) => {
+  if (printer_id == null) {
+    const params = new URLSearchParams();
+    params.append("action", "print");
+    params.append("dateRange[]", dateRange.value[0]);
+    params.append("dateRange[]", dateRange.value[1]);
 
-        window.open(
-          `${this.$axios.defaults.baseURL}/api/report?${params}`,
-          "_blank"
-        );
-      } else {
-        this.$axios
-          .$get(`api/report`, {
-            params: {
-              action: "print",
-              printer_id,
-              dateRange: this.dateRange,
-            },
-          })
-          .then((r) => {
-            ElMessage({
-              message: r.message,
-              type: "success",
-            });
-          })
-          .finally(() => {
-            this.showPrintDialog = false;
-          });
-      }
-    },
-
-    getTransaction() {
-      this.$axios
-        .$get("/api/getTransaction", { params: { dateRange: this.dateRange } })
-        .then((response) => {
-          this.transaction = response;
-          let total = response
-            .map((d) => d.total)
-            .reduce((sum, total) => sum + parseInt(total), 0);
-          this.transaction.push({ jenis_kendaraan: "TOTAL", total });
+    window.open(`${config.public.apiBase}/api/report?${params}`, "_blank");
+  } else {
+    api(`api/report`, {
+      params: {
+        action: "print",
+        printer_id,
+        dateRange: dateRange.value,
+      },
+    })
+      .then((r) => {
+        ElMessage({
+          message: r.message,
+          type: "success",
         });
-    },
-
-    getIncome() {
-      this.$axios
-        .$get("/api/getIncome", { params: { dateRange: this.dateRange } })
-        .then((response) => {
-          this.income = response;
-
-          let total = response
-            .map((d) => Number(d.total))
-            .reduce((sum, total) => sum + Number(total), 0);
-
-          let denda = response
-            .map((d) => Number(d.denda))
-            .reduce((sum, denda) => sum + Number(denda), 0);
-
-          this.income.push({ jenis_kendaraan: "TOTAL", total, denda });
-        });
-    },
-
-    async getParkedVehicle() {
-      const data = await this.$axios.$get("/api/getParkedVehicle", {
-        params: { dateRange: this.dateRange },
+      })
+      .finally(() => {
+        showPrintDialog.value = false;
       });
-
-      this.parkedVehicle = data;
-    },
-
-    getVehicleIn() {
-      this.$axios
-        .$get("/api/getVehicleIn", { params: { dateRange: this.dateRange } })
-        .then((r) => {
-          this.vehicleIn = r;
-          let total = r
-            .map((d) => d.total)
-            .reduce((sum, total) => sum + parseInt(total), 0);
-          this.vehicleIn.push({ gate: "TOTAL", total });
-        });
-    },
-
-    getReport() {
-      this.$axios
-        .$get("/api/report", { params: { dateRange: this.dateRange } })
-        .then((r) => (this.report = r));
-    },
-
-    async requestData() {
-      await this.$store.dispatch("getAreaParkirList");
-      this.getTransaction();
-      this.getIncome();
-      this.getParkedVehicle();
-      this.getVehicleIn();
-      this.getReport();
-    },
-  },
-
-  mounted() {
-    this.requestData();
-  },
+  }
 };
+
+const getTransaction = () => {
+  api("/api/getTransaction", {
+    params: { dateRange: dateRange.value },
+  }).then((response) => {
+    transaction.value = response;
+    let total = response
+      .map((d) => d.total)
+      .reduce((sum, total) => sum + parseInt(total), 0);
+    transaction.value.push({ jenis_kendaraan: "TOTAL", total });
+  });
+};
+
+const getIncome = () => {
+  api("/api/getIncome", { params: { dateRange: dateRange.value } }).then(
+    (response) => {
+      income.value = response;
+
+      let total = response
+        .map((d) => Number(d.total))
+        .reduce((sum, total) => sum + Number(total), 0);
+
+      let denda = response
+        .map((d) => Number(d.denda))
+        .reduce((sum, denda) => sum + Number(denda), 0);
+
+      income.value.push({ jenis_kendaraan: "TOTAL", total, denda });
+    }
+  );
+};
+
+const getParkedVehicle = async () => {
+  const data = await api("/api/getParkedVehicle", {
+    params: { dateRange: dateRange.value },
+  });
+
+  parkedVehicle.value = data;
+};
+
+const getVehicleIn = () => {
+  api("/api/getVehicleIn", { params: { dateRange: dateRange.value } }).then(
+    (r) => {
+      vehicleIn.value = r;
+      let total = r
+        .map((d) => d.total)
+        .reduce((sum, total) => sum + parseInt(total), 0);
+      vehicleIn.value.push({ gate: "TOTAL", total });
+    }
+  );
+};
+
+const getReport = () => {
+  api("/api/report", { params: { dateRange: dateRange.value } }).then(
+    (r) => (report.value = r)
+  );
+};
+
+const requestData = async () => {
+  await store.getAreaParkirList();
+  getTransaction();
+  getIncome();
+  getParkedVehicle();
+  getVehicleIn();
+  getReport();
+};
+
+onMounted(() => {
+  requestData();
+});
 </script>
