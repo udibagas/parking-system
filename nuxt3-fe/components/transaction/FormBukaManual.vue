@@ -66,7 +66,7 @@ const { show, gateOutList } = defineProps(["show", "gateOutList"]);
 const { api, formModel, formErrors } = useCrud("/api/manualOpenLog");
 const emit = defineEmit();
 
-const closeForm() => {
+const closeForm = () => {
   formModel.value = {};
   formErrors.value = {};
   emit("close");
@@ -101,7 +101,7 @@ const save = () => {
 
 onMounted(() => {
   if (gateOutList.value.length == 1) {
-      formModel.value.gate_out_id = gateOutList[0].value.id;
-    }
-})
+    formModel.value.gate_out_id = gateOutList[0].value.id;
+  }
+});
 </script>
