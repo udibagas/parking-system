@@ -17,7 +17,7 @@ class AuthController extends Controller
                     ->orWhere('email', $request->email);
             })->first();
 
-        if ($user && Auth::attempt($request->only(['email', 'password']), true)) {
+        if ($user && Auth::attempt([$user->email, $request->password], true)) {
             // simpan log
             UserLog::create([
                 'user_id' => $user->id,
@@ -25,7 +25,7 @@ class AuthController extends Controller
             ]);
 
             $request->session()->regenerate();
-            Auth::login($user, true);
+            // Auth::login($user, true);
 
             return response()->json([
                 'token' => $user->createToken($request->device_name ?: 'web')->plainTextToken,
