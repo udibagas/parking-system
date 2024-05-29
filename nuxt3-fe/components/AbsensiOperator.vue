@@ -128,6 +128,7 @@ const {
   filters,
   currentChange,
   sizeChange,
+  sortChange,
   requestData,
 } = useCrud("/api/absensiOperator");
 
