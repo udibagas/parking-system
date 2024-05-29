@@ -2,7 +2,7 @@
   <el-dialog
     center
     title="PILIH PRINTER"
-    v-model="show"
+    :model-value="show"
     width="500px"
     :before-close="
       (done) => {
