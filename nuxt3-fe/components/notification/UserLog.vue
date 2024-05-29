@@ -64,6 +64,7 @@
     <el-pagination
       small
       background
+      :current-page="page"
       @current-change="currentChange"
       @size-change="sizeChange"
       layout="total, sizes, prev, pager, next"
@@ -81,11 +82,14 @@ const { range } = defineProps(["range"]);
 
 const {
   api,
+  page,
   pageSize,
   tableData,
   loading,
+  keyword,
   currentChange,
   sizeChange,
+  sortChange,
   requestData,
 } = useCrud("/api/userLog");
 
