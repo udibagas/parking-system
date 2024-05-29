@@ -123,7 +123,8 @@
   </el-dialog>
 </template>
 
-<script>
+<script setup>
 const { trx, show } = defineProps(["trx", "show"]);
-const { setting } = useWebsiteStore();
+const store = useWebsiteStore();
+const setting = computed(() => store.setting);
 </script>

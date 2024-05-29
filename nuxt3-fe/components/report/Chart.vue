@@ -38,7 +38,8 @@
   </div>
 </template>
 
-<script>
+<script setup>
 const { date } = defineProps(["date"]);
-const { groupJenisKendaraanList } = useWebsiteStore();
+const store = useWebsiteStore();
+const groupJenisKendaraanList = computed(() => store.groupJenisKendaraanList);
 </script>
