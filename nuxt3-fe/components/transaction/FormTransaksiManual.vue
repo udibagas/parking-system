@@ -161,9 +161,9 @@
   </el-dialog>
 </template>
 
-<script>
+<script setup>
 const store = useWebsiteStore();
-const emit = defineEmit();
+const emit = defineEmits(["close", "reload"]);
 const { show, model } = defineProps(["show", "model"]);
 
 const loading = ref(false);

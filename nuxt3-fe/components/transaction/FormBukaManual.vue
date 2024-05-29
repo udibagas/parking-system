@@ -20,7 +20,7 @@
       </el-form-item>
 
       <el-form-item
-        v-if="this.gateOutList.length > 1"
+        v-if="gateOutList.length > 1"
         label="Gate Keluar"
         :error="formErrors.gate_out_id?.join(', ')"
       >
@@ -64,7 +64,7 @@
 <script setup>
 const { show, gateOutList } = defineProps(["show", "gateOutList"]);
 const { api, formModel, formErrors } = useCrud("/api/manualOpenLog");
-const emit = defineEmit();
+const emit = defineEmits(["close", "open-gate"]);
 
 const closeForm = () => {
   formModel.value = {};

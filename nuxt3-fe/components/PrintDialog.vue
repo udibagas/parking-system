@@ -43,13 +43,14 @@
   </el-dialog>
 </template>
 
-<script>
-const emit = defineEmits()
+<script setup>
+const emit = defineEmits(["close", "print"]);
 const store = useWebsiteStore();
 const { show } = defineProps(["show"]);
 const printerList = computed(() => store.printerList);
 const printer_id = ref(null);
 
 onMounted(() => {
-  store.getPrinterList()
-})
+  store.getPrinterList();
+});
+</script>
