@@ -58,7 +58,7 @@
 import moment from "moment";
 import { Printer } from "@element-plus/icons-vue";
 
-const api = useApi();
+const { api, toRupiah } = useCrud();
 
 const dateRange = ref([
   moment().format("YYYY-MM-01"),

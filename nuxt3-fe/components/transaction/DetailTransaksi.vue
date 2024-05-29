@@ -128,4 +128,5 @@ const { trx, show } = defineProps(["trx", "show"]);
 const store = useWebsiteStore();
 const setting = computed(() => store.setting);
 const emit = defineEmits(["close"]);
+const { toRupiah } = useCrud();
 </script>

@@ -58,7 +58,7 @@
 <script setup>
 import moment from "moment";
 import { Printer } from "@element-plus/icons-vue";
-const api = useApi();
+const { api, toRupiah } = useCrud();
 
 const date = ref(moment().format("YYYY-MM-DD"));
 const report = ref([]);
@@ -66,31 +66,31 @@ const loading = ref(false);
 const showPrintDialog = ref(false);
 
 const requestData = () => {
-      let params = { date: date.value };
-      loading.value = true;
+  let params = { date: date.value };
+  loading.value = true;
 
-      api("/api/memberRenewal/reportDaily", { params })
-        .then((r) => (report.value = r))
-        .finally(() => (loading.value = false));
-    },
+  api("/api/memberRenewal/reportDaily", { params })
+    .then((r) => (report.value = r))
+    .finally(() => (loading.value = false));
+};
 
-  printReport(printer_id) {
-    let params = { date: date.value, action: "print", printer_id };
-    loading.value = true;
+const printReport = (printer_id) => {
+  let params = { date: date.value, action: "print", printer_id };
+  loading.value = true;
 
-    api("/api/memberRenewal/reportDaily", { params })
-      .then((r) => {
-        ElMessage({
-          message: "Silakan ambil slip",
-          type: "success",
-          showClose: false,
-        });
-      })
-      .finally(() => {
-        loading.value = false;
-        showPrintDialog.value = false;
+  api("/api/memberRenewal/reportDaily", { params })
+    .then((r) => {
+      ElMessage({
+        message: "Silakan ambil slip",
+        type: "success",
+        showClose: false,
       });
-  };
+    })
+    .finally(() => {
+      loading.value = false;
+      showPrintDialog.value = false;
+    });
+};
 
 const getSummaries = (param) => {
   const { columns, data } = param;
@@ -119,6 +119,6 @@ const getSummaries = (param) => {
 };
 
 onMounted(() => {
-  requestData()
-})
+  requestData();
+});
 </script>

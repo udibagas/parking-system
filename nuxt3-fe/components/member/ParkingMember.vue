@@ -609,6 +609,7 @@ const {
   deleteData,
   requestData,
   searchData,
+  toRupiah
 } = useCrud("/api/member");
 
 onMounted(() => {

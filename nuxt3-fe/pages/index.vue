@@ -235,11 +235,10 @@
 import moment from "moment";
 definePageMeta({ layout: "default" });
 const store = useWebsiteStore();
-const api = useApi();
+const { api, toRupiah } = useCrud();
 const instance = getCurrentInstance();
 
 const formModel = reactive({ nomor_barcode: "", tarif: "", denda: "" });
-const formErrors = ref({});
 const snapshots = ref([]);
 const showManualOpenForm = ref(false);
 const ws = ref(null);
