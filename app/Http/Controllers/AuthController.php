@@ -17,7 +17,7 @@ class AuthController extends Controller
                     ->orWhere('email', $request->email);
             })->first();
 
-        if ($user && Auth::attempt([$user->email, $request->password], true)) {
+        if ($user && Auth::attempt(['email' => $user->email, 'password' => $request->password], true)) {
             // simpan log
             UserLog::create([
                 'user_id' => $user->id,
