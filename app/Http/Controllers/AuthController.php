@@ -24,13 +24,14 @@ class AuthController extends Controller
                 'action' => 'LOGIN'
             ]);
 
-            // $request->session()->regenerate();
-            // Auth::login($user, true);
-
-            return response()->json([
-                'token' => $user->createToken($request->device_name ?: 'web')->plainTextToken,
-                'user' => $user
-            ]);
+            try {
+                // $request->session()->regenerate();
+                Auth::login($user, true);
+                $token = $user->createToken($request->device_name ?: 'web', ['*'], now()->addDay())->plainTextToken;
+                return response()->json(['token' => $token, 'user' => $user]);
+            } catch (\Throwable $th) {
+                return response()->json(['message' => $th->getMessage()], 500);
+            }
         }
 
         return response()->json([
@@ -44,6 +45,8 @@ class AuthController extends Controller
             'user_id' => auth()->user()->id,
             'action' => 'LOGOUT'
         ]);
+
+        Auth::logout();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
