@@ -176,7 +176,7 @@
     <br />
 
     <el-pagination
-      class="text-right"
+      small
       background
       @current-change="currentChange"
       @size-change="sizeChange"
@@ -317,7 +317,7 @@ const {
   deleteData,
   closeForm,
   requestData,
-  toRupiah
+  toRupiah,
 } = useCrud("/api/memberRenewal");
 
 const store = useWebsiteStore();
