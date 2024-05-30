@@ -102,9 +102,9 @@
     <el-dialog
       v-model="showForm"
       title="AREA PARKIR"
+      width="500px"
       v-loading="loading"
       :close-on-click-modal="false"
-      width="500px"
     >
       <el-form label-width="150px" label-position="left">
         <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">

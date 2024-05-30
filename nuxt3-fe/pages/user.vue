@@ -117,8 +117,8 @@
 
     <el-dialog
       v-model="showForm"
-      :title="!!formModel.id ? 'EDIT USER' : 'TAMBAH USER'"
       width="500px"
+      :title="!!formModel.id ? 'EDIT USER' : 'TAMBAH USER'"
       :close-on-click-modal="false"
     >
       <el-form label-width="160px" label-position="left">

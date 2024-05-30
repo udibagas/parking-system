@@ -80,7 +80,6 @@
     <el-dialog
       v-model="showForm"
       title="SHIFT"
-      v-loading="loading"
       width="450px"
       :close-on-click-modal="false"
     >

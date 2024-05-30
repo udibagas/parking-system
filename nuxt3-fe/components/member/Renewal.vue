@@ -188,14 +188,13 @@
 
     <el-dialog
       v-model="showForm"
+      width="500px"
+      :close-on-click-modal="false"
       :title="
         !!formModel.id
           ? 'EDIT PEMBAYARAN KEANGGOTAAN'
           : 'INPUT PEMBAYARAN KEANGGOTAAN'
       "
-      v-loading="loading"
-      :close-on-click-modal="false"
-      width="500px"
     >
       <el-form label-width="180px" label-position="left">
         <el-form-item label="Member" :error="formErrors.member_id?.join(', ')">

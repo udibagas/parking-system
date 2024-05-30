@@ -1,14 +1,10 @@
 <template>
   <el-dialog
-    width="80%"
-    :model-value="show"
     center
+    width="80%"
     title="DETAIL TRANSAKSI"
-    :before-close="
-      (done) => {
-        emit('close');
-      }
-    "
+    :model-value="show"
+    :before-close="() => emit('close')"
   >
     <div class="flex flex-row">
       <table class="table-auto" style="min-width: 360px">

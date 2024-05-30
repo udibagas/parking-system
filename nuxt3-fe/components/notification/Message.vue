@@ -1,7 +1,7 @@
 <template>
   <el-dialog
-    :model-value="show"
     center
+    :model-value="show"
     :close-on-click-modal="false"
     :show-close="false"
   >

@@ -1,14 +1,11 @@
 <template>
   <el-dialog
     center
+    draggable
+    width="500px"
     title="PILIH PRINTER"
     :model-value="show"
-    width="500px"
-    :before-close="
-      (done) => {
-        emit('close');
-      }
-    "
+    :before-close="() => emit('close')"
   >
     <el-form>
       <el-form-item>

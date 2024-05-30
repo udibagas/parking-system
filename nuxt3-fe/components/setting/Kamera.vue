@@ -119,11 +119,10 @@
     ></el-pagination>
 
     <el-dialog
-      v-loading="loading"
       title="KAMERA"
-      :close-on-click-modal="false"
       v-model="showForm"
       width="600px"
+      :close-on-click-modal="false"
     >
       <el-form label-position="left" label-width="150px">
         <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">

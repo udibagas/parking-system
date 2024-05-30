@@ -100,10 +100,10 @@
   ></el-pagination>
 
   <el-dialog
+    draggable
+    width="500px"
     v-model="showForm"
     :title="!!formModel.id ? 'EDIT GROUP MEMBER' : 'TAMBAH GROUP MEMBER'"
-    width="500px"
-    v-loading="loading"
     :close-on-click-modal="false"
   >
     <el-form label-width="150px" label-position="left">

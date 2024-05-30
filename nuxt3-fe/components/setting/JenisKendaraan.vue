@@ -145,11 +145,10 @@
     ></el-pagination>
 
     <el-dialog
-      v-loading="loading"
       v-model="showForm"
       title="JENIS KENDARAAN"
-      :close-on-click-modal="false"
       width="700px"
+      :close-on-click-modal="false"
     >
       <el-form label-width="200px" label-position="left">
         <el-form-item label="Nama" :error="formErrors.nama?.join(', ')">

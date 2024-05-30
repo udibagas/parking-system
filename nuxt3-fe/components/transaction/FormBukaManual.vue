@@ -1,7 +1,7 @@
 <template>
   <el-dialog
-    title="FORM BUKA MANUAL"
     center
+    title="FORM BUKA MANUAL"
     :model-value="show"
     :before-close="closeForm"
   >
