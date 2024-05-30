@@ -2,18 +2,17 @@
   <el-card>
     <div style="display: flex; justify-content: space-between">
       <div style="font-size: 1.2em; line-height: 41px">KELOLA USER</div>
-      <el-form inline class="text-right" @submit.native.prevent="searchData">
-        <el-form-item style="margin-bottom: 0">
-          <el-button
-            size="small"
-            @click="openForm({ role: 0, password: '' })"
-            type="primary"
-            :icon="Plus"
-          >
-            TAMBAH USER
-          </el-button>
-        </el-form-item>
-        <el-form-item style="margin-bottom: 0">
+      <form class="flex justify-content-end" @submit.prevent="searchData">
+        <el-button
+          size="small"
+          @click="openForm({ role: 0, password: '' })"
+          type="primary"
+          :icon="Plus"
+          class="mr-2"
+        >
+          TAMBAH USER
+        </el-button>
+        <div>
           <el-input
             size="small"
             v-model="keyword"
@@ -22,8 +21,8 @@
             :clearable="true"
           >
           </el-input>
-        </el-form-item>
-      </el-form>
+        </div>
+      </form>
     </div>
 
     <br />
@@ -61,7 +60,7 @@
         <template #default="{ row }">
           <el-tag
             :type="row.status ? 'success' : 'info'"
-            size="mini"
+            size="small"
             style="width: 100%"
             effect="dark"
           >
@@ -120,7 +119,6 @@
       v-model="showForm"
       :title="!!formModel.id ? 'EDIT USER' : 'TAMBAH USER'"
       width="500px"
-      v-loading="loading"
       :close-on-click-modal="false"
     >
       <el-form label-width="160px" label-position="left">
@@ -218,12 +216,14 @@ const {
   keyword,
   currentChange,
   sizeChange,
+  sortChange,
   openForm,
   save,
   deleteData,
   closeForm,
   requestData,
   searchData,
+  refreshData,
 } = useCrud("/api/user");
 
 onMounted(() => {

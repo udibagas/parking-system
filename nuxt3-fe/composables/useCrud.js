@@ -52,7 +52,8 @@ export default (url) => {
   };
 
   const save = (cb) => {
-    loading.value = true;
+    const loadingInstance = ElLoading.service({ target: ".el-dialog" });
+
     api(formModel.value.id ? `${url}/${formModel.value.id}` : url, {
       method: formModel.value.id ? "PUT" : "POST",
       body: formModel.value,
@@ -76,7 +77,7 @@ export default (url) => {
         }
       })
       .finally(() => {
-        loading.value = false;
+        loadingInstance.close();
       });
   };
 
