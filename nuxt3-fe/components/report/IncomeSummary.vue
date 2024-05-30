@@ -28,8 +28,7 @@
 </template>
 
 <script setup>
-const { toRupiah } = useCrud();
-const api = useApi();
+const { toRupiah, api } = useCrud();
 const summary = ref({});
 const getData = () => {
   api("/api/summary").then((r) => (summary.value = r));
