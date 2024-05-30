@@ -224,7 +224,10 @@ const printReport = (printer_id = null) => {
 
 const getTransaction = () => {
   api("/api/getTransaction", {
-    params: { dateRange: dateRange.value },
+    params: {
+      "dateRange[0]": dateRange.value[0],
+      "dateRange[1]": dateRange.value[1],
+    },
   }).then((response) => {
     transaction.value = response;
     let total = response
@@ -235,47 +238,59 @@ const getTransaction = () => {
 };
 
 const getIncome = () => {
-  api("/api/getIncome", { params: { dateRange: dateRange.value } }).then(
-    (response) => {
-      income.value = response;
+  api("/api/getIncome", {
+    params: {
+      "dateRange[0]": dateRange.value[0],
+      "dateRange[1]": dateRange.value[1],
+    },
+  }).then((response) => {
+    income.value = response;
 
-      let total = response
-        .map((d) => Number(d.total))
-        .reduce((sum, total) => sum + Number(total), 0);
+    let total = response
+      .map((d) => Number(d.total))
+      .reduce((sum, total) => sum + Number(total), 0);
 
-      let denda = response
-        .map((d) => Number(d.denda))
-        .reduce((sum, denda) => sum + Number(denda), 0);
+    let denda = response
+      .map((d) => Number(d.denda))
+      .reduce((sum, denda) => sum + Number(denda), 0);
 
-      income.value.push({ jenis_kendaraan: "TOTAL", total, denda });
-    }
-  );
+    income.value.push({ jenis_kendaraan: "TOTAL", total, denda });
+  });
 };
 
 const getParkedVehicle = async () => {
   const data = await api("/api/getParkedVehicle", {
-    params: { dateRange: dateRange.value },
+    params: {
+      "dateRange[0]": dateRange.value[0],
+      "dateRange[1]": dateRange.value[1],
+    },
   });
 
   parkedVehicle.value = data;
 };
 
 const getVehicleIn = () => {
-  api("/api/getVehicleIn", { params: { dateRange: dateRange.value } }).then(
-    (r) => {
-      vehicleIn.value = r;
-      let total = r
-        .map((d) => d.total)
-        .reduce((sum, total) => sum + parseInt(total), 0);
-      vehicleIn.value.push({ gate: "TOTAL", total });
-    }
-  );
+  api("/api/getVehicleIn", {
+    params: {
+      "dateRange[0]": dateRange.value[0],
+      "dateRange[1]": dateRange.value[1],
+    },
+  }).then((r) => {
+    vehicleIn.value = r;
+    let total = r
+      .map((d) => d.total)
+      .reduce((sum, total) => sum + parseInt(total), 0);
+    vehicleIn.value.push({ gate: "TOTAL", total });
+  });
 };
 
 const getReport = () => {
-  api("/api/report", { params: { dateRange: dateRange.value } }).then(
-    (r) => (report.value = r)
-  );
+  api("/api/report", {
+    params: {
+      "dateRange[0]": dateRange.value[0],
+      "dateRange[1]": dateRange.value[1],
+    },
+  }).then((r) => (report.value = r));
 };
 
 const requestData = async () => {
