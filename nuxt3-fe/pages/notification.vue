@@ -2,19 +2,17 @@
   <el-card>
     <el-tabs>
       <el-tab-pane label="NOTIFIKASI">
-        <el-form inline class="text-right" @submit.native.prevent>
-          <el-form-item>
-            <el-button
-              size="small"
-              @click="clearNotification"
-              type="danger"
-              :icon="Delete"
-            >
-              HAPUS NOTIFIKASI
-            </el-button>
-          </el-form-item>
-
-          <el-form-item>
+        <form class="flex justify-content-end mb-3" @submit.prevent>
+          <el-button
+            size="small"
+            type="danger"
+            class="mr-2"
+            @click="clearNotification"
+            :icon="Delete"
+          >
+            HAPUS NOTIFIKASI
+          </el-button>
+          <div class="mr-2">
             <el-date-picker
               size="small"
               @change="requestData"
@@ -25,28 +23,26 @@
               range-separator="-"
               start-placeholder="Dari tgl"
               end-placeholder="Sampai tgl"
-              style="width: 250px"
             >
             </el-date-picker>
-          </el-form-item>
+          </div>
 
-          <el-form-item>
-            <el-input
-              size="small"
-              v-model="keyword"
-              placeholder="Cari"
-              :prefix-icon="Search"
-              clearable
-              @change="searchData"
-            >
-            </el-input>
-          </el-form-item>
-        </el-form>
+          <el-input
+            size="small"
+            v-model="keyword"
+            placeholder="Cari"
+            :prefix-icon="Search"
+            clearable
+            @change="searchData"
+            style="width: 180px"
+          >
+          </el-input>
+        </form>
 
         <el-table
           stripe
           :data="tableData.data"
-          height="calc(100vh - 285px)"
+          height="calc(100vh - 255px)"
           v-loading="loading"
           @sort-change="sortChange"
         >

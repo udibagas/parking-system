@@ -131,6 +131,8 @@ const {
   sizeChange,
   sortChange,
   requestData,
+  searchData,
+  refreshData,
 } = useCrud("/api/absensiOperator");
 
 onMounted(() => {

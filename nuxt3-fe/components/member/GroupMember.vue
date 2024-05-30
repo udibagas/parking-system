@@ -167,6 +167,7 @@ const {
   closeForm,
   requestData,
   searchData,
+  refreshData,
 } = useCrud("/api/groupMember");
 
 onMounted(() => {

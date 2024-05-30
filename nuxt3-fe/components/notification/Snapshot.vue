@@ -1,26 +1,22 @@
 <template>
   <div>
-    <el-form inline @submit.native.prevent class="text-right">
-      <el-form-item style="margin-bottom: 0">
-        <el-button
-          size="small"
-          type="danger"
-          :icon="Delete"
-          @click="deleteSnapshot"
-          :disabled="checkedNodes.length == 0"
-          >HAPUS SNAPSHOT</el-button
-        >
-      </el-form-item>
-      <el-form-item style="margin-bottom: 0">
-        <el-button
-          :icon="Refresh"
-          type="primary"
-          plain
-          size="small"
-          @click="refresh"
-        ></el-button>
-      </el-form-item>
-    </el-form>
+    <form @submit.prevent class="flex justify-content-end">
+      <el-button
+        size="small"
+        type="danger"
+        :icon="Delete"
+        @click="deleteSnapshot"
+        :disabled="checkedNodes.length == 0"
+        >HAPUS SNAPSHOT</el-button
+      >
+      <el-button
+        :icon="Refresh"
+        type="primary"
+        plain
+        size="small"
+        @click="refresh"
+      ></el-button>
+    </form>
 
     <div style="display: flex">
       <div class="file-browser">
@@ -95,7 +91,7 @@ const refresh = () => {
   padding: 15px;
   border: 1px solid #ddd;
   width: 400px;
-  height: calc(100vh - 255px);
+  height: calc(100vh - 252px);
   overflow: auto;
   flex-shrink: 0;
 }
