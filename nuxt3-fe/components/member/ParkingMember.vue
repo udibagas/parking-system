@@ -587,6 +587,7 @@ import {
   ZoomIn,
   Download,
   Printer,
+  Search,
 } from "@element-plus/icons-vue";
 
 const config = useRuntimeConfig();
@@ -607,11 +608,14 @@ const {
   sort_order,
   currentChange,
   sizeChange,
+  filterChange,
+  sortChange,
   openForm,
   save,
   deleteData,
   requestData,
   searchData,
+  refreshData,
   toRupiah,
 } = useCrud("/api/member");
 
