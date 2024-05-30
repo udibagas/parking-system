@@ -17,8 +17,7 @@ export default defineNuxtConfig({
                 process.env.NUXT_PUBLIC_API_BASE || "http://localhost:9000",
             sanctum: {
                 baseUrl:
-                    process.env.NUXT_PUBLIC_SANCTUM_BASE_URL ||
-                    "http://localhost:9000", // Laravel API
+                    process.env.NUXT_PUBLIC_API_BASE || "http://localhost:9000", // Laravel API
                 endpoints: {
                     login: "/api/login",
                     logout: "/api/logout",
