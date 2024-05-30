@@ -44,7 +44,7 @@
 </template>
 
 <script setup>
-import { Printer } from "@element-plus/icons-vue";
+import { CircleCloseFilled, Printer } from "@element-plus/icons-vue";
 
 const emit = defineEmits(["close", "print"]);
 const store = useWebsiteStore();
