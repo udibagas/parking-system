@@ -1,10 +1,5 @@
 <template>
-  <el-dialog
-    title="PROFIL SAYA"
-    v-loading="loading"
-    :model-value="show"
-    width="500px"
-  >
+  <el-dialog title="PROFIL SAYA" :model-value="show" width="500px">
     <el-form label-width="180px" label-position="left">
       <el-form-item label="Nama" :error="formErrors.name?.join(', ')">
         <el-input placeholder="Nama" v-model="formModel.name"></el-input>
@@ -55,11 +50,10 @@ const { show } = defineProps(["show"]);
 const emit = defineEmits(["close"]);
 
 const formModel = ref({ ...user.value });
-const loading = ref(false);
 const formErrors = ref({});
 
 const save = () => {
-  loading.value = true;
+  const loadingInstance = ElLoading.service({ target: ".el-dialog" });
 
   api(`/api/user/${formModel.value.id}`, {
     method: "PUT",
@@ -80,7 +74,7 @@ const save = () => {
       }
     })
     .finally(() => {
-      loading.value = false;
+      loadingInstance.close();
     });
 };
 </script>
