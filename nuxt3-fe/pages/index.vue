@@ -365,10 +365,11 @@ const hitungTarif = () => {
   }
 
   let durasiReal = durasiMenit - tarif.menit_pertama;
+  let hariParkir;
 
   // mode menginap 24 jam
   if (tarif.mode_menginap == 0) {
-    let hariParkir = Math.ceil(durasiMenit / (60 * 24));
+    hariParkir = Math.ceil(durasiMenit / (60 * 24));
 
     // mode tarif flat
     if (hariParkir == 0 && tarif.mode_tarif == 0) {
@@ -380,7 +381,7 @@ const hitungTarif = () => {
   if (tarif.mode_menginap == 1) {
     let hariIn = moment(timeIn.format("YYYY-MM-DD"));
     let hariOut = moment(timeOut.format("YYYY-MM-DD"));
-    let hariParkir = 0;
+    hariParkir = 0;
 
     if (durasiMenit >= 60) {
       hariParkir = hariOut.diff(hariIn, "days") + 1;
@@ -510,7 +511,7 @@ const cekTiket = async () => {
   let now = moment().format("YYYY-MM-DD HH:mm:ss");
 
   if (formModel.nomor_barcode.toLowerCase() == "xxxxx") {
-    formModel.time_in = moment().format("Y-MM-DD");
+    formModel.time_in = moment().format("YYYY-MM-DD");
     instance?.proxy?.$forceUpdate();
     formModel.time_out = now;
 
@@ -530,28 +531,24 @@ const cekTiket = async () => {
     });
 
     snapshots.value = data.snapshots;
-    const { id, gate_in_id, time_in, is_member } = data;
-
-    formModel = {
-      ...formModel,
-      id,
-      gate_in_id,
-      time_in,
-      is_member,
-      time_out: now,
-      tarif: 0,
-    };
+    const { id, gate_in_id, time_in, is_member, member } = data;
+    formModel.id = id;
+    formModel.gate_in_id = gate_in_id;
+    // formModel.time_in = time_in;
+    formModel.is_member = is_member;
+    formModel.time_out = now;
+    formModel.tarif = 0;
 
     instance?.proxy?.$forceUpdate();
 
     // jika bukan member
-    if (!data.is_member && jenisKendaraanList.value.length > 1) {
+    if (!is_member && jenisKendaraanList.value.length > 1) {
       document.querySelector("#jenis-kendaraan").focus();
       return;
     }
 
-    if (data.is_member) {
-      if (!!data.member.expired) {
+    if (is_member) {
+      if (!!member.expired) {
         ElAlert("Kartu telah habis masa berlaku", "Perhatian", {
           type: "warning",
           center: true,
@@ -563,9 +560,9 @@ const cekTiket = async () => {
         return false;
       }
 
-      if (!data.member.expired && data.member.expired_in <= 5) {
+      if (!member.expired && member.expired_in <= 5) {
         ElAlert(
-          `Kartu akan habis masa berlaku dalam ${data.member.expired_in} hari`,
+          `Kartu akan habis masa berlaku dalam ${member.expired_in} hari`,
           "Perhatian",
           {
             type: "warning",
@@ -577,13 +574,13 @@ const cekTiket = async () => {
         );
       }
 
-      if (!!setting.disable_plat_nomor) {
+      if (!!setting.value.disable_plat_nomor) {
         const vehicle = data.member.vehicles[0];
         formModel.jenis_kendaraan = vehicle.jenis_kendaraan;
         formModel.plat_nomor = vehicle.plat_nomor;
 
         // member auto open sesuai setingan
-        if (!!setting.member_auto_open) {
+        if (!!setting.value.member_auto_open) {
           const gateOut = pos.gate_outs.find((g) => {
             return g.jenis_kendaraan.includes(formModel.jenis_kendaraan);
           });
@@ -605,14 +602,14 @@ const cekTiket = async () => {
           save(false);
         }
       } else {
-        let vehicle = data.member.vehicles.find(
+        let vehicle = member.vehicles.find(
           (v) => v.plat_nomor == formModel.plat_nomor
         );
 
         if (!vehicle) {
           ElAlert(
             "Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
-              data.member.vehicles.map((v) => v.plat_nomor).join(", "),
+              member.vehicles.map((v) => v.plat_nomor).join(", "),
             "Perhatian",
             {
               type: "warning",
@@ -636,6 +633,7 @@ const cekTiket = async () => {
       hitungTarif();
     }
   } catch (error) {
+    console.log(error);
     if (error.response.status == 404) {
       ElMessage({
         message: error.response.data.message,
@@ -700,13 +698,12 @@ const submit = (ticket) => {
     !formModel.nomor_barcode ||
     !formModel.gate_out_id ||
     !formModel.jenis_kendaraan ||
-    !formModel.time_out ||
-    !formModel.time_in
+    !formModel.time_out
   ) {
     return;
   }
 
-  if (formModel.time_in.length < 16) {
+  if (formModel.time_in?.length < 16) {
     ElMessage({
       message: "FORMAT TIME IN SALAH",
       type: "error",
@@ -715,7 +712,7 @@ const submit = (ticket) => {
     return;
   }
 
-  if (formModel.time_in.length == 16) {
+  if (formModel.time_in?.length == 16) {
     formModel.time_in += ":00";
   }
 
