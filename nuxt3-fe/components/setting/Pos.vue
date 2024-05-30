@@ -166,6 +166,7 @@ const {
   deleteData,
   closeForm,
   requestData,
+  refreshData,
 } = useCrud("/api/pos");
 
 const printerList = computed(() => store.printerList);

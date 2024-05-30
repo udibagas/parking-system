@@ -20,7 +20,7 @@
           <el-tag
             effect="dark"
             :type="row.status ? 'success' : 'info'"
-            size="mini"
+            size="small"
             >{{ row.status ? "Aktif" : "Tidak Aktif" }}</el-tag
           >
         </template>

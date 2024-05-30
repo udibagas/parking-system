@@ -1,84 +1,79 @@
 <template>
-  <div>
-    <el-form inline class="text-right" @submit.native.prevent>
-      <el-form-item>
-        <el-button size="small" @click="clearLog" type="danger" :icon="Delete">
-          HAPUS LOG
-        </el-button>
-      </el-form-item>
-
-      <el-form-item>
-        <el-input
-          size="small"
-          v-model="keyword"
-          placeholder="Cari"
-          :prefix-icon="Search"
-          clearable
-          @change="
-            (v) => {
-              keyword = v;
-              requestData();
-            }
-          "
-        >
-        </el-input>
-      </el-form-item>
-    </el-form>
-
-    <el-table
-      :data="tableData.data"
-      stripe
-      height="calc(100vh - 310px)"
-      v-loading="loading"
-      @sort-change="sortChange"
+  <form class="flex justify-content-end mb-3" @submit.prevent>
+    <el-button
+      size="small"
+      type="danger"
+      class="mr-2"
+      @click="clearLog"
+      :icon="Delete"
     >
-      <el-table-column
-        prop="created_at"
-        label="Tanggal"
-        sortable="custom"
-        show-overflow-tooltip
-        min-width="150px"
-      >
-        <template #default="{ row }">
-          {{ moment(row.created_at).format("DD-MM-YYYY HH:mm:ss") }}
-        </template>
-      </el-table-column>
-      <el-table-column
-        prop="user"
-        label="User"
-        sortable="custom"
-        show-overflow-tooltip
-        min-width="150px"
-      ></el-table-column>
-      <el-table-column
-        prop="action"
-        label="Aksi"
-        sortable="custom"
-        show-overflow-tooltip
-        min-width="150px"
-      ></el-table-column>
-    </el-table>
+      HAPUS LOG
+    </el-button>
 
-    <br />
+    <el-input
+      clearable
+      size="small"
+      v-model="keyword"
+      placeholder="Cari"
+      style="width: 180px"
+      :prefix-icon="Search"
+      @change="searchData"
+    >
+    </el-input>
+  </form>
 
-    <el-pagination
-      v-if="tableData.total"
-      small
-      background
-      layout="total, sizes, prev, pager, next"
-      :page-size="pageSize"
-      :page-sizes="[10, 25, 50, 100]"
-      :total="tableData.total"
-      @current-change="currentChange"
-      @size-change="sizeChange"
-    ></el-pagination>
-  </div>
+  <el-table
+    :data="tableData.data"
+    stripe
+    height="calc(100vh - 280px)"
+    v-loading="loading"
+    @sort-change="sortChange"
+  >
+    <el-table-column
+      prop="created_at"
+      label="Tanggal"
+      sortable="custom"
+      show-overflow-tooltip
+      min-width="150px"
+    >
+      <template #default="{ row }">
+        {{ moment(row.created_at).format("DD-MM-YYYY HH:mm:ss") }}
+      </template>
+    </el-table-column>
+    <el-table-column
+      prop="user"
+      label="User"
+      sortable="custom"
+      show-overflow-tooltip
+      min-width="150px"
+    ></el-table-column>
+    <el-table-column
+      prop="action"
+      label="Aksi"
+      sortable="custom"
+      show-overflow-tooltip
+      min-width="150px"
+    ></el-table-column>
+  </el-table>
+
+  <br />
+
+  <el-pagination
+    v-if="tableData.total"
+    small
+    background
+    layout="total, sizes, prev, pager, next"
+    :page-size="pageSize"
+    :page-sizes="[10, 25, 50, 100]"
+    :total="tableData.total"
+    @current-change="currentChange"
+    @size-change="sizeChange"
+  ></el-pagination>
 </template>
 
 <script setup>
 import moment from "moment";
 import { Delete, Search } from "@element-plus/icons-vue";
-const { range } = defineProps(["range"]);
 
 const {
   api,
@@ -90,6 +85,7 @@ const {
   sizeChange,
   sortChange,
   requestData,
+  searchData,
 } = useCrud("/api/userLog");
 
 onMounted(() => {
@@ -113,8 +109,4 @@ const clearLog = () => {
     })
     .catch(() => console.log(e));
 };
-
-watch(range, () => {
-  requestData();
-});
 </script>

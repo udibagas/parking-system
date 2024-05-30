@@ -103,11 +103,11 @@
       </el-tab-pane>
 
       <el-tab-pane lazy label="ABSENSI OPERATOR">
-        <AbsensiOperator :date="filters.dateRange" />
+        <AbsensiOperator />
       </el-tab-pane>
 
       <el-tab-pane lazy label="LOG USER">
-        <NotificationUserLog :range="filters.dateRange" />
+        <NotificationUserLog />
       </el-tab-pane>
 
       <el-tab-pane lazy label="LOG GATE MASUK">

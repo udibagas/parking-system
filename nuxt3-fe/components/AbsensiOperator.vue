@@ -1,7 +1,7 @@
 <template>
   <div>
-    <el-form inline class="text-right" @submit.native.prevent>
-      <el-form-item>
+    <form class="flex justify-content-end mb-3" @submit.prevent>
+      <div class="mr-2">
         <el-date-picker
           size="small"
           @change="searchData"
@@ -14,33 +14,32 @@
           end-placeholder="Sampai"
         >
         </el-date-picker>
-      </el-form-item>
-      <el-form-item>
-        <el-input
-          size="small"
-          v-model="filters.keyword"
-          placeholder="Cari"
-          :prefix-icon="Search"
-          clearable
-          @change="searchData"
-        >
-        </el-input>
-      </el-form-item>
+      </div>
 
-      <el-form-item>
-        <el-button
-          :icon="Refresh"
-          @click="refreshData"
-          size="small"
-          type="primary"
-        ></el-button>
-      </el-form-item>
-    </el-form>
+      <el-input
+        clearable
+        size="small"
+        v-model="filters.keyword"
+        placeholder="Cari"
+        style="width: 180px"
+        class="mr-2"
+        :prefix-icon="Search"
+        @change="searchData"
+      >
+      </el-input>
+
+      <el-button
+        :icon="Refresh"
+        @click="refreshData"
+        size="small"
+        type="primary"
+      ></el-button>
+    </form>
 
     <el-table
       :data="tableData.data"
       stripe
-      height="calc(100vh - 310px)"
+      height="calc(100vh - 280px)"
       v-loading="loading"
       @sort-change="sortChange"
     >

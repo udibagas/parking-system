@@ -1,17 +1,16 @@
 <template>
-  <div>
-    <form action="" class="mb-3">
-      <el-input
-        size="small"
-        autofocus
-        placeholder="Cari log"
-        v-model="keyword"
-        :prefix-icon="Search"
-        clearable
-      ></el-input>
-    </form>
-    <div class="log-container" v-html="log"></div>
+  <div class="text-right mb-3">
+    <el-input
+      clearable
+      autofocus
+      size="small"
+      placeholder="Cari log"
+      style="width: 180px"
+      v-model="keyword"
+      :prefix-icon="Search"
+    ></el-input>
   </div>
+  <div class="log-container" v-html="log"></div>
 </template>
 
 <script setup>
@@ -32,7 +31,7 @@ onUnmounted(() => {
 });
 
 const getLog = () => {
-  const params = { keyword: keyword };
+  const params = { keyword: keyword.value };
 
   api(url, { params })
     .then((response) => (log.value = response))
