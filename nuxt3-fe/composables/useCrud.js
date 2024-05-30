@@ -127,6 +127,15 @@ export default (url) => {
       ...filters.value,
     };
 
+    // parse array
+    for (let key in params) {
+      if (Array.isArray(params[key])) {
+        delete params[key];
+        params[`${key}[0]`] = filters.value[key][0];
+        params[`${key}[1]`] = filters.value[key][1];
+      }
+    }
+
     loading.value = true;
     api(url, { params })
       .then((response) => {
