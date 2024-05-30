@@ -389,7 +389,10 @@ const setSudahKeluarSemua = () => {
     .then(() => {
       return api("/api/parkingTransaction/setSudahKeluarSemua", {
         method: "PUT",
-        body: { dateRange: filters.value.dateRange },
+        body: {
+          "dateRange[0]": dateRange.value[0],
+          "dateRange[1]": dateRange.value[1],
+        },
       });
     })
     .then((r) => {

@@ -67,7 +67,10 @@ const loading = ref(false);
 const showPrintDialog = ref(false);
 
 const requestData = () => {
-  let params = { dateRange: dateRange.value };
+  let params = {
+    "dateRange[0]": dateRange.value[0],
+    "dateRange[1]": dateRange.value[1],
+  };
   loading.value = true;
 
   api("/api/memberRenewal/report", { params })
@@ -76,7 +79,12 @@ const requestData = () => {
 };
 
 const printReport = (printer_id) => {
-  let params = { dateRange: dateRange.value, action: "print", printer_id };
+  let params = {
+    "dateRange[0]": dateRange.value[0],
+    "dateRange[1]": dateRange.value[1],
+    action: "print",
+    printer_id,
+  };
   loading.value = true;
 
   api("/api/memberRenewal/report", { params })
