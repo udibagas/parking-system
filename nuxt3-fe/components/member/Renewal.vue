@@ -204,7 +204,6 @@
             clearable
             v-model="formModel.member_id"
             placeholder="Member"
-            style="width: 100%"
           >
             <el-option
               v-for="(m, i) in memberList.filter((m) => m.berbayar)"
@@ -219,7 +218,7 @@
           label="Siklus Pembayaran"
           :error="formErrors.siklus_pembayaran?.join(', ')"
         >
-          <div class="flex justify-content-center align-item-center">
+          <div class="flex">
             <el-input
               type="number"
               v-model="formModel.siklus_pembayaran"
@@ -228,6 +227,7 @@
             <el-select
               placeholder="Pilih"
               v-model="formModel.siklus_pembayaran_unit"
+              style="width: 250px"
             >
               <el-option
                 v-for="(s, i) in siklus"
@@ -310,7 +310,6 @@ const {
   showForm,
   formErrors,
   formModel,
-  page,
   pageSize,
   tableData,
   loading,
@@ -360,7 +359,7 @@ const submit = () => {
 };
 
 const printSlip = (printer_id) => {
-  api(`${this.url}/printSlip/${this.selectedData.id}`, {
+  api(`/api/memberRenewal/printSlip/${selectedData.value.id}`, {
     method: "POST",
     body: {
       printer_id,
