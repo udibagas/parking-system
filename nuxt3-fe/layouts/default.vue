@@ -72,10 +72,10 @@
         style="padding: 20px; height: calc(100vh - 60px); overflow: auto"
       >
         <slot @back="goBack" />
+        <Profile :show="showProfile" @close="showProfile = false" />
       </el-main>
     </el-container>
   </el-container>
-  <Profile :show="showProfile" @close="showProfile = false" />
 </template>
 
 <script setup>

@@ -1,23 +1,16 @@
 <template>
   <div>
-    <el-form inline class="text-right" @submit.native.prevent>
-      <el-form-item>
-        <el-button
-          size="small"
-          type="primary"
-          :icon="Plus"
-          @click="
-            () => {
-              formModel = {};
-              formErrors = {};
-              showForm = true;
-            }
-          "
-        >
-          TRANSAKSI MANUAL
-        </el-button>
-      </el-form-item>
-      <el-form-item>
+    <form class="flex justify-content-end mb-3" @submit.prevent>
+      <el-button
+        size="small"
+        type="primary"
+        :icon="Plus"
+        @click="openForm({})"
+        class="mr-2"
+      >
+        TRANSAKSI MANUAL
+      </el-button>
+      <div class="mr-2">
         <el-date-picker
           size="small"
           @change="requestData"
@@ -30,35 +23,35 @@
           end-placeholder="Sampai"
         >
         </el-date-picker>
-      </el-form-item>
-      <el-form-item v-if="user.role == 1">
-        <el-tooltip
-          class="item"
-          effect="dark"
-          content="Set kendaraan sudah keluar untuk waktu terpilih"
-          placement="bottom"
-        >
-          <el-button
-            size="small"
-            type="danger"
-            :icon="Finished"
-            @click="setSudahKeluarSemua"
-          ></el-button>
-        </el-tooltip>
-      </el-form-item>
-      <el-form-item>
-        <el-input
+      </div>
+
+      <el-tooltip
+        v-if="user.role == 1"
+        class="item"
+        effect="dark"
+        content="Set kendaraan sudah keluar untuk waktu terpilih"
+        placement="bottom"
+      >
+        <el-button
           size="small"
-          v-model="keyword"
-          placeholder="Cari"
-          prefix-:icon="Search"
-          :clearable="true"
-          @change="searchData"
-          style="width: 150px"
-        >
-        </el-input>
-      </el-form-item>
-    </el-form>
+          type="danger"
+          :icon="Finished"
+          @click="setSudahKeluarSemua"
+          class="mr-2"
+        ></el-button>
+      </el-tooltip>
+
+      <el-input
+        size="small"
+        v-model="keyword"
+        placeholder="Cari"
+        :prefix-icon="Search"
+        :clearable="true"
+        @change="searchData"
+        style="width: 150px"
+      >
+      </el-input>
+    </form>
 
     <el-table
       :data="tableData.data"
@@ -70,7 +63,7 @@
         }
       "
       @filter-change="filterChange"
-      height="calc(100vh - 285px)"
+      height="calc(100vh - 280px)"
       v-loading="loading"
       @sort-change="sortChange"
     >
@@ -324,15 +317,13 @@ const { user } = useSanctumAuth();
 import {
   Refresh,
   Plus,
-  SuccessFilled,
-  CircleCloseFilled,
   Edit,
-  Delete,
   MoreFilled,
   ZoomIn,
   Check,
   Printer,
   Finished,
+  Search,
 } from "@element-plus/icons-vue";
 
 const {
@@ -343,6 +334,7 @@ const {
   pageSize,
   tableData,
   loading,
+  filters,
   currentChange,
   sizeChange,
   requestData,
@@ -356,13 +348,13 @@ const shiftList = computed(() => store.shiftList);
 
 const trx = ref(null);
 const showTrxDetail = ref(null);
-const filters = ref({ dateRange: null });
 
 onBeforeMount(() => {
   store.getShiftList();
 });
 
 onMounted(() => {
+  filters.value.dateRange = null;
   requestData();
 });
 
@@ -387,7 +379,7 @@ const setSudahKeluarSemua = () => {
     .then(() => {
       return api("/api/parkingTransaction/setSudahKeluarSemua", {
         method: "PUT",
-        body: { dateRange: this.filters.dateRange },
+        body: { dateRange: filters.value.dateRange },
       });
     })
     .then((r) => {
@@ -395,7 +387,7 @@ const setSudahKeluarSemua = () => {
         message: r.message,
         type: "success",
       });
-      this.requestData();
+      requestData();
     })
     .catch((e) => console.log(e));
 };

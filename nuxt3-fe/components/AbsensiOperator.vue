@@ -20,7 +20,7 @@
           size="small"
           v-model="filters.keyword"
           placeholder="Cari"
-          :prefix-:icon="Search"
+          :prefix-icon="Search"
           clearable
           @change="searchData"
         >
@@ -120,7 +120,7 @@
 <script setup>
 import moment from "moment";
 const { date } = defineProps(["date"]);
-import { Refresh } from "@element-plus/icons-vue";
+import { Refresh, Search } from "@element-plus/icons-vue";
 const {
   pageSize,
   tableData,

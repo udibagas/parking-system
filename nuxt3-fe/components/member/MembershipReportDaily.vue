@@ -1,28 +1,25 @@
 <template>
   <div v-loading="loading">
-    <el-form inline style="text-align: right">
-      <el-form-item>
-        <el-date-picker
-          size="small"
-          @change="requestData"
-          v-model="date"
-          format="DD/MMM/YYYY"
-          value-format="YYYY-MM-DD"
-          type="date"
-        >
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item>
-        <el-button
-          size="small"
-          type="primary"
-          :icon="Printer"
-          @click="showPrintDialog = true"
-        >
-          PRINT LAPORAN
-        </el-button>
-      </el-form-item>
-    </el-form>
+    <form class="flex justify-content-end mb-3">
+      <el-date-picker
+        size="small"
+        @change="requestData"
+        v-model="date"
+        format="DD/MMM/YYYY"
+        value-format="YYYY-MM-DD"
+        type="date"
+        class="mr-2"
+      >
+      </el-date-picker>
+      <el-button
+        size="small"
+        type="primary"
+        :icon="Printer"
+        @click="showPrintDialog = true"
+      >
+        PRINT LAPORAN
+      </el-button>
+    </form>
 
     <el-table show-summary stripe :data="report" :summary-method="getSummaries">
       <el-table-column label="Tanggal" header-align="center" align="center">

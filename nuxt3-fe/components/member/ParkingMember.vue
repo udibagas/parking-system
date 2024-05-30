@@ -1,43 +1,41 @@
 <template>
   <div>
-    <el-form inline class="text-right" @submit.native.prevent>
-      <el-form-item>
+    <form @submit.prevent class="flex justify-content-end mb-3">
+      <el-button
+        size="small"
+        @click="openForm({ vehicles: [], register_date: now, tarif: 0 })"
+        type="primary"
+        :icon="Plus"
+        class="mr-2"
+      >
+        TAMBAH MEMBER
+      </el-button>
+      <el-input
+        size="small"
+        v-model="keyword"
+        placeholder="Cari"
+        :prefix-icon="Search"
+        :clearable="true"
+        @change="searchData"
+        style="width: 200px"
+        class="mr-2"
+      >
+      </el-input>
+      <el-button-group>
         <el-button
+          :icon="Download"
           size="small"
-          @click="openForm({ vehicles: [], register_date: now, tarif: 0 })"
           type="primary"
-          :icon="Plus"
-          >TAMBAH MEMBER</el-button
-        >
-      </el-form-item>
-      <el-form-item>
-        <el-input
+          @click="exportData('member-parkir')"
+        ></el-button>
+        <el-button
+          :icon="Printer"
           size="small"
-          v-model="keyword"
-          placeholder="Cari"
-          prefix-:icon="Search"
-          :clearable="true"
-          @change="searchData"
-        >
-        </el-input>
-      </el-form-item>
-      <el-form-item>
-        <el-button-group>
-          <el-button
-            :icon="Download"
-            size="small"
-            type="primary"
-            @click="exportData('member-parkir')"
-          ></el-button>
-          <el-button
-            :icon="Printer"
-            size="small"
-            type="primary"
-            @click="print"
-          ></el-button>
-        </el-button-group>
-      </el-form-item>
-    </el-form>
+          type="primary"
+          @click="print"
+        ></el-button>
+      </el-button-group>
+    </form>
 
     <el-table
       :data="tableData.data"
@@ -48,7 +46,7 @@
           showDetail = true;
         }
       "
-      height="calc(100vh - 310px)"
+      height="calc(100vh - 280px)"
       @filter-change="filterChange"
       v-loading="loading"
       @sort-change="sortChange"
@@ -77,8 +75,9 @@
             effect="dark"
             style="width: 100%"
             :type="row.status ? 'success' : 'info'"
-            >{{ row.status ? "Aktif" : "Nonaktif" }}</el-tag
           >
+            {{ row.status ? "Aktif" : "Nonaktif" }}
+          </el-tag>
         </template>
       </el-table-column>
       <el-table-column
@@ -109,9 +108,7 @@
       </el-table-column>
 
       <el-table-column
-        :filters="
-          this.groupMemberList.map((g) => ({ value: g.id, text: g.nama }))
-        "
+        :filters="groupMemberList.map((g) => ({ value: g.id, text: g.nama }))"
         column-key="group_member_id"
         prop="group.nama"
         label="Group"
@@ -231,7 +228,7 @@
       </el-table-column>
       <el-table-column
         fixed="right"
-        width="40px"
+        width="60px"
         align="center"
         header-align="center"
       >
@@ -260,14 +257,16 @@
                 <el-dropdown-item
                   :icon="Edit"
                   @click.native.prevent="openForm(row)"
-                  >Edit</el-dropdown-item
                 >
+                  Edit
+                </el-dropdown-item>
                 <el-dropdown-item
-                  v-if="$auth.user.role == 1"
+                  v-if="user.role == 1"
                   :icon="Delete"
                   @click.native.prevent="deleteData(row.id)"
-                  >Hapus</el-dropdown-item
                 >
+                  Hapus
+                </el-dropdown-item>
               </el-dropdown-menu>
             </template>
           </el-dropdown>
@@ -429,12 +428,9 @@
               <el-input
                 type="number"
                 v-model="formModel.siklus_pembayaran"
-                style="width: 30%"
+                class="mr-2"
               ></el-input>
-              <el-select
-                v-model="formModel.siklus_pembayaran_unit"
-                style="width: 66%; float: right; clear: right"
-              >
+              <el-select v-model="formModel.siklus_pembayaran_unit">
                 <el-option
                   v-for="(s, i) in siklus"
                   :value="s.value"
@@ -553,9 +549,9 @@
               type="primary"
             ></el-button>
           </template>
-          <template #default="{ row }">
+          <template #default="scope">
             <el-button
-              @click="deleteVehicle(scope.$index, row.id)"
+              @click="deleteVehicle(scope.$index, scope.row.id)"
               :icon="Delete"
               size="small"
               type="danger"
@@ -579,8 +575,6 @@
 
 <script setup>
 import moment from "moment";
-const config = useRuntimeConfig();
-
 import {
   Refresh,
   Plus,
@@ -590,18 +584,26 @@ import {
   Delete,
   MoreFilled,
   ZoomIn,
+  Download,
+  Printer,
 } from "@element-plus/icons-vue";
 
+const config = useRuntimeConfig();
 const store = useWebsiteStore();
+const { user } = useSanctumAuth();
 
 const {
   api,
   showForm,
+  formModel,
   formErrors,
   pageSize,
   tableData,
   loading,
   keyword,
+  filters,
+  sort_prop,
+  sort_order,
   currentChange,
   sizeChange,
   openForm,
@@ -609,12 +611,12 @@ const {
   deleteData,
   requestData,
   searchData,
-  toRupiah
+  toRupiah,
 } = useCrud("/api/member");
 
-onMounted(() => {
-  requestData();
-});
+const selectedData = ref({ vehicles: [] });
+const showDetail = ref(false);
+const now = ref(moment().format("YYYY-MM-DD"));
 
 const expiry_date = computed(() => {
   try {
@@ -629,24 +631,19 @@ const expiry_date = computed(() => {
   }
 });
 
-const selectedData = ref({ vehicles: [] });
-const formModel = ref({ vehicles: [] });
-const showDetail = ref(false);
-const now = ref(moment().format("YYYY-MM-DD"));
-
 const groupMemberList = computed(() => store.groupMemberList);
 const jenisKendaraanList = computed(() => store.jenisKendaraanList);
 const siklus = computed(() => store.siklus);
 const setting = computed(() => store.setting);
 
-watch(
-  () => formModel.value.berbayar,
-  (berbayar) => {
-    if (!berbayar) {
-      formModel.value.tarif = 0;
-    }
-  }
-);
+// watch(
+//   () => formModel.value.berbayar,
+//   (berbayar) => {
+//     if (!berbayar) {
+//       formModel.value.tarif = 0;
+//     }
+//   }
+// );
 
 const closeForm = () => {
   showForm.value = false;
@@ -661,10 +658,10 @@ const submit = () => {
 
 const print = () => {
   const params = {
-    sort_prop: this.sort_prop || "nama",
-    sort_order: this.sort_order || "asc",
+    sort_prop: sort_prop.value || "nama",
+    sort_order: sort_order.value || "asc",
     action: "print",
-    ...this.filters,
+    ...filters.value,
   };
 
   const querystring = new URLSearchParams(params).toString();
@@ -701,4 +698,9 @@ const deleteVehicle = (index, id) => {
     });
   }
 };
+
+onMounted(() => {
+  formModel.value = { vehicles: [] };
+  requestData();
+});
 </script>

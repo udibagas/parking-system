@@ -1,7 +1,7 @@
 <template>
   <div v-loading="loading">
-    <el-form inline style="text-align: right">
-      <el-form-item>
+    <form class="flex justify-content-end mb-3">
+      <div>
         <el-date-picker
           size="small"
           @change="requestData"
@@ -12,21 +12,19 @@
           range-separator="-"
           start-placeholder="Dari tanggal"
           end-placeholder="Sampai tanggal"
-          style="margin-top: 5px; width: 250px"
-        >
-        </el-date-picker>
-      </el-form-item>
-      <el-form-item>
-        <el-button
-          size="small"
-          type="primary"
-          :icon="Printer"
-          @click="showPrintDialog = true"
-        >
-          PRINT LAPORAN
-        </el-button>
-      </el-form-item>
-    </el-form>
+          class="mr-2"
+        ></el-date-picker>
+      </div>
+
+      <el-button
+        size="small"
+        type="primary"
+        :icon="Printer"
+        @click="showPrintDialog = true"
+      >
+        PRINT LAPORAN
+      </el-button>
+    </form>
 
     <el-table show-summary stripe :data="report" :summary-method="getSummaries">
       <el-table-column label="Tanggal" header-align="center" align="center">
@@ -69,17 +67,17 @@ const loading = ref(false);
 const showPrintDialog = ref(false);
 
 const requestData = () => {
-  let params = { dateRange: this.dateRange };
-  this.loading = true;
+  let params = { dateRange: dateRange.value };
+  loading.value = true;
 
   api("/api/memberRenewal/report", { params })
-    .then((r) => (this.report = r))
-    .finally(() => (this.loading = false));
+    .then((r) => (report.value = r))
+    .finally(() => (loading.value = false));
 };
 
 const printReport = (printer_id) => {
-  let params = { dateRange: this.dateRange, action: "print", printer_id };
-  this.loading = true;
+  let params = { dateRange: dateRange.value, action: "print", printer_id };
+  loading.value = true;
 
   api("/api/memberRenewal/report", { params })
     .then((r) => {
@@ -90,8 +88,8 @@ const printReport = (printer_id) => {
       });
     })
     .finally(() => {
-      this.loading = false;
-      this.showPrintDialog = false;
+      loading.value = false;
+      showPrintDialog.value = false;
     });
 };
 
@@ -106,13 +104,13 @@ const getSummaries = (param) => {
     }
 
     if (index === 1) {
-      sums[index] = this.report.reduce((prev, curr) => {
+      sums[index] = report.value.reduce((prev, curr) => {
         return prev + Number(curr.jumlah);
       }, 0);
     }
 
     if (index === 2) {
-      let pendapatan = this.report.reduce((prev, curr) => {
+      let pendapatan = report.value.reduce((prev, curr) => {
         return prev + Number(curr.pendapatan);
       }, 0);
       sums[index] = toRupiah(pendapatan);

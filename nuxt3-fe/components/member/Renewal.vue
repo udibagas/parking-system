@@ -1,20 +1,20 @@
 <template>
   <div>
-    <el-form inline class="text-right" @submit.native.prevent>
-      <el-form-item>
-        <el-button
-          :icon="Plus"
-          size="small"
-          @click="openForm({})"
-          type="primary"
-        >
-          INPUT PEMBAYARAN KEANGGOTAAN
-        </el-button>
-      </el-form-item>
-
-      <el-form-item>
+    <form
+      @submit.native.prevent
+      class="flex justify-content-end align-item-center mb-3"
+    >
+      <el-button
+        :icon="Plus"
+        size="small"
+        @click="openForm({})"
+        type="primary"
+        class="mr-2"
+      >
+        INPUT PEMBAYARAN KEANGGOTAAN
+      </el-button>
+      <div>
         <el-date-picker
-          style="margin-top: 5px; width: 250px"
           size="small"
           @change="requestData"
           v-model="filters.dateRange"
@@ -24,28 +24,27 @@
           range-separator="-"
           start-placeholder="Dari tgl"
           end-placeholder="Sampai tgl"
+          class="mr-2"
         >
         </el-date-picker>
-      </el-form-item>
+      </div>
 
-      <el-form-item>
-        <el-input
-          size="small"
-          v-model="keyword"
-          placeholder="Cari"
-          prefix-:icon="Search"
-          clearable
-          @change="searchData"
-          style="width: 150px"
-        >
-        </el-input>
-      </el-form-item>
-    </el-form>
+      <el-input
+        size="small"
+        v-model="keyword"
+        placeholder="Cari"
+        :prefix-icon="Search"
+        clearable
+        @change="searchData"
+        style="width: 200px"
+      >
+      </el-input>
+    </form>
 
     <el-table
       :data="tableData.data"
       stripe
-      height="calc(100vh - 310px)"
+      height="calc(100vh - 280px)"
       v-loading="loading"
       @sort-change="sortChange"
     >
@@ -79,7 +78,7 @@
         prop="nomor_kartu"
         label="Nomor Kartu"
         sortable="custom"
-        min-width="130"
+        min-width="140"
       ></el-table-column>
 
       <el-table-column
@@ -128,7 +127,7 @@
 
       <el-table-column
         fixed="right"
-        width="40px"
+        width="60px"
         align="center"
         header-align="center"
       >
@@ -178,6 +177,7 @@
     <el-pagination
       small
       background
+      :current-page="page"
       @current-change="currentChange"
       @size-change="sizeChange"
       layout="total, sizes, prev, pager, next"
@@ -195,6 +195,7 @@
       "
       v-loading="loading"
       :close-on-click-modal="false"
+      width="500px"
     >
       <el-form label-width="180px" label-position="left">
         <el-form-item label="Member" :error="formErrors.member_id?.join(', ')">
@@ -219,23 +220,24 @@
           label="Siklus Pembayaran"
           :error="formErrors.siklus_pembayaran?.join(', ')"
         >
-          <el-input
-            type="number"
-            v-model="formModel.siklus_pembayaran"
-            style="width: 30%"
-          ></el-input>
-          <el-select
-            placeholder="Pilih"
-            v-model="formModel.siklus_pembayaran_unit"
-            style="width: 66%; float: right; clear: right"
-          >
-            <el-option
-              v-for="(s, i) in siklus"
-              :value="s.value"
-              :label="s.label"
-              :key="i"
-            ></el-option>
-          </el-select>
+          <div class="flex justify-content-center align-item-center">
+            <el-input
+              type="number"
+              v-model="formModel.siklus_pembayaran"
+              class="mr-2"
+            ></el-input>
+            <el-select
+              placeholder="Pilih"
+              v-model="formModel.siklus_pembayaran_unit"
+            >
+              <el-option
+                v-for="(s, i) in siklus"
+                :value="s.value"
+                :label="s.label"
+                :key="i"
+              ></el-option>
+            </el-select>
+          </div>
         </el-form-item>
 
         <el-form-item
@@ -292,6 +294,7 @@
 </template>
 
 <script setup>
+import moment from "moment";
 import {
   Refresh,
   Plus,
@@ -300,6 +303,7 @@ import {
   Edit,
   Delete,
   MoreFilled,
+  Search,
 } from "@element-plus/icons-vue";
 
 const {
@@ -307,22 +311,29 @@ const {
   showForm,
   formErrors,
   formModel,
+  page,
   pageSize,
   tableData,
   loading,
+  filters,
+  keyword,
   currentChange,
   sizeChange,
+  sortChange,
   openForm,
   save,
   deleteData,
   closeForm,
   requestData,
+  searchData,
+  refreshData,
   toRupiah,
 } = useCrud("/api/memberRenewal");
 
 const store = useWebsiteStore();
 
 onMounted(() => {
+  filters.value = { dateRange: [] };
   requestData();
 });
 

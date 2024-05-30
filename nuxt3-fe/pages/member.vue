@@ -20,9 +20,9 @@ const { getGroupMemberList, getMemberList } = useWebsiteStore();
 import {
   MemberParkingMember,
   MemberGroupMember,
-  // MemberRenewal,
-  // MemberMembershipReportDaily,
-  // MemberMembershipReport,
+  MemberRenewal,
+  MemberMembershipReportDaily,
+  MemberMembershipReport,
 } from "#components";
 
 const tabs = [
@@ -32,17 +32,17 @@ const tabs = [
     label: "GROUP MEMBER",
     visible: user.value.role == 1,
   },
-  // { component: MemberRenewal, label: "PEMBAYARAN", visible: true },
-  // {
-  //   component: MemberMembershipReportDaily,
-  //   label: "LAPORAN PENDAPATAN HARIAN",
-  //   visible: user.role == 1,
-  // },
-  // {
-  //   component: MemberMembershipReport,
-  //   label: "SUMMARY LAPORAN PENDAPATAN",
-  //   visible: user.role == 1,
-  // },
+  { component: MemberRenewal, label: "PEMBAYARAN", visible: true },
+  {
+    component: MemberMembershipReportDaily,
+    label: "LAPORAN PENDAPATAN HARIAN",
+    visible: user.value.role == 1,
+  },
+  {
+    component: MemberMembershipReport,
+    label: "SUMMARY LAPORAN PENDAPATAN",
+    visible: user.value.role == 1,
+  },
 ];
 
 onMounted(() => {
