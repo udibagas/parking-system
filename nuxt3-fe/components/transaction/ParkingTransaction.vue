@@ -123,7 +123,7 @@
         show-overflow-tooltip
         prop="parking_transactions.tarif"
         sortable="custom"
-        min-width="100px"
+        min-width="120px"
       >
         <template #default="{ row }">
           {{ row.durasi }}
@@ -285,6 +285,7 @@
     <el-pagination
       small
       background
+      :current-page="page"
       @current-change="currentChange"
       @size-change="sizeChange"
       layout="total, sizes, prev, pager, next"
@@ -313,7 +314,7 @@
 <script setup>
 import moment from "moment";
 const store = useWebsiteStore();
-const { user } = useSanctumAuth();
+const auth = useSanctumAuth();
 import {
   Refresh,
   Plus,
@@ -331,13 +332,20 @@ const {
   showForm,
   formErrors,
   formModel,
+  page,
   pageSize,
   tableData,
   loading,
   filters,
+  keyword,
+  openForm,
   currentChange,
   sizeChange,
+  sortChange,
+  filterChange,
   requestData,
+  searchData,
+  refreshData,
   toRupiah,
 } = useCrud("/api/parkingTransaction");
 
@@ -345,12 +353,14 @@ const jenisKendaraanList = computed(() => store.jenisKendaraanList);
 const gateInList = computed(() => store.gateInList);
 const gateOutList = computed(() => store.gateOutList);
 const shiftList = computed(() => store.shiftList);
+const user = computed(() => auth.user.value);
 
 const trx = ref(null);
 const showTrxDetail = ref(null);
 
 onBeforeMount(() => {
   store.getShiftList();
+  store.getPos();
 });
 
 onMounted(() => {

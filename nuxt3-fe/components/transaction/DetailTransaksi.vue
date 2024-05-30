@@ -82,13 +82,13 @@
             <td class="border bg-blue-700 text-white px-4 py-1">Durasi</td>
             <td class="border bg-blue-100 px-4 py-1">{{ trx.durasi }}</td>
           </tr>
-          <tr v-if="$auth.user.role == 1">
+          <tr v-if="user.role == 1">
             <td class="border bg-blue-700 text-white px-4 py-1">Tarif</td>
             <td class="border bg-blue-100 px-4 py-1">
               {{ toRupiah(trx.tarif) }}
             </td>
           </tr>
-          <tr v-if="$auth.user.role == 1">
+          <tr v-if="user.role == 1">
             <td class="border bg-blue-700 text-white px-4 py-1">Denda</td>
             <td class="border bg-blue-100 px-4 py-1">
               {{ toRupiah(trx.denda) }}
@@ -124,9 +124,13 @@
 </template>
 
 <script setup>
+import moment from "moment";
 const { trx, show } = defineProps(["trx", "show"]);
 const store = useWebsiteStore();
-const setting = computed(() => store.setting);
+const auth = useSanctumAuth();
 const emit = defineEmits(["close"]);
 const { toRupiah } = useCrud();
+
+const setting = computed(() => store.setting);
+const user = computed(() => auth.user.value);
 </script>

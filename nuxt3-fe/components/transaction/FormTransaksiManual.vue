@@ -164,24 +164,18 @@
 <script setup>
 import { CircleCloseFilled, SuccessFilled } from "@element-plus/icons-vue";
 
+const { api, formErrors } = useCrud();
 const store = useWebsiteStore();
 const emit = defineEmits(["close", "reload"]);
 const { show, model } = defineProps(["show", "model"]);
 
 const loading = ref(false);
-const formErrors = ref({});
 
 const formModel = computed(() => model);
-const posList = computed(() => store.posList);
+const pos = computed(() => store.pos);
 const gateOutList = computed(() => store.gateOutList);
 const gateInList = computed(() => store.gateInList);
 const jenisKendaraanList = computed(() => store.jenisKendaraanList);
-const durasi = computed(() => {
-  var date1 = moment(formModel.value.time_in);
-  var date2 = moment(formModel.value.time_out);
-  var duration = moment.duration(date2.diff(date1));
-  return moment.utc(duration.asMilliseconds()).format("HH:mm:ss");
-});
 
 const closeForm = () => {
   formErrors.value = {};
@@ -192,31 +186,30 @@ const save = () => {
   loading.value = true;
   formModel.value.manual = 1;
 
-  api("/api/parkingTransaction", { method: "POST", body: formModel })
-    .then((r) => {
+  api("/api/parkingTransaction", { method: "POST", body: formModel.value })
+    .then(({ data, message }) => {
       ElMessage({
-        message: "Data berhasil disimpan",
+        message,
         type: "success",
         showClose: true,
       });
 
       closeForm();
       emit("reload");
-      // TODO: handle if this error
-      openGate(formModel.value.gate_out_id);
+      openGate(data.gate_out_id);
     })
     .catch((e) => {
-      if (e.response.status == 422) {
-        formErrors.value = e.response.data.errors;
+      if (e.response?.status == 422) {
+        formErrors.value = e.response._data.errors;
+      } else {
+        console.log(e);
       }
     })
     .finally(() => (loading.value = false));
 };
 
 const openGate = (gate_out_id) => {
-  const pos = posList.value.find((p) => p.id == formModel.value.pos_id);
   const gate = gateOutList.value.find((g) => g.id == gate_out_id);
-
   const ws = new WebSocket(`ws://${pos.value.ip_address}:5678/`);
 
   ws.onerror = (event) => {

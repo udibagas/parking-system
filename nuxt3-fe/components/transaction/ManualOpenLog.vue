@@ -148,23 +148,22 @@
 <script setup>
 import moment from "moment";
 import { Refresh, MoreFilled, Camera, Search } from "@element-plus/icons-vue";
-const { range } = defineProps(["range"]);
 const {
   pageSize,
   tableData,
   loading,
   filters,
+  keyword,
   currentChange,
   sizeChange,
+  sortChange,
   requestData,
+  refreshData,
+  searchData,
 } = useCrud("/api/manualOpenLog");
 
 const showSnapshot = ref(false);
 const snapshots = ref([]);
-
-watch(range, (v) => {
-  requestData();
-});
 
 onMounted(() => {
   filters.value.dateRange = [];
