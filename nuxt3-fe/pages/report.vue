@@ -36,11 +36,9 @@
 			</table>
 		</el-card> -->
 
-    <el-row class="mb-3 border rounded-md p-3 bg-gray-200">
-      <el-col :span="8">
-        <div class="text-blue-700 text-2xl ml-3">LAPORAN</div>
-      </el-col>
-      <el-col :span="16" style="text-align: right">
+    <div class="mb-3 border rounded-md p-3 bg-gray-200 flex">
+      <div class="text-blue-700 text-2xl ml-3 flex-grow">LAPORAN</div>
+      <div class="mr-2">
         <el-date-picker
           class="mr-3"
           @change="requestData"
@@ -53,29 +51,39 @@
           end-placeholder="End date"
         >
         </el-date-picker>
+      </div>
 
-        <el-button type="primary" :icon="Printer" @click="printReport(null)">
-          PRINT LAPORAN (A4)
-        </el-button>
-        <el-button
-          type="primary"
-          :icon="Printer"
-          @click="showPrintDialog = true"
-        >
-          PRINT LAPORAN (STRUK)
-        </el-button>
-      </el-col>
-    </el-row>
+      <el-dropdown split-button type="primary">
+        <el-icon class="mr-2">
+          <Printer />
+        </el-icon>
+        PRINT LAPORAN
+
+        <template #dropdown>
+          <el-dropdown-menu>
+            <el-dropdown-item
+              :icon="Printer"
+              @click.native.prevent="printReport(null)"
+            >
+              A4
+            </el-dropdown-item>
+            <el-dropdown-item
+              :icon="Printer"
+              @click.native.prevent="showPrintDialog = true"
+            >
+              STRUK
+            </el-dropdown-item>
+          </el-dropdown-menu>
+        </template>
+      </el-dropdown>
+    </div>
 
     <ReportChart :date="dateRange" />
 
     <el-row :gutter="15">
       <el-col :span="10">
         <!-- kendaraan masuk -->
-        <el-card
-          class="bg-purple-600 text-white mb-3"
-          :body-style="{ padding: '0' }"
-        >
+        <el-card class="mb-3" :body-style="{ padding: '0' }">
           <template #header>Kendaraan Masuk</template>
 
           <table class="table min-w-full">
@@ -90,10 +98,7 @@
           </table>
         </el-card>
 
-        <el-card
-          class="bg-blue-600 text-white mb-3"
-          :body-style="{ padding: '0' }"
-        >
+        <el-card class="mb-3" :body-style="{ padding: '0' }">
           <template #header>Transaksi</template>
           <table class="table min-w-full">
             <tbody>
@@ -107,10 +112,7 @@
           </table>
         </el-card>
 
-        <el-card
-          class="bg-green-600 text-white mb-3"
-          :body-style="{ padding: '0' }"
-        >
+        <el-card class="mb-3" :body-style="{ padding: '0' }">
           <template #header>Pendapatan</template>
           <table class="table min-w-full">
             <tbody>
@@ -126,7 +128,7 @@
 
         <!-- Kendaraan masih di dalam -->
         <el-card
-          class="bg-orange-600 text-white mb-3"
+          class="mb-3"
           :body-style="{ padding: '0' }"
           v-if="parkedVehicle.length > 0"
         >
