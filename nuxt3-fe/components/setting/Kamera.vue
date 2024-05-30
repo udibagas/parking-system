@@ -107,14 +107,15 @@
     <br />
 
     <el-pagination
+      v-if="tableData.total"
       small
       background
-      @current-change="currentChange"
-      @size-change="sizeChange"
       layout="total, sizes, prev, pager, next"
       :page-size="pageSize"
       :page-sizes="[10, 25, 50, 100]"
       :total="tableData.total"
+      @current-change="currentChange"
+      @size-change="sizeChange"
     ></el-pagination>
 
     <el-dialog

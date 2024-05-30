@@ -158,7 +158,7 @@ export default (url) => {
   const exportData = (fileName) => {
     const params = {
       sort_prop: sort_prop.value,
-      sort_order: this.sort_order.value,
+      sort_order: sort_order.value,
       ...filters.value,
       action: "export",
     };
