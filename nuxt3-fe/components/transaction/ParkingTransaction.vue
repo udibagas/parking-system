@@ -364,7 +364,7 @@ onBeforeMount(() => {
 });
 
 onMounted(() => {
-  filters.value.dateRange = null;
+  filters.value.dateRange = [];
   requestData();
 });
 
