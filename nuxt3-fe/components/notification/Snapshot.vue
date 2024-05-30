@@ -86,7 +86,7 @@ const deleteSnapshot = () => {
 
 const refresh = () => {
   show.value = false;
-  instance?.proxy?.$nextTick(() => (show.value = true));
+  nextTick(() => (show.value = true));
 };
 </script>
 
