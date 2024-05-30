@@ -1,4 +1,4 @@
 #!/bin/bash
 
 npm run generate
-cp -r dist/* ../public/
+cp -r .output/public/* ../public/
