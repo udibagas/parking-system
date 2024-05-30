@@ -154,7 +154,7 @@ const clearNotification = () => {
     }
   )
     .then(() => {
-      return api(`${this.url}/clearNotification`, { method: "DELETE" });
+      return api(`/api/notification/clearNotification`, { method: "DELETE" });
     })
     .then((r) => {
       requestData();

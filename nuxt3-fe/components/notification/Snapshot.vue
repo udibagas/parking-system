@@ -50,7 +50,6 @@ const url = ref("");
 const show = ref(true);
 const checkedNodes = ref([]);
 const props = ref({ label: "label", isLeaf: "isLeaf" });
-const instance = getCurrentInstance();
 
 const loadNode = (node, resolve) => {
   const params = {
@@ -66,7 +65,7 @@ const deleteSnapshot = () => {
       return api("/api/snapshot/delete", {
         method: "POST",
         body: {
-          checkedNodes: this.checkedNodes,
+          checkedNodes: checkedNodes.value,
         },
       });
     })
@@ -74,7 +73,7 @@ const deleteSnapshot = () => {
       url.value = "";
       ElMessage({ message: r.message, type: "success" });
       // TODO
-      // checkedNodes.value.forEach((node) => $refs.tree.remove(node));
+      checkedNodes.value.forEach((node) => $refs.tree.remove(node));
       checkedNodes.value = [];
     })
     .catch((e) => console.log(e));
