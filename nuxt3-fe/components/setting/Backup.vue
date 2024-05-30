@@ -1,54 +1,51 @@
 <template>
   <div>
-    <el-form class="text-right" inline @submit.native.prevent>
-      <el-form-item>
-        <el-button
-          :disabled="selectedFiles.length == 0"
-          @click="deleteFiles"
-          type="danger"
-          :icon="Delete"
-          size="small"
-          title="Hapus File Backup"
-        >
-          HAPUS FILE BACKUP
-        </el-button>
-      </el-form-item>
-      <el-form-item>
-        <el-button
-          @click="triggerOpenFile"
-          type="primary"
-          :icon="Upload"
-          size="small"
-          title="Upload File Backup"
-          >UPLOAD FILE BACKUP</el-button
-        >
-        <input
-          type="file"
-          style="display: none"
-          id="input-file"
-          @change="uploadFile"
-        />
-      </el-form-item>
+    <form class="flex justify-content-end mb-3" inline @submit.prevent>
+      <el-button
+        :disabled="selectedFiles.length == 0"
+        @click="deleteFiles"
+        type="danger"
+        :icon="Delete"
+        size="small"
+        title="Hapus File Backup"
+      >
+        HAPUS FILE BACKUP
+      </el-button>
 
-      <el-form-item>
-        <el-button
-          @click="backup"
-          type="primary"
-          :icon="Plus"
-          size="small"
-          title="Generate Backup"
-          :loading="processing"
-        >
-          GENERATE BACKUP
-        </el-button>
-      </el-form-item>
-    </el-form>
+      <el-button
+        @click="triggerOpenFile"
+        type="primary"
+        class="mr-2"
+        :icon="Upload"
+        size="small"
+        title="Upload File Backup"
+      >
+        UPLOAD FILE BACKUP
+      </el-button>
+      <input
+        type="file"
+        style="display: none"
+        id="input-file"
+        @change="uploadFile"
+      />
+
+      <el-button
+        @click="backup"
+        type="primary"
+        :icon="Plus"
+        size="small"
+        title="Generate Backup"
+        :loading="processing"
+      >
+        GENERATE BACKUP
+      </el-button>
+    </form>
 
     <el-table
       :data="tableData"
       v-loading="loading"
       stripe
-      height="calc(100vh - 240px)"
+      height="calc(100vh - 235px)"
       @selection-change="handleSelectionChange"
     >
       <el-table-column
