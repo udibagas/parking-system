@@ -163,6 +163,7 @@ export default (url) => {
 
   const toRupiah = (value) => {
     if (!value) return "-";
+    value = Number(value);
     return value.toLocaleString("id-ID", {
       style: "currency",
       currency: "IDR",
