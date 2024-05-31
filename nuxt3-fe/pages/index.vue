@@ -222,7 +222,6 @@
 
 <script setup>
 import moment from "moment";
-definePageMeta({ layout: "default" });
 const store = useWebsiteStore();
 const { api, toRupiah } = useCrud();
 const instance = getCurrentInstance();
@@ -990,11 +989,11 @@ onMounted(async () => {
 });
 
 onDeactivated(() => {
-  if (ws) {
-    ws.close();
+  if (ws.value) {
+    ws.value.close();
   }
 
-  clearInterval(updateTarifInterval);
+  clearInterval(updateTarifInterval.value);
 });
 </script>
 
