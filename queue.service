@@ -3,8 +3,8 @@ Description=Parking Queue Service
 Requires=network.target
 
 [Service]
-User=www-data
-WorkingDirectory=/home/[user]/apps/parking-system
+User=parking
+WorkingDirectory=/home/parking/parking-system
 ExecStart=/usr/bin/php artisan queue:work
 Restart=always
 RestartSec=3

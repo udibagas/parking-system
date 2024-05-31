@@ -4,7 +4,7 @@ Requires=network.target
 
 [Service]
 User=root
-ExecStart=/usr/bin/gate_out.py
+ExecStart=/home/parking/parking-system/gate_out.py
 Restart=always
 RestartSec=3
 

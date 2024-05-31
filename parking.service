@@ -9,7 +9,7 @@ Requires=network.target
 
 [Service]
 User=root
-ExecStart=/home/yogya/apps/parking-system/parking.py
+ExecStart=/home/parking/parking-system/parking.py
 Restart=always
 RestartSec=3
 

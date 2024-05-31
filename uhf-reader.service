@@ -4,7 +4,7 @@ Requires=network.target
 
 [Service]
 User=root
-ExecStart=/home/weleri-server/apps/parking-system/uhf-reader.py
+ExecStart=/home/parking/parking-system/uhf-reader.py
 Restart=always
 RestartSec=3
 

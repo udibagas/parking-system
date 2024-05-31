@@ -3,9 +3,9 @@ Description=Websocket service
 Requires=network.target
 
 [Service]
-User=www-data
-WorkingDirectory=/home/[user]/apps/parking-system
-ExecStart=/usr/bin/php artisan websocket:serve
+User=parking
+WorkingDirectory=/home/parking/parking-system
+ExecStart=/usr/bin/php artisan reverb:start
 Restart=always
 RestartSec=3
 
