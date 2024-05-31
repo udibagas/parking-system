@@ -90,7 +90,7 @@ const refresh = () => {
   padding: 15px;
   border: 1px solid #ddd;
   width: 400px;
-  height: calc(100vh - 252px);
+  height: calc(100vh - 212px);
   overflow: auto;
   flex-shrink: 0;
 }

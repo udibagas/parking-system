@@ -45,7 +45,7 @@
         showDetail = true;
       }
     "
-    height="calc(100vh - 280px)"
+    height="calc(100vh - 240px)"
     @filter-change="filterChange"
     v-loading="loading"
     @sort-change="sortChange"

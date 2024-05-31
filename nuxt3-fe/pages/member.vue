@@ -1,16 +1,14 @@
 <template>
-  <el-card>
-    <el-tabs>
-      <el-tab-pane
-        v-for="(tab, i) in tabs.filter((t) => t.visible)"
-        :key="i"
-        lazy
-        :label="tab.label"
-      >
-        <component :is="tab.component" />
-      </el-tab-pane>
-    </el-tabs>
-  </el-card>
+  <el-tabs>
+    <el-tab-pane
+      v-for="(tab, i) in tabs.filter((t) => t.visible)"
+      :key="i"
+      lazy
+      :label="tab.label"
+    >
+      <component :is="tab.component" />
+    </el-tab-pane>
+  </el-tabs>
 </template>
 
 <script setup>

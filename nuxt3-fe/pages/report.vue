@@ -161,9 +161,7 @@
       </el-col>
 
       <el-col :span="14">
-        <el-card>
-          <div v-html="report"></div>
-        </el-card>
+        <div style="padding: 0 20px" v-html="report"></div>
       </el-col>
     </el-row>
 

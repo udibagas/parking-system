@@ -1,16 +1,14 @@
 <template>
-  <el-card>
-    <el-tabs>
-      <el-tab-pane
-        lazy
-        v-for="(c, i) in components"
-        :key="i"
-        :label="c.label.toUpperCase()"
-      >
-        <component :is="c.component"></component>
-      </el-tab-pane>
-    </el-tabs>
-  </el-card>
+  <el-tabs>
+    <el-tab-pane
+      lazy
+      v-for="(c, i) in components"
+      :key="i"
+      :label="c.label.toUpperCase()"
+    >
+      <component :is="c.component"></component>
+    </el-tab-pane>
+  </el-tabs>
 </template>
 
 <script setup>

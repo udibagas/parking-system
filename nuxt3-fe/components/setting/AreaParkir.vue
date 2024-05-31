@@ -8,7 +8,7 @@
 
     <br />
 
-    <el-table :data="tableData.data" stripe height="calc(100vh - 285px)">
+    <el-table :data="tableData.data" stripe>
       <el-table-column
         type="index"
         :index="tableData.from"
@@ -103,7 +103,6 @@
       v-model="showForm"
       title="AREA PARKIR"
       width="500px"
-      v-loading="loading"
       :close-on-click-modal="false"
     >
       <el-form label-width="150px" label-position="left">

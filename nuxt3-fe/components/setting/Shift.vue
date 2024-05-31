@@ -7,12 +7,7 @@
 
   <br />
 
-  <el-table
-    :data="tableData.data"
-    stripe
-    height="calc(100vh - 260px)"
-    v-loading="loading"
-  >
+  <el-table :data="tableData.data" stripe v-loading="loading">
     <el-table-column
       type="index"
       :index="tableData.from"

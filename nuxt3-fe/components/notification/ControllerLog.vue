@@ -41,7 +41,7 @@ const getLog = () => {
 
 <style scoped>
 .log-container {
-  height: calc(100vh - 265px);
+  height: calc(100vh - 225px);
   background: black;
   color: white;
   padding: 15px;

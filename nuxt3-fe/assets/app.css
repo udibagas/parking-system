@@ -149,6 +149,10 @@ table {
   overflow: auto;
 }
 
+.el-menu {
+    border-right: none !important;
+}
+
 .sidebar:not(.el-menu--collapse) {
   width: 200px;
 }
@@ -159,7 +163,7 @@ table {
 }
 
 .el-main {
-  background-color: #efefef;
+  background-color: #ffffff;
 }
 
 .flex {
