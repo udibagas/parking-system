@@ -14,6 +14,25 @@
       label="#"
     ></el-table-column>
 
+    <el-table-column
+      width="100"
+      label="Status"
+      prop="status"
+      align="center"
+      header-align="center"
+    >
+      <template #default="{ row }">
+        <el-tag
+          effect="dark"
+          :type="row.status ? 'success' : 'info'"
+          size="small"
+          style="width: 100%"
+        >
+          {{ row.status ? "Aktif" : "Tidak Aktif" }}
+        </el-tag>
+      </template>
+    </el-table-column>
+
     <el-table-column width="120" label="Nama" prop="nama"></el-table-column>
 
     <el-table-column
@@ -40,25 +59,6 @@
       label="Snapshot URL"
       prop="snapshot_url"
     ></el-table-column>
-
-    <el-table-column
-      width="100"
-      label="Status"
-      prop="status"
-      align="center"
-      header-align="center"
-    >
-      <template #default="{ row }">
-        <el-tag
-          effect="dark"
-          :type="row.status ? 'success' : 'info'"
-          size="small"
-          style="width: 100%"
-        >
-          {{ row.status ? "Aktif" : "Tidak Aktif" }}
-        </el-tag>
-      </template>
-    </el-table-column>
 
     <el-table-column
       fixed="right"

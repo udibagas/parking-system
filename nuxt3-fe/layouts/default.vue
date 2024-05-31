@@ -89,6 +89,7 @@ import {
   CreditCard,
   DataAnalysis,
   ArrowRight,
+  Setting,
 } from "@element-plus/icons-vue";
 
 const icon = {
@@ -99,6 +100,7 @@ const icon = {
   DocumentCopy,
   CreditCard,
   DataAnalysis,
+  Setting,
 };
 
 const store = useWebsiteStore();

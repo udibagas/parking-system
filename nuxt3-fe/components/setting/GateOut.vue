@@ -20,6 +20,7 @@
           effect="dark"
           :type="row.status ? 'success' : 'info'"
           size="small"
+          style="width: 100%"
         >
           {{ row.status ? "Aktif" : "Tidak Aktif" }}
         </el-tag>
@@ -59,13 +60,13 @@
     </el-table-column>
 
     <el-table-column
-      min-width="120"
+      min-width="130"
       label="Perintah Buka"
       prop="open_command"
     ></el-table-column>
 
     <el-table-column
-      min-width="120"
+      min-width="130"
       label="Perintah Tutup"
       prop="close_command"
     ></el-table-column>

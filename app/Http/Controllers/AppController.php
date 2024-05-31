@@ -40,6 +40,7 @@ class AppController extends Controller
             ['label' => 'User', 'icon' => 'el-icon-user', 'icon2' => 'User',  'path' => '/user'],
             ['label' => 'Log', 'icon' => 'el-icon-bell', 'icon2' => 'Bell',  'path' => '/notification'],
             ['label' => 'Pengaturan', 'icon' => 'el-icon-setting', 'icon2' => 'Operation', 'path' => '/setting'],
+            ['label' => 'Perangkat', 'icon' => 'el-icon-printer', 'icon2' => 'Setting', 'path' => '/device'],
         ];
 
         return $request->user()->role == 1 ? array_merge($nav, $adminNav) : $nav;

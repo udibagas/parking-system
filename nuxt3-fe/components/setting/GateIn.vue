@@ -15,12 +15,13 @@
       align="center"
       header-align="center"
     ></el-table-column>
-    <el-table-column min-width="100" label="Status" prop="status">
+    <el-table-column width="100" label="Status" prop="status">
       <template #default="{ row }">
         <el-tag
           effect="dark"
           :type="row.status ? 'success' : 'info'"
           size="small"
+          style="width: 100%"
         >
           {{ row.status ? "Aktif" : "Tidak Aktif" }}
         </el-tag>

@@ -16,16 +16,9 @@ import {
   SettingGeneral,
   SettingJenisKendaraan,
   SettingShift,
-  SettingKamera,
-  SettingPrinter,
-  SettingPos,
-  SettingGateIn,
-  SettingGateOut,
   SettingAreaParkir,
   SettingBackup,
 } from "#components";
-
-const store = useWebsiteStore();
 
 const components = [
   {
@@ -41,26 +34,6 @@ const components = [
     component: SettingShift,
   },
   {
-    label: "Kamera",
-    component: SettingKamera,
-  },
-  {
-    label: "Printer",
-    component: SettingPrinter,
-  },
-  {
-    label: "Pos",
-    component: SettingPos,
-  },
-  {
-    label: "Gate Keluar",
-    component: SettingGateOut,
-  },
-  {
-    label: "Gate Masuk",
-    component: SettingGateIn,
-  },
-  {
     label: "Area Parkir",
     component: SettingAreaParkir,
   },
@@ -69,9 +42,4 @@ const components = [
     component: SettingBackup,
   },
 ];
-
-onMounted(async () => {
-  await store.getKameraList();
-  await store.getPrinterList();
-});
 </script>
