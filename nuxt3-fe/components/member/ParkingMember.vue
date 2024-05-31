@@ -167,7 +167,7 @@
       prop="siklus_pembayaran"
       label="Siklus Bayar"
       sortable="custom"
-      min-width="130px"
+      min-width="140px"
     >
       <template #default="{ row }">
         {{ row.siklus_pembayaran }}
