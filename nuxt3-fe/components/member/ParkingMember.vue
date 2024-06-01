@@ -286,9 +286,9 @@
   <el-dialog
     v-if="!!selectedData"
     center
-    fullscreen
     title="INFORMASI MEMBER"
     v-model="showDetail"
+    width="1024px"
   >
     <MemberParkingMemberDetail :member="selectedData" />
   </el-dialog>
@@ -605,6 +605,7 @@ const {
   requestData,
   searchData,
   refreshData,
+  exportData,
   toRupiah,
 } = useCrud("/api/member");
 

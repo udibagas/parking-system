@@ -120,7 +120,7 @@
   <el-dialog
     title="KAMERA"
     v-model="showForm"
-    width="600px"
+    width="500px"
     :close-on-click-modal="false"
   >
     <el-form label-position="left" label-width="150px">
@@ -143,24 +143,6 @@
       </el-form-item>
 
       <el-form-item
-        label="Otentifikasi"
-        :error="formErrors.auth_type?.join(', ')"
-      >
-        <el-select
-          v-model="formModel.auth_type"
-          placeholder="Otentifikasi"
-          style="width: 100%"
-        >
-          <el-option
-            v-for="(t, i) in ['basic', 'digest']"
-            :value="t"
-            :label="t"
-            :key="i"
-          ></el-option>
-        </el-select>
-      </el-form-item>
-
-      <el-form-item
         label="URL Snapshot"
         :error="formErrors.snapshot_url?.join(', ')"
       >
@@ -168,6 +150,16 @@
           placeholder="URL Snapshot"
           v-model="formModel.snapshot_url"
         ></el-input>
+      </el-form-item>
+
+      <el-form-item
+        label="Otentifikasi"
+        :error="formErrors.auth_type?.join(', ')"
+      >
+        <el-radio-group v-model="formModel.auth_type">
+          <el-radio value="digest">Digest</el-radio>
+          <el-radio value="basic">Basic</el-radio>
+        </el-radio-group>
       </el-form-item>
 
       <el-form-item label="Status" :error="formErrors.status?.join(', ')">

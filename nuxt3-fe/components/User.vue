@@ -1,28 +1,24 @@
 <template>
-  <div style="display: flex; justify-content: space-between">
-    <div style="font-size: 1.2em; line-height: 41px">KELOLA USER</div>
-    <form class="flex justify-content-end" @submit.prevent="searchData">
-      <el-button
-        size="small"
-        @click="openForm({ role: 0, password: '' })"
-        type="primary"
-        :icon="Plus"
-        class="mr-2"
-      >
-        TAMBAH USER
-      </el-button>
-      <div>
-        <el-input
-          size="small"
-          v-model="keyword"
-          placeholder="Cari"
-          :prefix-icon="Search"
-          :clearable="true"
-        >
-        </el-input>
-      </div>
-    </form>
-  </div>
+  <form class="flex justify-content-end" @submit.prevent="searchData">
+    <el-button
+      size="small"
+      @click="openForm({ role: 0, password: '' })"
+      type="primary"
+      :icon="Plus"
+      class="mr-2"
+    >
+      TAMBAH USER
+    </el-button>
+    <el-input
+      size="small"
+      v-model="keyword"
+      placeholder="Cari"
+      style="width: 180px"
+      :prefix-icon="Search"
+      :clearable="true"
+    >
+    </el-input>
+  </form>
 
   <br />
 

@@ -18,6 +18,7 @@ import {
   SettingShift,
   SettingAreaParkir,
   SettingBackup,
+  User,
 } from "#components";
 
 const components = [
@@ -28,6 +29,10 @@ const components = [
   {
     label: "Jenis Kendaraan & Tarif",
     component: SettingJenisKendaraan,
+  },
+  {
+    label: "User",
+    component: User,
   },
   {
     label: "Shift",
