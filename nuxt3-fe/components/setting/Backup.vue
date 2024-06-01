@@ -147,10 +147,7 @@ const deleteData = (file) => {
   ElMessageBox.confirm("Anda yakin akan menghapus file ini?", "Konfirmasi", {
     type: "warning",
   })
-    .then(() => {
-      const params = { file };
-      return api("/api/backup", { method: "DELETE", params });
-    })
+    .then(() => api("/api/backup", { method: "DELETE", body: { file } }))
     .then((response) => {
       ElMessage({
         message: response.message,
