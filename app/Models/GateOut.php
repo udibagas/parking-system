@@ -23,7 +23,11 @@ class GateOut extends Model
         'uhf_reader_port'
     ];
 
-    protected $casts = ['kamera' => 'json', 'jenis_kendaraan' => 'json'];
+    protected $casts = [
+        'kamera' => 'json',
+        'jenis_kendaraan' => 'json',
+        'status' => 'boolean'
+    ];
 
     protected $appends = ['kameraList'];
 

@@ -20,7 +20,10 @@ class GateIn extends Model
         'printer_id'
     ];
 
-    protected $casts = ['kamera' => 'json'];
+    protected $casts = [
+        'kamera' => 'json',
+        'status' => 'boolean'
+    ];
 
     protected $appends = ['kameraList'];
 

@@ -199,18 +199,20 @@
       </el-form-item>
 
       <el-form-item label="Status" :error="formErrors.status?.join(', ')">
-        <el-select
+        <el-switch
+          :active-value="true"
+          :inactive-value="false"
           v-model="formModel.status"
-          placeholder="Status"
-          style="width: 100%"
+          active-color="#13ce66"
         >
-          <el-option
-            v-for="(t, i) in ['Tidak Aktif', 'Aktif']"
-            :value="i"
-            :label="t"
-            :key="i"
-          ></el-option>
-        </el-select>
+        </el-switch>
+        <el-tag
+          :type="formModel.status ? 'success' : 'info'"
+          size="small"
+          style="margin-left: 10px"
+        >
+          {{ !!formModel.status ? "Aktif" : "Nonaktif" }}
+        </el-tag>
       </el-form-item>
     </el-form>
 

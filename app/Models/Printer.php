@@ -16,6 +16,10 @@ class Printer extends Model
         'status'
     ];
 
+    protected $casts = [
+        'status' => 'boolean'
+    ];
+
     protected $appends = ['type'];
 
     public function scopeActive($q)

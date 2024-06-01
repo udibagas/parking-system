@@ -18,6 +18,10 @@ class Kamera extends Model
         'status'
     ];
 
+    protected $casts = [
+        'status' => 'boolean'
+    ];
+
     public function scopeActive($q)
     {
         return $q->where('status', 1);

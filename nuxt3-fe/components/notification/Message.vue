@@ -14,9 +14,9 @@
     </div>
 
     <template #footer>
-      <el-button type="primary" :icon="CircleCloseFilled" @click="show = false"
-        >TUTUP</el-button
-      >
+      <el-button type="primary" :icon="CircleCloseFilled" @click="show = false">
+        TUTUP
+      </el-button>
     </template>
   </el-dialog>
 </template>
@@ -34,15 +34,17 @@ const echo = ref(null);
 const setting = computed(() => store.setting);
 const api = useApi();
 
-onMounted(async () => {
+onMounted(() => {
+  console.log(setting.value.server_address);
   echo.value = new Echo({
     broadcaster: "reverb",
     key: "g2iix2c1zwlt3dgvo35h",
-    wsHost: setting.value.server_address,
+    wsHost: "localhost",
     wsPort: 8080,
     forceTLS: false,
     disableStats: true,
     authorizer: (channel, options) => {
+      console.log(channel);
       return {
         authorize: (socketId, callback) => {
           api("/api/broadcasting/auth", {
