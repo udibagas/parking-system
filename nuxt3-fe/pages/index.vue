@@ -935,7 +935,6 @@ onMounted(async () => {
   }
 
   document.getElementById("gate-out-app").addEventListener("keydown", (e) => {
-    console.log(e);
     // ke field nomor plat
     if (e.key == "-") {
       e.preventDefault();
