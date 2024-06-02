@@ -29,14 +29,14 @@
           show-checkbox
           highlight-current
           node-key="path"
-          @node-click="({ isFile, url }) => (url = isFile ? url : '')"
+          @node-click="onNodeClick"
           @check="(node, tree) => (checkedNodes = tree.checkedNodes)"
         >
         </el-tree>
       </div>
 
       <div class="img-container">
-        <img :src="url" alt="" style="width: 100%" />
+        <img :src="imageURL" alt="" style="width: 100%" />
       </div>
     </div>
   </div>
@@ -46,14 +46,14 @@
 import { Delete, Refresh } from "@element-plus/icons-vue";
 
 const api = useApi();
-const url = ref("");
+const imageURL = ref("");
 const show = ref(true);
 const checkedNodes = ref([]);
 const props = ref({ label: "label", isLeaf: "isLeaf" });
 
 const loadNode = (node, resolve) => {
   const params = {
-    directory: node.data === undefined ? "snapshots" : node.data.path,
+    directory: node.data == false ? "snapshots" : node.data.path,
   };
 
   api("/api/snapshot", { params }).then((response) => resolve(response));
@@ -77,6 +77,13 @@ const deleteSnapshot = () => {
       checkedNodes.value = [];
     })
     .catch((e) => console.log(e));
+};
+
+const onNodeClick = ({ isFile, url }) => {
+  console.log(isFile, url);
+  if (isFile) {
+    imageURL.value = url;
+  }
 };
 
 const refresh = () => {
