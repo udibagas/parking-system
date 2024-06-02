@@ -1,5 +1,11 @@
 <template>
-  <div v-if="pos" class="flex" id="gate-out-app">
+  <div
+    v-if="pos"
+    class="flex"
+    id="gate-out-app"
+    style="height: calc(100vh - 100px)"
+    tabindex="1"
+  >
     <div style="width: 600px; flex-shrink: 0">
       <h1 class="mt-0 mb-3 p-2 bg-red text-white text-center text-xl">
         {{ pos.nama }}
@@ -746,7 +752,7 @@ const save = async (ticket) => {
   }
 };
 
-const connectPos = async () => {
+const connectPos = () => {
   ws.value = new WebSocket(`ws://${pos.value.ip_address}:5678/`);
 
   ws.value.onerror = (event) => {
@@ -897,7 +903,7 @@ const initialize = async () => {
     document.querySelector("#plat-nomor").focus();
   }
 
-  await connectPos();
+  connectPos();
 };
 
 const takeSnapshot = async () => {
@@ -924,13 +930,12 @@ const takeSnapshot = async () => {
 
 onMounted(async () => {
   await initialize();
-
-  if (pos.value) {
+  if (!pos.value) {
     return;
   }
 
-  document.querySelector("#gate-out-app").addEventListener("keydown", (e) => {
-    // console.log(e.key)
+  document.getElementById("gate-out-app").addEventListener("keydown", (e) => {
+    console.log(e);
     // ke field nomor plat
     if (e.key == "-") {
       e.preventDefault();

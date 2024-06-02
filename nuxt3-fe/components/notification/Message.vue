@@ -35,7 +35,6 @@ const setting = computed(() => store.setting);
 const api = useApi();
 
 onMounted(() => {
-  console.log(setting.value.server_address);
   echo.value = new Echo({
     broadcaster: "reverb",
     key: "g2iix2c1zwlt3dgvo35h",
