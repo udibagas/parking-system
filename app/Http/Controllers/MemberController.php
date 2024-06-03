@@ -152,7 +152,7 @@ class MemberController extends Controller
                     'warna' => 'HITAM',
                 ]);
 
-                return $member;
+                return response()->json($member);
             } else {
                 return response(['message' => 'Member tidak ditemukan'], 404);
             }
@@ -173,7 +173,7 @@ class MemberController extends Controller
             }
         }
 
-        return $member;
+        return response()->json($member);
     }
 
     /**
