@@ -21,7 +21,6 @@ use App\Models\Setting;
 use App\Models\User;
 use App\Models\UserLog;
 use Carbon\Carbon;
-use Error;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
