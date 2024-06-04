@@ -31,14 +31,4 @@ class Printer extends Model
     {
         return filter_var($this->ip_address, FILTER_VALIDATE_IP) ? 'network' : 'local';
     }
-
-    /**
-     * The channels the user receives notification broadcasts on.
-     *
-     * @return string
-     */
-    public function receivesBroadcastNotificationsOn()
-    {
-        return 'notification';
-    }
 }

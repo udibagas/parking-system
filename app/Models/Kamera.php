@@ -26,14 +26,4 @@ class Kamera extends Model
     {
         return $q->where('status', 1);
     }
-
-    /**
-     * The channels the user receives notification broadcasts on.
-     *
-     * @return string
-     */
-    public function receivesBroadcastNotificationsOn()
-    {
-        return 'notification';
-    }
 }
