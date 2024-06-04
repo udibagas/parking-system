@@ -2,9 +2,11 @@
 
 namespace App\Notifications;
 
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class GateInNotification extends Notification implements ShouldQueue
 {
@@ -33,16 +35,15 @@ class GateInNotification extends Notification implements ShouldQueue
         return ['broadcast'];
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
+    public function toBroadcast(object $notifiable): BroadcastMessage
     {
-        return [
+        return new BroadcastMessage([
             'message' => $this->message
-        ];
+        ]);
+    }
+
+    public function broadcastOn()
+    {
+        return new Channel('notification');
     }
 }
