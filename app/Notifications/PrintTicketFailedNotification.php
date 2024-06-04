@@ -3,9 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\ParkingTransaction;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class PrintTicketFailedNotification extends Notification implements ShouldQueue
 {
@@ -37,14 +39,16 @@ class PrintTicketFailedNotification extends Notification implements ShouldQueue
         return ['broadcast'];
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
+    public function toBroadcast(object $notifiable): BroadcastMessage
     {
-        return ['message' => $this->message];
+        return new BroadcastMessage([
+            'message' => $this->message,
+            'transaction' => $this->parkingTransaction
+        ]);
+    }
+
+    public function broadcastOn()
+    {
+        return new Channel('notification');
     }
 }

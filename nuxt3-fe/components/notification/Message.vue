@@ -60,13 +60,18 @@ onMounted(() => {
     },
   });
 
-  echo.value.private("notification").notification((notification) => {
-    notification.value = notification;
-    show.value = true;
-  });
+  echo.value
+    .listen(
+      "notification",
+      "Illuminate\\Notifications\\Events\\BroadcastNotificationCreated"
+    )
+    .notification((e) => {
+      show.value = true;
+      notification.value = e;
+    });
 });
 
 onUnmounted(() => {
-  echo.value.leave("log");
+  echo.value.leave("notification");
 });
 </script>

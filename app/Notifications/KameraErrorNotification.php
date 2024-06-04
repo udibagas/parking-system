@@ -3,9 +3,11 @@
 namespace App\Notifications;
 
 use App\Models\Kamera;
+use Illuminate\Broadcasting\Channel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Notifications\Messages\BroadcastMessage;
 
 class KameraErrorNotification extends Notification implements ShouldQueue
 {
@@ -37,14 +39,16 @@ class KameraErrorNotification extends Notification implements ShouldQueue
         return ['broadcast'];
     }
 
-    /**
-     * Get the array representation of the notification.
-     *
-     * @param  mixed  $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
+    public function toBroadcast(object $notifiable): BroadcastMessage
     {
-        return ['message' => $this->message];
+        return new BroadcastMessage([
+            'message' => $this->message,
+            'kamera' => $this->kamera
+        ]);
+    }
+
+    public function broadcastOn()
+    {
+        return new Channel('notification');
     }
 }
