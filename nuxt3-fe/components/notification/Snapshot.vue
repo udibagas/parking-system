@@ -24,7 +24,7 @@
           v-if="show"
           :props="props"
           :load="loadNode"
-          ref="tree"
+          ref="treeRef"
           lazy
           show-checkbox
           highlight-current
@@ -50,6 +50,7 @@ const imageURL = ref("");
 const show = ref(true);
 const checkedNodes = ref([]);
 const props = ref({ label: "label", isLeaf: "isLeaf" });
+const treeRef = ref("");
 
 const loadNode = (node, resolve) => {
   const params = {
@@ -70,10 +71,9 @@ const deleteSnapshot = () => {
       });
     })
     .then((r) => {
-      url.value = "";
+      imageURL.value = "";
       ElMessage({ message: r.message, type: "success" });
-      // TODO
-      checkedNodes.value.forEach((node) => $refs.tree.remove(node));
+      checkedNodes.value.forEach((node) => treeRef.value.remove(node));
       checkedNodes.value = [];
     })
     .catch((e) => console.log(e));
