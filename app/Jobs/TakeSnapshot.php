@@ -5,12 +5,14 @@ namespace App\Jobs;
 use App\Models\Kamera;
 use App\Notifications\KameraErrorNotification;
 use App\Models\ParkingTransaction;
+use App\Models\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use GuzzleHttp\Client;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class TakeSnapshot implements ShouldQueue
@@ -61,7 +63,8 @@ class TakeSnapshot implements ShouldQueue
                 $path = 'snapshots/' . date('Y/m/d/H/') . $fileName;
                 Storage::put($path, $response->getBody());
             } catch (\Exception $e) {
-                $kamera->notify(new KameraErrorNotification($kamera));
+                $operators = User::active()->operator()->get();
+                Notification::send($operators, new KameraErrorNotification($kamera));
                 continue;
             }
 

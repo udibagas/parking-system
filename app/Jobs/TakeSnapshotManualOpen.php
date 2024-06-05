@@ -4,6 +4,7 @@ namespace App\Jobs;
 
 use App\Models\Kamera;
 use App\Models\ManualOpenLog;
+use App\Models\User;
 use App\Notifications\KameraErrorNotification;
 use GuzzleHttp\Client;
 use Illuminate\Bus\Queueable;
@@ -11,6 +12,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class TakeSnapshotManualOpen implements ShouldQueue
@@ -62,7 +64,8 @@ class TakeSnapshotManualOpen implements ShouldQueue
                 $path = 'public/snapshots/' . date('Y/m/d/H/') . $fileName;
                 Storage::put($path, $response->getBody());
             } catch (\Exception $e) {
-                $kamera->notify(new KameraErrorNotification($kamera));
+                $operators = User::active()->operator()->get();
+                Notification::send($operators, new KameraErrorNotification($kamera));
                 continue;
             }
 

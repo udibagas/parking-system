@@ -5,9 +5,11 @@ namespace App\Http\Controllers;
 use App\Models\GateOut;
 use App\Http\Requests\GateOutRequest;
 use App\Models\Kamera;
+use App\Models\User;
 use App\Notifications\KameraErrorNotification;
 use GuzzleHttp\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\Storage;
 
 class GateOutController extends Controller
@@ -100,7 +102,8 @@ class GateOutController extends Controller
                 $path = 'snapshots/' . date('Y/m/d/H/') . $fileName;
                 Storage::put($path, $response->getBody());
             } catch (\Exception $e) {
-                $kamera->notify(new KameraErrorNotification($kamera));
+                $operators = User::active()->operator()->get();
+                Notification::send($operators, new KameraErrorNotification($kamera));
                 continue;
             }
         }

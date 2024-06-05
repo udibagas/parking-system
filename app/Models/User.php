@@ -52,4 +52,9 @@ class User extends Authenticatable
     {
         return $q->where('role', 0);
     }
+
+    public function scopeActive($q)
+    {
+        return $q->where('status', 1);
+    }
 }
