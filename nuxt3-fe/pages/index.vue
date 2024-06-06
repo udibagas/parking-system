@@ -211,8 +211,6 @@
       :gateOutList="pos.gate_outs"
       @open-gate="(gate_out_id) => openGate(gate_out_id)"
     />
-
-    <NotificationMessage />
   </div>
 
   <div
