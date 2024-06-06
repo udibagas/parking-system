@@ -77,7 +77,11 @@
 </template>
 
 <script setup>
+import Echo from "laravel-echo";
+import Pusher from "pusher-js";
+window.Pusher = Pusher;
 const { user, logout } = useSanctumAuth();
+
 import {
   Fold,
   Expand,
@@ -106,7 +110,9 @@ const icon = {
 const store = useWebsiteStore();
 const collapse = ref(true);
 const showProfile = ref(false);
+const echo = ref("");
 const navigationList = computed(() => store.navigationList);
+
 useHead({
   title: "MITRATEKNIK PARKING SYSTEM",
 });
@@ -137,5 +143,40 @@ onBeforeMount(async () => {
   await store.getGateInList();
   await store.getGateOutList();
   await store.getJenisKendaraanList();
+});
+
+onMounted(() => {
+  echo.value = new Echo({
+    broadcaster: "reverb",
+    key: "g2iix2c1zwlt3dgvo35h",
+    wsHost: store.server_address,
+    wsPort: 8080,
+    forceTLS: false,
+    disableStats: true,
+    authorizer: (channel, options) => {
+      return {
+        authorize: (socketId, callback) => {
+          api("/api/broadcasting/auth", {
+            method: "POST",
+            body: JSON.stringify({
+              socket_id: socketId,
+              channel_name: channel.name,
+            }),
+          })
+            .then((response) => callback(false, response))
+            .catch((error) => callback(true, error));
+        },
+      };
+    },
+  });
+
+  echo.value
+    .listen(
+      "notification",
+      "Illuminate.Notifications.Events.BroadcastNotificationCreated"
+    )
+    .notification((e) => {
+      ElMessageBox.alert(e.message);
+    });
 });
 </script>
