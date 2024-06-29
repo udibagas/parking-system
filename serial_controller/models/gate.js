@@ -89,6 +89,11 @@ class Gate {
       this.reconnect();
     });
   }
+
+  open(delay = 0.5) {
+    const command = "A".repeat(delay / 0.5);
+    this.port.write(Buffer.from(`${command}\n`));
+  }
 }
 
 module.exports = Gate;
