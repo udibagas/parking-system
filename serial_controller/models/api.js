@@ -21,86 +21,69 @@ class Api {
       },
     });
 
-    try {
-      const data = await res.json();
-      if (res.statusText !== "OK") throw new Error(data.message);
-      this.TOKEN = data.token;
-    } catch (error) {
-      throw error;
-    }
+    const data = await res.json();
+    if (res.statusText !== "OK") throw new Error(data.message);
+    this.TOKEN = data.token;
   }
 
   static async getSetting() {
-    try {
-      const res = await fetch(`${API_BASE}/setting`, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${this.TOKEN}`,
-        },
-      });
+    const res = await fetch(`${API_BASE}/setting`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${this.TOKEN}`,
+      },
+    });
 
-      const data = await res.json();
-      if (res.statusText !== "OK") throw new Error(data.message);
-      this.SETTING = data;
-    } catch (error) {
-      console.error(error.message);
-    }
+    const data = await res.json();
+    if (res.statusText !== "OK") throw new Error(data.message);
+    this.SETTING = data;
   }
 
   static async getGates() {
-    try {
-      const res = await fetch(`${API_BASE}/gateIn`, {
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${this.TOKEN}`,
-        },
-        params: { status: true },
-      });
-      const data = await res.json();
-      if (res.statusText !== "OK") throw new Error(data.message);
+    const res = await fetch(`${API_BASE}/gateIn`, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${this.TOKEN}`,
+      },
+      params: { status: true },
+    });
+    const data = await res.json();
+    if (res.statusText !== "OK") throw new Error(data.message);
 
-      return data.map((el) => {
-        const {
-          id,
-          nama,
-          jenis_kendaraan,
-          controller_ip_address: path,
-          controller_port: baudrate,
-          printer,
-        } = el;
+    return data.map((el) => {
+      const {
+        id,
+        nama,
+        jenis_kendaraan,
+        controller_ip_address: path,
+        controller_port: baudrate,
+        printer,
+      } = el;
 
-        return new Gate(id, nama, jenis_kendaraan, path, baudrate, printer);
-      });
-    } catch (error) {
-      console.error(error.message);
-    }
+      return new Gate(id, nama, jenis_kendaraan, path, baudrate, printer);
+    });
   }
 
   static async saveDataAndOpenGate(gate) {
     const { nama, jenis_kendaraan, id } = gate;
     const payload = { is_member: 0, jenis_kendaraan, gate_in_id: id };
+    const res = await fetch(`${API_BASE}/apiStore`, {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+        Authorization: `Bearer ${this.TOKEN}`,
+      },
+    });
 
-    try {
-      const res = await fetch(`${API_BASE}/apiStore`, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Bearer ${this.TOKEN}`,
-        },
-      });
-
-      const json = await res.json();
-      if (res.statusText != "OK") throw new Error(json.message);
-      console.log(`${nama}: ${JSON.stringify(json)}`);
-      gate.printer.printTicket(json, gate, this.SETTING);
-      gate.open(3);
-    } catch (error) {
-      console.error(error.message);
-    }
+    const json = await res.json();
+    if (res.statusText != "OK") throw new Error(json.message);
+    console.log(`${nama}: ${JSON.stringify(json)}`);
+    gate.printer.printTicket(json, gate, this.SETTING);
+    gate.open(3);
   }
 }
 

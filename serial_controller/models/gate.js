@@ -67,8 +67,13 @@ class Gate {
           case "STRUK":
             console.log(`${nama}: tombol struk ditekan`);
             player.stopAndPlay(player.SILAKAN_AMBIL_TIKET);
-            await saveDataAndOpenGate(this);
-            player.stopAndPlay(player.TERIMAKASIH);
+
+            try {
+              await saveDataAndOpenGate(this);
+              player.stopAndPlay(player.TERIMAKASIH);
+            } catch (error) {
+              console.error(error.message);
+            }
             break;
 
           case "EMRGN":
