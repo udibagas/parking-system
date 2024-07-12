@@ -526,7 +526,6 @@ const cekTiket = async () => {
     const { id, gate_in_id, time_in, is_member, member } = data;
     formModel.id = id;
     formModel.gate_in_id = gate_in_id;
-    // formModel.time_in = time_in;
     formModel.is_member = is_member;
     formModel.time_out = now;
     formModel.tarif = 0;
@@ -649,7 +648,6 @@ const resetForm = () => {
   formModel.plat_nomor = setting.value.plat_nomor_default;
   formModel.nomor_barcode = "";
   formModel.time_out = "";
-  formModel.time_in = "";
   formModel.duration = "";
 
   snapshots.value = [];
@@ -696,6 +694,7 @@ const submit = (ticket) => {
   }
 
   if (formModel.time_in?.length < 16) {
+    console.log(formModel);
     ElMessage({
       message: "FORMAT TIME IN SALAH",
       type: "error",
@@ -725,7 +724,7 @@ const save = async (ticket) => {
     });
 
     ElMessage({
-      message: r.data.message,
+      message: r.message,
       type: "success",
     });
 
@@ -785,7 +784,7 @@ const openGate = (gate_out_id) => {
     ].join(";")
   );
 
-  setTimeout(resetForm, 3000);
+  setTimeout(resetForm, 2000);
 };
 
 const openGateMemberUHF = () => {
