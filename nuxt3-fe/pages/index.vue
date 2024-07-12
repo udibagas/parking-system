@@ -694,7 +694,6 @@ const submit = (ticket) => {
   }
 
   if (formModel.time_in?.length < 16) {
-    console.log(formModel);
     ElMessage({
       message: "FORMAT TIME IN SALAH",
       type: "error",
