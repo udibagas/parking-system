@@ -739,8 +739,6 @@ const save = async (ticket) => {
     //     openGate(gate_out_id)
     //   }, 4000)
     // }
-
-    resetForm();
   } catch (error) {
     ElMessage({
       message: error.response._data.message,
