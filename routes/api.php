@@ -83,6 +83,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('printSlip/{memberRenewal}', [MemberRenewalController::class, 'printSlip']);
     });
 
+    // get gate in based on ip address
+    Route::get('gateIn/me', [GateInController::class, 'me']);
+
     Route::apiResources([
         'areaParkir' => AreaParkirController::class,
         'gateIn' => GateInController::class,

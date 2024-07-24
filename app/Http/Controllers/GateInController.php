@@ -30,6 +30,13 @@ class GateInController extends Controller
         return $request->paginated ? $data->paginate($request->pageSize) : $data->get();
     }
 
+    public function me(Request $request)
+    {
+        return GateIn::active()
+            ->where('controller_ip_address', $request->ip())
+            ->first();
+    }
+
     /**
      * Store a newly created resource in storage.
      *
