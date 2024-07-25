@@ -34,6 +34,7 @@ class GateInController extends Controller
     {
         return GateIn::active()
             ->where('controller_ip_address', $request->ip())
+            ->include('printer')
             ->first();
     }
 
