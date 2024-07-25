@@ -11,7 +11,7 @@ class GateInController extends Controller
 {
     public function __construct()
     {
-        $this->middleware('role:1')->except(['index', 'notification']);
+        $this->middleware('role:1')->except(['index', 'notification', 'me']);
     }
 
     /**
