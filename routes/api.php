@@ -42,6 +42,7 @@ use Illuminate\Support\Facades\Route;
 Broadcast::routes(['middleware' => ['auth:sanctum']]);
 
 Route::post('login', [AuthController::class, 'login']);
+Route::post('parkingTransaction/apiStore', [ParkingTransactionController::class, 'apiStore']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
@@ -62,11 +63,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('setSudahKeluarSemua', [ParkingTransactionController::class, 'setSudahKeluarSemua']);
         Route::put('setSudahKeluar/{parkingTransaction}', [ParkingTransactionController::class, 'setSudahKeluar']);
         Route::get('search', [ParkingTransactionController::class, 'search']);
-        Route::post('apiStore', [ParkingTransactionController::class, 'apiStore']);
     });
 
     Route::apiResource('parkingTransaction', ParkingTransactionController::class);
-
 
     Route::group(['prefix' => 'notification'], function () {
         Route::get('unreadNotification', [NotificationController::class, 'unreadNotification']);
