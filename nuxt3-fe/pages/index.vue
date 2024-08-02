@@ -150,9 +150,9 @@
         id="submit-btn"
         @keyup.right="nextBtn"
         @keyup.down="nextBtn"
-        @keydown.enter="submit(true)"
+        @keydown.enter="submit(false)"
         class="my-big-btn"
-        @click="submit(true)"
+        @click="submit(false)"
       >
         BUKA GATE
       </button>
