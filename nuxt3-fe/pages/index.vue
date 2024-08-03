@@ -252,7 +252,6 @@ const duration = computed(() => {
   let day = time_out.diff(time_in, "days");
   let hour = time_out.diff(time_in, "hours");
   let minute = time_out.diff(time_in, "minutes");
-  let second = time_out.diff(time_in, "seconds");
 
   return `${day}HR ${String(hour % 24).padStart(2, "0")}:${String(
     minute % 60
@@ -523,7 +522,7 @@ const cekTiket = async () => {
     });
 
     snapshots.value = data.snapshots;
-    const { id, gate_in_id, time_in, is_member, member } = data;
+    const { id, gate_in_id, is_member, member } = data;
     formModel.id = id;
     formModel.gate_in_id = gate_in_id;
     formModel.is_member = is_member;
