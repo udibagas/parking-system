@@ -196,7 +196,7 @@
       </el-row>
     </div>
 
-    <Kamera />
+    <!-- <Kamera /> -->
 
     <div
       :class="{ 'ml-5': true, flex: setting.orientasi_kamera == 'POTRAIT' }"
