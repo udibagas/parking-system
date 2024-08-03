@@ -539,7 +539,7 @@ const cekTiket = async () => {
 
     if (is_member) {
       if (!!member.expired) {
-        ElAlert("Kartu telah habis masa berlaku", "Perhatian", {
+        ElMessageBox.alert("Kartu telah habis masa berlaku", "Perhatian", {
           type: "warning",
           center: true,
           roundButton: true,
@@ -551,7 +551,7 @@ const cekTiket = async () => {
       }
 
       if (!member.expired && member.expired_in <= 5) {
-        ElAlert(
+        ElMessageBox.alert(
           `Kartu akan habis masa berlaku dalam ${member.expired_in} hari`,
           "Perhatian",
           {
@@ -565,26 +565,28 @@ const cekTiket = async () => {
       }
 
       if (!!setting.value.disable_plat_nomor) {
+        document.querySelector("#submit-btn").focus();
+
         const vehicle = data.member.vehicles[0];
         formModel.jenis_kendaraan = vehicle.jenis_kendaraan;
         formModel.plat_nomor = vehicle.plat_nomor;
 
-        // member auto open sesuai setingan
-        if (!!setting.value.member_auto_open) {
-          const gateOut = pos.gate_outs.find((g) => {
-            return g.jenis_kendaraan.includes(formModel.jenis_kendaraan);
+        const gateOut = pos.value.gate_outs.find((g) => {
+          return g.jenis_kendaraan.includes(formModel.jenis_kendaraan);
+        });
+
+        if (!gateOut) {
+          ElMessage({
+            message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
+            type: "error",
           });
+          return;
+        }
 
-          if (!gateOut) {
-            ElMessage({
-              message: "Tidak ada gate keluar untuk jenis kendaraan terkait",
-              type: "error",
-            });
-            return;
-          }
+        formModel.gate_out_id = gateOut.id;
 
-          formModel.gate_out_id = gateOut.id;
-
+        // member auto open sesuai setingan
+        if (setting.value.member_auto_open) {
           if (formModel.id) {
             takeSnapshot();
           }
@@ -597,7 +599,7 @@ const cekTiket = async () => {
         );
 
         if (!vehicle) {
-          ElAlert(
+          ElMessageBox.alert(
             "Plat nomor tidak cocok dengan kartu. Nomor plat yang terdaftar adalah " +
               member.vehicles.map((v) => v.plat_nomor).join(", "),
             "Perhatian",
@@ -623,10 +625,9 @@ const cekTiket = async () => {
       hitungTarif();
     }
   } catch (error) {
-    console.log(error);
-    if (error.response.status == 404) {
+    if (error.response?.status == 404) {
       ElMessage({
-        message: error.response.data.message,
+        message: error.response._data.message,
         type: "error",
         center: true,
         showClose: true,
@@ -663,6 +664,7 @@ const resetForm = () => {
 };
 
 const submit = (ticket) => {
+  console.log(formModel);
   // kalau tiket hilang harus isi time in dulu
   if (formModel.nomor_barcode.toLowerCase() == "xxxxx" && !formModel.time_in) {
     document.querySelector("#time-in").focus();
@@ -779,7 +781,7 @@ const openGate = (gate_out_id) => {
     ].join(";")
   );
 
-  setTimeout(resetForm, 2000);
+  setTimeout(resetForm, 1000);
 };
 
 const openGateMemberUHF = () => {
