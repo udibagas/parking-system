@@ -648,6 +648,7 @@ const resetForm = () => {
   formModel.plat_nomor = setting.value.plat_nomor_default;
   formModel.nomor_barcode = "";
   formModel.time_out = "";
+  formModel.time_in = undefined; // MUST BE UNDEFINED!
   formModel.duration = "";
 
   snapshots.value = [];
@@ -700,10 +701,6 @@ const submit = (ticket) => {
       showClose: true,
     });
     return;
-  }
-
-  if (formModel.time_in?.length == 16) {
-    formModel.time_in += ":00";
   }
 
   save(ticket);
