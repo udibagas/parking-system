@@ -86,7 +86,9 @@
         <el-time-select
           style="width: 100%"
           v-model="formModel.mulai"
-          :picker-options="{ start: '00:00', step: '00:30', end: '24:00' }"
+          start="00:00"
+          step="00:01"
+          end="23:59"
           placeholder="Mulai"
         >
         </el-time-select>
@@ -96,7 +98,9 @@
         <el-time-select
           style="width: 100%"
           v-model="formModel.selesai"
-          :picker-options="{ start: '00:00', step: '00:30', end: '24:00' }"
+          start="00:00"
+          step="00:01"
+          end="23:59"
           placeholder="Selesai"
         >
         </el-time-select>
