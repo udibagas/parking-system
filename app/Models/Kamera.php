@@ -12,6 +12,7 @@ class Kamera extends Model
     protected $fillable = [
         'nama',
         'snapshot_url',
+        'streaming_url',
         'username',
         'password',
         'auth_type',
