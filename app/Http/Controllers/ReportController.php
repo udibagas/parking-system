@@ -302,8 +302,8 @@ class ReportController extends Controller
             s.nama AS Shift,
             u.name AS Petugas,
             {$countQuery}
-            {$sumQuery}
             COUNT(pt.time_out) AS Jumlah,
+            {$sumQuery}
             SUM(pt.tarif + pt.denda) AS Total
         FROM
             parking_transactions pt
