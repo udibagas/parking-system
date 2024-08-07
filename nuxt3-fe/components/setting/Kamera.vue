@@ -61,6 +61,13 @@
     ></el-table-column>
 
     <el-table-column
+      show-overflow-tooltip
+      min-width="150"
+      label="Streaming URL"
+      prop="streaming_url"
+    ></el-table-column>
+
+    <el-table-column
       fixed="right"
       width="60px"
       align="center"
@@ -149,6 +156,16 @@
         <el-input
           placeholder="URL Snapshot"
           v-model="formModel.snapshot_url"
+        ></el-input>
+      </el-form-item>
+
+      <el-form-item
+        label="URL Streaming"
+        :error="formErrors.streaming_url?.join(', ')"
+      >
+        <el-input
+          placeholder="URL Streaming"
+          v-model="formModel.streaming_url"
         ></el-input>
       </el-form-item>
 

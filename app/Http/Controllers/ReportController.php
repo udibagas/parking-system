@@ -284,4 +284,47 @@ class ReportController extends Controller
 
         return ['message' => 'SILAKAN AMBIL SLIP'];
     }
+
+    public function reportPerPos(Request $request)
+    {
+        $jenisKendaraan = JenisKendaraan::all();
+        $countQuery = '';
+        $sumQuery = '';
+
+        foreach ($jenisKendaraan as $k) {
+            $col = $k->nama;
+            $countQuery += "COUNT(IF(pt.jenis_kendaraan='{$col}', 1, null)) AS 'Jumlah {$col}',";
+            $sumQuery += "SUM(IF(pt.jenis_kendaraan='{$col}', pt.tarif + pt.denda, 0)) AS 'Total {$col}',";
+        }
+
+        $query = "SELECT
+            DATE(pt.time_out) AS Tanggal,
+            s.nama AS Shift,
+            u.name AS Petugas,
+            {$countQuery}
+            {$sumQuery}
+            COUNT(pt.time_out) AS Jumlah,
+            SUM(pt.tarif + pt.denda) AS Total
+        FROM
+            parking_transactions pt
+        JOIN gate_outs go ON
+            go.id = pt.gate_out_id
+        JOIN pos p ON
+            p.id = go.pos_id
+        JOIN shifts s ON
+            s.id = pt.shift_id
+        JOIN users u ON
+            u.id = pt.user_id
+        WHERE
+            p.id = ?
+            AND pt.time_out IS NOT NULL
+            AND DATE(pt.time_out) BETWEEN ? AND ?
+        GROUP BY
+            Tanggal,
+            Shift,
+            Petugas
+        ";
+
+        return DB::select($query, [$request->pos_id, ...$request->dateRange]);
+    }
 }
