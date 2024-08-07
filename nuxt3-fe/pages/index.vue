@@ -229,7 +229,7 @@
 <script setup>
 import moment from "moment";
 const store = useWebsiteStore();
-const { api, toRupiah } = useCrud();
+const api = useApi();
 const instance = getCurrentInstance();
 
 const formModel = reactive({ nomor_barcode: "", tarif: "", denda: "" });

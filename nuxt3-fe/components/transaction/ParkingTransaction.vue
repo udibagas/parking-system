@@ -341,7 +341,6 @@ const {
   requestData,
   searchData,
   refreshData,
-  toRupiah,
 } = useCrud("/api/parkingTransaction");
 
 const jenisKendaraanList = computed(() => store.jenisKendaraanList);

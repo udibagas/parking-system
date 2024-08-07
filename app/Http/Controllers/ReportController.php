@@ -293,8 +293,8 @@ class ReportController extends Controller
 
         foreach ($jenisKendaraan as $k) {
             $col = $k->nama;
-            $countQuery += "COUNT(IF(pt.jenis_kendaraan='{$col}', 1, null)) AS 'Jumlah {$col}',";
-            $sumQuery += "SUM(IF(pt.jenis_kendaraan='{$col}', pt.tarif + pt.denda, 0)) AS 'Total {$col}',";
+            $countQuery .= "COUNT(IF(pt.jenis_kendaraan='{$col}', 1, null)) AS '{$col}_count',";
+            $sumQuery .= "SUM(IF(pt.jenis_kendaraan='{$col}', pt.tarif + pt.denda, 0)) AS '{$col}_sum',";
         }
 
         $query = "SELECT

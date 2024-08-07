@@ -19,6 +19,7 @@
     "nuxt": "^3.11.2",
     "nuxt-auth-sanctum": "^0.3.1",
     "pinia": "^2.1.7",
+    "rtsp-relay": "^1.9.0",
     "vue": "^3.4.27",
     "vue-echarts": "^6.7.2",
     "vue-router": "^4.3.2"

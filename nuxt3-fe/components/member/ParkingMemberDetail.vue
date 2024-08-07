@@ -121,7 +121,6 @@
 <script setup>
 import moment from "moment";
 const { member } = defineProps(["member"]);
-const { toRupiah } = useCrud();
 
 const getSiklus = (k) => {
   return [

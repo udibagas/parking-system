@@ -55,7 +55,7 @@
 <script setup>
 import moment from "moment";
 import { Printer } from "@element-plus/icons-vue";
-const { api, toRupiah } = useCrud();
+const api = useApi();
 
 const date = ref(moment().format("YYYY-MM-DD"));
 const report = ref([]);

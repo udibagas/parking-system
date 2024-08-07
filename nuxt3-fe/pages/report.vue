@@ -81,7 +81,7 @@
     <ReportChart :date="dateRange" />
 
     <el-row :gutter="15">
-      <el-col :span="10">
+      <el-col :span="8">
         <!-- kendaraan masuk -->
         <el-card class="mb-3" :body-style="{ padding: '0' }">
           <template #header>Kendaraan Masuk</template>
@@ -160,8 +160,10 @@
         </el-card>
       </el-col>
 
-      <el-col :span="14">
+      <el-col :span="16">
         <div style="padding: 0 20px" v-html="report"></div>
+
+        <ReportByPos />
       </el-col>
     </el-row>
 
@@ -177,7 +179,7 @@
 import { Printer } from "@element-plus/icons-vue";
 import moment from "moment";
 const store = useWebsiteStore();
-const { api, toRupiah } = useCrud();
+const api = useApi();
 const config = useRuntimeConfig();
 
 const transaction = ref([]);

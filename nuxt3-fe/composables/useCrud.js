@@ -171,16 +171,6 @@ export default (url) => {
       .finally(() => (loading.value = false));
   };
 
-  const toRupiah = (value) => {
-    if (!value) return "-";
-    value = Number(value);
-    return value.toLocaleString("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      maximumFractionDigits: 0,
-    });
-  };
-
   return {
     api,
     showForm,
@@ -206,6 +196,5 @@ export default (url) => {
     closeForm,
     requestData,
     exportData,
-    toRupiah,
   };
 };

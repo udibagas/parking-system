@@ -606,7 +606,6 @@ const {
   searchData,
   refreshData,
   exportData,
-  toRupiah,
 } = useCrud("/api/member");
 
 const selectedData = ref({ vehicles: [] });

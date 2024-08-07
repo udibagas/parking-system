@@ -312,7 +312,6 @@ const {
   deleteData,
   closeForm,
   requestData,
-  toRupiah,
 } = useCrud("/api/jenisKendaraan");
 
 onMounted(() => {

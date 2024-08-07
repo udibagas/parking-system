@@ -325,7 +325,6 @@ const {
   requestData,
   searchData,
   refreshData,
-  toRupiah,
 } = useCrud("/api/memberRenewal");
 
 const store = useWebsiteStore();
