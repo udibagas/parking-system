@@ -58,6 +58,13 @@
     />
 
     <el-table-column
+      prop="Jumlah"
+      label="JUMLAH"
+      align="center"
+      header-align="center"
+    />
+
+    <el-table-column
       v-for="(k, i) in jenisKendaraanList"
       :prop="`${k.nama}_sum`"
       :label="`${k.nama}`"
@@ -68,13 +75,6 @@
         {{ toRupiah(row[`${k.nama}_sum`]) }}
       </template>
     </el-table-column>
-
-    <el-table-column
-      prop="Jumlah"
-      label="JUMLAH"
-      align="center"
-      header-align="center"
-    />
 
     <el-table-column
       prop="Total"
