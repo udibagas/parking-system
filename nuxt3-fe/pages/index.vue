@@ -1,12 +1,6 @@
 <template>
-  <div
-    v-if="pos"
-    class="flex"
-    id="gate-out-app"
-    style="height: calc(100vh - 100px)"
-    tabindex="1"
-  >
-    <div style="width: 600px; flex-shrink: 0">
+  <div v-if="pos" style="display: flex" id="gate-out-app" tabindex="1">
+    <div style="width: 600px; flex-shrink: 0; margin-right: 10px">
       <h1 class="mt-0 mb-3 p-2 bg-red text-white text-center text-xl">
         {{ pos.nama }}
       </h1>
@@ -196,10 +190,8 @@
       </el-row>
     </div>
 
-    <!-- <Kamera /> -->
-
     <div
-      :class="{ 'ml-5': true, flex: setting.orientasi_kamera == 'POTRAIT' }"
+      :class="{ flex: setting.orientasi_kamera == 'POTRAIT' }"
       style="width: 100%"
     >
       <div class="mb-1" style="width: 100%" v-for="s in snapshots" :key="s.id">
@@ -224,6 +216,8 @@
       KOMPUTER INI TIDAK TERDAFTAR SEBAGAI POS
     </div>
   </div>
+
+  <Kamera style="margin-top: 20px" />
 </template>
 
 <script setup>

@@ -1,41 +1,54 @@
 <template>
-  <div style="display: flex; justify-items: center">
-    <img
-      v-for="kamera in tableData.data?.filter((k) => k.status)"
-      :key="kamera.id"
-      :src="snapshots[kamera.id]"
-      alt="Snapshot"
-    />
+  <div class="streaming-container">
+    <canvas
+      v-if="urls.length"
+      v-for="(url, i) in urls"
+      :id="`canvas${i}`"
+    ></canvas>
+    <div v-else>Tidak ada streaming</div>
   </div>
 </template>
 
 <script setup>
-const { api, tableData, requestData } = useCrud("/api/kamera");
-const snapshots = ref({});
+import { loadPlayer } from "rtsp-relay/browser";
+const store = useWebsiteStore();
 
-const getSnapshot = () => {
-  tableData.value.data
-    ?.filter((k) => k.status)
-    .forEach(({ id }) => {
-      api(`/api/kamera/test/${id}`).then((r) => {
-        snapshots.value[id] = "data:image/jpeg;base64," + r.snapshot;
-      });
-    });
-};
-
-const interval = setInterval(getSnapshot, 3000);
-
-onBeforeMount(() => {
-  requestData();
+const urls = computed(() => {
+  return store.kameraList
+    .filter((k) => k.status && k.streaming_url)
+    .map((k) => k.streaming_url);
 });
 
-onDeactivated(() => clearInterval(interval));
+onMounted(async () => {
+  for (const i = 0; i < urls.length; i++) {
+    await loadPlayer({
+      url: `ws://localhost:2000/api/stream?url=${url}`,
+      canvas: document.querySelector(`#canvas${i}`),
+      audio: false,
+      onDisconnect: () => console.log("Connection lost"),
+    });
+  }
+});
+
+onBeforeMount(() => {
+  store.getKameraList();
+});
 </script>
 
 <style scoped>
-img {
-  border: 1px solid #eee;
-  width: 300px;
-  height: 300px;
+.streaming-container {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  /* justify-content: center; */
+  flex-direction: row;
+  gap: 2px;
+  flex-grow: 1;
+}
+
+canvas {
+  border: 1px solid #ddd;
+  width: 310px;
+  height: 175px;
 }
 </style>
