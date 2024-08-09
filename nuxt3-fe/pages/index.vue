@@ -195,7 +195,7 @@
       style="width: 100%"
     >
       <div class="mb-1" style="width: 100%" v-for="s in snapshots" :key="s.id">
-        <img :src="s.url" style="width: 700px" />
+        <img :src="s.url" style="height: 194px; border: 1px solid #aaa" />
       </div>
     </div>
 
@@ -227,7 +227,10 @@ const api = useApi();
 const instance = getCurrentInstance();
 
 const formModel = reactive({ nomor_barcode: "", tarif: "", denda: "" });
-const snapshots = ref([]);
+const snapshots = ref([
+  // { id: 1, url: "https://via.placeholder.com/150" },
+  // { id: 2, url: "https://via.placeholder.com/150" },
+]);
 const showManualOpenForm = ref(false);
 const ws = ref(null);
 const updateTarifInterval = ref(null);
