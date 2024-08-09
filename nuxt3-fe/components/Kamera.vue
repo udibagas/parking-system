@@ -20,9 +20,9 @@ const urls = computed(() => {
 });
 
 onMounted(async () => {
-  for (const i = 0; i < urls.length; i++) {
+  for (const i = 0; i < urls.value.length; i++) {
     await loadPlayer({
-      url: `ws://localhost:2000/api/stream?url=${urls[i]}`,
+      url: `ws://localhost:2000/api/stream?url=${urls.value[i]}`,
       canvas: document.querySelector(`#canvas${i}`),
       audio: false,
       onDisconnect: () => console.log("Connection lost"),
