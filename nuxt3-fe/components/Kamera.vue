@@ -41,7 +41,7 @@ onMounted(async () => {
 
 canvas {
   border: 1px solid #ddd;
-  width: 300px;
-  height: 168px;
+  width: 250px;
+  height: 140px;
 }
 </style>
