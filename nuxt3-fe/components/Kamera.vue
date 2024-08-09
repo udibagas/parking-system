@@ -1,11 +1,6 @@
 <template>
   <div class="streaming-container">
-    <canvas
-      v-if="urls.length"
-      v-for="(url, i) in urls"
-      :id="`canvas${i}`"
-    ></canvas>
-    <div v-else>Tidak ada streaming</div>
+    <canvas v-for="camera in cameras" :id="`canvas${camera.id}`"></canvas>
   </div>
 </template>
 
@@ -13,25 +8,23 @@
 import { loadPlayer } from "rtsp-relay/browser";
 const store = useWebsiteStore();
 
-const urls = computed(() => {
-  return store.kameraList
-    .filter((k) => k.status && k.streaming_url)
-    .map((k) => k.streaming_url);
+const cameras = computed(() => {
+  return store.kameraList.filter((k) => k.status && k.streaming_url);
 });
 
 onMounted(async () => {
-  for (const i = 0; i < urls.value.length; i++) {
-    await loadPlayer({
-      url: `ws://localhost:2000/api/stream?url=${urls.value[i]}`,
-      canvas: document.querySelector(`#canvas${i}`),
-      audio: false,
-      onDisconnect: () => console.log("Connection lost"),
-    });
-  }
-});
-
-onBeforeMount(async () => {
   await store.getKameraList();
+  const cctv = store.kameraList.filter((k) => k.status && k.streaming_url);
+  setTimeout(async () => {
+    for (const camera of cctv) {
+      await loadPlayer({
+        url: `ws://localhost:2000/api/stream?url=${camera.streaming_url}`,
+        canvas: document.querySelector(`#canvas${camera.id}`),
+        audio: false,
+        onDisconnect: () => console.log("Connection lost"),
+      });
+    }
+  }, 1000);
 });
 </script>
 
