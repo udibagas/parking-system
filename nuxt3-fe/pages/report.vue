@@ -1,178 +1,57 @@
 <template>
-  <div>
-    <ReportIncomeSummary />
-
-    <!-- <el-card class="mb-3" :body-style="{ padding: '0' }">
-			<table class="min-w-full">
-				<thead>
-					<tr>
-						<th class="border-b px-3 py-1">AREA PARKIR</th>
-						<th class="border-b px-3 py-1">KAPASITAS</th>
-						<th class="border-b px-3 py-1">TERISI</th>
-						<th class="border-b px-3 py-1">TERSEDIA</th>
-					</tr>
-				</thead>
-				<tbody>
-					<tr
-						v-for="p in areaParkirList"
-						:key="p.id"
-						:class="{
-							'bg-red-300': p.kapasitas == p.terisi,
-							'bg-green-300': p.terisi < p.kapasitas,
-						}"
-					>
-						<td class="border-b px-3 py-1">
-							{{ p.nama }}
-						</td>
-						<td class="text-center border-b px-3 py-1">
-							{{ p.kapasitas }}
-						</td>
-						<td class="text-center border-b px-3 py-1">{{ p.terisi }}</td>
-						<td class="text-center border-b px-3 py-1">
-							{{ p.kapasitas - p.terisi }}
-						</td>
-					</tr>
-				</tbody>
-			</table>
-		</el-card> -->
-
-    <div class="mb-3 border rounded-md p-3 bg-gray-200 flex">
-      <div class="text-blue-700 text-2xl ml-3 flex-grow">LAPORAN</div>
-      <div class="mr-2">
-        <el-date-picker
-          class="mr-3"
-          @change="requestData"
-          v-model="dateRange"
-          format="DD/MMM/YYYY"
-          value-format="YYYY-MM-DD"
-          type="daterange"
-          range-separator="To"
-          start-placeholder="Start date"
-          end-placeholder="End date"
-        >
-        </el-date-picker>
-      </div>
-
-      <el-dropdown split-button type="primary">
-        <el-icon class="mr-2">
-          <Printer />
-        </el-icon>
-        PRINT LAPORAN
-
-        <template #dropdown>
-          <el-dropdown-menu>
-            <el-dropdown-item
-              :icon="Printer"
-              @click.native.prevent="printReport(null)"
-            >
-              A4
-            </el-dropdown-item>
-            <el-dropdown-item
-              :icon="Printer"
-              @click.native.prevent="showPrintDialog = true"
-            >
-              STRUK
-            </el-dropdown-item>
-          </el-dropdown-menu>
-        </template>
-      </el-dropdown>
+  <div class="flex" style="padding-bottom: 10px; margin-bottom: 40px">
+    <div class="ml-3 flex-grow" style="font-size: 1.3rem; font-weight: bold">
+      LAPORAN
+    </div>
+    <div class="mr-2">
+      <el-date-picker
+        class="mr-3"
+        @change="requestData"
+        v-model="dateRange"
+        format="DD/MMM/YYYY"
+        value-format="YYYY-MM-DD"
+        type="daterange"
+        range-separator="To"
+        start-placeholder="Start date"
+        end-placeholder="End date"
+      >
+      </el-date-picker>
     </div>
 
-    <ReportChart :date="dateRange" />
+    <el-dropdown split-button type="primary">
+      <el-icon class="mr-2">
+        <Printer />
+      </el-icon>
+      PRINT LAPORAN
 
-    <el-row :gutter="15">
-      <el-col :span="8">
-        <!-- kendaraan masuk -->
-        <el-card class="mb-3" :body-style="{ padding: '0' }">
-          <template #header>Kendaraan Masuk</template>
-
-          <table class="table min-w-full">
-            <tbody>
-              <tr v-for="(t, id) in vehicleIn" :key="id">
-                <td class="border-b px-3 py-1">{{ t.gate }}</td>
-                <td class="border-b px-3 py-1 text-right">
-                  {{ t.total.toLocaleString("id-ID") }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </el-card>
-
-        <el-card class="mb-3" :body-style="{ padding: '0' }">
-          <template #header>Transaksi</template>
-          <table class="table min-w-full">
-            <tbody>
-              <tr v-for="(t, id) in transaction" :key="id">
-                <td class="border-b px-3 py-1">{{ t.jenis_kendaraan }}</td>
-                <td class="border-b px-3 py-1 text-right">
-                  {{ t.total.toLocaleString("id-ID") }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </el-card>
-
-        <el-card class="mb-3" :body-style="{ padding: '0' }">
-          <template #header>Pendapatan</template>
-          <table class="table min-w-full">
-            <tbody>
-              <tr v-for="(t, id) in income" :key="id">
-                <td class="border-b px-3 py-1">{{ t.jenis_kendaraan }}</td>
-                <td class="border-b px-3 py-1 text-right">
-                  {{ toRupiah(Number(t.total) + Number(t.denda)) }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </el-card>
-
-        <!-- Kendaraan masih di dalam -->
-        <el-card
-          class="mb-3"
-          :body-style="{ padding: '0' }"
-          v-if="parkedVehicle.length > 0"
-        >
-          <template #header>Kendaraan Masih Terparkir</template>
-          <table class="table min-w-full">
-            <thead>
-              <tr>
-                <th
-                  v-for="(header, index) in Object.keys(parkedVehicle[0])"
-                  :key="index"
-                  class="border-b px-3 py-1"
-                >
-                  {{ header }}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="(t, id) in parkedVehicle" :key="id">
-                <td
-                  class="border-b px-3 py-1 text-center"
-                  v-for="(header, index) in Object.keys(parkedVehicle[id])"
-                  :key="index"
-                >
-                  {{ t[header] }}
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </el-card>
-      </el-col>
-
-      <el-col :span="16">
-        <div style="padding: 0 20px" v-html="report"></div>
-
-        <ReportByPos />
-      </el-col>
-    </el-row>
-
-    <PrintDialog
-      :show="showPrintDialog"
-      @print="(printer_id) => printReport(printer_id)"
-      @close="showPrintDialog = false"
-    />
+      <template #dropdown>
+        <el-dropdown-menu>
+          <el-dropdown-item
+            :icon="Printer"
+            @click.native.prevent="printReport(null)"
+          >
+            A4
+          </el-dropdown-item>
+          <el-dropdown-item
+            :icon="Printer"
+            @click.native.prevent="showPrintDialog = true"
+          >
+            STRUK
+          </el-dropdown-item>
+        </el-dropdown-menu>
+      </template>
+    </el-dropdown>
   </div>
+
+  <div style="padding: 0 20px" v-html="report"></div>
+
+  <ReportByPos />
+
+  <PrintDialog
+    :show="showPrintDialog"
+    @print="(printer_id) => printReport(printer_id)"
+    @close="showPrintDialog = false"
+  />
 </template>
 
 <script setup>
@@ -207,10 +86,8 @@ const printReport = (printer_id = null) => {
       params: {
         action: "print",
         printer_id,
-        dateRange: {
-          "dateRange[0]": dateRange.value[0],
-          "dateRange[1]": dateRange.value[1],
-        },
+        "dateRange[0]": dateRange.value[0],
+        "dateRange[1]": dateRange.value[1],
       },
     })
       .then((r) => {
