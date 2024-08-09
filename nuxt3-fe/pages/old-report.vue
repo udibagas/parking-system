@@ -207,10 +207,8 @@ const printReport = (printer_id = null) => {
       params: {
         action: "print",
         printer_id,
-        dateRange: {
-          "dateRange[0]": dateRange.value[0],
-          "dateRange[1]": dateRange.value[1],
-        },
+        "dateRange[0]": dateRange.value[0],
+        "dateRange[1]": dateRange.value[1],
       },
     })
       .then((r) => {
