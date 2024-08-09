@@ -30,8 +30,8 @@ onMounted(async () => {
   }
 });
 
-onBeforeMount(() => {
-  store.getKameraList();
+onBeforeMount(async () => {
+  await store.getKameraList();
 });
 </script>
 
