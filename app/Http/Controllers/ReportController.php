@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\JenisKendaraan;
 use App\Models\ParkingTransaction;
+use App\Models\Pos;
 use App\Models\Setting;
 use App\Models\Shift;
 use Illuminate\Http\Request;
@@ -325,6 +326,168 @@ class ReportController extends Controller
             Petugas
         ";
 
-        return DB::select($query, [$request->pos_id, ...$request->dateRange]);
+        $data = DB::select($query, [$request->pos_id, ...$request->dateRange]);
+        return $data;
+    }
+
+    public function printHarian(Request $request)
+    {
+        $setting = Setting::first();
+        $selectedPrinter = AppPrinter::find($request->printer_id);
+        $pos = Pos::find($request->pos_id);
+        $date = $request->dateRange[0];
+
+        try {
+            if (filter_var($selectedPrinter->ip_address, FILTER_VALIDATE_IP)) {
+                $connector = new NetworkPrintConnector($selectedPrinter->ip_address, $selectedPrinter->port ?: 9100);
+            } else {
+                $connector = new FilePrintConnector($selectedPrinter->ip_address);
+            }
+
+            $printer = new Printer($connector);
+        } catch (\Exception $e) {
+            return response(['message' => 'KONEKSI KE PRINTER GAGAL. ' . $e->getMessage()], 500);
+        }
+
+        try {
+            $printer->setJustification(Printer::JUSTIFY_CENTER);
+            $printer->text("LAPORAN HARIAN {$pos->nama}\n");
+            $printer->text($setting->nama_lokasi . "\n");
+            $printer->text('POS: ' . $pos->nama . "\n");
+            $printer->text('Tanggal: ' . date('d-m-Y', strtotime($date)));
+            $printer->text("\n\n");
+            $printer->setJustification(Printer::JUSTIFY_LEFT);
+
+            // kalau mintanya pakai range tinggal di looping berdasarkan date range
+            // get summary by date, shift and operator
+            $query = "SELECT
+                pt.user_id,
+                pt.shift_id,
+                s.nama AS shift,
+                u.name AS petugas,
+                SUM(pt.tarif + pt.denda) as total
+            FROM
+                parking_transactions pt
+            JOIN shifts s ON
+                s.id = pt.shift_id
+            JOIN users u ON
+                u.id = pt.user_id
+            JOIN gate_outs go ON
+                go.id = pt.gate_out_id
+            WHERE
+                DATE(pt.time_out) = ?
+                AND go.pos_id = ?
+            ";
+
+            $data = DB::query($query, [$date, $pos->id]);
+            foreach ($data as $d) {
+                $printer->text(
+                    str_pad($d->shift, 15)
+                        . str_pad($d->petugas, 15)
+                        . str_pad(number_format($d->total, 0, ',', ','), 15)
+                );
+
+                // get summary by jenis_kendaraan
+                $query = "SELECT
+                    jenis_kendaraan,
+                    COUNT(time_out) AS jumlah,
+                    SUM(tarif + denda) AS total
+                FROM
+                    parking_transactions pt
+                JOIN gate_outs go ON
+                    go.id = pt.gate_out_id
+                WHERE
+                    DATE(time_out) = ?
+                    AND user_id = ?
+                    AND shift_id = ?
+                    AND go.pos_id = ?
+                GROUP BY jenis_kendaraan
+                ";
+
+                $queryTotal = "SELECT
+                    SUM(tarif + denda) AS total
+                FROM parking_transactions pt
+                JOIN gate_outs go ON
+                    go.id = pt.gate_out_id
+                WHERE
+                    DATE(time_out) = ?
+                    AND user_id = ?
+                    AND shift_id = ?
+                    AND go.pos_id = ?
+                ";
+
+                $values = [$date, $d->user_id, $d->shift_id, $pos->id];
+                $dataDetail = DB::query($query, $values);
+                $dataTotal = DB::query($queryTotal, $values);
+
+                foreach ($dataDetail as $dd) {
+                    $printer->text(
+                        str_pad(" - " . $dd->jenis_kendaraan, 15)
+                            . str_pad($dd->jumlah, 15)
+                            . str_pad(number_format($dd->total, 0, ',', ','), 15)
+                    );
+                }
+
+                foreach ($dataTotal as $dt) {
+                    $printer->text(
+                        str_pad('TOTAL', 30)
+                            . str_pad(number_format($dt->total, 0, ',', ','), 15)
+                    );
+                }
+
+                $printer->text("\n");
+            }
+
+            $queryAll = "SELECT
+                s.nama AS shift,
+                SUM(pt.tarif + pt.denda) AS total
+            FROM
+                parking_transactions pt
+            JOIN shifts s ON
+                s.id = pt.shift_id
+            JOIN gate_outs go ON
+                go.id = pt.gate_out_id
+            WHERE
+                DATE(pt.time_out) = ?
+                AND go.pos_id = ?
+            GROUP BY shift
+            ORDER BY s.id ASC
+            ";
+
+            $querySumAll = "SELECT SUM(tarif + denda) AS total
+            FROM
+                parking_transactions pt
+            JOIN gate_outs go ON
+                go.id = pt.gate_out_id
+            WHERE
+                DATE(time_out) = ?
+                AND go.pos_id = ?
+            ";
+
+            $printer->text("\nTOTAL PENDAPATAN");
+            $dataAll = DB::query($queryAll, [$date, $pos->id]);
+            $dataSumAll = DB::query($querySumAll, [$date, $pos->id]);
+
+            foreach ($dataAll as $da) {
+                $printer->text(
+                    str_pad(" - " . $da->shift, 30)
+                        . str_pad(number_format($da->total, 0, ',', ','), 15)
+                );
+            }
+
+            foreach ($dataSumAll as $ds) {
+                $printer->text(
+                    str_pad("TOTAL", 30)
+                        . str_pad(number_format($ds->total, 0, ',', ','), 15)
+                );
+            }
+
+            $printer->cut();
+            $printer->close();
+        } catch (\Exception $e) {
+            return response(['message' => 'GAGAL MENCETAK SLIP.' . $e->getMessage()], 500);
+        }
+
+        return ['message' => 'SILAKAN AMBIL SLIP'];
     }
 }
