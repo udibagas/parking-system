@@ -333,8 +333,18 @@ class ReportController extends Controller
     public function printHarian(Request $request)
     {
         $setting = Setting::first();
-        $selectedPrinter = AppPrinter::find($request->printer_id);
         $pos = Pos::find($request->pos_id);
+
+        if (!$pos) {
+            return response(['message' => 'Pos tidak ditemukan'], 404);
+        }
+
+        $selectedPrinter = AppPrinter::find($pos->printer_id);
+
+        if (!$selectedPrinter) {
+            return response(['message' => 'Printer tidak ditemukan'], 404);
+        }
+
         $date = $request->dateRange[0];
 
         try {
