@@ -28,8 +28,17 @@
       style="width: 240px; margin-right: 10px"
     >
     </el-date-picker>
-    <el-button :icon="ElIconDownload" @click="download" type="primary">
+    <el-button
+      :icon="ElIconDownload"
+      @click="download"
+      type="primary"
+      style="margin-right: 10px"
+    >
       Download
+    </el-button>
+
+    <el-button :icon="ElIconPrinter" @click="printReportHarian" type="primary">
+      PRINT LAPORAN HARIAN
     </el-button>
   </div>
 
@@ -125,12 +134,27 @@ function requestData() {
 function download() {
   api("/api/reportPerPos", {
     params: {
+      pos_id: pos_id.value,
       "dateRange[0]": dateRange.value[0],
       "dateRange[1]": dateRange.value[1],
-      pos_id: pos_id.value,
     },
   }).then((data) => {
     exportFromJSON({ data, fileName: "Laporan Per Pos", exportType: "xls" });
+  });
+}
+
+function printReportHarian() {
+  api("api/printReportHarian", {
+    params: {
+      pos_id: pos_id.value,
+      "dateRange[0]": dateRange.value[0],
+      "dateRange[1]": dateRange.value[1],
+    },
+  }).then((r) => {
+    ElMessage({
+      message: "SILAKAN AMBIL SLIP",
+      type: "success",
+    });
   });
 }
 </script>

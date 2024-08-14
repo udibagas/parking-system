@@ -330,7 +330,7 @@ class ReportController extends Controller
         return $data;
     }
 
-    public function printHarian(Request $request)
+    public function printReportHarian(Request $request)
     {
         $setting = Setting::first();
         $pos = Pos::find($request->pos_id);
