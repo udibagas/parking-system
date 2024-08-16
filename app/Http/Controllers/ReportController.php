@@ -392,9 +392,9 @@ class ReportController extends Controller
             $data = DB::query($query, [$date, $pos->id]);
             foreach ($data as $d) {
                 $printer->text(
-                    str_pad($d->shift, 15)
-                        . str_pad($d->petugas, 15)
-                        . str_pad(number_format($d->total, 0, ',', ','), 15)
+                    str_pad($d['shift'], 15)
+                        . str_pad($d['petugas'], 15)
+                        . str_pad(number_format($d['total'], 0, ',', ','), 15)
                 );
 
                 // get summary by jenis_kendaraan
@@ -426,22 +426,22 @@ class ReportController extends Controller
                     AND go.pos_id = ?
                 ";
 
-                $values = [$date, $d->user_id, $d->shift_id, $pos->id];
+                $values = [$date, $d['user_id'], $d['shift_id'], $pos->id];
                 $dataDetail = DB::query($query, $values);
                 $dataTotal = DB::query($queryTotal, $values);
 
                 foreach ($dataDetail as $dd) {
                     $printer->text(
-                        str_pad(" - " . $dd->jenis_kendaraan, 15)
-                            . str_pad($dd->jumlah, 15)
-                            . str_pad(number_format($dd->total, 0, ',', ','), 15)
+                        str_pad(" - " . $dd['jenis_kendaraan'], 15)
+                            . str_pad($dd['jumlah'], 15)
+                            . str_pad(number_format($dd['total'], 0, ',', ','), 15)
                     );
                 }
 
                 foreach ($dataTotal as $dt) {
                     $printer->text(
                         str_pad('TOTAL', 30)
-                            . str_pad(number_format($dt->total, 0, ',', ','), 15)
+                            . str_pad(number_format($dt['total'], 0, ',', ','), 15)
                     );
                 }
 
@@ -480,15 +480,15 @@ class ReportController extends Controller
 
             foreach ($dataAll as $da) {
                 $printer->text(
-                    str_pad(" - " . $da->shift, 30)
-                        . str_pad(number_format($da->total, 0, ',', ','), 15)
+                    str_pad(" - " . $da['shift'], 30)
+                        . str_pad(number_format($da['total'], 0, ',', ','), 15)
                 );
             }
 
             foreach ($dataSumAll as $ds) {
                 $printer->text(
                     str_pad("TOTAL", 30)
-                        . str_pad(number_format($ds->total, 0, ',', ','), 15)
+                        . str_pad(number_format($ds['total'], 0, ',', ','), 15)
                 );
             }
 
