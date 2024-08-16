@@ -387,6 +387,11 @@ class ReportController extends Controller
             WHERE
                 DATE(pt.time_out) = ?
                 AND go.pos_id = ?
+            GROUP BY
+                pt.user_id,
+                pt.shift_id,
+                shift,
+                petugas
             ";
 
             $data = DB::select($query, [$date, $pos->id]);
