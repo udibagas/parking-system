@@ -361,7 +361,7 @@ class ReportController extends Controller
 
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
-            $printer->text("LAPORAN HARIAN {$pos->nama}\n");
+            $printer->text("LAPORAN HARIAN\n");
             $printer->text($setting->nama_lokasi . "\n");
             $printer->text('POS: ' . $pos->nama . "\n");
             $printer->text('Tanggal: ' . date('d-m-Y', strtotime($date)));
