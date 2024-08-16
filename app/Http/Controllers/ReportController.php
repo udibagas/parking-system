@@ -362,11 +362,11 @@ class ReportController extends Controller
         try {
             $printer->setJustification(Printer::JUSTIFY_CENTER);
             $printer->text("LAPORAN HARIAN\n");
-            $printer->text($setting->nama_lokasi . "\n");
-            $printer->text('POS: ' . $pos->nama . "\n");
-            $printer->text('Tanggal: ' . date('d-m-Y', strtotime($date)));
-            $printer->text("\n\n");
+            $printer->text($setting->nama_lokasi . "\n\n");
             $printer->setJustification(Printer::JUSTIFY_LEFT);
+
+            $printer->text('POS     : ' . $pos->nama . "\n");
+            $printer->text('TANGGAL : ' . date('d-m-Y', strtotime($date)) . "\n\n");
 
             // kalau mintanya pakai range tinggal di looping berdasarkan date range
             // get summary by date, shift and operator
