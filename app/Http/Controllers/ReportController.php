@@ -464,7 +464,7 @@ class ReportController extends Controller
                 DATE(pt.time_out) = ?
                 AND go.pos_id = ?
             GROUP BY shift
-            ORDER BY s.id ASC
+            ORDER BY shift ASC
             ";
 
             $querySumAll = "SELECT SUM(tarif + denda) AS total
