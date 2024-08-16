@@ -404,7 +404,7 @@ class ReportController extends Controller
 
                 // get summary by jenis_kendaraan
                 $query = "SELECT
-                    jenis_kendaraan,
+                    pt.jenis_kendaraan,
                     COUNT(time_out) AS jumlah,
                     SUM(tarif + denda) AS total
                 FROM
@@ -416,7 +416,7 @@ class ReportController extends Controller
                     AND user_id = ?
                     AND shift_id = ?
                     AND go.pos_id = ?
-                GROUP BY jenis_kendaraan
+                GROUP BY pt.jenis_kendaraan
                 ";
 
                 $queryTotal = "SELECT
@@ -425,9 +425,9 @@ class ReportController extends Controller
                 JOIN gate_outs go ON
                     go.id = pt.gate_out_id
                 WHERE
-                    DATE(time_out) = ?
-                    AND user_id = ?
-                    AND shift_id = ?
+                    DATE(pt.time_out) = ?
+                    AND pt.user_id = ?
+                    AND pt.shift_id = ?
                     AND go.pos_id = ?
                 ";
 
@@ -473,7 +473,7 @@ class ReportController extends Controller
             JOIN gate_outs go ON
                 go.id = pt.gate_out_id
             WHERE
-                DATE(time_out) = ?
+                DATE(pt.time_out) = ?
                 AND go.pos_id = ?
             ";
 
