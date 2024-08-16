@@ -389,7 +389,7 @@ class ReportController extends Controller
                 AND go.pos_id = ?
             ";
 
-            $data = DB::query($query, [$date, $pos->id]);
+            $data = DB::select($query, [$date, $pos->id]);
             foreach ($data as $d) {
                 $printer->text(
                     str_pad($d['shift'], 15)
@@ -427,8 +427,8 @@ class ReportController extends Controller
                 ";
 
                 $values = [$date, $d['user_id'], $d['shift_id'], $pos->id];
-                $dataDetail = DB::query($query, $values);
-                $dataTotal = DB::query($queryTotal, $values);
+                $dataDetail = DB::select($query, $values);
+                $dataTotal = DB::select($queryTotal, $values);
 
                 foreach ($dataDetail as $dd) {
                     $printer->text(
@@ -475,8 +475,8 @@ class ReportController extends Controller
             ";
 
             $printer->text("\nTOTAL PENDAPATAN");
-            $dataAll = DB::query($queryAll, [$date, $pos->id]);
-            $dataSumAll = DB::query($querySumAll, [$date, $pos->id]);
+            $dataAll = DB::select($queryAll, [$date, $pos->id]);
+            $dataSumAll = DB::select($querySumAll, [$date, $pos->id]);
 
             foreach ($dataAll as $da) {
                 $printer->text(
