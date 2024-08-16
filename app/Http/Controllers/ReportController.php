@@ -398,7 +398,7 @@ class ReportController extends Controller
             foreach ($data as $d) {
                 $printer->text(
                     str_pad($d->shift, 15)
-                        . str_pad($d->petugas, 8)
+                        . str_pad($d->petugas, 10)
                         . str_pad(number_format($d->total, 0, ',', '.'), 20, ' ', STR_PAD_LEFT)
                         . "\n"
                 );
@@ -439,14 +439,14 @@ class ReportController extends Controller
                 foreach ($dataDetail as $dd) {
                     $printer->text(
                         str_pad(" - " . $dd->jenis_kendaraan, 15)
-                            . str_pad($dd->jumlah, 8)
+                            . str_pad($dd->jumlah, 10)
                             . str_pad(number_format($dd->total, 0, ',', '.'), 20, ' ', STR_PAD_LEFT)
                             . "\n"
                     );
                 }
 
                 $printer->text(
-                    str_pad('TOTAL', 23)
+                    str_pad('TOTAL', 25)
                         . str_pad(number_format($dataTotal->total, 0, ',', '.'), 20, ' ', STR_PAD_LEFT)
                         . "\n"
                 );
@@ -486,14 +486,14 @@ class ReportController extends Controller
 
             foreach ($dataAll as $da) {
                 $printer->text(
-                    str_pad(" - " . $da->shift, 23)
+                    str_pad(" - " . $da->shift, 25)
                         . str_pad(number_format($da->total, 0, ',', '.'), 20, ' ', STR_PAD_LEFT)
                         . "\n"
                 );
             }
 
             $printer->text(
-                str_pad("TOTAL", 23)
+                str_pad("TOTAL", 25)
                     . str_pad(number_format($dataSumAll->total, 0, ',', '.'), 20, ' ', STR_PAD_LEFT)
                     . "\n"
             );
