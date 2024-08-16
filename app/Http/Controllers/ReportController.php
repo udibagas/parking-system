@@ -480,7 +480,7 @@ class ReportController extends Controller
                 AND go.pos_id = ?
             ";
 
-            $printer->text("\nTOTAL PENDAPATAN");
+            $printer->text("\nTOTAL PENDAPATAN\n");
             $dataAll = DB::select($queryAll, [$date, $pos->id]);
             $dataSumAll = DB::selectOne($querySumAll, [$date, $pos->id]);
 
