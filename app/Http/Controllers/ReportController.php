@@ -428,7 +428,7 @@ class ReportController extends Controller
 
                 $values = [$date, $d['user_id'], $d['shift_id'], $pos->id];
                 $dataDetail = DB::select($query, $values);
-                $dataTotal = DB::select($queryTotal, $values);
+                $dataTotal = DB::selectOne($queryTotal, $values);
 
                 foreach ($dataDetail as $dd) {
                     $printer->text(
@@ -438,12 +438,10 @@ class ReportController extends Controller
                     );
                 }
 
-                foreach ($dataTotal as $dt) {
-                    $printer->text(
-                        str_pad('TOTAL', 30)
-                            . str_pad(number_format($dt['total'], 0, ',', ','), 15)
-                    );
-                }
+                $printer->text(
+                    str_pad('TOTAL', 30)
+                        . str_pad(number_format($dataTotal['total'], 0, ',', ','), 15)
+                );
 
                 $printer->text("\n");
             }
@@ -476,7 +474,7 @@ class ReportController extends Controller
 
             $printer->text("\nTOTAL PENDAPATAN");
             $dataAll = DB::select($queryAll, [$date, $pos->id]);
-            $dataSumAll = DB::select($querySumAll, [$date, $pos->id]);
+            $dataSumAll = DB::selectOne($querySumAll, [$date, $pos->id]);
 
             foreach ($dataAll as $da) {
                 $printer->text(
@@ -485,12 +483,10 @@ class ReportController extends Controller
                 );
             }
 
-            foreach ($dataSumAll as $ds) {
-                $printer->text(
-                    str_pad("TOTAL", 30)
-                        . str_pad(number_format($ds['total'], 0, ',', ','), 15)
-                );
-            }
+            $printer->text(
+                str_pad("TOTAL", 30)
+                    . str_pad(number_format($dataSumAll['total'], 0, ',', ','), 15)
+            );
 
             $printer->cut();
             $printer->close();
