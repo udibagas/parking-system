@@ -474,7 +474,22 @@ class ParkingTransactionController extends Controller
                 SUM(tarif) AS pendapatan
             FROM parking_transactions
             JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
-            WHERE time_out IS NOT NULL
+            WHERE nomor_barcode != 'xxxxx'
+                AND time_out IS NOT NULL
+                AND is_member = 0
+                AND operator = :operator
+                AND DATE(time_out) = :date
+                AND gate_outs.pos_id = :pos_id
+                AND tarif > 0
+            GROUP BY parking_transactions.jenis_kendaraan
+        ";
+
+        $sqlTiketHilang = "SELECT parking_transactions.jenis_kendaraan, COUNT(parking_transactions.id) AS jumlah,
+                SUM(tarif) AS pendapatan
+            FROM parking_transactions
+            JOIN gate_outs ON gate_outs.id = parking_transactions.gate_out_id
+            WHERE nomor_barcode = 'xxxxx'
+                AND time_out IS NOT NULL
                 AND is_member = 0
                 AND operator = :operator
                 AND DATE(time_out) = :date
@@ -534,6 +549,12 @@ class ParkingTransactionController extends Controller
         ";
 
         $pendapatanReguler = DB::select($sqlReguler, [
+            ':date' => $request->date,
+            ':operator' => $request->user()->name,
+            ':pos_id' => $request->pos_id
+        ]);
+
+        $pendapatanTiketHilang = DB::select($sqlTiketHilang, [
             ':date' => $request->date,
             ':operator' => $request->user()->name,
             ':pos_id' => $request->pos_id
@@ -627,6 +648,23 @@ class ParkingTransactionController extends Controller
             $printer->text(str_pad('SUB TOTAL', 15, ' ')
                 . str_pad($subTotalReguler['jumlah'], 5, ' ', STR_PAD_LEFT)
                 . str_pad(number_format($subTotalReguler['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n\n");
+
+            // TIKET HILANG SECTION
+            $printer->text("TIKET HILANG\n");
+            $subTotalTiketHilang = ['jumlah' => 0, 'pendapatan' => 0];
+
+            foreach ($pendapatanTiketHilang as $d) {
+                $subTotalTiketHilang['jumlah'] += $d->jumlah;
+                $subTotalTiketHilang['pendapatan'] += $d->pendapatan;
+
+                $printer->text(str_pad('-- ' . $d->jenis_kendaraan, 15, ' ')
+                    . str_pad($d->jumlah, 5, ' ', STR_PAD_LEFT)
+                    . str_pad(number_format($d->pendapatan, 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n");
+            }
+
+            $printer->text(str_pad('SUB TOTAL', 15, ' ')
+                . str_pad($subTotalTiketHilang['jumlah'], 5, ' ', STR_PAD_LEFT)
+                . str_pad(number_format($subTotalTiketHilang['pendapatan'], 0, ',', '.'), 15, ' ', STR_PAD_LEFT) . "\n\n");
 
 
             // DENDA SECTION
