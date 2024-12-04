@@ -17,7 +17,7 @@ sudo apt install -y \
     composer \
     sed
 
-git clone https://github.com/udibagas/parking-system.git
+git clone -b main --single-branch https://github.com/udibagas/parking-system.git
 sudo pip3 install python-escpos requests
 cd parking-system
 composer install
@@ -27,7 +27,7 @@ php artisan jwt:secret
 
 # prepare database server
 sudo mysql -uroot -e 'create database parking_system'
-sudo mysql -uroot -e 'grant all on parking_system.* to parking_system@localhost identified with mysql_native_password by Bismillah1@#$%"'
+sudo mysql -uroot -e 'grant all on parking_system.* to parking_system@localhost identified with mysql_native_password by "Bismillah1@#$%"'
 sudo mysql -uroot -e 'flush privileges'
 
 # migrate then populate db
@@ -50,11 +50,11 @@ sudo usermod -a -G root www-data
 sudo usermod -a -G lp www-data
 sudo systemctl restart apache2
 
-# upstart
-chmod +x parking
-sed -i "4 a DAEMON=`pwd`/parking.py" parking
-sudo cp parking /etc/init.d/
-chown root:root /etc/init.d/parking
-sudo cp parking.conf /etc/init/
-chown root:root /etc/init/parking.conf
-reboot
+# systemd
+sudo mv *.service /etc/systemd/system
+# sesuaikan script-nya
+
+crontab -e
+# * * * * * cd parking-system && php artisan schedule:run >> /dev/null 2>&1
+
+
