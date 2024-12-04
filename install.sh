@@ -23,7 +23,7 @@ cd parking-system
 composer install
 cp .env-prod .env
 php artisan key:generate
-php artisan jwt:secret
+php artisan storage:link
 
 # prepare database server
 sudo mysql -uroot -e 'create database parking_system'
@@ -34,20 +34,10 @@ sudo mysql -uroot -e 'flush privileges'
 php artisan migrate
 php artisan db:seed
 
-# prepare document root
-sudo mv /var/www/html /var/www/html-bak
-sudo ln -s `pwd`/public /var/www/html
-mkdir `pwd`/public/snapshot
-chmod 777 `pwd`/public/snapshot
-sudo chmod 777 storage -R
-
 # prepare web server
 sudo sed -i 172s/None/All/ /etc/apache2/apache2.conf
+# set apache2 user as server/parking
 sudo a2enmod rewrite
-# allow web to access serial & printer
-sudo usermod -a -G dialout www-data
-sudo usermod -a -G root www-data
-sudo usermod -a -G lp www-data
 sudo systemctl restart apache2
 
 # systemd
@@ -56,5 +46,8 @@ sudo mv *.service /etc/systemd/system
 
 crontab -e
 # * * * * * cd parking-system && php artisan schedule:run >> /dev/null 2>&1
+
+crontab -e (as root)
+@daily echo "" > /var/log/parking.log
 
 
