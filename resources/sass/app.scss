@@ -1,0 +1,26 @@
+@import "~tailwindcss/base";
+
+@import "~tailwindcss/components";
+
+@import "~tailwindcss/utilities";
+
+@font-face {
+    font-family: "MyriadMM";
+    src: url("../assets/fonts/MyriadMM.ttf");
+}
+
+* {
+    font-family: "MyriadMM", sans-serif;
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    font-family: "MyriadMM", sans-serif;
+    min-height: 100%;
+    color: #505050;
+    margin: 0;
+    padding: 0;
+}

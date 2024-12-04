@@ -1,0 +1,13 @@
+[Unit]
+Description=Websocket service
+Requires=network.target
+
+[Service]
+User=parking
+WorkingDirectory=/home/parking/parking-system
+ExecStart=/usr/bin/php artisan reverb:start
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

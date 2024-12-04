@@ -1,0 +1,12 @@
+[Unit]
+Description=UHF Reader Service
+Requires=network.target
+
+[Service]
+User=root
+ExecStart=/home/parking/parking-system/uhf-reader.py
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

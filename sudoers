@@ -1,0 +1,8 @@
+%www-data ALL=NOPASSWD: /bin/systemctl start parking
+%www-data ALL=NOPASSWD: /bin/systemctl stop parking
+%www-data ALL=NOPASSWD: /bin/systemctl restart parking
+%www-data ALL=NOPASSWD: /bin/systemctl status parking
+%www-data ALL=NOPASSWD: /bin/systemctl start uhf-reader
+%www-data ALL=NOPASSWD: /bin/systemctl stop uhf-reader
+%www-data ALL=NOPASSWD: /bin/systemctl restart uhf-reader
+%www-data ALL=NOPASSWD: /bin/systemctl status uhf-reader

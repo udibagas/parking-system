@@ -1,0 +1,314 @@
+Protocol PCLess Interface
+header = char 0xA6 / char 166
+Footer = char 0xA9 / char 169
+Semua paket data selalu diawali dengan header dan diakhiri dengan footer, baik command maupun response
+
+Command ke device:
+O1N = relay 1 on
+response : OUT1ONOK
+
+O2N = relay 2 on
+response : OUT2ONOK
+
+OUT3ON = relay 3 on
+response : OUT3ONOK
+
+OUT4ON = relay 4 on
+response : OUT4ONOK
+
+OUT1OFF = relay 1 off
+response : OUT1OFFOK
+
+OUT2OFF = relay 2 off
+response : OUT2OFFOK
+
+OUT3OFF = relay 3 off
+response : OUT3OFFOK
+
+OUT4OFF = relay 4 off
+response : OUT4OFFOK
+
+OPEN1 = relay 2 off, relay 3 off, relay 1 on 1 detik, lalu off
+response : OPEN1OK
+
+CLOSE1 = relay 1 off, relay 3 off, relay 2 on 1 detik, lalu off
+response : CLOSE1OK
+
+STOP1 = relay 1 off, relay 2 off, relay 3 on 1 detik, lalu off
+response : STOP1OK
+
+OPEN2 = relay 1 on, relay 2 off
+response : OPEN2OK
+
+CLOSE2 = relay 2 on, relay 1 off
+response : CLOSE2OK
+
+STOP2 = relay 1 off, relay 2 off
+response : STOP2OK
+
+PING = mengecek apakah device berfungsi atau tidak. Jika tidak ada respon, maka ada problem pada device atau koneksi
+response : PINGOK
+
+STAT = mengecek status input dan output
+response : STATabcdefgh
+a = 1 jika input 1 on, a = 0 jika input 1 off
+b = 1 jika input 2 on, a = 0 jika input 2 off
+c = 1 jika input 3 on, a = 0 jika input 3 off
+d = 1 jika input 4 on, a = 0 jika input 4 off
+e = 1 jika output 1 on, a = 0 jika output 1 off
+f = 1 jika output 2 on, a = 0 jika output 2 off
+g = 1 jika output 3 on, a = 0 jika output 3 off
+h = 1 jika output 4 on, a = 0 jika output 4 off
+
+TRIG1 = relay 1 on 1 detik, lalu off
+response : TRIG1OK
+
+TRIG2 = relay 2 on 1 detik, lalu off
+response : TRIG2OK
+
+TRIG3 = relay 3 on 1 detik, lalu off
+response : TRIG3OK
+
+TRIG4 = relay 4 on 1 detik, lalu off
+response : TRIG4OK
+
+MTxxxxx = play track MP3 nomor xxxxx
+xxxxx = 5 digit nomor track
+response : MTOK
+apabila track MP3 valid, setelah selesai play, device mengirimkan response : PLAYEND
+apabila track MP3 tidak valid, device mengirimkan response : NOTRACK
+
+MS = stop play track MP3
+response : MS
+
+PRxyyyyyyy = kirim data ke printer serial (baud rate tergantung nilai x, data bit 8, stop bit 1, parity none)
+x = baud rate
+x = 0, baud 1200
+x = 1, baud 2400
+x = 2, baud 4800
+x = 3, baud 9600
+x = 4, baud 19200
+x = 5, baud 38400
+yyyyy = data yang akan dikirim ke printer, max 1024 byte (1Kb)
+response : PROK
+
+DSyyyyyy = kirim data ke external display
+yyyyy = data yang dikirim
+response : DSOK 
+
+
+Data dari device:
+PTxxxxx = printer serial mengirimkan response
+xxxxx = data dari printer serial
+
+Wxxxxxx = ada data kartu wiegand
+xxxxxx = 6 digit atau 8 digit data kartu RFID wiegand
+6 digit untuk wiegand-26, 8 digit untuk wiegand-34 (auto detect)
+
+header = char 0xA6 / char 166
+Footer = char 0xA9 / char 169
+Semua paket data selalu diawali dengan header dan diakhiri dengan footer, baik command maupun response
+
+jika input 1 berubah status dari OFF menjadi ON, interface akan mengirimkan data IN1ON
+jika input 1 berubah status dari ON menjadi OFF, interface akan mengirimkan data IN1OFF
+jika input 2 berubah status dari OFF menjadi ON, interface akan mengirimkan data IN2ON
+jika input 2 berubah status dari ON menjadi OFF, interface akan mengirimkan data IN2OFF
+jika input 3 berubah status dari OFF menjadi ON, interface akan mengirimkan data IN3ON
+jika input 3 berubah status dari ON menjadi OFF, interface akan mengirimkan data IN3OFF
+jika input 4 berubah status dari OFF menjadi ON, interface akan mengirimkan data IN4ON
+jika input 4 berubah status dari ON menjadi OFF, interface akan mengirimkan data IN4OFF
+jika interface menerima data valid dari card reader Wiegand-26/34 (auto detect), maka interface akan mengirimkan data Waaaaaaaa
+aaaaaaaa = 8/10 digit desimal data nomor UID kartu RFID
+(8 digit untuk Wiegand 26, 10 digit untuk Wiegand 34)
+
+Install the following package by entering:
+sudo apt-get install libgconf-2-4
+
+Add yourself to the "dialout" group:
+sudo usermod -a -G dialout $USER
+
+Create a rule file to automatically enable permissions when Palette™/P+™ is connected:
+sudo nano /etc/udev/rules.d/50-local.rules
+
+Paste this line in the file you just created:
+ACTION=="add", ATTRS{idProduct}=="0042", ATTRS{idVendor}=="2341", DRIVERS=="usb", RUN+="chmod a+rw /dev/ttyACM0"
+/etc/init.d/udev restart
+
+Press Control-O and then Control-X to save the file and exit.
+
+=====================================================================
+
+Struktur protocol : header - DS - Command+Data - footer
+header = char(166)
+footer = char(169)
+DS = memerintahkan PCLess untuk kirim data ke port External display
+
+Command :
+Dabccddxxxxxx|effggyyyyyyyy = menampilkan text pada baris 1 dan / atau baris 2
+
+a : brightness, nilai antara 0 s.d. 9
+b : mode baris 1
+b = 0, tampilan baris 1 tidak diupdate
+b = 1. text baris 1 tampil normal
+b = 2, text baris 1 blinking
+b = 3, baris 1 menampilkan waktu
+b = 4, baris 1 menampilkan tanggal
+cc = bernilai antara 01 s.d. 99, durasi blinking text baris 1
+dd = bernilai antara 01 s.d. 99, speed running text baris 1
+xxxxxxxx = text baris 1, max 100 karakter
+NB : text baris 1 akan otomatis running jika jumlah karakter melebihi 10
+| = separator
+e : mode baris 2
+e = 0, tampilan baris 2 tidak diupdate
+e = 1. text baris 2 tampil normal
+e = 2, text baris 2 blinking
+e = 3, baris 1 menampilkan waktu
+e = 4, baris 1 menampilkan tanggal
+ff = bernilai antara 01 s.d. 99, durasi blinking text baris 2
+gg = bernilai antara 01 s.d. 99, speed running text baris 2
+yyyyyyyyy = text baris 2, max 100 karakter
+NB : text baris 2 akan otomatis running jika jumlah karakter melebihi 10
+text baris 1 dan baris 2 yang diupdate menggunakan command D, tidak disave pada memory
+
+Command :
+Tabccddxxxxxx|effggyyyyyyyy = menyimpan text baris 1 dan / atau baris 2 pada memory
+command ini sama persis dengan command D, bedanya text disimpan pada memory dan tidak ditampilkan
+
+Command :
+U = menampilkan text yang disimpan pada memory menggunakan command T
+
+Command :
+AhhmmssDDMMYY = mengeset tanggal dan waktu
+hh = 2 digit jam
+mm = 2 digit menit
+ss = 2 digit detik
+DD = 2 digit tanggal
+MM = 2 digit bulan
+YY = 2 digit tahun
+
+* * * * * www-data cd /home/server/apps/parking-system && php artisan schedule:run >> /dev/null 2>&1
+
+ISSUE:
+
+- jumlah kendaraan masih terparkir masih salah
+- perhitungan kapasitas masih salah. masih bisa di minus di report
+- chart di report
+
+=========================
+
+controller baru
+
+Protocol Interface Serial/USB
+
+Serial settings :
+Baud rate 9600 bps
+data bit 8
+stop bit 1
+parity none
+RTS CTS disabled
+DTR DSR disabled
+flowcontrol none
+
+Command :
+1. *OUT1ON#
+mengaktifkan output 1
+response : *OUT1ONOK#
+
+2. *OUT2ON#
+mengaktifkan output 2
+response : *OUT2ONOK#
+
+3. *OUT3ON#
+mengaktifkan output 3
+response : *OUT3ONOK#
+
+4. *OUT4ON#
+mengaktifkan output 4
+response : *OUT4ONOK#
+
+6. *OUT1OFF#
+menonaktifkan output 1
+response : *OUT1OFFOK#
+
+7. *OUT2OFF#
+menonaktifkan output 2
+response : *OUT2OFFOK#
+
+8. *OUT3OFF#
+menonaktifkan output 3
+response : *OUT3OFFOK#
+
+9. *OUT4OFF#
+menonaktifkan output 4
+response : *OUT4OFFOK#
+
+11. *OPEN1#
+mengaktifkan output 1 selama 1 detik, kemudian output 1 off
+response : *OPEN1OK#
+
+12. *CLOSE1#
+mengaktifkan output 2 selama 1 detik, kemudian output 2 off
+response : *CLOSE1OK#
+
+13. *STOP1#
+mengaktifkan output 3 selama 1 detik, kemudian output 3 off
+response : *STOP1OK#
+
+14. *OPEN2#
+mengaktifkan output 1 dan menonaktifkan output 2
+response : *OPEN2OK#
+
+15. *CLOSE2#
+mengaktifkan output 2 dan menonaktifkan output 1
+response : *CLOSE2OK#
+
+16. *STOP2#
+menonaktifkan output 1 dan output 2
+response : *STOP2OK#
+
+17. *PING#
+mengecek apakah interface aktif
+response : *PINGOK#
+
+18. *STAT#
+meminta status semua input dan semua output saat ini
+response : *STATabcdefghi#
+a = 1 jika input 1 ON, a = 0 jika input 1 OFF
+b = 1 jika input 2 ON, a = 0 jika input 2 OFF
+c = 1 jika input 3 ON, a = 0 jika input 3 OFF
+d = 1 jika input 4 ON, a = 0 jika input 4 OFF
+e = 1 jika output 1 ON, a = 0 jika output 1 OFF
+f = 1 jika output 2 ON, a = 0 jika output 2 OFF
+g = 1 jika output 3 ON, a = 0 jika output 3 OFF
+h = 1 jika output 4 ON, a = 0 jika output 4 OFF
+i = 1 jika output 5 ON, a = 0 jika output 5 OFF
+
+19. *TRIG1#
+mengaktifkan output 1 selama 1 detik, kemudian output 1 off
+
+20. *TRIG2#
+mengaktifkan output 2 selama 1 detik, kemudian output 2 off
+
+21. *TRIG3#
+mengaktifkan output 3 selama 1 detik, kemudian output 3 off
+
+22. *TRIG4#
+mengaktifkan output 4 selama 1 detik, kemudian output 4 off
+
+Saat interface dinyalakan pertama kali, interface akan mengirimkan data *POWERON#
+jika input 1 berubah status dari OFF menjadi ON, interface akan mengirimkan data *IN1ON#
+jika input 1 berubah status dari ON menjadi OFF, interface akan mengirimkan data *IN1OFF#
+jika input 2 berubah status dari OFF menjadi ON, interface akan mengirimkan data *IN2ON#
+jika input 2 berubah status dari ON menjadi OFF, interface akan mengirimkan data *IN2OFF#
+jika input 3 berubah status dari OFF menjadi ON, interface akan mengirimkan data *IN3ON#
+jika input 3 berubah status dari ON menjadi OFF, interface akan mengirimkan data *IN3OFF#
+jika input 4 berubah status dari OFF menjadi ON, interface akan mengirimkan data *IN4ON#
+jika input 4 berubah status dari ON menjadi OFF, interface akan mengirimkan data *IN4OFF#
+jika interface menerima data valid dari card reader Wiegand-26/34 (auto detect), maka interface akan mengirimkan data *Waaaaaaaa# (channel 1)
+*Xaaaaaaaa# (channel 2)
+aaaaaaaa = 8/10 digit desimal data nomor UID kartu RFID
+(8 digit untuk Wiegand 26, 10 digit untuk Wiegand 34)
+
+
+
+
