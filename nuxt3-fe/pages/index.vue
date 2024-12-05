@@ -198,7 +198,6 @@
         <img :src="s.url" style="height: 194px; border: 1px solid #aaa" />
       </div>
     </div>
-
     <TransactionFormBukaManual
       :show="showManualOpenForm"
       @close="showManualOpenForm = false"
@@ -369,6 +368,7 @@ const hitungTarif = () => {
 
   // mode menginap lewat tengah malam
   if (tarif.mode_menginap == 1) {
+    console.log("Masuk logic menginap tengah malam");
     let hariIn = moment(timeIn.format("YYYY-MM-DD"));
     let hariOut = moment(timeOut.format("YYYY-MM-DD"));
     hariParkir = 0;
@@ -378,6 +378,8 @@ const hitungTarif = () => {
     } else {
       hariParkir = 1;
     }
+
+    console.log("hariParkir =", hariParkir);
   }
 
   let hariMenginap = hariParkir >= 1 ? hariParkir - 1 : 0;
@@ -391,6 +393,7 @@ const hitungTarif = () => {
 
   // tarif progresif
   if (tarif.mode_tarif == 1) {
+    console.log("Masuk logic tarif progresif");
     let tarifMaksimum = hariMenginap * tarif.tarif_maksimum;
 
     // menginap 24 jam
@@ -416,8 +419,9 @@ const hitungTarif = () => {
       formModel.tarif = tarifMaksimum + tarifHariTerakhir + tarifMenginap;
     }
 
-    // menginap lewat lengahmalam
+    // menginap lewat lengah malam
     if (tarif.mode_menginap == 1) {
+      console.log("Progresif tengah malam");
       if (hariParkir > 1) {
         let menitHariPertama =
           moment(timeIn.format("YYYY-MM-DD") + " 24:00:00").diff(
@@ -456,6 +460,7 @@ const hitungTarif = () => {
           tarifHariTerakhir +
           tarifMenginap;
       } else {
+        console.log("Hari parkir cuma sehari");
         tarifHariPertama =
           Math.ceil(durasiReal / tarif.menit_selanjutnya) *
           tarif.tarif_menit_selanjutnya;
@@ -465,6 +470,7 @@ const hitungTarif = () => {
         }
 
         formModel.tarif = tarifMenitPertama + tarifHariPertama;
+        console.log("Tarif =", formModel.tarif);
       }
     }
   }
