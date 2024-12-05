@@ -467,7 +467,7 @@ const hitungTarif = () => {
           tarifMenginap;
       } else {
         console.log("Hari parkir cuma sehari");
-        tarifHariPertama =
+        let tarifHariPertama =
           Math.ceil(durasiReal / tarif.menit_selanjutnya) *
           tarif.tarif_menit_selanjutnya;
 
