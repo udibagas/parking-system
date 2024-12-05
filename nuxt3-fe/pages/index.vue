@@ -80,7 +80,7 @@
             @keyup.enter="toGateIn"
             @change="hitungTarif"
             id="time-in"
-            v-mask="'####-##-## ##:##'"
+            v-mask="'####-##-## ##:##:##'"
             v-model="formModel.time_in"
             class="my-input"
           />
@@ -340,10 +340,16 @@ const hitungTarif = () => {
   }
 
   let timeIn = moment(formModel.time_in);
+  console.log(formModel.time_in);
+  console.log("timeIn", timeIn);
   let timeOut = formModel.time_out ? moment(formModel.time_out) : moment();
-  let durasiMenit = timeOut.diff(timeIn, "minutes") || 1;
+  console.log("timeOut", timeOut);
+  let durasiMenit = timeOut.diff(timeIn, "minutes");
 
   let tarifMenitPertama = tarif.tarif_menit_pertama;
+
+  console.log("durasiMenit", durasiMenit);
+  console.log("tarifMenitPertama", tarifMenitPertama);
 
   // tak peduli flat atau progressif berlaku seperti ini
   if (durasiMenit <= tarif.menit_pertama) {
@@ -527,10 +533,11 @@ const cekTiket = async () => {
     });
 
     snapshots.value = data.snapshots;
-    const { id, gate_in_id, is_member, member } = data;
+    const { id, gate_in_id, is_member, member, time_in } = data;
     formModel.id = id;
     formModel.gate_in_id = gate_in_id;
     formModel.is_member = is_member;
+    formModel.time_in = time_in;
     formModel.time_out = now;
     formModel.tarif = 0;
 
