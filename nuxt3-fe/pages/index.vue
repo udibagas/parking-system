@@ -340,16 +340,10 @@ const hitungTarif = () => {
   }
 
   let timeIn = moment(formModel.time_in);
-  console.log(formModel.time_in);
-  console.log("timeIn", timeIn);
   let timeOut = formModel.time_out ? moment(formModel.time_out) : moment();
-  console.log("timeOut", timeOut);
   let durasiMenit = timeOut.diff(timeIn, "minutes");
 
   let tarifMenitPertama = tarif.tarif_menit_pertama;
-
-  console.log("durasiMenit", durasiMenit);
-  console.log("tarifMenitPertama", tarifMenitPertama);
 
   // tak peduli flat atau progressif berlaku seperti ini
   if (durasiMenit <= tarif.menit_pertama) {
@@ -374,7 +368,6 @@ const hitungTarif = () => {
 
   // mode menginap lewat tengah malam
   if (tarif.mode_menginap == 1) {
-    console.log("Masuk logic menginap tengah malam");
     let hariIn = moment(timeIn.format("YYYY-MM-DD"));
     let hariOut = moment(timeOut.format("YYYY-MM-DD"));
     hariParkir = 0;
@@ -384,9 +377,9 @@ const hitungTarif = () => {
     } else {
       hariParkir = 1;
     }
-
-    console.log("hariParkir =", hariParkir);
   }
+
+  console.log("hariParkir =", hariParkir);
 
   let hariMenginap = hariParkir >= 1 ? hariParkir - 1 : 0;
   let tarifMenginap = hariMenginap * tarif.tarif_menginap;
@@ -466,7 +459,6 @@ const hitungTarif = () => {
           tarifHariTerakhir +
           tarifMenginap;
       } else {
-        console.log("Hari parkir cuma sehari");
         let tarifHariPertama =
           Math.ceil(durasiReal / tarif.menit_selanjutnya) *
           tarif.tarif_menit_selanjutnya;
