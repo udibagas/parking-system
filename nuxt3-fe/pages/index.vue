@@ -420,7 +420,6 @@ const hitungTarif = () => {
 
     // menginap lewat lengah malam
     if (tarif.mode_menginap == 1) {
-      console.log("Progresif tengah malam");
       if (hariParkir > 1) {
         let menitHariPertama =
           moment(timeIn.format("YYYY-MM-DD") + " 24:00:00").diff(
@@ -436,7 +435,7 @@ const hitungTarif = () => {
         let tarifHariPertama =
           Math.ceil(menitHariPertama / tarif.menit_selanjutnya) *
           tarif.tarif_menit_selanjutnya;
-        tarifHariTerakhir =
+        let tarifHariTerakhir =
           Math.ceil(menitHariTerakhir / tarif.menit_selanjutnya) *
           tarif.tarif_menit_selanjutnya;
 
@@ -448,9 +447,8 @@ const hitungTarif = () => {
           tarifHariTerakhir = tarif.tarif_maksimum;
         }
 
-        if (hariParkir <= 2) {
-          tarifMaksimum = 0;
-        }
+        tarifMaksimum =
+          hariParkir <= 2 ? 0 : (hariParkir - 2) * tarif.tarif_maksimum;
 
         formModel.tarif =
           tarifMenitPertama +
@@ -458,6 +456,13 @@ const hitungTarif = () => {
           tarifHariPertama +
           tarifHariTerakhir +
           tarifMenginap;
+
+        console.log("tarifMenitPertama =", tarifMenitPertama);
+        console.log("tarifMaksimum =", tarifMaksimum);
+        console.log("tarifHariPertama =", tarifHariPertama);
+        console.log("tarifHariTerakhir =", tarifHariTerakhir);
+        console.log("tarifMenginap =", tarifMenginap);
+        console.log("formModel.tarif =", formModel.tarif);
       } else {
         let tarifHariPertama =
           Math.ceil(durasiReal / tarif.menit_selanjutnya) *
