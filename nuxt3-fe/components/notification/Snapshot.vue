@@ -79,9 +79,8 @@ const deleteSnapshot = () => {
     .catch((e) => console.log(e));
 };
 
-const onNodeClick = ({ isFile, url }) => {
-  console.log(isFile, url);
-  if (isFile) {
+const onNodeClick = ({ isLeaf, url }) => {
+  if (isLeaf) {
     imageURL.value = url;
   }
 };

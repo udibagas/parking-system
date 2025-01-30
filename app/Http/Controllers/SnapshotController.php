@@ -15,12 +15,12 @@ class SnapshotController extends Controller
 
         return array_map(function ($node) {
             $nodes  = explode('/', $node);
-            $isFile = strpos($node, '.') !== false;
+            $isLeaf = strpos($node, '.') !== false;
 
             return [
                 'label'     => $nodes[count($nodes) - 1],
                 'path'      => $node,
-                'isFile'    => $isFile,
+                'isLeaf'    => $isLeaf,
                 'url'       => url(Storage::url($node))
             ];
         }, array_merge($dirs, $files));
@@ -31,7 +31,7 @@ class SnapshotController extends Controller
         $request->validate(['checkedNodes' => 'required']);
 
         foreach ($request->checkedNodes as $node) {
-            if ($node['isFile']) {
+            if ($node['isLeaf']) {
                 Storage::delete($node['path']);
                 Snapshot::where('path', $node['path'])->delete();
             } else {
