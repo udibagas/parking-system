@@ -51,7 +51,7 @@ onUnmounted(() => {
   color: white;
   padding: 15px;
   font-family: monospace;
-  font-size: 1rem;
+  font-size: 0.8rem;
   overflow: auto;
 }
 </style>
