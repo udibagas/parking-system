@@ -6,7 +6,7 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 DROP TABLE IF EXISTS `absensi_operators`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `absensi_operators` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint unsigned NOT NULL,
@@ -19,7 +19,7 @@ CREATE TABLE `absensi_operators` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `area_parkirs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `area_parkirs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -32,9 +32,24 @@ CREATE TABLE `area_parkirs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+DROP TABLE IF EXISTS `failed_jobs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `failed_jobs` (
+  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+  `uuid` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
+  `connection` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `queue` text COLLATE utf8mb4_unicode_ci NOT NULL,
+  `payload` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `exception` longtext COLLATE utf8mb4_unicode_ci NOT NULL,
+  `failed_at` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `failed_jobs_uuid_unique` (`uuid`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `gate_ins`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gate_ins` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -52,7 +67,7 @@ CREATE TABLE `gate_ins` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `gate_outs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `gate_outs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `shortcut_key` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -76,7 +91,7 @@ CREATE TABLE `gate_outs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `group_members`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `group_members` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -91,7 +106,7 @@ CREATE TABLE `group_members` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `jenis_kendaraans`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `jenis_kendaraans` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -116,7 +131,7 @@ CREATE TABLE `jenis_kendaraans` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `jobs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `jobs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `queue` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -131,7 +146,7 @@ CREATE TABLE `jobs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `kameras`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `kameras` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -142,12 +157,13 @@ CREATE TABLE `kameras` (
   `status` tinyint(1) NOT NULL DEFAULT '0',
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
+  `streaming_url` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `manual_open_logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `manual_open_logs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `gate_out_id` bigint NOT NULL,
@@ -161,7 +177,7 @@ CREATE TABLE `manual_open_logs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `member_renewals`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `member_renewals` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `member_id` bigint NOT NULL,
@@ -178,7 +194,7 @@ CREATE TABLE `member_renewals` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `member_vehicles`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `member_vehicles` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `member_id` bigint NOT NULL,
@@ -195,7 +211,7 @@ CREATE TABLE `member_vehicles` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `members`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `members` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -222,7 +238,7 @@ CREATE TABLE `members` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `migrations`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `migrations` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `migration` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -232,7 +248,7 @@ CREATE TABLE `migrations` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `notifications`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `notifications` (
   `id` char(36) COLLATE utf8mb4_unicode_ci NOT NULL,
   `type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -248,7 +264,7 @@ CREATE TABLE `notifications` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `parking_transactions`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `parking_transactions` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `is_member` tinyint(1) NOT NULL DEFAULT '0',
@@ -278,7 +294,7 @@ CREATE TABLE `parking_transactions` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `personal_access_tokens`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `personal_access_tokens` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `tokenable_type` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -297,7 +313,7 @@ CREATE TABLE `personal_access_tokens` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pos` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -310,7 +326,7 @@ CREATE TABLE `pos` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `printers`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `printers` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `nama` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -324,7 +340,7 @@ CREATE TABLE `printers` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pulse_aggregates`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pulse_aggregates` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `bucket` int unsigned NOT NULL,
@@ -344,7 +360,7 @@ CREATE TABLE `pulse_aggregates` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pulse_entries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pulse_entries` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `timestamp` int unsigned NOT NULL,
@@ -361,7 +377,7 @@ CREATE TABLE `pulse_entries` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `pulse_values`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `pulse_values` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `timestamp` int unsigned NOT NULL,
@@ -377,7 +393,7 @@ CREATE TABLE `pulse_values` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `settings`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `settings` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `jml_kendaraan_per_kartu` int NOT NULL DEFAULT '0',
@@ -394,14 +410,13 @@ CREATE TABLE `settings` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   `id_pelanggan` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
-  `server_address` varchar(45) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   `orientasi_kamera` varchar(255) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `shifts`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `shifts` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `mulai` time NOT NULL,
@@ -414,7 +429,7 @@ CREATE TABLE `shifts` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `snapshots`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `snapshots` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `parking_transaction_id` bigint unsigned NOT NULL,
@@ -431,7 +446,7 @@ CREATE TABLE `snapshots` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `user_logs`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `user_logs` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `user_id` bigint NOT NULL,
@@ -443,7 +458,7 @@ CREATE TABLE `user_logs` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `users`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `users` (
   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -462,7 +477,7 @@ CREATE TABLE `users` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 DROP TABLE IF EXISTS `websockets_statistics_entries`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
+/*!40101 SET character_set_client = utf8 */;
 CREATE TABLE `websockets_statistics_entries` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `app_id` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL,
@@ -508,8 +523,9 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (24,'2021_08_23_103
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (25,'2021_08_30_105826_add_uhf_reader_on_gate',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (26,'2021_09_21_215709_add_id_pelanggan_on_settings',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (27,'2021_09_22_131208_add_group_on_vehcle_list',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (28,'2021_09_22_132638_add_server_address_on_settings',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (29,'2021_09_24_110124_create_absensi_operators_table',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (30,'2021_10_09_102310_add_last_sync_on_jenis_kendaraan',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (31,'2021_11_26_163010_add_camera_orientation_on_setting',1);
-INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (32,'2023_06_07_000001_create_pulse_tables',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (28,'2021_09_24_110124_create_absensi_operators_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (29,'2021_10_09_102310_add_last_sync_on_jenis_kendaraan',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (30,'2021_11_26_163010_add_camera_orientation_on_setting',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (31,'2023_06_07_000001_create_pulse_tables',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (32,'2024_06_03_144949_create_failed_jobs_table',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (33,'2024_08_05_165649_add_stream_url_on_kamera',1);
