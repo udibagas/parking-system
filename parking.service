@@ -1,15 +1,11 @@
-# taruh di /etc/systemd/system
-# systemctl daemon-reload
-# systemctl enable parking
-# systemctl start parking
-
 [Unit]
 Description=Parking controller service
 Requires=network.target
 
 [Service]
-User=root
-ExecStart=/home/parking/parking-system/parking.py
+User=parking
+WorkingDirectory=/home/parking/parking-system/gate-controller
+ExecStart=/usr/local/bin/node app.js
 Restart=always
 RestartSec=3
 
