@@ -20,7 +20,6 @@ class Setting extends Model
         'hapus_transaksi_dalam_hari',
         'orientasi_kamera',
         'id_pelanggan',
-        'server_address'
     ];
 
     protected $casts = ['disable_plat_nomor' => 'boolean'];

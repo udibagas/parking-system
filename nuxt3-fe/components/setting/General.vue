@@ -158,16 +158,6 @@
           </el-form-item>
 
           <el-form-item
-            label="Server Address"
-            :error="formErrors.server_address?.join(', ')"
-          >
-            <el-input
-              placeholder="Server Address"
-              v-model="formModel.server_address"
-            ></el-input>
-          </el-form-item>
-
-          <el-form-item
             label="ID Pelanggan"
             :error="formErrors.id_pelanggan?.join(', ')"
           >
