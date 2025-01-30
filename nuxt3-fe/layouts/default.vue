@@ -145,11 +145,13 @@ onBeforeMount(async () => {
   await store.getJenisKendaraanList();
 });
 
+const host = window.location.host.split(":")[0];
+
 onMounted(() => {
   echo.value = new Echo({
     broadcaster: "reverb",
     key: "g2iix2c1zwlt3dgvo35h",
-    wsHost: store.server_address,
+    wsHost: host,
     wsPort: 8080,
     forceTLS: false,
     disableStats: true,
