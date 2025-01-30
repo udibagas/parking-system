@@ -1,52 +1,57 @@
 <template>
-  <div class="text-right mb-3">
-    <el-input
-      clearable
-      autofocus
-      size="small"
-      placeholder="Cari log"
-      style="width: 180px"
-      v-model="keyword"
-      :prefix-icon="Search"
-    ></el-input>
+  <div class="log-container">
+    <div v-for="(log, i) in logs" :key="i">
+      {{ moment(log.timestamp).format("YYYY-MM-DD HH:mm:ss") }}
+      [{{ log.level.toUpperCase() }}]
+      {{ log.message }}
+    </div>
   </div>
-  <div class="log-container" v-html="log"></div>
 </template>
 
 <script setup>
-import { Search } from "@element-plus/icons-vue";
+import moment from "moment";
 
-const api = useApi();
-const { url } = defineProps(["url"]);
-const log = ref("");
-const requestInterval = ref(null);
-const keyword = ref(null);
+const logs = ref([]);
+const socket = ref(null);
 
 onMounted(() => {
-  requestInterval.value = setInterval(getLog, 2000);
+  const host = window.location.host.split(":")[0];
+  const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+  const wsUrl = `${protocol}//${host}:8090`;
+  socket.value = new WebSocket(wsUrl);
+
+  socket.value.onmessage = (event) => {
+    logs.value.unshift(JSON.parse(event.data));
+  };
+
+  socket.value.onopen = () => {
+    console.log("WebSocket connection established!!!");
+  };
+
+  socket.value.onclose = () => {
+    console.log("WebSocket connection closed!!!");
+  };
+
+  socket.value.onerror = (error) => {
+    console.error("WebSocket error:", error.message);
+  };
 });
 
 onUnmounted(() => {
-  clearInterval(requestInterval.value);
+  if (socket.value) {
+    socket.value.close();
+  }
 });
-
-const getLog = () => {
-  const params = { keyword: keyword.value };
-
-  api(url, { params })
-    .then((response) => (log.value = response))
-    .catch((e) => console.log(e));
-};
 </script>
 
 <style scoped>
 .log-container {
-  height: calc(100vh - 225px);
+  height: calc(100vh - 185px);
   background: black;
   color: white;
   padding: 15px;
   font-family: monospace;
-  font-size: 0.9em;
+  font-size: 1rem;
   overflow: auto;
 }
 </style>
