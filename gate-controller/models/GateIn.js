@@ -1,11 +1,9 @@
 "use strict";
 const winston = require("winston");
-const Transport = require("winston-transport");
 const { default: axios } = require("axios");
 const moment = require("moment");
 
 const db = require("../config/db");
-const Card = require("./card");
 const Audio = require("./audio");
 const RunningText = require("./runningText");
 const MySocket = require("./mySocket");
@@ -132,13 +130,6 @@ class GateIn {
       this.state = "idle";
     }
 
-    // E-MONEY TAPPED
-    if (stringData.slice(0, 2) === "PT") {
-      logger.info(`${this.nama} E-Money detected`);
-      if (this.state === "idle") return;
-      await this.handleEMoney(data);
-    }
-
     // MEMBER CARD TAPPED
     if (stringData[0] === "W") {
       logger.info(`${this.nama}: Member Card detected`);
@@ -258,23 +249,6 @@ class GateIn {
       nomor_kartu: member.nomor_kartu,
       member_id: member.id,
     });
-  }
-
-  async handleEMoney(data) {
-    const card = Card.create(data);
-    logger.info(`${this.nama}: ${card}`);
-
-    if (card.invalidCardNumber) {
-      logger.error(`${this.nama}: Invalid card number`);
-      return;
-    }
-
-    if (card.insufficientBalance) {
-      logger.error(`${this.nama}: Saldo kosong`);
-      return;
-    }
-
-    this.proceed({ nomor_kartu: card.number, is_member: 0 });
   }
 }
 
