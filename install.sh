@@ -46,8 +46,3 @@ sudo mv *.service /etc/systemd/system
 
 crontab -e
 # * * * * * cd parking-system && php artisan schedule:run >> /dev/null 2>&1
-
-crontab -e (as root)
-@daily echo "" > /var/log/parking.log
-
-
