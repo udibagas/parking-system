@@ -49,6 +49,7 @@ class GateIn {
     this.uhf_active = uhf_active;
     this.state = "idle";
     this.socket = new MySocket();
+    this.socket.setKeepAlive(true, 10000);
     this.audio = new Audio(this.socket);
     this.runningText = new RunningText(this.socket);
   }

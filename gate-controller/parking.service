@@ -1,6 +1,7 @@
 [Unit]
 Description=Parking controller service
-Requires=network.target
+After=mysql.service network.target
+Requires=mysql.service network.target
 
 [Service]
 User=parking
